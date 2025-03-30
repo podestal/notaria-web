@@ -24,28 +24,28 @@ const Login = () => {
           action="validar_usuario.php"
         >
           <div className="mb-4 w-[65%] grid grid-cols-3 justify-items-center place-content-start gap-4">
-            <label htmlFor="usuario" className="font-semibold block text-gray-700 italic font-calibri">
+            <label htmlFor="usuario" className="mt-1 font-semibold block text-gray-700 italic font-calibri">
               Usuario
             </label>
             <input
                 type="text"
                 id="usuario"
                 name="usuario"
-                className="w-full border rounded mt-1 uppercase col-span-2"
+                className="pl-1 w-full border rounded mt-1 uppercase col-span-2"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 
           <div className="mb-4 w-[65%] grid grid-cols-3 gap-4">
-            <label htmlFor="clave" className="font-semibold block text-gray-700 italic font-calibri">
+            <label htmlFor="clave" className="mt-1 font-semibold block text-gray-700 italic font-calibri">
               Contraseña
             </label>
             <input
                 type="password"
                 id="clave"
                 name="clave"
-                className="w-full border rounded mt-1 col-span-2"
+                className="pl-1 w-full border rounded mt-1 col-span-2"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
