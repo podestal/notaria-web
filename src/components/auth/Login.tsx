@@ -1,12 +1,21 @@
 import { useState } from 'react';
 import loginImg from './../../assets/imgs/login.png'
 import axios from 'axios';
+import useAuthStore from '../../store/useAuthStore';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
+
+interface DecodedToken {
+    user_id: number;
+}
 
 
 const Login = () => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const {setTokens, setUserId, clearTokens} = useAuthStore()
+    const navigate = useNavigate()
 
     const URL = import.meta.env.VITE_BASE_URL
 
@@ -24,6 +33,11 @@ const Login = () => {
         .then(response => {
             console.log('Response',response)
             console.log('Response Data', response.data);
+            const decoded = jwtDecode<DecodedToken>(response.data.access_token)
+            clearTokens()
+            setTokens(response.data.access_token, response.data.refresh_token)
+            setUserId(decoded.user_id)
+            navigate('/')
         })
         .catch(error => {
             console.error('Error', error);
