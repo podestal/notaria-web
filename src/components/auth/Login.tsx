@@ -21,9 +21,10 @@ const Login = () => {
 
     const handleLogin = () => {
         console.log('loging');
+        console.log('URL', URL)
         axios.post(`${URL}/login`, {
-            usuario: 'ADMINISTRADOR',
-            clave: 'ADMINISTRADOR'
+            usuario: username,
+            clave: password
         }, {
             headers: {
                 'Content-Type': 'application/json',
