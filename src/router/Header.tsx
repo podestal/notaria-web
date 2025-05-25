@@ -2,16 +2,22 @@ import headerImg from '../assets/imgs/header.png'
 import notariaLogo from '../assets/imgs/logo-notaria-rodriguez-zea-juliaca-2.png'
 import usuario from '../assets/icons/usuario.png'
 import llave from '../assets/icons/llave.png'
-import salir from '../assets/icons/salir.png'
 import moment from 'moment'
 import { daysInSpanish, monthsInSpanish } from '../utils/datesInSpanish'
 import house from '../assets/icons/casa.png'
 import people from '../assets/icons/people.ico'
 import { useState } from 'react'
+import Logout from '../components/auth/Logout'
+import { Tipokardex } from '../services/api/tipokardexService'
+import useBodyRenderStore from '../hooks/store/bodyRenderStore'
+import useCorrelativeStore from '../hooks/store/useCorrelativeStore'
+import getTitleCase from '../utils/getTitleCase'
+import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
 
 interface MenuOptions {
     name: string;
     subOptions?: string[]
+    docType?: number
 }
 
 interface MenuItem {
@@ -19,7 +25,11 @@ interface MenuItem {
     options: MenuOptions[]
 }
 
-const Header = () => {
+interface Props {
+  kardexTypes: Tipokardex[]
+}
+
+const Header = ({ kardexTypes }: Props) => {
 
     const currentDate = daysInSpanish[moment().format('LLLL').split(' ')[0].split(',')[0].toLocaleLowerCase()]
     const currentDay = moment().format('DD')
@@ -29,15 +39,20 @@ const Header = () => {
     const [openDropdown, setOpenDropdown] = useState<number | null>(null);
     const [openSubDropdown, setOpenSubDropdown] = useState<number | null>(null);
 
+    const setBodyRender = useBodyRenderStore((state) => state.setBodyRender)
+
+    // reinitilizes correlative
+    const setCorrelative = useCorrelativeStore(s => s.setCorrelative)
+
+    const setKardexFilter = useKardexFiltersStore(s => s.setKardexFilter)
+
     const menuItems: MenuItem[] = [
       { label: "PROTOCOLARES", options: 
-        [   {name: "Escrituras"},
-            {name: "No Contenciosos"},
-            {name: "Transferencias Vehiculares"},
-            {name: "Garantías Mobiliarias"},
-            {name: "Testamentos"},
-            {name: "Protestos"},
-        ]},
+          [
+            ...kardexTypes?.map((kardexType) => ({ name: kardexType.nomtipkar, docType: kardexType.idtipkar })),
+            { name: "Protestos" }
+          ],
+      },
         { label: "EXTRAPROTOCOLARES", options: 
             [   {name: "Calificacíon de Firmas"},
                 {name: "Cert. Autorización de viaje"},
@@ -134,10 +149,7 @@ const Header = () => {
                 <p className='text-xs mb-1 hover:text-yellow-400 hover:underlin'>Cambiar Contraseña</p>
                 <img src={llave} alt="" className='w-[23px] h-[23px]' />
             </div>
-            <div className='flex justify-end items-center gap-2 cursor-pointer'>
-                <p className='text-xs hover:text-gray-200 hover:underline'>Cerrar Sesión</p>
-                <img src={salir} alt="" className='w-[23px] h-[23px] hover:opacity-80' />
-            </div>
+            <Logout />
         </div>
     </div>
     <div className='w-full  bg-gradient-to-b from-sky-950 to-slate-950 py-2'>
@@ -187,9 +199,17 @@ const Header = () => {
                         className="relative"
                         onMouseEnter={() => option.subOptions && setOpenSubDropdown(idx)}
                         onMouseLeave={() => setOpenSubDropdown(null)}
+                        onClick={() => {
+                          setCorrelative('')
+                          option.docType && setBodyRender(option.docType)
+                          setKardexFilter({
+                            type: '',
+                            value: ''
+                        })
+                          console.log('option.docType', option)}}
                       >
                         <li className="px-4 py-2 hover:bg-sky-500 hover:text-slate-50 cursor-pointer w-full border-b border-neutral-600 flex justify-between">
-                          {option.name}
+                          {getTitleCase(option.name)}
                           {option.subOptions && <span>▶</span>}
                         </li>
 
