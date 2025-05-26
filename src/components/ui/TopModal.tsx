@@ -23,7 +23,7 @@ const TopModal = ({ isOpen, onClose, children }: TopModalProps) => {
 
           {/* Modal container */}
           <motion.div
-            className="fixed top-20 left-0 right-0 z-50 mx-auto max-w-4xl w-full bg-white rounded-b-2xl shadow-lg overflow-y-auto max-h-screen p-6"
+            className="fixed top-20 left-0 right-0 z-50 mx-auto max-w-5xl w-full bg-white rounded-b-2xl shadow-lg overflow-y-auto max-h-screen p-6"
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}

@@ -3,11 +3,13 @@ import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
 import { useState } from "react"
+import Calendar from "../../ui/Calendar"
 
 const KardexForm = () => {
 
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const [selectedKardexType, setSelectedKardexType] = useState(0)
+    const [date, setDate] = useState<Date | undefined>(new Date())
 
   return (
     <form className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
@@ -24,7 +26,11 @@ const KardexForm = () => {
                     options={kardexTypes.map(type => ({ value: type.idtipkar, label: getTitleCase(type.nomtipkar) }))}
                     setter={setSelectedKardexType}
                 />
-                <p>Fecha ...fecha todays</p>
+                <p>Fecha</p>
+                <Calendar 
+                    selectedDate={date}
+                    setSelectedDate={setDate}
+                />
                 <p>Hora ... hour now</p>
             </div>
             <p>Referencia - input - button</p>
