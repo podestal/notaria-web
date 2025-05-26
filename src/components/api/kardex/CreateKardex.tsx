@@ -6,6 +6,7 @@ import KardexForm from "./KardexForm"
 const CreateKardex = () => {
 
     const [open, setOpen] = useState(false)
+
   return (
     <>
     <div>

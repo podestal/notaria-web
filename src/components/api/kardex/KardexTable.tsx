@@ -35,7 +35,6 @@ const KardexTable = () => {
   return (
     <div>
         <div className="px-2">
-          <>{console.log('error', error)}</>
           <KardexTableHeader />
           <KardexTableBody 
               kardexList={kardexPage.results }
