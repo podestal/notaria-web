@@ -6,6 +6,14 @@ import { useState } from "react"
 import Calendar from "../../ui/Calendar"
 import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
+import DropdownInput from "../../ui/DropdownInput"
+import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
+
+const options = [
+    { id: '1', label: 'Contrato 001' },
+    { id: '2', label: 'Contrato 002' },
+    { id: '3', label: 'Contrato 003' },
+  ];
 
 const KardexForm = () => {
 
@@ -14,7 +22,7 @@ const KardexForm = () => {
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
 
-
+    const [selected, setSelected] = useState<{ id: string; label: string } | null>(null);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         // Handle form submission logic here
@@ -73,11 +81,21 @@ const KardexForm = () => {
                     className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                 />
             </div>
-            <div className="flex justify-between items-center gap-4">
+            {/* <div className="flex justify-between items-center gap-4">
                 <p>Contrato ... input</p>
                 <p>Agregar Acto</p>
                 <p>Ocultar Acto</p>
-            </div>
+            </div> */}
+            <SearchableDropdownInput
+                options={[
+                    { id: '1', label: 'Contrato 001' },
+                    { id: '2', label: 'Contrato de Servicio' },
+                    { id: '3', label: 'Contrato Especial' },
+                ]}
+                selected={selected}
+                setSelected={setSelected}
+                placeholder="Buscar contrato..."
+            />
             <div className="flex justify-between items-center gap-4">
                 <p>rESPONSABLE ... auto user logged in</p>
                 <p>Recepción ...select other users</p>
