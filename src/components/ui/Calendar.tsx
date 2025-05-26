@@ -38,7 +38,7 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
         className="flex justify-center items-center gap-6 cursor-pointer text-center bg-white border-neutral-400 border-2 rounded-lg w-full text-xs px-2 py-2 focus:border-blue-700 focus:outline-none"
         onClick={() => setOpen(true)}
       >
-        <span className="font-bold">Date:</span>{' '}
+        <span className="font-bold">Fecha:</span>{' '}
         {selectedDate ? moment(selectedDate).format('MMMM-DD-YYYY') : 'Select a date'}
         <CalendarIcon />
       </p>
