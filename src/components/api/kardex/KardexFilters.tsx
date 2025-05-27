@@ -16,6 +16,7 @@ const KardexFilters = () => {
     const [numberValue, setNumberValue] = useState(kardexTypes[bodyRender])
     const [filterDocument, setFilterDocument] = useState('')
     const [filterName, setFilterName] = useState('')
+    const [filterNumescritura, setFilterNumescritura] = useState('')
     const [filterType, setFilterType] = useState<'K' | 'N' | 'D' | 'E' | ''>('')
     const setCorrelative = useCorrelativeStore(s => s.setCorrelative)
     const {setKardexFilter, kardexFilter} = useKardexFiltersStore()
@@ -45,6 +46,8 @@ const KardexFilters = () => {
             filterValue = filterDocument
         } else if (filterName) {
             filterValue = filterName
+        } else if (filterNumescritura) {
+            filterValue = filterNumescritura
         } else {
             return
         }
@@ -70,6 +73,7 @@ const KardexFilters = () => {
                         setNumberValue(e.target.value)
                         setFilterDocument('')
                         setFilterName('')
+                        setFilterNumescritura('')
                         setFilterType('K')
                     }}
                     type="text" 
@@ -83,6 +87,7 @@ const KardexFilters = () => {
                         setFilterDocument(e.target.value)
                         setFilterName('')
                         setNumberValue(kardexTypes[bodyRender])
+                        setFilterNumescritura('')
                         setFilterType('D')
                     }}
                     type="text" 
@@ -96,6 +101,7 @@ const KardexFilters = () => {
                         setFilterName(e.target.value)
                         setFilterDocument('')
                         setNumberValue(kardexTypes[bodyRender])
+                        setFilterNumescritura('')
                         setFilterType('N')
                     }}
                     type="text" 
@@ -103,7 +109,16 @@ const KardexFilters = () => {
             </div>
             <div className="flex items-center justify-center gap-2">
                 <p>Nº Escr/Act:</p>
-                <input type="text" className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
+                <input 
+                    value={filterNumescritura}
+                    onChange={(e) => {
+                        setFilterNumescritura(e.target.value)
+                        setFilterDocument('')
+                        setFilterName('')
+                        setNumberValue(kardexTypes[bodyRender])
+                        setFilterType('E')
+                    }}
+                    type="text" className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
             </div>
             <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Buscar</button>
         </div>

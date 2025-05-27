@@ -30,10 +30,11 @@ interface Props {
     byCorrelative?: boolean
     byDocument?: boolean
     byName?: boolean
+    byNumescritura?: boolean
 
 }
 
-const getKardexService =({ id, byCorrelative, byDocument, byName }: Props) => {
+const getKardexService =({ id, byCorrelative, byDocument, byName, byNumescritura }: Props) => {
 
     let url = '/kardex/'
     if (id) {
@@ -44,7 +45,10 @@ const getKardexService =({ id, byCorrelative, byDocument, byName }: Props) => {
         url += 'by_document/'
     } else if (byName) {
         url += 'by_name/'
+    } else if (byNumescritura) {
+        url += 'by_numescritura/'
     }
+
 
     return new APIClient<KardexPage, KardexPage>(url)
 }

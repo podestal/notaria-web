@@ -21,6 +21,9 @@ const useGetKardexList = ({ page, idtipkar, kardexFilter }: Props): UseQueryResu
         }
         else if (kardexFilter.type === 'D') {
             kardexService = getKardexService({ byDocument: true })
+        } 
+        else if (kardexFilter.type === 'E') {
+            kardexService = getKardexService({ byNumescritura: true })
         }
     }
 
@@ -35,7 +38,11 @@ const useGetKardexList = ({ page, idtipkar, kardexFilter }: Props): UseQueryResu
         }
         else if (kardexFilter.type === 'D') {
             params = { document: kardexFilter.value, idtipkar: idtipkar.toString(), page }
+        } 
+        else if (kardexFilter.type === 'E') {
+            params = { numescritura: kardexFilter.value, idtipkar: idtipkar.toString(), page }
         }
+    
     } else if (page && idtipkar) {
         params = { page, idtipkar: idtipkar.toString() }
     }
