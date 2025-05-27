@@ -19,7 +19,7 @@ const KardexTableBody = ({ kardexList }: Props) => {
                 <p>{singleKardex.contrato}</p>
                 <p>{getTitleCase(singleKardex.cliente)}</p>
                 <p>{singleKardex.fechaescritura}</p>
-                <p>{singleKardex.numinstrmento}</p>
+                <p>{singleKardex.numescritura}</p>
                 <p>{singleKardex.numminuta}</p>
                 <p>{singleKardex.folioini}</p>
                 <p>{singleKardex.foliofin}</p>
