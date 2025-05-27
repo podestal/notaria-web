@@ -45,7 +45,7 @@ const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelect
   };
 
   return (
-    <div className="relative w-full" ref={wrapperRef}>
+    <div className="relative w-full my-4" ref={wrapperRef}>
       <input
         ref={inputRef}
         type="text"

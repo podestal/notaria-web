@@ -6,14 +6,8 @@ import { useState } from "react"
 import Calendar from "../../ui/Calendar"
 import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
-import DropdownInput from "../../ui/DropdownInput"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
-
-const options = [
-    { id: '1', label: 'Contrato 001' },
-    { id: '2', label: 'Contrato 002' },
-    { id: '3', label: 'Contrato 003' },
-  ];
+import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
 
 const KardexForm = () => {
 
@@ -21,6 +15,7 @@ const KardexForm = () => {
     const [selectedKardexType, setSelectedKardexType] = useState(0)
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
+    const [responsible, setResponsible] = useState<string>('ADMINISTRADOR') 
 
     const [selected, setSelected] = useState<{ id: string; label: string } | null>(null);
     const handleSubmit = (e: React.FormEvent) => {
@@ -29,10 +24,12 @@ const KardexForm = () => {
     }
 
     const { data: tipoActos, isLoading, isError, error, isSuccess } = useGetTipoActo()
+    const { data: usuarios, isLoading: isLoadingUsuarios, isError: isErrorUsuarios, error: errorUsuarios, isSuccess: isSuccessUsuarios } = useGetUsuarios()
 
-    if (isLoading) return <p className="text-sm animate-pulse text-center my-10">Cargando ....</p>
+    if (isLoading || isLoadingUsuarios) return <p className="text-sm animate-pulse text-center my-10">Cargando ....</p>
     if (isError) return <p className="text-center my-8">Error: {error.message}</p>
-    if (isSuccess) 
+    if (isErrorUsuarios) return <p className="text-center my-8">Error: {errorUsuarios.message}</p>
+    if (isSuccess && isSuccessUsuarios) 
 
   return (
     <form 
@@ -87,18 +84,30 @@ const KardexForm = () => {
                 <p>Ocultar Acto</p>
             </div> */}
             <SearchableDropdownInput
-                options={[
-                    { id: '1', label: 'Contrato 001' },
-                    { id: '2', label: 'Contrato de Servicio' },
-                    { id: '3', label: 'Contrato Especial' },
-                ]}
+                options={tipoActos.map(acto => ({ id: acto.idtipoacto, label: getTitleCase(acto.desacto) }))}
                 selected={selected}
                 setSelected={setSelected}
                 placeholder="Buscar contrato..."
             />
-            <div className="flex justify-between items-center gap-4">
-                <p>rESPONSABLE ... auto user logged in</p>
-                <p>Recepción ...select other users</p>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="flex justify-center items-center gap-4">
+                    <p>Responsable</p>
+                    <input 
+                        value={responsible}
+                        onChange={(e) => setResponsible(e.target.value)}
+                        placeholder="Código de Acto"
+                        className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
+                    />
+                </div>
+                <div className="flex justify-center items-center gap-4">
+
+                    <Selector 
+                        options={[{ value: 0, label: 'Seleccionar Usuario' }, ...usuarios.map(user => ({ value: user.idusuario, label: getTitleCase(user.loginusuario) }))]}
+                        setter={() => {}}
+                        label="Recepción"
+                        horizontal
+                    />
+                </div>
             </div>
             <div className="flex justify-between items-center gap-4">
                 <p>Abogado ... select abogados</p>
