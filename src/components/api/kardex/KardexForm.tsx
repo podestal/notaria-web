@@ -16,9 +16,10 @@ const KardexForm = () => {
     const [selectedKardexType, setSelectedKardexType] = useState(0)
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
-    const [responsible, setResponsible] = useState<string>('ADMINISTRADOR') 
+    // const [responsible, setResponsible] = useState<string>('ADMINISTRADOR') 
 
     const [selected, setSelected] = useState<{ id: string; label: string } | null>(null);
+    const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         // Handle form submission logic here
@@ -44,7 +45,7 @@ const KardexForm = () => {
         </div>
         <>{console.log('selectedKardexType', selectedKardexType)}</>
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
-            <div className="flex justify-between gap-4 mb-6">
+            <div className="flex justify-between items-center gap-4 mb-6">
                 <Selector 
                     options={[{ value: 0, label: 'Tipo de Kardex' },...kardexTypes.map(type => ({ value: type.idtipkar, label: getTitleCase(type.nomtipkar) }))]}
                     setter={setSelectedKardexType}
@@ -94,16 +95,15 @@ const KardexForm = () => {
             />
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-center items-center gap-4">
-                    <p>Responsable</p>
-                    <input 
-                        value={responsible}
-                        onChange={(e) => setResponsible(e.target.value)}
-                        placeholder="Código de Acto"
-                        className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
+                    <p className="text-md font-bold py-2">Responsable</p>
+                    <SearchableDropdownInput 
+                        options={usuarios.map(user => ({ id: String(user.idusuario), label: getTitleCase(user.loginusuario) }))}
+                        selected={responsible}
+                        setSelected={setResponsible}
+                        placeholder="Buscar responsable..."
                     />
                 </div>
                 <div className="flex justify-center items-center gap-4">
-
                     <Selector 
                         options={[{ value: 0, label: 'Seleccionar Usuario' }, ...usuarios.map(user => ({ value: user.idusuario, label: getTitleCase(user.loginusuario) }))]}
                         setter={() => {}}
@@ -112,18 +112,33 @@ const KardexForm = () => {
                     />
                 </div>
             </div>
-            <div className="flex justify-between items-center gap-4 my-4">
+            <div className="grid grid-cols-2 place-content-center place-items-start gap-4 my-4">
                 <Selector 
                     options={[{ value: 0, label: 'Seleccionar Abogado' }, ...abogados.map(abogado => ({ value: Number(abogado.idabogado), label: getTitleCase(abogado.razonsocial) }))]}
                     setter={() => {}}
                     label="Abogado"
                     horizontal
                 />
-                <p>Funcionario ...input </p>
+                <div className="flex justify-center items-center gap-4">
+                    <p>Funcionario</p>
+                    <input 
+                        className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
+                    />
+                </div>
             </div>
-            <div className="flex justify-between items-center gap-4">
-                <p>Presentante ...select</p>
-                <p>Plantilla ...Select</p>
+            <div className="grid grid-cols-2 place-content-center place-items-start gap-4 my-4">
+                <Selector 
+                    options={[{ value: 0, label: 'Seleccionar Presentante' }]}
+                    setter={() => {}}
+                    label="Presentante"
+                    horizontal
+                />
+                <Selector 
+                    options={[{ value: 0, label: 'Seleccionar Plantilla' }]}
+                    setter={() => {}}
+                    label="Plantilla"
+                    horizontal
+                />
             </div>
         </div>
 
