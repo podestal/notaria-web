@@ -8,6 +8,7 @@ import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
+import useGetAbogados from "../../../hooks/api/abogados/useGetAbogados"
 
 const KardexForm = () => {
 
@@ -25,11 +26,13 @@ const KardexForm = () => {
 
     const { data: tipoActos, isLoading, isError, error, isSuccess } = useGetTipoActo()
     const { data: usuarios, isLoading: isLoadingUsuarios, isError: isErrorUsuarios, error: errorUsuarios, isSuccess: isSuccessUsuarios } = useGetUsuarios()
+    const { data: abogados, isLoading: isLoadingAbogados, isError: isErrorAbogados, error: errorAbogados, isSuccess: isSuccessAbogados } = useGetAbogados()
 
-    if (isLoading || isLoadingUsuarios) return <p className="text-sm animate-pulse text-center my-10">Cargando ....</p>
+    if (isLoading || isLoadingUsuarios || isLoadingAbogados) return <p className="text-sm animate-pulse text-center my-10">Cargando ....</p>
     if (isError) return <p className="text-center my-8">Error: {error.message}</p>
     if (isErrorUsuarios) return <p className="text-center my-8">Error: {errorUsuarios.message}</p>
-    if (isSuccess && isSuccessUsuarios) 
+    if (isErrorAbogados) return <p className="text-center my-8">Error: {errorAbogados.message}</p>
+    if (isSuccess && isSuccessUsuarios && isSuccessAbogados) 
 
   return (
     <form 
@@ -109,8 +112,13 @@ const KardexForm = () => {
                     />
                 </div>
             </div>
-            <div className="flex justify-between items-center gap-4">
-                <p>Abogado ... select abogados</p>
+            <div className="flex justify-between items-center gap-4 my-4">
+                <Selector 
+                    options={[{ value: 0, label: 'Seleccionar Abogado' }, ...abogados.map(abogado => ({ value: Number(abogado.idabogado), label: getTitleCase(abogado.razonsocial) }))]}
+                    setter={() => {}}
+                    label="Abogado"
+                    horizontal
+                />
                 <p>Funcionario ...input </p>
             </div>
             <div className="flex justify-between items-center gap-4">
