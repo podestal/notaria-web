@@ -36,8 +36,8 @@ const TopModal = ({ isOpen, onClose, children }: TopModalProps) => {
               </button>
             </div>
             {/* Modal content */}
-            <div className="mt-2 overflow-y-auto max-h-[75vh]">{children}
-                <p>asdasdas</p>
+            <div className="mt-2 overflow-y-auto max-h-[75vh]">
+              {children}
             </div>
           </motion.div>
         </>

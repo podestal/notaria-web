@@ -10,45 +10,30 @@ import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
 import useGetAbogados from "../../../hooks/api/abogados/useGetAbogados"
 import { CreateKardexData } from "../../../hooks/api/kardex/useCreateKardex"
-import { KardexPage } from "../../../services/api/kardexService"
+import { Kardex, KardexPage } from "../../../services/api/kardexService"
 import { UseMutationResult } from "@tanstack/react-query"
 import moment from "moment"
-import useKardexFiltersStore from "../../../hooks/store/useKardexFiltersStore"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 
 interface Props {
-    createKardex: UseMutationResult<KardexPage, Error, CreateKardexData>
+    kardex?: Kardex
+    createKardex?: UseMutationResult<KardexPage, Error, CreateKardexData>
+    
 }
 
-const KardexForm = ({ createKardex }: Props) => {
+const KardexForm = ({ createKardex, kardex }: Props) => {
 
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
-    const [karedexReference, setKardexReference] = useState('')
-    const [selectedKardexType, setSelectedKardexType] = useState(bodyRender)
+    const [karedexReference, setKardexReference] = useState(kardex?.kardex || '') 
+    const [selectedKardexType, setSelectedKardexType] = useState(kardex?.idtipkar || bodyRender) 
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
-    // const [responsible, setResponsible] = useState<string>('ADMINISTRADOR') 
 
     const [contrato, setContrato] = useState<{ id: string; label: string } | null>(null);
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-    // kardex: string;
-    // idtipkar: number;
-    // fechaingreso: string;
-    // referencia?: string;
-    // codactos: string;
-    // contrato: string;
-    // idusuario: number;
-    // responsable: number;
-    // retenido: number
-    // desistido: number;
-    // autorizado: number;
-    // idrecogio: number;
-    // pagado: number;
-    // visita: number;
-    // idnotario: number;
 
         if (contrato === null) {
             console.log('No se ha seleccionado un contrato')
@@ -61,7 +46,7 @@ const KardexForm = ({ createKardex }: Props) => {
             return
         }
 
-        createKardex.mutate({
+        createKardex && createKardex.mutate({
             kardex: {
                 kardex: '',
                 idtipkar: selectedKardexType,
