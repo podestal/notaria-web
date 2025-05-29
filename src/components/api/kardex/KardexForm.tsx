@@ -13,6 +13,8 @@ import { CreateKardexData } from "../../../hooks/api/kardex/useCreateKardex"
 import { KardexPage } from "../../../services/api/kardexService"
 import { UseMutationResult } from "@tanstack/react-query"
 import moment from "moment"
+import useKardexFiltersStore from "../../../hooks/store/useKardexFiltersStore"
+import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 
 interface Props {
     createKardex: UseMutationResult<KardexPage, Error, CreateKardexData>
@@ -20,9 +22,10 @@ interface Props {
 
 const KardexForm = ({ createKardex }: Props) => {
 
+    const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const [karedexReference, setKardexReference] = useState('')
-    const [selectedKardexType, setSelectedKardexType] = useState(0)
+    const [selectedKardexType, setSelectedKardexType] = useState(bodyRender)
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
     // const [responsible, setResponsible] = useState<string>('ADMINISTRADOR') 
@@ -61,7 +64,7 @@ const KardexForm = ({ createKardex }: Props) => {
         createKardex.mutate({
             kardex: {
                 kardex: '',
-                idtipkar: 1,
+                idtipkar: selectedKardexType,
                 fechaingreso: moment(date).format('DD/MM/YYYY'),
                 referencia: karedexReference,
                 codactos: contrato.id,
@@ -98,12 +101,13 @@ const KardexForm = ({ createKardex }: Props) => {
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">Nuevo Kardex</h2>
         </div>
-        <>{console.log('selectedKardexType', selectedKardexType)}</>
+        {/* <>{console.log('bodyRender', bodyRender)}</> */}
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
             <div className="flex justify-between items-center gap-4 mb-6">
                 <Selector 
                     options={[{ value: 0, label: 'Tipo de Kardex' },...kardexTypes.map(type => ({ value: type.idtipkar, label: getTitleCase(type.nomtipkar) }))]}
                     setter={setSelectedKardexType}
+                    defaultValue={selectedKardexType}
                 />
                 <Calendar 
                     selectedDate={date}

@@ -16,7 +16,7 @@ const useCreateKardex = ({ idtipkar }: Props): UseMutationResult<KardexPage, Err
     return useMutation({
         mutationFn: (data: CreateKardexData) => kardexService.post(data.kardex),
         onSuccess: (res) => {
-            queryClient.invalidateQueries({ queryKey: ['kardex list', 1, idtipkar] })
+            queryClient.invalidateQueries({ queryKey: ['kardex list', "1", idtipkar] })
             console.log('Kardex created successfully:', res);
             
         },

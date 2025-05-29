@@ -2,12 +2,14 @@ import { useState } from "react"
 import TopModal from "../../ui/TopModal"
 import KardexForm from "./KardexForm"
 import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
+import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 
 
 const CreateKardex = () => {
 
     const [open, setOpen] = useState(false)
-    const createKardex = useCreateKardex({ idtipkar: 1 }) 
+    const bodyRender = useBodyRenderStore(s => s.bodyRender)
+    const createKardex = useCreateKardex({ idtipkar: bodyRender }) 
 
   return (
     <>
