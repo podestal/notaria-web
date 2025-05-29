@@ -11,7 +11,7 @@ interface Props {
 
 const useGetKardexList = ({ page, idtipkar, kardexFilter }: Props): UseQueryResult<KardexPage, Error> => {
     let kardexService = getKardexService({ })
-    console.log('kardexFilter in hook', kardexFilter);
+
     if (kardexFilter && kardexFilter.type) {
         if (kardexFilter.type === 'K') {
             kardexService = getKardexService({ byCorrelative: true })

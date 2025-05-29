@@ -85,11 +85,6 @@ const KardexForm = () => {
                     className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                 />
             </div>
-            {/* <div className="flex justify-between items-center gap-4">
-                <p>Contrato ... input</p>
-                <p>Agregar Acto</p>
-                <p>Ocultar Acto</p>
-            </div> */}
             <SearchableDropdownInput
                 options={tipoActos.map(acto => ({ id: acto.idtipoacto, label: getTitleCase(acto.desacto) }))}
                 selected={selected}
