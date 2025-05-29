@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
-import TopModal from "../../ui/TopModal"
 import KardexForm from "./KardexForm"
+import TopModalWithTabs from "../../ui/TopModalWithTabs"
 
 interface Props {
     kardex: Kardex
@@ -34,14 +34,17 @@ const KardexCard = ({ kardex }: Props) => {
         <p>{getTitleCase(kardex.usuario)}</p>
         <p>Escaneo ...</p>
     </div>
-    <TopModal 
+    <TopModalWithTabs 
         isOpen={open}
         onClose={() => setOpen(false)}
-    >
-        <KardexForm 
-            kardex={kardex}
-        />
-    </TopModal>
+        tabs={[
+            { id: 'general', label: 'Kardex Info', content: <KardexForm kardex={kardex} /> },
+            { id: 'details', label: 'Contratantes', content: <p>details</p> },
+            { id: 'notes', label: 'Digitación', content: <p>notes</p> },
+            { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
+            { id: 'uif', label: 'UIF/PDT Patrimonial', content: <p>details</p> },
+          ]}
+    />
     </>
   )
 }
