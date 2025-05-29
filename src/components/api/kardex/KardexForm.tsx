@@ -14,6 +14,7 @@ import { Kardex, KardexPage } from "../../../services/api/kardexService"
 import { UseMutationResult } from "@tanstack/react-query"
 import moment from "moment"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 interface Props {
     kardex?: Kardex
@@ -23,6 +24,7 @@ interface Props {
 
 const KardexForm = ({ createKardex, kardex }: Props) => {
 
+    const { setMessage, setShow, setType } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const [karedexReference, setKardexReference] = useState(kardex?.kardex || '') 
@@ -36,13 +38,17 @@ const KardexForm = ({ createKardex, kardex }: Props) => {
         e.preventDefault()
 
         if (contrato === null) {
-            console.log('No se ha seleccionado un contrato')
+            setMessage('No se ha seleccionado un contrato')
+            setShow(true)
+            setType('error')
             return
             
         }
 
         if (responsible === null) {
-            console.log('No se ha seleccionado un responsable')
+            setMessage('No se ha seleccionado un responsable')
+            setShow(true)
+            setType('error')
             return
         }
 
@@ -64,6 +70,17 @@ const KardexForm = ({ createKardex, kardex }: Props) => {
                 idnotario: 1,
                 contrato: contrato.label, 
                 numescritura: '' 
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Kardex creado exitosamente')
+                setShow(true)
+                setType('success')
+            }, 
+            onError: (error) => {
+                setMessage(`Error al crear el kardex: ${error.message}`)
+                setShow(true)
+                setType('error')
             }
         })
     }
