@@ -17,12 +17,13 @@ import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 interface Props {
+    setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
     kardex?: Kardex
     createKardex?: UseMutationResult<KardexPage, Error, CreateKardexData>
     
 }
 
-const KardexForm = ({ createKardex, kardex }: Props) => {
+const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
@@ -76,6 +77,7 @@ const KardexForm = ({ createKardex, kardex }: Props) => {
                 setMessage('Kardex creado exitosamente')
                 setShow(true)
                 setType('success')
+                setNotAllowed && setNotAllowed(false)
             }, 
             onError: (error) => {
                 setMessage(`Error al crear el kardex: ${error.message}`)

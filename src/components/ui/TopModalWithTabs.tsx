@@ -5,6 +5,7 @@ interface Tab {
   id: string;
   label: string;
   content: ReactNode;
+  notAllowed?: boolean;
 }
 
 interface TopModalWithTabsProps {
@@ -49,12 +50,14 @@ const TopModalWithTabs = ({ isOpen, onClose, tabs }: TopModalWithTabsProps) => {
                   <motion.button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
+                    disabled={tab.notAllowed}
                     className={`text-left px-4 py-2 rounded-lg transition-all font-medium text-sm
-                      ${
-                        activeTab === tab.id
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'bg-white text-slate-700 hover:bg-slate-200'
-                      }`}
+                        ${tab.notAllowed && 'opacity-50 cursor-not-allowed'}
+                        ${
+                            activeTab === tab.id
+                            ? 'bg-blue-600 text-white shadow-lg'
+                            : 'bg-white text-slate-700 hover:bg-slate-200'
+                        }`}
                     whileTap={{ scale: 0.98 }}
                     whileHover={{ scale: 1.02 }}
                   >
