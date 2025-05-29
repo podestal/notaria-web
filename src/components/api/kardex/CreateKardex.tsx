@@ -3,6 +3,7 @@ import KardexForm from "./KardexForm"
 import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import TopModalWithTabs from "../../ui/TopModalWithTabs"
+import ContratantesForm from "../contratantes/ContratantesForm"
 
 
 const CreateKardex = () => {
@@ -27,7 +28,7 @@ const CreateKardex = () => {
         onClose={() => setOpen(false)}
         tabs={[
             { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
-            { id: 'details', label: 'Contratantes', content: <p>details</p>, notAllowed },
+            { id: 'details', label: 'Contratantes', content: <ContratantesForm />, notAllowed },
             { id: 'notes', label: 'Digitación', content: <p>notes</p>, notAllowed },
             { id: 'escrituración', label: 'Escrituración', content: <p>notes</p>, notAllowed },
             { id: 'uif', label: 'UIF/PDT Patrimonial', content: <p>details</p>, notAllowed },

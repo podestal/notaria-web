@@ -3,6 +3,7 @@ import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
 import KardexForm from "./KardexForm"
 import TopModalWithTabs from "../../ui/TopModalWithTabs"
+import ContratantesForm from "../contratantes/ContratantesForm"
 
 interface Props {
     kardex: Kardex
@@ -39,7 +40,7 @@ const KardexCard = ({ kardex }: Props) => {
         onClose={() => setOpen(false)}
         tabs={[
             { id: 'general', label: 'Kardex Info', content: <KardexForm kardex={kardex} /> },
-            { id: 'details', label: 'Contratantes', content: <p>details</p> },
+            { id: 'details', label: 'Contratantes', content: <ContratantesForm /> },
             { id: 'notes', label: 'Digitación', content: <p>notes</p> },
             { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
             { id: 'uif', label: 'UIF/PDT Patrimonial', content: <p>details</p> },
