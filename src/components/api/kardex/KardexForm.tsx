@@ -9,20 +9,75 @@ import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
 import useGetAbogados from "../../../hooks/api/abogados/useGetAbogados"
+import { CreateKardexData } from "../../../hooks/api/kardex/useCreateKardex"
+import { KardexPage } from "../../../services/api/kardexService"
+import { UseMutationResult } from "@tanstack/react-query"
+import moment from "moment"
 
-const KardexForm = () => {
+interface Props {
+    createKardex: UseMutationResult<KardexPage, Error, CreateKardexData>
+}
+
+const KardexForm = ({ createKardex }: Props) => {
 
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
+    const [karedexReference, setKardexReference] = useState('')
     const [selectedKardexType, setSelectedKardexType] = useState(0)
     const [date, setDate] = useState<Date | undefined>(new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
     // const [responsible, setResponsible] = useState<string>('ADMINISTRADOR') 
 
-    const [selected, setSelected] = useState<{ id: string; label: string } | null>(null);
+    const [contrato, setContrato] = useState<{ id: string; label: string } | null>(null);
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        // Handle form submission logic here
+    // kardex: string;
+    // idtipkar: number;
+    // fechaingreso: string;
+    // referencia?: string;
+    // codactos: string;
+    // contrato: string;
+    // idusuario: number;
+    // responsable: number;
+    // retenido: number
+    // desistido: number;
+    // autorizado: number;
+    // idrecogio: number;
+    // pagado: number;
+    // visita: number;
+    // idnotario: number;
+
+        if (contrato === null) {
+            console.log('No se ha seleccionado un contrato')
+            return
+            
+        }
+
+        if (responsible === null) {
+            console.log('No se ha seleccionado un responsable')
+            return
+        }
+
+        createKardex.mutate({
+            kardex: {
+                kardex: '',
+                idtipkar: 1,
+                fechaingreso: moment(date).format('DD/MM/YYYY'),
+                referencia: karedexReference,
+                codactos: contrato.id,
+                idusuario: Number(responsible.id),
+                responsable: Number(responsible.id),
+                retenido: 0,
+                desistido: 0,
+                autorizado: 0,
+                idrecogio: 0,
+                pagado: 0,
+                visita: 0,
+                idnotario: 1,
+                contrato: contrato.label, 
+                numescritura: '' 
+            }
+        })
     }
 
     const { data: tipoActos, isLoading, isError, error, isSuccess } = useGetTipoActo()
@@ -63,6 +118,8 @@ const KardexForm = () => {
             </div>
             <div className="flex justify-between items-center gap-4 mb-6">
                 <input 
+                    value={karedexReference}
+                    onChange={(e) => setKardexReference(e.target.value)}
                     placeholder="Referencia del Kardex"
                     className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                 />
@@ -70,7 +127,7 @@ const KardexForm = () => {
             </div>
             <div className="flex justify-between items-center gap-4">
                 <input 
-                    value={selected ? selected.id : ''}
+                    value={contrato ? contrato.id : ''}
                     onChange={() => {}}
                     disabled
                     placeholder="Código de Acto"
@@ -87,8 +144,8 @@ const KardexForm = () => {
             </div>
             <SearchableDropdownInput
                 options={tipoActos.map(acto => ({ id: acto.idtipoacto, label: getTitleCase(acto.desacto) }))}
-                selected={selected}
-                setSelected={setSelected}
+                selected={contrato}
+                setSelected={setContrato}
                 placeholder="Buscar contrato..."
             />
             <div className="grid grid-cols-2 gap-4">

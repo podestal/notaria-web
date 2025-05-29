@@ -1,11 +1,13 @@
 import { useState } from "react"
 import TopModal from "../../ui/TopModal"
 import KardexForm from "./KardexForm"
+import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
 
 
 const CreateKardex = () => {
 
     const [open, setOpen] = useState(false)
+    const createKardex = useCreateKardex({ idtipkar: 1 }) 
 
   return (
     <>
@@ -21,7 +23,9 @@ const CreateKardex = () => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <KardexForm />
+        <KardexForm 
+            createKardex={createKardex}
+        />
     </TopModal>
     </>
   )

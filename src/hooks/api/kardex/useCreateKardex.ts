@@ -1,7 +1,7 @@
 import { useMutation, UseMutationResult, useQueryClient } from "@tanstack/react-query"
 import getKardexService, { KardexPage, CreateUpdateKardex } from "../../../services/api/kardexService"
 
-interface CreateKardexData {
+export interface CreateKardexData {
     kardex: CreateUpdateKardex
 }
 
