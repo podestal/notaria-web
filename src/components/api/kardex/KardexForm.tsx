@@ -154,7 +154,9 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
                 />
             </div>
             <SearchableDropdownInput
-                options={tipoActos.map(acto => ({ id: acto.idtipoacto, label: getTitleCase(acto.desacto) }))}
+                options={tipoActos
+                    .filter(acto => acto.idtipkar === selectedKardexType)
+                    .map(acto => ({ id: acto.idtipoacto, label: getTitleCase(acto.desacto) }))}
                 selected={contrato}
                 setSelected={setContrato}
                 placeholder="Buscar contrato..."
