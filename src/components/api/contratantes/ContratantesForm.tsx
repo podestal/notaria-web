@@ -2,6 +2,7 @@ import { useState } from "react"
 import Selector from "../../ui/Selector"
 import axios from "axios"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import ClientesForm from "../clientes/ClientesForm"
 
 const ContratantesForm = () => {
 
@@ -67,7 +68,8 @@ const ContratantesForm = () => {
 
   return (
     <>
-    {showForm
+    <ClientesForm />
+    {/* {showForm
     ? 
     <div className="text-black">
         <h2 className="text-lg font-semibold mb-4">Datos del Contratante</h2>
@@ -101,13 +103,7 @@ const ContratantesForm = () => {
         </button>
         </>
         }
-    </div>}
-    {/* <form
-        onSubmit={handleSubmit}
-    >
-        
-
-    </form> */}
+    </div>} */}
     </>
   )
 }

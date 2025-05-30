@@ -9,6 +9,7 @@ const ContratantesTableHeader = () => {
         <p>Fecha Firma</p>
         <p>Responsable</p>
         <p>Dec.Juradas</p>
+        <p>Editar</p>
     </div>
   )
 }

@@ -1,6 +1,8 @@
+import { Pencil, SquareX } from "lucide-react"
 import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
 import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
+
 
 interface Props {
     kardex: Kardex
@@ -22,8 +24,20 @@ const ContratantesTableBody = ({ kardex }: Props) => {
             <p className="col-span-2">{getTitleCase(contratante.cliente)}</p>
             <p className="col-span-2">{getTitleCase(contratante.condicion)}</p>
             <p className="pl-2">{contratante.firma === '1' ? 'Si' : 'No'}</p>
-            <p className="">{contratante.fechafirma}</p>
+            <p className="pl-2">{contratante.fechafirma}</p>
             <p className="pl-2">{getTitleCase(kardex.usuario)}</p>
+            <p></p>
+            <div className="flex items-start justify-start gap-2 pl-4">
+                <SquareX 
+                    size={20}
+                    className="text-red-500 hover:text-red-400 cursor-pointer"
+                />
+                <p>|</p>
+                <Pencil 
+                    size={20}
+                    className="text-blue-500 hover:text-blue-400 cursor-pointer"
+                />
+            </div>
         </div>
     ))}
     </>
