@@ -16,7 +16,7 @@ import moment from "moment"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import KardexFormTabs from "./KardexFormTabs"
-import ContratantesForm from "../contratantes/ContratantesForm"
+import ContratantesMain from "../contratantes/ContratantesMain"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -212,7 +212,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
         <KardexFormTabs 
             tabs={[
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
-                { id: 'details', label: 'Contratantes', content: <ContratantesForm /> },
+                { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
                 { id: 'notes', label: 'Digitación', content: <p>notes</p> },
                 { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
                 { id: 'uif', label: 'UIF/PDT Patrimonial', content: <p>details</p> },
