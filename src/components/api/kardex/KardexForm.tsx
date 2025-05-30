@@ -15,6 +15,8 @@ import { UseMutationResult } from "@tanstack/react-query"
 import moment from "moment"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import KardexFormTabs from "./KardexFormTabs"
+import ContratantesForm from "../contratantes/ContratantesForm"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -98,6 +100,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
     if (isSuccess && isSuccessUsuarios && isSuccessAbogados) 
 
   return (
+    <>
     <form 
         onSubmit={handleSubmit}
         className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
@@ -204,9 +207,19 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
                 />
             </div>
         </div>
-
-
     </form>
+    {kardex && 
+        <KardexFormTabs 
+            tabs={[
+                // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
+                { id: 'details', label: 'Contratantes', content: <ContratantesForm /> },
+                { id: 'notes', label: 'Digitación', content: <p>notes</p> },
+                { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
+                { id: 'uif', label: 'UIF/PDT Patrimonial', content: <p>details</p> },
+            ]}
+        />
+    }
+    </>
   )
 }
 
