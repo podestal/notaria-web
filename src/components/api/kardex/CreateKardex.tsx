@@ -2,8 +2,7 @@ import { useState } from "react"
 import KardexForm from "./KardexForm"
 import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
-import TopModalWithTabs from "../../ui/TopModalWithTabs"
-import ContratantesForm from "../contratantes/ContratantesForm"
+import TopModal from "../../ui/TopModal"
 
 
 const CreateKardex = () => {
@@ -11,7 +10,6 @@ const CreateKardex = () => {
     const [open, setOpen] = useState(false)
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const createKardex = useCreateKardex({ idtipkar: bodyRender }) 
-    const [notAllowed, setNotAllowed] = useState(true)
 
   return (
     <>
@@ -23,7 +21,13 @@ const CreateKardex = () => {
             <span className="border-b-2 border-amber-500 pb-1">Nuevo</span>
         </button>
     </div>
-    <TopModalWithTabs 
+    <TopModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+    >
+        <KardexForm createKardex={createKardex} />
+    </TopModal>
+    {/* <TopModalWithTabs 
         isOpen={open}
         onClose={() => setOpen(false)}
         tabs={[
@@ -35,7 +39,7 @@ const CreateKardex = () => {
           ]}
     >
 
-    </TopModalWithTabs>
+    </TopModalWithTabs> */}
     </>
   )
 }

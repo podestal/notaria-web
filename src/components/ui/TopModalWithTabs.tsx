@@ -50,7 +50,7 @@ const TopModalWithTabs = ({ isOpen, onClose, tabs }: TopModalWithTabsProps) => {
                   <motion.button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    disabled={tab.notAllowed}
+                    disabled
                     className={`text-left px-4 py-2 rounded-lg transition-all font-medium text-sm
                         ${tab.notAllowed && 'opacity-50 cursor-not-allowed'}
                         ${
