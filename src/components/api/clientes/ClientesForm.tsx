@@ -66,7 +66,11 @@ const ClientesForm = () => {
     <form
         onSubmit={handleSubmit}
     >
-        <h2 className="text-2xl font-bold text-center mb-10">Nuevo Cliente</h2>
+        <div className="grid grid-cols-3 items-center gap-6 mb-10">
+            <div></div>
+            <h2 className="text-2xl font-bold text-center">Nuevo Cliente</h2>
+            <p>consulta reniec</p>
+        </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
                 label="Apellido Paterno"
