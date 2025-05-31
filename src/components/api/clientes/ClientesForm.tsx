@@ -12,8 +12,22 @@ const ClientesForm = () => {
     const [direccion, setDireccion] = useState('')
     const [nombre, setNombre] = useState('')
 
+    // Error handling states
+    const [apepatError, setApepatError] = useState('')
+    const [prinomError, setPrinomError] = useState('') 
+    
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!apepat) {
+            setApepatError('Apellido Paterno es requerido')
+            return
+        }
+    }
+
   return (
-    <form>
+    <form
+        onSubmit={handleSubmit}
+    >
         <h2 className="text-2xl font-bold text-center mb-10">Nuevo Cliente</h2>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
@@ -21,6 +35,8 @@ const ClientesForm = () => {
                 value={apepat}
                 setValue={setApepat}
                 horizontal={true}
+                required={true}
+                error={apepatError}
             />
             <SimpleInput 
                 label="Apellido Materno"
