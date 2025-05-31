@@ -1,5 +1,25 @@
 import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
+import Selector from "../../ui/Selector"
+import SimpleSelector from "../../ui/SimpleSelector"
+import nationalities from "../../../utils/nationalities"
+import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
+
+
+const civilStatusOptions = [
+    { value: 0, label: 'Seleccionar Estado Civil' },
+    { value: 1, label: 'Soltero' },
+    { value: 2, label: 'Casado' },
+    { value: 3, label: 'Divorciado' },
+    { value: 4, label: 'Viudo' },
+    { value: 5, label: 'Conviviente' },
+]
+
+const sexOptions = [
+    { value: 0, label: 'Seleccionar Sexo' },
+    { value: 1, label: 'Masculino' },
+    { value: 2, label: 'Femenino' },
+]
 
 const ClientesForm = () => {
 
@@ -11,6 +31,11 @@ const ClientesForm = () => {
     const [segnom, setSegnom] = useState('')
     const [direccion, setDireccion] = useState('')
     const [nombre, setNombre] = useState('')
+
+    const [civilStatus, setCivilStatus] = useState(0)
+    const [sex, setSex] = useState(0)
+    const [nationality, setNationality] = useState<{ id: string; label: string } | null>(null)
+    const [resident, setResident] = useState(1)
 
     // Error handling states
     const [apepatError, setApepatError] = useState('')
@@ -51,6 +76,7 @@ const ClientesForm = () => {
                 value={prinom}
                 setValue={setPrinom}
                 horizontal={true}
+                required
             />
             <SimpleInput 
                 label="Segundo Nombre"
@@ -59,46 +85,58 @@ const ClientesForm = () => {
                 horizontal={true}
             />
         </div>
-        <div className="flex flex-col justify-center items-center gap-6 mb-4">
+        <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
                 label="Dirección"
                 value={direccion}
                 setValue={setDireccion}
                 horizontal={true}
+                required
             />
             <SimpleInput 
                 label="Ubigeo"
                 value={nombre}
                 setValue={setNombre}
                 horizontal={true}
+                required
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleInput 
+            <SimpleSelector 
                 label="Estado Civil"
-                value={prinom}
-                setValue={setPrinom}
+                setter={setCivilStatus}
+                options={civilStatusOptions}
                 horizontal={true}
+                required
             />
-            <SimpleInput 
+            <SimpleSelector 
                 label="Sexo"
-                value={segnom}
-                setValue={setSegnom}
+                setter={setSex}
+                options={sexOptions}
                 horizontal={true}
+                required
             />
         </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleInput 
-                label="Nacionalidad"
-                value={prinom}
-                setValue={setPrinom}
-                horizontal={true}
-            />
-            <SimpleInput 
+        <div className="grid grid-cols-3 items-center gap-6 mb-6">
+            <div className="w-full flex justify-center items-center gap-4 col-span-2">
+                <p className="pl-2 block text-xs font-semibold text-slate-700">Nacionalidad</p>
+                <SearchableDropdownInput
+                    options={[...nationalities.map(nat => ({ id: (nat.id).toString(), label: nat.name }))]}
+                    selected={nationality}
+                    setSelected={setNationality}
+                    placeholder="Buscar nacionalidad"
+                    required
+                />
+            </div>
+            <SimpleSelector 
                 label="Residente"
-                value={segnom}
-                setValue={setSegnom}
+                setter={setResident}
+                options={[
+                    { value: 1, label: 'Sí' },
+                    { value: 0, label: 'No' }
+                ]}
                 horizontal={true}
+                required
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-6">

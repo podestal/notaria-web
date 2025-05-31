@@ -7,6 +7,7 @@ interface SimpleInputProps {
   error?: string;
   horizontal?: boolean;
   required?: boolean;
+  fullWidth?: boolean;
 }
 
 const shakeAnimation = {
@@ -21,6 +22,7 @@ const SimpleInput = ({
   error,
   horizontal = false,
   required = false,
+  fullWidth = false,
 }: SimpleInputProps) => {
   return (
     <div
@@ -41,7 +43,9 @@ const SimpleInput = ({
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     placeholder={label}
-                    className={`w-64 bg-white text-slate-700 border ${
+                    className={`bg-white text-slate-700 border ${
+                    fullWidth ? 'w-full' : 'w-64'
+                    } ${
                     horizontal && 'col-span-2'
                     } ${
                     error ? 'border-red-500' : 'border-slate-300'

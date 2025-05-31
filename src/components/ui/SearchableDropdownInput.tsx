@@ -10,9 +10,10 @@ interface Props {
   selected: Option | null;
   setSelected: React.Dispatch<React.SetStateAction<Option | null>>;
   placeholder?: string;
+  required?: boolean;
 }
 
-const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelected, placeholder }) => {
+const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelected, placeholder, required }) => {
   const [inputValue, setInputValue] = useState(selected?.label || '');
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,18 +47,21 @@ const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelect
 
   return (
     <div className="relative w-full my-4" ref={wrapperRef}>
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder={placeholder || 'Select an option'}
-        className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
-        value={inputValue}
-        onFocus={() => setOpen(true)}
-        onChange={(e) => {
-          setInputValue(e.target.value);
-          setOpen(true);
-        }}
-      />
+      <div className='flex items-center w-full gap-2'>
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder={placeholder || 'Select an option'}
+          className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
+          value={inputValue}
+          onFocus={() => setOpen(true)}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            setOpen(true);
+          }}
+        />
+        {required && <span className="text-red-500">*</span>}
+      </div>
       {open && (
         <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
           {filtered.length === 0 ? (
