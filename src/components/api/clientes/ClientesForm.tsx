@@ -4,6 +4,9 @@ import Selector from "../../ui/Selector"
 import SimpleSelector from "../../ui/SimpleSelector"
 import nationalities from "../../../utils/nationalities"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
+import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacionalidades"
+import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
+import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
 
 
 const civilStatusOptions = [
@@ -48,6 +51,16 @@ const ClientesForm = () => {
             return
         }
     }
+
+    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
+    const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
+    const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos()
+
+    if (isNacionalidadesLoading || isLoadingProfesiones || isLoadingCargos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
+
+    if (isNacionalidadesError || isErrorProfesiones || isErrorCargos) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
+
+    if (nacionalidadesSuccess && isSuccessProfesiones && isSuccessCargos)
 
   return (
     <form
@@ -121,7 +134,7 @@ const ClientesForm = () => {
             <div className="w-full flex justify-center items-center gap-4 col-span-2">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Nacionalidad</p>
                 <SearchableDropdownInput
-                    options={[...nationalities.map(nat => ({ id: (nat.id).toString(), label: nat.name }))]}
+                    options={[...nacionalidades.map(nat => ({ id: (nat.idnacionalidad).toString(), label: nat.descripcion }))]}
                     selected={nationality}
                     setSelected={setNationality}
                     placeholder="Buscar nacionalidad"
@@ -131,6 +144,7 @@ const ClientesForm = () => {
             <SimpleSelector 
                 label="Residente"
                 setter={setResident}
+                defaultValue={resident}
                 options={[
                     { value: 1, label: 'Sí' },
                     { value: 0, label: 'No' }
@@ -151,25 +165,31 @@ const ClientesForm = () => {
                 value={segnom}
                 setValue={setSegnom}
                 horizontal={true}
+                required
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleInput 
-                label="Prof/Ocupación"
-                value={prinom}
-                setValue={setPrinom}
-                horizontal={true}
-            />
-            <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Seleccionar</button>
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleInput 
-                label="Cargo"
-                value={prinom}
-                setValue={setPrinom}
-                horizontal={true}
-            />
-            <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Seleccionar</button>
+            <div className="w-full flex justify-center items-center gap-4 col-span-2">
+                <p className="pl-2 block text-xs font-semibold text-slate-700">Profesión</p>
+                <SearchableDropdownInput
+                    options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
+                    selected={nationality}
+                    setSelected={setNationality}
+                    placeholder="Buscar Profesión"
+                    required
+                />
+            </div>
+            <div className="w-full flex justify-center items-center gap-4 col-span-2">
+                <p className="pl-2 block text-xs font-semibold text-slate-700">Cargo</p>
+                <SearchableDropdownInput
+                    options={[...cargos.map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
+                    selected={nationality}
+                    setSelected={setNationality}
+                    placeholder="Buscar Cargo"
+                    required
+                />
+            </div>
+            {/* <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Seleccionar</button> */}
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
