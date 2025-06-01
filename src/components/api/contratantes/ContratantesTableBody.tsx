@@ -19,7 +19,7 @@ const ContratantesTableBody = ({ kardex }: Props) => {
 
   return (
     <>
-    {contratantes.length > 1 ? 
+    {contratantes.length > 0 ? 
     <>
     {contratantes.map((contratante) => (
         <div className="grid grid-cols-9 text-xs text-black px-2 my-2 place-content-center border-b-2 border-gray-200">
