@@ -7,6 +7,7 @@ import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacionalidades"
 import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
 import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
+import axios from "axios"
 
 
 const civilStatusOptions = [
@@ -27,7 +28,7 @@ const sexOptions = [
 const ClientesForm = () => {
 
 
-
+    const [dni, setDni] = useState('47067139')
     const [apepat, setApepat] = useState('')
     const [apemat, setApemat] = useState('')
     const [prinom, setPrinom] = useState('')
@@ -36,8 +37,9 @@ const ClientesForm = () => {
     const [nombre, setNombre] = useState('')
 
     const [civilStatus, setCivilStatus] = useState(0)
-    const [sex, setSex] = useState(0)
+    const [gender, setGender] = useState(0)
     const [nationality, setNationality] = useState<{ id: string; label: string } | null>(null)
+    const [birthdate, setBirthdate] = useState('')
     const [resident, setResident] = useState(1)
 
     // Error handling states
@@ -50,6 +52,29 @@ const ClientesForm = () => {
             setApepatError('Apellido Paterno es requerido')
             return
         }
+    }
+
+    const handleReniec = () => {
+        console.log('Consulta RENIEC')
+        axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${dni}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
+        ).then(response => {
+            console.log('response', response.data)
+            setApepat(response.data.resultado.apellido_paterno || '')
+            setApemat(response.data.resultado.apellido_materno || '')
+            setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
+            setBirthdate(response.data.resultado.fecha_nacimiento || '')
+            if (response.data.resultado.genero === 'M') {
+                setGender(1) // Masculino
+            }
+            else if (response.data.resultado.genero === 'F') {
+                setGender(2) // Femenino
+            }
+
+        }).catch(error => {
+            console.error('Error al consultar RENIEC:', error)
+        });
+            
+        
     }
 
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
@@ -69,7 +94,10 @@ const ClientesForm = () => {
         <div className="grid grid-cols-3 items-center gap-6 mb-10">
             <div></div>
             <h2 className="text-2xl font-bold text-center">Nuevo Cliente</h2>
-            <p>consulta reniec</p>
+            <button
+                type="button"
+                onClick={handleReniec}
+            >consulta reniec</button>
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
@@ -128,7 +156,7 @@ const ClientesForm = () => {
             />
             <SimpleSelector 
                 label="Sexo"
-                setter={setSex}
+                setter={setGender}
                 options={sexOptions}
                 horizontal={true}
                 required
@@ -166,8 +194,8 @@ const ClientesForm = () => {
             />
             <SimpleInput 
                 label="Fecha de Nacimiento"
-                value={segnom}
-                setValue={setSegnom}
+                value={birthdate}
+                setValue={setBirthdate}
                 horizontal={true}
                 required
             />
