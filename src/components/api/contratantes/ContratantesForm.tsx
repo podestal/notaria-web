@@ -1,4 +1,4 @@
-import ClientesForm from "../clientes/ClientesForm"
+// import ClientesForm from "../clientes/ClientesForm"
 
 const ContratantesForm = () => {
 
@@ -11,8 +11,10 @@ const ContratantesForm = () => {
 
   return (
     <>
-    <ClientesForm />
-
+    {/* <ClientesForm /> */}
+    <div>
+        Contratantes Form
+    </div>
     </>
   )
 }

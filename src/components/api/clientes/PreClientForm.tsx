@@ -2,6 +2,8 @@ import { useState } from "react"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import Selector from "../../ui/Selector"
 import axios from "axios"
+import ContratantesForm from "../contratantes/ContratantesForm"
+import ClientesForm from "./ClientesForm"
 
 const documentNaturalOptions = [
     { value: 0, label: 'Seleccione una opción' },
@@ -22,9 +24,13 @@ const PreClientForm = () => {
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
     const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(0)
     const [document, setDocument] = useState('')
+    const [showContratanteForm, setShowContratanteForm] = useState(false)
+    const [showClienteForm, setShowClienteForm] = useState(false)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
 
-    const handleLookup = () => {
+    const handleLookup = (e: React.FormEvent) => {
+
+        e.preventDefault()
 
         if (selectedTipoPersona === 0) {
             setType('error')
@@ -65,33 +71,26 @@ const PreClientForm = () => {
         axios.get(
             `${import.meta.env.VITE_API_URL}cliente2/by_dni/?dni=${document}`
         ).then(response => {
-            console.log(response.data)
+            if (response.data.idcliente) {
+                setShowContratanteForm(true)
+                setShowClienteForm(false)
+            } else {
+                setShowContratanteForm(false)
+                setShowClienteForm(true)
+            }
         }).catch(error => {
             console.error(error);
         })
-                
-
-        // axios.get(`https://api.factiliza.com/v1/dni/info/${document}`, {
-        //     headers: {
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   })
-        //   .then(response => {
-        //     console.log(response.data);
-        //     setShowForm(true)
-        //     setNombres(response.data.data.nombre_completo);
-        //     setDireccion(response.data.data.direccion);
-        //   })
-        //   .catch(error => {
-        //     console.error(error);
-        //   });
+            
     }
 
 
   return (
-    <div>
+    <>
+        <div>
         <h2 className="text-xl font-bold text-center mb-10">Buscar Cliente</h2>
-        <div
+        <form
+            onSubmit={handleLookup}
             className="grid grid-cols-5 items-center gap-6"
         >
             <Selector 
@@ -123,7 +122,6 @@ const PreClientForm = () => {
                 </div>}
                 {selectedTipoDocumento > 0 && 
                 <button 
-                    onClick={handleLookup}
                     disabled={document.length === 0}
                     className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 
                     type="submit">
@@ -131,8 +129,19 @@ const PreClientForm = () => {
                 </button>}
             </>
             }
-        </div>
+        </form>
     </div>
+    {showContratanteForm &&
+        <div className="mt-10">
+            <ContratantesForm />
+        </div>
+    }
+    {showClienteForm &&
+        <div className="mt-10">
+            <ClientesForm />
+        </div>
+    }
+    </>
   )
 }
 

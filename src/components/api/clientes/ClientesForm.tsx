@@ -93,7 +93,7 @@ const ClientesForm = () => {
     >
         <div className="grid grid-cols-3 items-center gap-6 mb-10">
             <div></div>
-            <h2 className="text-2xl font-bold text-center">Nuevo Cliente</h2>
+            <h2 className="text-xl font-bold text-center">Nuevo Cliente</h2>
             <button
                 type="button"
                 onClick={handleReniec}
