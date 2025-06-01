@@ -19,6 +19,8 @@ const ContratantesTableBody = ({ kardex }: Props) => {
 
   return (
     <>
+    {contratantes.length > 1 ? 
+    <>
     {contratantes.map((contratante) => (
         <div className="grid grid-cols-9 text-xs text-black px-2 my-2 place-content-center border-b-2 border-gray-200">
             <p className="col-span-2">{getTitleCase(contratante.cliente)}</p>
@@ -40,6 +42,10 @@ const ContratantesTableBody = ({ kardex }: Props) => {
             </div>
         </div>
     ))}
+    </>
+    :
+    <p className="text-xs text-center text-gray-80 my-4">No se encontraron contratanes para este documento</p>
+    }
     </>
   )
 }
