@@ -36,7 +36,7 @@ const SimpleInput = ({
         </label>
       )}
 
-        <div>
+        <div className='col-span-2'>
             <div className='flex items-center gap-2'>
                 <motion.input
                     {...(error ? shakeAnimation : {})}
