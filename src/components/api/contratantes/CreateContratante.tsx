@@ -2,7 +2,6 @@ import { UserPlus } from "lucide-react"
 import TopModal from "../../ui/TopModal"
 import { useState } from "react"
 import PreClientForm from "../clientes/PreClientForm"
-import ContratantesForm from "./ContratantesForm"
 
 const CreateContratante = () => {
 
@@ -21,9 +20,7 @@ const CreateContratante = () => {
                 isOpen={open}
                 onClose={() => setOpen(false)}
             >
-                {/* <ContratantesForm /> */}
-                {/* <PreClientForm /> */}
-                <ContratantesForm />
+                <PreClientForm />
             </TopModal>
         </div>
     </>

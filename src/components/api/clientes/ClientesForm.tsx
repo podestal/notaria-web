@@ -97,7 +97,8 @@ const ClientesForm = () => {
             <button
                 type="button"
                 onClick={handleReniec}
-            >consulta reniec</button>
+                className="bg-gray-50 px-2 py-1 w-[60%] text-sm h-full transition duration-300 border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex justify-center items-center gap-1"
+            >Consulta Reniec</button>
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
