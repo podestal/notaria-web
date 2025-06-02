@@ -32,10 +32,12 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const [karedexReference, setKardexReference] = useState(kardex?.kardex || '') 
     const [selectedKardexType, setSelectedKardexType] = useState(kardex?.idtipkar || bodyRender) 
-    const [date, setDate] = useState<Date | undefined>(new Date())
+    const kardexDateArray = kardex ? kardex?.fechaescritura?.split('-') : ''
+    const kardexDate = kardexDateArray && `${kardexDateArray[1]}-${kardexDateArray[2]}-${kardexDateArray[0]}`
+    const [date, setDate] = useState<Date | undefined>(kardex ? new Date(kardexDate) || new Date() : undefined)
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
 
-    const [contrato, setContrato] = useState<{ id: string; label: string } | null>(null);
+    const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -60,7 +62,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
                 kardex: '',
                 idtipkar: selectedKardexType,
                 fechaingreso: moment(date).format('DD/MM/YYYY'),
-                referencia: karedexReference,
+                referencia: karedexReference || 'This is a test reference',
                 codactos: contrato.id,
                 idusuario: Number(responsible.id),
                 responsable: Number(responsible.id),
@@ -108,7 +110,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
         </div>
-        {/* <>{console.log('bodyRender', bodyRender)}</> */}
+        <>{console.log('contrato', kardex?.contrato)}</>
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
             <div className="flex justify-between items-center gap-4 mb-6">
                 <Selector 
@@ -136,9 +138,17 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
                 />
                 <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Generar Kardex</button>
             </div>
+            {/* <>{tipoActos
+            .filter(acto => acto.idtipkar === selectedKardexType)
+            .map(tipo => {
+                console.log('tipoActo', tipo.desacto)
+                console.log('kardex.contrato', kardex?.contrato.split('/')[0]);
+                
+            })}</> */}
             <div className="flex justify-between items-center gap-4">
                 <input 
-                    value={contrato ? contrato.id : ''}
+                    // value={contrato ? contrato.id : `${kardex ? tipoActos.find(acto => acto.desacto === kardex.contrato)?.idtipoacto : '00'}`}
+                    value={kardex ? tipoActos.find(acto => acto.desacto === kardex.contrato.split('/')[0].trim())?.idtipoacto || '00' : `${contrato ? contrato.id : ''}`}
                     onChange={() => {}}
                     disabled
                     placeholder="Código de Acto"
@@ -156,8 +166,9 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
             <SearchableDropdownInput
                 options={tipoActos
                     .filter(acto => acto.idtipkar === selectedKardexType)
-                    .map(acto => ({ id: acto.idtipoacto, label: getTitleCase(acto.desacto) }))}
+                    .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} /` }))}
                 selected={contrato}
+                // defaultValue={kardex && tipoActos.find(tipoActo => tipoActo.desacto === kardex.contrato) || null}
                 setSelected={setContrato}
                 placeholder="Buscar contrato..."
             />

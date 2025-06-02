@@ -11,10 +11,11 @@ interface Props {
   setSelected: React.Dispatch<React.SetStateAction<Option | null>>;
   placeholder?: string;
   required?: boolean;
+  defaultValue?: string;
 }
 
-const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelected, placeholder, required }) => {
-  const [inputValue, setInputValue] = useState(selected?.label || '');
+const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelected, placeholder, required, defaultValue }) => {
+  const [inputValue, setInputValue] = useState(selected?.label || defaultValue || '');
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
