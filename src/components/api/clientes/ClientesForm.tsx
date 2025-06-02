@@ -42,6 +42,9 @@ const ClientesForm = () => {
     const [birthdate, setBirthdate] = useState('')
     const [resident, setResident] = useState(1)
 
+    const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(null)
+    const [cargo, setCargo] = useState<{ id: string; label: string } | null>(null)
+
     // Error handling states
     const [apepatError, setApepatError] = useState('')
     const [prinomError, setPrinomError] = useState('') 
@@ -63,6 +66,7 @@ const ClientesForm = () => {
             setApemat(response.data.resultado.apellido_materno || '')
             setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
             setBirthdate(response.data.resultado.fecha_nacimiento || '')
+            setDireccion('Avis Luz y Fuerza D-8')
             if (response.data.resultado.genero === 'M') {
                 setGender(1) // Masculino
             }
@@ -158,6 +162,7 @@ const ClientesForm = () => {
             <SimpleSelector 
                 label="Sexo"
                 setter={setGender}
+                defaultValue={gender}
                 options={sexOptions}
                 horizontal={true}
                 required
@@ -206,8 +211,8 @@ const ClientesForm = () => {
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Profesión</p>
                 <SearchableDropdownInput
                     options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
-                    selected={nationality}
-                    setSelected={setNationality}
+                    selected={profesion}
+                    setSelected={setProfesion}
                     placeholder="Buscar Profesión"
                     required
                 />
@@ -216,8 +221,8 @@ const ClientesForm = () => {
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Cargo</p>
                 <SearchableDropdownInput
                     options={[...cargos.map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
-                    selected={nationality}
-                    setSelected={setNationality}
+                    selected={cargo}
+                    setSelected={setCargo}
                     placeholder="Buscar Cargo"
                     required
                 />
@@ -227,8 +232,8 @@ const ClientesForm = () => {
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
                 label="Teléfono Celular"
-                value={direccion}
-                setValue={setDireccion}
+                value={nombre}
+                setValue={setNombre}
                 horizontal={true}
             />
             <SimpleInput 
@@ -241,8 +246,8 @@ const ClientesForm = () => {
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
                 label="Teléfono Fijo"
-                value={direccion}
-                setValue={setDireccion}
+                value={nombre}
+                setValue={setNombre}
                 horizontal={true}
             />
             <SimpleInput 

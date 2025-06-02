@@ -106,7 +106,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
         className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
         <div className="flex justify-center items-center gap-2 p-4 rounded-t-lg text-slate-50 ">
             <FileText className="text-green-600"/>
-            <h2 className="text-xl text-amber-500">Nuevo Kardex</h2>
+            <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
         </div>
         {/* <>{console.log('bodyRender', bodyRender)}</> */}
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
