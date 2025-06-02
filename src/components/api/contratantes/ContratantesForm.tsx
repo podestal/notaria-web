@@ -1,13 +1,18 @@
 import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
+import { Cliente2 } from "../../../services/api/clienteService"
 
-const ContratantesForm = () => {
+interface Props {
+    cliente2: Cliente2 | null
+}
 
-    const [apePaterno, setApePaterno] = useState('')
-    const [apeMaterno, setApeMaterno] = useState('')
-    const [prinom, setPrinom] = useState('')
-    const [segnom, setSegnom] = useState('')
-    const [address, setAddress] = useState('')
+const ContratantesForm = ({ cliente2 }: Props) => {
+
+    const [apePaterno, setApePaterno] = useState(cliente2 ? cliente2.apepat : '')
+    const [apeMaterno, setApeMaterno] = useState( cliente2 ? cliente2.apemat : '')
+    const [prinom, setPrinom] = useState( cliente2 ? cliente2.prinom : '')
+    const [segnom, setSegnom] = useState( cliente2 ? cliente2.segnom : '')
+    const [address, setAddress] = useState( cliente2 ? cliente2.direccion : '')
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
@@ -90,11 +95,11 @@ const ContratantesForm = () => {
         <div className="flex items-center justify-start gap-10 mt-6">
             <div className="flex items-center justify-center gap-4">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Firma</p>
-                <input type="checkbox" />
+                <input checked type="checkbox" />
             </div>
             <div className="flex items-center justify-center gap-4">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Incluir en el Indic</p>
-                <input type="checkbox" />
+                <input checked type="checkbox" />
             </div>
         </div>
     </form>

@@ -26,6 +26,7 @@ const PreClientForm = () => {
     const [document, setDocument] = useState('')
     const [showContratanteForm, setShowContratanteForm] = useState(false)
     const [showClienteForm, setShowClienteForm] = useState(false)
+    const [cliente2, setCliente2] = useState(null)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
 
     const handleLookup = (e: React.FormEvent) => {
@@ -72,6 +73,8 @@ const PreClientForm = () => {
             `${import.meta.env.VITE_API_URL}cliente2/by_dni/?dni=${document}`
         ).then(response => {
             if (response.data.idcliente) {
+                console.log('Cliente encontrado:', response.data);
+                setCliente2(response.data)
                 setShowContratanteForm(true)
                 setShowClienteForm(false)
             } else {
@@ -133,7 +136,9 @@ const PreClientForm = () => {
     </div>
     {showContratanteForm &&
         <div className="mt-10">
-            <ContratantesForm />
+            <ContratantesForm 
+                cliente2={cliente2}
+            />
         </div>
     }
     {showClienteForm &&
