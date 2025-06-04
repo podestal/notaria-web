@@ -70,7 +70,7 @@ const PreClientForm = () => {
 
         // get client here
         axios.get(
-            `${import.meta.env.VITE_API_URL}cliente2/by_dni/?dni=${document}`
+            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
         ).then(response => {
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);
