@@ -47,6 +47,8 @@ export interface Cliente {
     cumpclie?: string; // Date in 'DD/MM/YYYY' format
 }
 
+export type CreateUpdateCliente1 = Omit<Cliente, 'idcliente'> 
+
 interface Props {
     clienteId: string
     byDni?: boolean

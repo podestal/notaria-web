@@ -5,6 +5,7 @@ interface SimpleInputProps {
   value: string;
   setValue: (val: string) => void;
   error?: string;
+  setError?: (val: string) => void;
   horizontal?: boolean;
   required?: boolean;
   fullWidth?: boolean;
@@ -20,6 +21,7 @@ const SimpleInput = ({
   value,
   setValue,
   error,
+  setError,
   horizontal = false,
   required = false,
   fullWidth = false,
@@ -41,7 +43,10 @@ const SimpleInput = ({
                 <motion.input
                     {...(error ? shakeAnimation : {})}
                     value={value}
-                    onChange={(e) => setValue(e.target.value)}
+                    onChange={(e) => {
+                      setError && setError('')
+                      setValue(e.target.value)
+                    }}
                     placeholder={label}
                     className={`bg-white text-slate-700 border ${
                     fullWidth ? 'w-full' : 'w-64'

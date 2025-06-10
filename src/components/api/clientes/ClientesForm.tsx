@@ -47,6 +47,7 @@ const ClientesForm = () => {
 
     // Error handling states
     const [apepatError, setApepatError] = useState('')
+    const [apematError, setApematError] = useState('')
     const [prinomError, setPrinomError] = useState('') 
     
     const handleSubmit = (e: React.FormEvent) => {
@@ -55,6 +56,18 @@ const ClientesForm = () => {
             setApepatError('Apellido Paterno es requerido')
             return
         }
+
+        if (!prinom) {
+            setPrinomError('Primer Nombre es requerido')
+            return
+        }
+
+        if (!apemat) {
+            setApematError('Apellido Materno es requerido')
+            return
+        }
+
+
     }
 
     const handleReniec = () => {
@@ -112,12 +125,16 @@ const ClientesForm = () => {
                 horizontal={true}
                 required={true}
                 error={apepatError}
+                setError={setApepatError}
             />
             <SimpleInput 
                 label="Apellido Materno"
                 value={apemat}
                 setValue={setApemat}
                 horizontal={true}
+                required={true}
+                error={apematError}
+                setError={setApematError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-6">
@@ -127,6 +144,8 @@ const ClientesForm = () => {
                 setValue={setPrinom}
                 horizontal={true}
                 required
+                error={prinomError}
+                setError={setPrinomError}
             />
             <SimpleInput 
                 label="Segundo Nombre"
