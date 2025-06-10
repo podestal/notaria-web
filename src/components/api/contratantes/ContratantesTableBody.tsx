@@ -21,6 +21,7 @@ const ContratantesTableBody = ({ kardex }: Props) => {
     <>
     {contratantes.length > 0 ? 
     <>
+    <>{console.log('contratante', contratantes)}</>
     {contratantes.map((contratante) => (
         <div className="grid grid-cols-9 text-xs text-black px-2 my-2 place-content-center border-b-2 border-gray-200">
             <p className="col-span-2">{getTitleCase(contratante.cliente)}</p>
