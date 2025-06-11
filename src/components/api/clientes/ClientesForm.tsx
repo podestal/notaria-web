@@ -22,7 +22,7 @@ interface Props {
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
     setCliente1: React.Dispatch<React.SetStateAction<Cliente | null>>
-    cliente1: Cliente | null
+    cliente1?: Cliente | null
     nacionalidades: Nacionalidad[]
     profesiones: Profesion[]
     cargos: Cargo[]
@@ -541,7 +541,7 @@ const ClientesForm = ({
             <button 
                 type="submit"
                 className="mt-8 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
-                Guardar Cliente
+                {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
             </button>
         </div>
     </form>

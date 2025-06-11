@@ -13,11 +13,12 @@ interface Props {
     cliente1: Cliente | null
 }
 
-const CreateCliente = ({ 
+const UpdateCliente = ({ 
     dni, 
     setShowContratanteForm, 
     setShowClienteForm, 
     setCliente1, 
+    cliente1
  }: Props) => {
 
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
@@ -41,9 +42,9 @@ const CreateCliente = ({
         profesiones={profesiones}
         cargos={cargos}
         ubigeos={ubigeos}
-        cliente1={null} // Since this is for creating a new client, we pass null
+        cliente1={cliente1} 
     />
   )
 }
 
-export default CreateCliente
+export default UpdateCliente

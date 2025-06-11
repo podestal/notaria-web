@@ -5,6 +5,7 @@ import axios from "axios"
 import ContratantesForm from "../contratantes/ContratantesForm"
 import { Cliente } from "../../../services/api/cliente1Service"
 import CreateCliente from "./CreateCliente"
+import UpdateCliente from "./UpdateCliente"
 
 const documentNaturalOptions = [
     { value: 0, label: 'Seleccione una opción' },
@@ -149,13 +150,23 @@ const PreClientForm = () => {
     }
     {showClienteForm &&
         <div className="mt-10">
-            <CreateCliente 
-                cliente1={cliente1}
+            {cliente1 
+            ? 
+            <UpdateCliente 
                 setShowContratanteForm={setShowContratanteForm}
                 setShowClienteForm={setShowClienteForm}
                 setCliente1={setCliente1}
                 dni={document}
+                cliente1={cliente1}
             />
+            : 
+            <CreateCliente 
+                setShowContratanteForm={setShowContratanteForm}
+                setShowClienteForm={setShowClienteForm}
+                setCliente1={setCliente1}
+                dni={document}
+                cliente1={null}
+            />}
         </div>
     }
     </>
