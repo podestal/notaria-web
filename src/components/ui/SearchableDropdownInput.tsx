@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Option {
@@ -12,9 +13,25 @@ interface Props {
   placeholder?: string;
   required?: boolean;
   defaultValue?: string;
+  error?: string;
+  setError?: (val: string) => void;
 }
 
-const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelected, placeholder, required, defaultValue }) => {
+const shakeAnimation = {
+  initial: { x: 0 },
+  animate: { x: [0, -5, 5, -5, 5, 0], transition: { duration: 0.4 } },
+};
+
+const SearchableDropdownInput: React.FC<Props> = ({
+  options,
+  selected,
+  setSelected,
+  placeholder,
+  required,
+  defaultValue,
+  error,
+  setError,
+}) => {
   const [inputValue, setInputValue] = useState(selected?.label || defaultValue || '');
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,25 +61,38 @@ const SearchableDropdownInput: React.FC<Props> = ({ options, selected, setSelect
     setSelected(option);
     setInputValue(option.label);
     setOpen(false);
+    setError?.(''); // clear error when an option is selected
   };
 
   return (
     <div className="relative w-full my-4" ref={wrapperRef}>
-      <div className='flex items-center w-full gap-2'>
-        <input
+      <div className="flex items-center w-full gap-2">
+        <motion.input
+          {...(error ? shakeAnimation : {})}
           ref={inputRef}
           type="text"
           placeholder={placeholder || 'Select an option'}
-          className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
+          className={`w-full bg-white text-slate-700 border rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
+            error
+              ? 'border-red-500 focus:ring-red-300'
+              : 'border-slate-300 focus:ring-blue-300'
+          }`}
           value={inputValue}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            setOpen(true);
+            setError?.('');
+          }}
           onChange={(e) => {
             setInputValue(e.target.value);
             setOpen(true);
+            setError?.('');
           }}
         />
         {required && <span className="text-red-500">*</span>}
       </div>
+      {error && (
+        <div className="text-xs text-red-500 mt-1 px-2">{error}</div>
+      )}
       {open && (
         <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
           {filtered.length === 0 ? (

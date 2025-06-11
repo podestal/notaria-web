@@ -1,14 +1,13 @@
 import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
-import Selector from "../../ui/Selector"
 import SimpleSelector from "../../ui/SimpleSelector"
-import nationalities from "../../../utils/nationalities"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacionalidades"
 import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
 import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
 import axios from "axios"
 import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 
 const civilStatusOptions = [
@@ -28,6 +27,7 @@ const sexOptions = [
 
 const ClientesForm = () => {
 
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [dni, setDni] = useState('47067139')
     const [apepat, setApepat] = useState('')
@@ -36,6 +36,7 @@ const ClientesForm = () => {
     const [segnom, setSegnom] = useState('')
     const [direccion, setDireccion] = useState('')
     const [nombre, setNombre] = useState('')
+    const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(null)
 
     const [civilStatus, setCivilStatus] = useState(0)
     const [gender, setGender] = useState(0)
@@ -50,21 +51,51 @@ const ClientesForm = () => {
     const [apepatError, setApepatError] = useState('')
     const [apematError, setApematError] = useState('')
     const [prinomError, setPrinomError] = useState('') 
+    const [direccionError, setDireccionError] = useState('')
+    const [ubigeoError, setUbigeoError] = useState('')
     
     const handleSubmit = (e: React.FormEvent) => {
+
+        console.log('ubigeo', ubigeo);
+        
         e.preventDefault()
         if (!apepat) {
             setApepatError('Apellido Paterno es requerido')
+            setType('error')
+            setMessage('Apellido Paterno es requerido')
+            setShow(true)
             return
         }
 
         if (!prinom) {
             setPrinomError('Primer Nombre es requerido')
+            setType('error')
+            setMessage('Primer Nombre es requerido')
+            setShow(true)
             return
         }
 
         if (!apemat) {
             setApematError('Apellido Materno es requerido')
+            setType('error')
+            setMessage('Apellido Materno es requerido')
+            setShow(true)
+            return
+        }
+
+        if (!direccion) {
+            setDireccionError('Dirección es requerida')
+            setType('error')
+            setMessage('Dirección es requerida')
+            setShow(true)
+            return
+        }
+
+        if (!ubigeo) {
+            setUbigeoError('Ubigeo es requerido')
+            setType('error')
+            setMessage('Ubigeo es requerido')
+            setShow(true)
             return
         }
 
@@ -164,14 +195,22 @@ const ClientesForm = () => {
                 setValue={setDireccion}
                 horizontal={true}
                 required
+                error={direccionError}
+                setError={setDireccionError}
             />
-            <SimpleInput 
-                label="Ubigeo"
-                value={nombre}
-                setValue={setNombre}
-                horizontal={true}
-                required
-            />
+            <div className="w-full flex justify-center items-center gap-4 col-span-2">
+                <p className="pl-2 block text-xs font-semibold text-slate-700">Ubigeo</p>
+                <SearchableDropdownInput
+                    options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
+                    selected={ubigeo}
+                    setSelected={setUbigeo}
+                    placeholder="Buscar Ubigeo"
+                    required
+                    error={ubigeoError}
+                    setError={setUbigeoError}
+                />
+            </div>
+
         </div>
         <div className="flex justify-center items-center gap-6 mb-6">
             <SimpleSelector 
