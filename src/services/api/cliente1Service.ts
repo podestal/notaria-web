@@ -39,12 +39,15 @@ export interface Cliente {
     telfijo: string;
     telcel: string;
     sexo?: string;
+    telofi?: string;
     idestcivil?: number | null;
     nacionalidad?: string;
     idprofesion?: number | null;
     detaprofesion?: string | null;
     idcargoprofe?: number | null;
     cumpclie?: string; // Date in 'DD/MM/YYYY' format
+    resedente?: string; // '1' for resident, '0' for non-resident
+    
 }
 
 export type CreateUpdateCliente1 = Omit<Cliente, 'idcliente'> 
@@ -61,7 +64,7 @@ const getCliente1Service = ({ clienteId, byDni = false }: Props) => {
     } else if (clienteId) {
         url = `/cliente/${clienteId}/`
     }
-    return new APIClient<Cliente>(url)
+    return new APIClient<Cliente, CreateUpdateCliente1>(url)
 }
 
 export default getCliente1Service

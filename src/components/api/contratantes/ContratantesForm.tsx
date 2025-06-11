@@ -1,18 +1,22 @@
 import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
 import { Cliente2 } from "../../../services/api/clienteService"
+import { Cliente } from "../../../services/api/cliente1Service"
 
 interface Props {
     cliente2: Cliente2 | null
+    cliente1: Cliente | null
+    setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
+    setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ContratantesForm = ({ cliente2 }: Props) => {
+const ContratantesForm = ({ cliente1, setShowContratanteForm, setShowClienteForm }: Props) => {
 
-    const [apePaterno, setApePaterno] = useState(cliente2 ? cliente2.apepat : '')
-    const [apeMaterno, setApeMaterno] = useState( cliente2 ? cliente2.apemat : '')
-    const [prinom, setPrinom] = useState( cliente2 ? cliente2.prinom : '')
-    const [segnom, setSegnom] = useState( cliente2 ? cliente2.segnom : '')
-    const [address, setAddress] = useState( cliente2 ? cliente2.direccion : '')
+    const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
+    const [apeMaterno, setApeMaterno] = useState( cliente1 ? cliente1.apemat : '')
+    const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
+    const [segnom, setSegnom] = useState( cliente1 ? cliente1.segnom : '')
+    const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
@@ -87,7 +91,14 @@ const ContratantesForm = ({ cliente2 }: Props) => {
                 />
             </div>
             <div className="w-full flex justify-center items-center gap-4">
-                <button className="bg-gray-50 h-full px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">
+                <button 
+                    className="bg-gray-50 h-full px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md"
+                    type="button"
+                    onClick={() => {
+                        setShowContratanteForm(false)
+                        setShowClienteForm(true)
+                    }}
+                >
                     Editar Cliente
                 </button>
             </div>

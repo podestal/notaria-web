@@ -3,7 +3,8 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import Selector from "../../ui/Selector"
 import axios from "axios"
 import ContratantesForm from "../contratantes/ContratantesForm"
-import ClientesForm from "./ClientesForm"
+import { Cliente } from "../../../services/api/cliente1Service"
+import CreateCliente from "./CreateCliente"
 
 const documentNaturalOptions = [
     { value: 0, label: 'Seleccione una opción' },
@@ -27,6 +28,7 @@ const PreClientForm = () => {
     const [showContratanteForm, setShowContratanteForm] = useState(false)
     const [showClienteForm, setShowClienteForm] = useState(false)
     const [cliente2, setCliente2] = useState(null)
+    const [cliente1, setCliente1] = useState<Cliente | null>(null)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
 
     const handleLookup = (e: React.FormEvent) => {
@@ -75,6 +77,7 @@ const PreClientForm = () => {
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);
                 setCliente2(response.data)
+                setCliente1(response.data)
                 setShowContratanteForm(true)
                 setShowClienteForm(false)
             } else {
@@ -138,12 +141,21 @@ const PreClientForm = () => {
         <div className="mt-10">
             <ContratantesForm 
                 cliente2={cliente2}
+                cliente1={cliente1}
+                setShowContratanteForm={setShowContratanteForm}
+                setShowClienteForm={setShowClienteForm}
             />
         </div>
     }
     {showClienteForm &&
         <div className="mt-10">
-            <ClientesForm />
+            <CreateCliente 
+                cliente1={cliente1}
+                setShowContratanteForm={setShowContratanteForm}
+                setShowClienteForm={setShowClienteForm}
+                setCliente1={setCliente1}
+                dni={document}
+            />
         </div>
     }
     </>

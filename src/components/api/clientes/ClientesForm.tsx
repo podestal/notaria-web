@@ -2,14 +2,32 @@ import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
-import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacionalidades"
-import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
-import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
 import axios from "axios"
-import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import DateInput from "../../ui/DateInput"
+import useCreateCliente from "../../../hooks/api/cliente/useCreateCliente"
+import { Cliente } from "../../../services/api/cliente1Service"
+import { Nacionalidad } from "../../../services/api/nacionalidadesService"
+import { Profesion } from "../../../services/api/profesionesService"
+import { Cargo } from "../../../services/api/cargosService"
+import { Ubigeo } from "../../../services/api/ubigeoService"
 
+// nacionalidades={nacionalidades}
+// profesiones={profesiones}
+// cargos={cargos}
+// ubigeos={ubigeos}
+
+interface Props {
+    dni: string
+    setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
+    setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
+    setCliente1: React.Dispatch<React.SetStateAction<Cliente | null>>
+    cliente1: Cliente | null
+    nacionalidades: Nacionalidad[]
+    profesiones: Profesion[]
+    cargos: Cargo[]
+    ubigeos: Ubigeo []
+}
 
 const civilStatusOptions = [
     { value: 0, label: 'Seleccionar Estado Civil' },
@@ -26,28 +44,82 @@ const sexOptions = [
     { value: 2, label: 'Femenino' },
 ]
 
-const ClientesForm = () => {
+const ClientesForm = ({ 
+    dni, 
+    setShowContratanteForm, 
+    setShowClienteForm, 
+    setCliente1,
+    cliente1,
+    nacionalidades,
+    profesiones,
+    cargos,
+    ubigeos, 
+    }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
 
-    const [dni, setDni] = useState('47067139')
-    const [apepat, setApepat] = useState('')
-    const [apemat, setApemat] = useState('')
-    const [prinom, setPrinom] = useState('')
-    const [segnom, setSegnom] = useState('')
-    const [direccion, setDireccion] = useState('')
-    const [nombre, setNombre] = useState('')
-    const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(null)
+    const [apepat, setApepat] = useState(cliente1 ? cliente1.apepat : '')
+    const [apemat, setApemat] = useState( cliente1 ? cliente1.apemat : '')
+    const [prinom, setPrinom] = useState(cliente1 ? cliente1.prinom : '')
+    const [segnom, setSegnom] = useState(cliente1 ? cliente1.segnom : '')
+    const [direccion, setDireccion] = useState(cliente1 ? cliente1.direccion : '')
+    const [nombre, setNombre] = useState(cliente1 ? cliente1.nombre : '')
+    const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(() => {
+        if (cliente1 && cliente1.idubigeo) {
+          const match = ubigeos.find(ubi => ubi.coddis === cliente1.idubigeo);
+          if (match) {
+            return {
+              id: match.coddis,
+              label: `${match.nomdpto} - ${match.nomprov} - ${match.nomdis}`,
+            };
+          }
+        }
+        return null;
+      });
+      
     const [naturalFrom, setNaturalFrom] = useState('')
 
-    const [civilStatus, setCivilStatus] = useState(0)
-    const [gender, setGender] = useState(0)
-    const [nationality, setNationality] = useState<{ id: string; label: string } | null>(null)
-    const [birthdate, setBirthdate] = useState('')
+    const [civilStatus, setCivilStatus] = useState(cliente1 ? civilStatusOptions.find( option => option.value === cliente1.idestcivil)?.value : 0)
+    const [gender, setGender] = useState(cliente1 ? sexOptions.find( option => option.label[0] === cliente1.sexo)?.value : 0)
+    const [nationality, setNationality] = useState<{ id: string; label: string } | null>(() => {
+        if (cliente1 && cliente1.idubigeo) {
+          const match = nacionalidades.find(nacionalidad => nacionalidad.idnacionalidad === parseInt(cliente1.nacionalidad || '0'));
+          if (match) {
+            return {
+              id: (match.idnacionalidad).toString(),
+              label: match.descripcion,
+            };
+          }
+        }
+        return null;
+      })
+    const [birthdate, setBirthdate] = useState(cliente1 ? cliente1.cumpclie || '' : '')
     const [resident, setResident] = useState(1)
 
-    const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(null)
-    const [cargo, setCargo] = useState<{ id: string; label: string } | null>(null)
+    const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(() => {
+        if (cliente1 && cliente1.idubigeo) {
+          const match = profesiones.find(profesion => profesion.idprofesion === cliente1.idprofesion);
+          if (match) {
+            return {
+              id: (match.idprofesion).toString(),
+              label: match.desprofesion,
+            };
+          }
+        }
+        return null;
+      })
+    const [cargo, setCargo] = useState<{ id: string; label: string } | null>(() => {
+        if (cliente1 && cliente1.idubigeo) {
+          const match = cargos.find(cargo => cargo.idcargoprofe === cliente1.idcargoprofe);
+          if (match) {
+            return {
+              id: (match.idcargoprofe).toString(),
+              label: match.descripcrapro,
+            };
+          }
+        }
+        return null;
+      })
 
     const [celphone, setCellphone] = useState('')
     const [officePhone, setOfficePhone] = useState('')
@@ -66,6 +138,9 @@ const ClientesForm = () => {
     const [birthdateError, setBirthdateError] = useState('')
     const [profesionError, setProfesionError] = useState('')
     const [cargoError, setCargoError] = useState('')
+
+    // Create Cliente function
+    const createClient = useCreateCliente()
     
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -95,6 +170,8 @@ const ClientesForm = () => {
             setShow(true)
             return
         }
+
+        setNombre(`${apepat} ${apemat}, ${prinom} ${segnom}`)
 
         if (!direccion) {
             setDireccionError('Dirección es requerida')
@@ -194,6 +271,50 @@ const ClientesForm = () => {
             return
         }
 
+        createClient.mutate({
+            cliente: {
+                tipper: 'N',
+                apepat,
+                apemat,
+                prinom,
+                segnom,
+                nombre,
+                direccion,
+                idubigeo: ubigeo.id,
+                resedente: resident === 1 ? '1' : '0',
+                idtipdoc: 1,
+                numdoc: dni,
+                email,
+                nacionalidad: nationality.id,
+                idestcivil: civilStatus,
+                sexo: gender === 1 ? 'M' : 'F',
+                telfijo: fixedPhone,
+                telcel: celphone,
+                telofi: officePhone,
+                idcargoprofe: parseInt(cargo.id),
+                idprofesion: parseInt(profesion.id),
+                detaprofesion: profesion.label,
+                cumpclie: birthdate,
+            }
+        }, {
+            onSuccess: (data) => {
+                console.log('Cliente creado:', data)
+                setType('success')
+                setMessage('Cliente creado exitosamente')
+                setShow(true)
+                setShowClienteForm(false)
+                setShowContratanteForm(true)
+                setCliente1(data)
+
+            },
+            onError: (error) => {
+                console.error('Error al crear cliente:', error)
+                setType('error')
+                setMessage('Error al crear cliente')
+                setShow(true)
+            }
+        })
+
     }
 
     const handleReniec = () => {
@@ -205,7 +326,7 @@ const ClientesForm = () => {
             setApemat(response.data.resultado.apellido_materno || '')
             setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
             setBirthdate(response.data.resultado.fecha_nacimiento || '')
-            setDireccion('Avis Luz y Fuerza D-8')
+            // setDireccion('Avis Luz y Fuerza D-8')
             if (response.data.resultado.genero === 'M') {
                 setGender(1) // Masculino
             }
@@ -219,17 +340,6 @@ const ClientesForm = () => {
             
         
     }
-
-    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
-    const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
-    const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos()
-    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
-
-    if (isNacionalidadesLoading || isLoadingProfesiones || isLoadingCargos || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
-
-    if (isNacionalidadesError || isErrorProfesiones || isErrorCargos || isErrorUbigeo) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
-
-    if (nacionalidadesSuccess && isSuccessProfesiones && isSuccessCargos && isSuccessUbigeo)
 
   return (
     <form
@@ -296,6 +406,7 @@ const ClientesForm = () => {
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Ubigeo</p>
                 <SearchableDropdownInput
                     options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
+                    defaultValue='1'
                     selected={ubigeo}
                     setSelected={setUbigeo}
                     placeholder="Buscar Ubigeo"
@@ -315,6 +426,7 @@ const ClientesForm = () => {
                 required
                 error={civilStatusError}
                 setError={setCivilStatusError}
+                defaultValue={civilStatus}
             />
             <SimpleSelector 
                 label="Sexo"
@@ -359,6 +471,7 @@ const ClientesForm = () => {
                 setValue={setNaturalFrom}
                 horizontal={true}
             />
+            <>{console.log('cliente', cliente1)}</>
             <DateInput 
                 label="Fecha de Nacimiento"
                 value={birthdate}
