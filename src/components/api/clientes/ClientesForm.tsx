@@ -8,6 +8,7 @@ import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacion
 import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
 import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
 import axios from "axios"
+import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
 
 
 const civilStatusOptions = [
@@ -97,12 +98,13 @@ const ClientesForm = () => {
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
     const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
     const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos()
+    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
 
-    if (isNacionalidadesLoading || isLoadingProfesiones || isLoadingCargos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
+    if (isNacionalidadesLoading || isLoadingProfesiones || isLoadingCargos || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 
-    if (isNacionalidadesError || isErrorProfesiones || isErrorCargos) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
+    if (isNacionalidadesError || isErrorProfesiones || isErrorCargos || isErrorUbigeo) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
 
-    if (nacionalidadesSuccess && isSuccessProfesiones && isSuccessCargos)
+    if (nacionalidadesSuccess && isSuccessProfesiones && isSuccessCargos && isSuccessUbigeo)
 
   return (
     <form
@@ -137,6 +139,7 @@ const ClientesForm = () => {
                 setError={setApematError}
             />
         </div>
+        <>{console.log('ubigeos', ubigeos)}</>
         <div className="flex justify-center items-center gap-6 mb-6">
             <SimpleInput 
                 label="Primer Nombre"
