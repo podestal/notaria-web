@@ -8,6 +8,7 @@ import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
 import axios from "axios"
 import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import DateInput from "../../ui/DateInput"
 
 
 const civilStatusOptions = [
@@ -53,6 +54,10 @@ const ClientesForm = () => {
     const [prinomError, setPrinomError] = useState('') 
     const [direccionError, setDireccionError] = useState('')
     const [ubigeoError, setUbigeoError] = useState('')
+    const [civilStatusError, setCivilStatusError] = useState('')
+    const [genderError, setGenderError] = useState('')
+    const [nationalityError, setNationalityError] = useState('')
+    const [birthdateError, setBirthdateError] = useState('')
     
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -99,6 +104,37 @@ const ClientesForm = () => {
             return
         }
 
+        if (civilStatus === 0) {
+            setCivilStatusError('Estado Civil es requerido')
+            setType('error')
+            setMessage('Estado Civil es requerido')
+            setShow(true)
+            return
+        }
+
+        if (gender === 0) {
+            setGenderError('Sexo es requerido')
+            setType('error')
+            setMessage('Sexo es requerido')
+            setShow(true)
+            return  
+        }
+
+        if (nationality === null) {
+            setNationalityError('Nacionalidad es requerida')
+            setType('error')
+            setMessage('Nacionalidad es requerida')
+            setShow(true)
+            return
+        }
+
+        if (!birthdate) {
+            setBirthdateError('Fecha de Nacimiento es requerida')
+            setType('error')
+            setMessage('Fecha de Nacimiento es requerida')
+            setShow(true)
+            return
+        }
 
     }
 
@@ -219,6 +255,8 @@ const ClientesForm = () => {
                 options={civilStatusOptions}
                 horizontal={true}
                 required
+                error={civilStatusError}
+                setError={setCivilStatusError}
             />
             <SimpleSelector 
                 label="Sexo"
@@ -227,6 +265,8 @@ const ClientesForm = () => {
                 options={sexOptions}
                 horizontal={true}
                 required
+                error={genderError}
+                setError={setGenderError}
             />
         </div>
         <div className="grid grid-cols-3 items-center gap-6 mb-6">
@@ -238,6 +278,8 @@ const ClientesForm = () => {
                     setSelected={setNationality}
                     placeholder="Buscar nacionalidad"
                     required
+                    error={nationalityError}
+                    setError={setNationalityError}
                 />
             </div>
             <SimpleSelector 
@@ -259,12 +301,20 @@ const ClientesForm = () => {
                 setValue={setPrinom}
                 horizontal={true}
             />
-            <SimpleInput 
+            {/* <SimpleInput 
                 label="Fecha de Nacimiento"
                 value={birthdate}
                 setValue={setBirthdate}
                 horizontal={true}
                 required
+            /> */}
+            <DateInput 
+                label="Fecha de Nacimiento"
+                value={birthdate}
+                setValue={setBirthdate}
+                required
+                error={birthdateError}
+                setError={setBirthdateError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-6">
