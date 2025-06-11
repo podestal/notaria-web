@@ -1,82 +1,3 @@
-// import { motion } from 'framer-motion';
-
-// interface DateInputProps {
-//   label?: string;
-//   value: string;
-//   setValue: (val: string) => void;
-//   error?: string;
-//   setError?: (val: string) => void;
-//   required?: boolean;
-// }
-
-// const shakeAnimation = {
-//   initial: { x: 0 },
-//   animate: { x: [0, -5, 5, -5, 5, 0], transition: { duration: 0.4 } },
-// };
-
-// const formatDate = (val: string) => {
-//   // Remove non-digit characters
-//   const digits = val.replace(/\D/g, '').slice(0, 8); // Max 8 digits (DDMMYYYY)
-
-//   const parts = [];
-//   if (digits.length >= 2) parts.push(digits.slice(0, 2));
-//   if (digits.length >= 4) parts.push(digits.slice(2, 4));
-//   if (digits.length > 4) parts.push(digits.slice(4));
-
-//   return parts.join('/');
-// };
-
-// const DateInput = ({
-//   label,
-//   value,
-//   setValue,
-//   error,
-//   setError,
-//   required = false,
-// }: DateInputProps) => {
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const raw = e.target.value;
-//     const formatted = formatDate(raw);
-//     setError?.('');
-//     setValue(formatted);
-//   };
-
-//   return (
-//     <div className="flex flex-col gap-1 w-full my-2">
-//       {label && (
-//         <label className="pl-1 text-xs font-semibold text-slate-700">
-//           {label} {required && <span className="text-red-500">*</span>}
-//         </label>
-//       )}
-//       <motion.input
-//         {...(error ? shakeAnimation : {})}
-//         type="text"
-//         inputMode="numeric"
-//         maxLength={10}
-//         placeholder="DD/MM/YYYY"
-//         value={value}
-//         onChange={handleChange}
-//         className={`bg-white text-slate-700 border ${
-//           error ? 'border-red-500' : 'border-slate-300'
-//         } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
-//           error ? 'focus:ring-red-300' : 'focus:ring-blue-300'
-//         }`}
-//       />
-//       {error && (
-//         <motion.div
-//           className="text-xs text-red-500 mt-1 px-1"
-//           initial={{ opacity: 0, y: -5 }}
-//           animate={{ opacity: 1, y: 0 }}
-//         >
-//           {error}
-//         </motion.div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default DateInput;
-
 import { motion } from 'framer-motion';
 
 interface DateInputProps {
@@ -86,6 +7,7 @@ interface DateInputProps {
   error?: string;
   setError?: (val: string) => void;
   required?: boolean;
+  horizontal?: boolean;
 }
 
 const shakeAnimation = {
@@ -112,6 +34,7 @@ const DateInput = ({
   error,
   setError,
   required = false,
+  horizontal = false,
 }: DateInputProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.currentTarget.value; // Get the raw input value
@@ -126,7 +49,7 @@ const DateInput = ({
       };
 
   return (
-    <div className="flex flex-col gap-1 w-full my-2">
+    <div className={`flex w-full ${horizontal ? 'grid grid-cols-3 items-center' : 'flex-col justify-center items-start'} gap-6`}>
       {label && (
         <label className="pl-1 text-xs font-semibold text-slate-700">
           {label} {required && <span className="text-red-500">*</span>}
@@ -137,10 +60,10 @@ const DateInput = ({
         type="text"
         inputMode="numeric"
         maxLength={10}
-        placeholder="DD/MM/YYYY"
+        placeholder="DD/MM/AAAA"
         value={value}
         onChange={handleChange}
-        className={`bg-white text-slate-700 border ${
+        className={`col-span-2 bg-white text-slate-700 border ${
           error ? 'border-red-500' : 'border-slate-300'
         } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
           error ? 'focus:ring-red-300' : 'focus:ring-blue-300'

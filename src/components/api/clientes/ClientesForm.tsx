@@ -38,6 +38,7 @@ const ClientesForm = () => {
     const [direccion, setDireccion] = useState('')
     const [nombre, setNombre] = useState('')
     const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(null)
+    const [naturalFrom, setNaturalFrom] = useState('')
 
     const [civilStatus, setCivilStatus] = useState(0)
     const [gender, setGender] = useState(0)
@@ -47,6 +48,11 @@ const ClientesForm = () => {
 
     const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(null)
     const [cargo, setCargo] = useState<{ id: string; label: string } | null>(null)
+
+    const [celphone, setCellphone] = useState('')
+    const [officePhone, setOfficePhone] = useState('')
+    const [fixedPhone, setFixedPhone] = useState('')
+    const [email, setEmail] = useState('')
 
     // Error handling states
     const [apepatError, setApepatError] = useState('')
@@ -58,6 +64,8 @@ const ClientesForm = () => {
     const [genderError, setGenderError] = useState('')
     const [nationalityError, setNationalityError] = useState('')
     const [birthdateError, setBirthdateError] = useState('')
+    const [profesionError, setProfesionError] = useState('')
+    const [cargoError, setCargoError] = useState('')
     
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -132,6 +140,56 @@ const ClientesForm = () => {
             setBirthdateError('Fecha de Nacimiento es requerida')
             setType('error')
             setMessage('Fecha de Nacimiento es requerida')
+            setShow(true)
+            return
+        }
+
+        const rawBirthdate = birthdate.split('/')
+
+        if (rawBirthdate.length !== 3 || rawBirthdate[0].length !== 2 || rawBirthdate[1].length !== 2 || rawBirthdate[2].length !== 4) {
+            setBirthdateError('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
+            setType('error')
+            setMessage('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
+            setShow(true)
+            return
+        }
+
+        if (parseInt(rawBirthdate[0]) < 1 || parseInt(rawBirthdate[0]) > 31) {
+            setBirthdateError('Día de Nacimiento debe ser entre 01 y 31')
+            setType('error')
+            setMessage('Día de Nacimiento debe ser entre 01 y 31')
+            setShow(true)
+            return  
+        }
+
+        if (parseInt(rawBirthdate[1]) < 1 || parseInt(rawBirthdate[1]) > 12) {
+            setBirthdateError('Mes de Nacimiento debe ser entre 01 y 12')
+            setType('error')
+            setMessage('Mes de Nacimiento debe ser entre 01 y 12')
+            setShow(true)
+            return  
+        }
+
+        if (parseInt(rawBirthdate[2]) < 1900 || parseInt(rawBirthdate[2]) > new Date().getFullYear()) {
+            setBirthdateError('Año de Nacimiento debe ser válido')
+            setType('error')
+            setMessage('Año de Nacimiento debe ser válido')
+            setShow(true)
+            return  
+        }
+
+        if (profesion === null) {
+            setProfesionError('Profesión es requerida')
+            setType('error')
+            setMessage('Profesión es requerida')
+            setShow(true)
+            return
+        }
+
+        if (cargo === null) {
+            setCargoError('Cargo es requerido')
+            setType('error')
+            setMessage('Cargo es requerido')
             setShow(true)
             return
         }
@@ -297,17 +355,10 @@ const ClientesForm = () => {
         <div className="flex justify-center items-center gap-6 mb-6">
             <SimpleInput 
                 label="Natural de"
-                value={prinom}
-                setValue={setPrinom}
+                value={naturalFrom}
+                setValue={setNaturalFrom}
                 horizontal={true}
             />
-            {/* <SimpleInput 
-                label="Fecha de Nacimiento"
-                value={birthdate}
-                setValue={setBirthdate}
-                horizontal={true}
-                required
-            /> */}
             <DateInput 
                 label="Fecha de Nacimiento"
                 value={birthdate}
@@ -315,6 +366,7 @@ const ClientesForm = () => {
                 required
                 error={birthdateError}
                 setError={setBirthdateError}
+                horizontal
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-6">
@@ -326,6 +378,8 @@ const ClientesForm = () => {
                     setSelected={setProfesion}
                     placeholder="Buscar Profesión"
                     required
+                    error={profesionError}
+                    setError={setProfesionError}
                 />
             </div>
             <div className="w-full flex justify-center items-center gap-4 col-span-2">
@@ -336,6 +390,8 @@ const ClientesForm = () => {
                     setSelected={setCargo}
                     placeholder="Buscar Cargo"
                     required
+                    error={cargoError}
+                    setError={setCargoError}
                 />
             </div>
             {/* <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Seleccionar</button> */}
@@ -343,28 +399,28 @@ const ClientesForm = () => {
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
                 label="Teléfono Celular"
-                value={nombre}
-                setValue={setNombre}
+                value={celphone}
+                setValue={setCellphone}
                 horizontal={true}
             />
             <SimpleInput 
                 label="Teléfono Oficina"
-                value={nombre}
-                setValue={setNombre}
+                value={officePhone}
+                setValue={setOfficePhone}
                 horizontal={true}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
                 label="Teléfono Fijo"
-                value={nombre}
-                setValue={setNombre}
+                value={fixedPhone}
+                setValue={setFixedPhone}
                 horizontal={true}
             />
             <SimpleInput 
                 label="Email"
-                value={nombre}
-                setValue={setNombre}
+                value={email}
+                setValue={setEmail}
                 horizontal={true}
             />
         </div>
