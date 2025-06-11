@@ -1,4 +1,5 @@
 import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
+import useUpdateCliente from "../../../hooks/api/cliente/useUpdateCliente"
 import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacionalidades"
 import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
 import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
@@ -20,6 +21,8 @@ const UpdateCliente = ({
     setCliente1, 
     cliente1
  }: Props) => {
+
+    const updateCliente = useUpdateCliente({ clienteId: cliente1?.idcliente || '', dni })
 
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
     const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
@@ -43,6 +46,7 @@ const UpdateCliente = ({
         cargos={cargos}
         ubigeos={ubigeos}
         cliente1={cliente1} 
+        updateCliente={updateCliente} // Pass the updateCliente mutation
     />
   )
 }

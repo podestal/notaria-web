@@ -1,7 +1,7 @@
 import { UseMutationResult, useMutation } from "@tanstack/react-query"
 import getCliente1Service, { Cliente, CreateUpdateCliente1 } from "../../../services/api/cliente1Service"
 
-interface CreateClienteData {
+export interface CreateClienteData {
     cliente: CreateUpdateCliente1
 }
 

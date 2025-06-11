@@ -1,4 +1,5 @@
 import useGetCargos from "../../../hooks/api/cargos/useGetCargos"
+import useCreateCliente from "../../../hooks/api/cliente/useCreateCliente"
 import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacionalidades"
 import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
 import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
@@ -19,6 +20,8 @@ const CreateCliente = ({
     setShowClienteForm, 
     setCliente1, 
  }: Props) => {
+
+    const createCliente = useCreateCliente()
 
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
     const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
@@ -42,6 +45,7 @@ const CreateCliente = ({
         cargos={cargos}
         ubigeos={ubigeos}
         cliente1={null} // Since this is for creating a new client, we pass null
+        createCliente={createCliente} // Pass the createCliente mutation
     />
   )
 }

@@ -5,12 +5,14 @@ import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import axios from "axios"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import DateInput from "../../ui/DateInput"
-import useCreateCliente from "../../../hooks/api/cliente/useCreateCliente"
 import { Cliente } from "../../../services/api/cliente1Service"
 import { Nacionalidad } from "../../../services/api/nacionalidadesService"
 import { Profesion } from "../../../services/api/profesionesService"
 import { Cargo } from "../../../services/api/cargosService"
 import { Ubigeo } from "../../../services/api/ubigeoService"
+import { UseMutationResult } from "@tanstack/react-query"
+import { UpdateClienteData } from "../../../hooks/api/cliente/useUpdateCliente"
+import { CreateClienteData } from "../../../hooks/api/cliente/useCreateCliente"
 
 // nacionalidades={nacionalidades}
 // profesiones={profesiones}
@@ -27,6 +29,8 @@ interface Props {
     profesiones: Profesion[]
     cargos: Cargo[]
     ubigeos: Ubigeo []
+    updateCliente?: UseMutationResult<Cliente, Error, UpdateClienteData>
+    createCliente?: UseMutationResult<Cliente, Error, CreateClienteData>
 }
 
 const civilStatusOptions = [
@@ -54,6 +58,8 @@ const ClientesForm = ({
     profesiones,
     cargos,
     ubigeos, 
+    updateCliente,
+    createCliente
     }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -138,9 +144,6 @@ const ClientesForm = ({
     const [birthdateError, setBirthdateError] = useState('')
     const [profesionError, setProfesionError] = useState('')
     const [cargoError, setCargoError] = useState('')
-
-    // Create Cliente function
-    const createClient = useCreateCliente()
     
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -271,7 +274,7 @@ const ClientesForm = ({
             return
         }
 
-        createClient.mutate({
+        createCliente && createCliente.mutate({
             cliente: {
                 tipper: 'N',
                 apepat,
@@ -314,6 +317,51 @@ const ClientesForm = ({
                 setShow(true)
             }
         })
+
+        updateCliente && updateCliente.mutate({
+            cliente: {
+                tipper: 'N',
+                apepat,
+                apemat,
+                prinom,
+                segnom,
+                nombre,
+                direccion,
+                idubigeo: ubigeo.id,
+                resedente: resident === 1 ? '1' : '0',
+                idtipdoc: 1,
+                numdoc: dni,
+                email,
+                nacionalidad: nationality.id,
+                idestcivil: civilStatus,
+                sexo: gender === 1 ? 'M' : 'F',
+                telfijo: fixedPhone,
+                telcel: celphone,
+                telofi: officePhone,
+                idcargoprofe: parseInt(cargo.id),
+                idprofesion: parseInt(profesion.id),
+                detaprofesion: profesion.label,
+                cumpclie: birthdate,
+            }
+        }, {
+            onSuccess: (data) => {
+                console.log('Cliente actualizado:', data)
+                setType('success')
+                setMessage('Cliente actualizado exitosamente')
+                setShow(true)
+                setShowClienteForm(false)
+                setShowContratanteForm(true)
+                setCliente1(data)
+
+            },
+            onError: (error) => {
+                console.error('Error al actualizar cliente:', error)
+                setType('error')
+                setMessage('Error al actualizar cliente')
+                setShow(true)
+            }   
+        })
+
 
     }
 
