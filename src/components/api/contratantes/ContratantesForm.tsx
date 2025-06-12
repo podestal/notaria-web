@@ -19,6 +19,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
     const [segnom, setSegnom] = useState( cliente1 ? cliente1.segnom : '')
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
+    const [selectedActos, setSelectedActos] = useState<string[]>([])
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
@@ -50,6 +51,8 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
             </div>
             <ContratantesConditionFilter 
                 idtipoacto={idtipoacto}
+                selectedActos={selectedActos}
+                setSelectedActos={setSelectedActos}
             />
         </div>
         <div className="grid grid-cols-5 gap-4 mt-4">

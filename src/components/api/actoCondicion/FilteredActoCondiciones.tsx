@@ -1,10 +1,13 @@
 import useGetActoCondicionByTipoActo from "../../../hooks/api/actoCondicion/useGetActoCondicionByTipoActo";
+import MultiSelect from "../../ui/MultiSelect";
 
 interface Props {
     idtipoacto: string
+    selectedActos: string[]
+    setSelectedActos: React.Dispatch<React.SetStateAction<string[]>>
 }
 
-const FilteredActoCondiciones = ({ idtipoacto }: Props) => {
+const FilteredActoCondiciones = ({ idtipoacto, selectedActos, setSelectedActos }: Props) => {
 
     const { data: actoCondiciones, isLoading, isError, error, isSuccess } = useGetActoCondicionByTipoActo({ idtipoacto })
 
@@ -19,22 +22,18 @@ const FilteredActoCondiciones = ({ idtipoacto }: Props) => {
 
   return (
     <>
-        <p>Seleccione condiciones</p>
-        <>{console.log('open', open)}</>
-        <ul>
-            { actoCondiciones.map((condicion) => (
-                <li
-                    key={condicion.idcondicion}
-                    className="text-xs text-gray-700 my-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md"
-                    onClick={() => {
-                        // Aquí puedes manejar la selección de la condición
-                        console.log(`Condición seleccionada: ${condicion.condicion}`);
-                    }}
-                >
-                    {condicion.condicion}
-                </li>
-            ))}
-        </ul>
+        <p className="text-lg text-center font-semibold">Seleccione condiciones</p>
+        <>{console.log('actoCondiciones', actoCondiciones)}</>
+        <MultiSelect 
+            options={actoCondiciones.map(condicion => ({
+                id: condicion.idcondicion,
+                label: condicion.condicion
+            }))}
+            placeholder="Seleccione condiciones"
+            label=""
+            selectedIds={selectedActos}
+            setSelectedIds={setSelectedActos}
+        />
     </>
   )
 }
