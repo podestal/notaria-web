@@ -14,6 +14,8 @@ const ContratantesMain = ({ kardex }: Props) => {
         />
         <CreateContratante 
             idtipoacto={kardex.codactos}
+            idtipkar={kardex.idtipkar}
+            kardex={kardex.kardex}
         />
     </>
   )

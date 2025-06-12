@@ -3,6 +3,9 @@ import SimpleInput from "../../ui/SimpleInput"
 import { Cliente2 } from "../../../services/api/clienteService"
 import { Cliente } from "../../../services/api/cliente1Service"
 import ContratantesConditionFilter from "./ContratantesConditionFilter"
+import { CreateContratanteData } from "../../../hooks/api/contratantes/useCreateContratantes"
+import { Contratante } from "../../../services/api/contratantesService"
+import { UseMutationResult } from "@tanstack/react-query"
 
 interface Props {
     cliente2: Cliente2 | null
@@ -10,9 +13,12 @@ interface Props {
     idtipoacto: string
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
+    createContratante: UseMutationResult<Contratante, Error, CreateContratanteData>
+    idtipkar: number
+    kardex: string
 }
 
-const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm }: Props) => {
+const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, createContratante, idtipkar, kardex }: Props) => {
 
     const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
     const [apeMaterno, setApeMaterno] = useState( cliente1 ? cliente1.apemat : '')
@@ -20,14 +26,50 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [segnom, setSegnom] = useState( cliente1 ? cliente1.segnom : '')
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
     const [selectedActos, setSelectedActos] = useState<string[]>([])
+    const [firma, setFirma] = useState(false)
+    const [incluirIndic, setIncluirIndic] = useState(false)
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
+        if (selectedActos.length === 0) {
+            console.error('Debe seleccionar al menos una condición')
+            return
+        }
+
+
+        const formattedActos = selectedActos.map(acto => (`${acto}.xxx`)).join('/')
+
+        createContratante.mutate({
+            contratante: {
+                idtipkar,
+                kardex,
+                condicion: formattedActos,
+                firma: firma ? '1' : '0',
+                fechafirma: "0000",
+                resfirma: 0,
+                tiporepresentacion: '0', 
+                indice: incluirIndic ? '1' : '0',
+                visita: '0',
+                inscrito: '1',
+                
+            }
+        }, {
+            onSuccess: (res) => {
+                console.log('res', res);
+                
+                // setShowContratanteForm(false)
+                // setShowClienteForm(true)
+            },
+            onError: (error) => {
+                console.error('Error creating contratante:', error)
+            }
+        })
+
+
     }
 
   return (
     <>
-    {/* <ClientesForm /> */}
     <form
         onSubmit={handleCreateContratante}
     >
@@ -104,11 +146,19 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
         <div className="flex items-center justify-start gap-10 mt-6">
             <div className="flex items-center justify-center gap-4">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Firma</p>
-                <input checked type="checkbox" />
+                <input 
+                    type="checkbox"  
+                    checked={firma}
+                    onChange={(e) => setFirma(e.target.checked)}    
+                />
             </div>
             <div className="flex items-center justify-center gap-4">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Incluir en el Indic</p>
-                <input checked type="checkbox" />
+                <input 
+                    type="checkbox" 
+                    checked={incluirIndic}
+                    onChange={(e) => setIncluirIndic(e.target.checked)}
+                />
             </div>
         </div>
     </form>

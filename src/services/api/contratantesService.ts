@@ -8,7 +8,14 @@ export interface Contratante {
     firma: string;
     fechafirma: string;
     cliente: string;
+    resfirma: number;
+    tiporepresentacion: string;
+    indice: string;
+    visita: string;
+    inscrito: string;
 }
+
+export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente'>
 
 interface Props {
     byKardex?: boolean;
@@ -19,7 +26,7 @@ const getContratantesService = ({ byKardex }: Props) => {
     if (byKardex) {
         url += 'by_kardex/';
     }
-    return new APIClient<Contratante, Contratante>(url);
+    return new APIClient<Contratante, CreateUpdateContratante>(url);
 }
 
 export default getContratantesService

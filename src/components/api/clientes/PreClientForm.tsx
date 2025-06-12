@@ -6,9 +6,12 @@ import ContratantesForm from "../contratantes/ContratantesForm"
 import { Cliente } from "../../../services/api/cliente1Service"
 import CreateCliente from "./CreateCliente"
 import UpdateCliente from "./UpdateCliente"
+import useCreateContratante from "../../../hooks/api/contratantes/useCreateContratantes"
 
 interface Props {
     idtipoacto: string
+    idtipkar: number
+    kardex: string
 }
 
 const documentNaturalOptions = [
@@ -24,7 +27,7 @@ const documentNaturalOptions = [
     { value: 9, label: 'Otro' }
 ]
 
-const PreClientForm = ({ idtipoacto }: Props) => {
+const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
@@ -35,6 +38,8 @@ const PreClientForm = ({ idtipoacto }: Props) => {
     const [cliente2, setCliente2] = useState(null)
     const [cliente1, setCliente1] = useState<Cliente | null>(null)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
+
+    const createContratante = useCreateContratante()
 
     const handleLookup = (e: React.FormEvent) => {
 
@@ -150,6 +155,9 @@ const PreClientForm = ({ idtipoacto }: Props) => {
                 setShowContratanteForm={setShowContratanteForm}
                 setShowClienteForm={setShowClienteForm}
                 idtipoacto={idtipoacto}
+                createContratante={createContratante}
+                idtipkar={idtipkar}
+                kardex={kardex}
             />
         </div>
     }

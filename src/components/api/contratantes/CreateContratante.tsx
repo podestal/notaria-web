@@ -5,9 +5,11 @@ import PreClientForm from "../clientes/PreClientForm"
 
 interface Props {
     idtipoacto: string
+    idtipkar: number
+    kardex: string
 }
 
-const CreateContratante = ({ idtipoacto }: Props) => {
+const CreateContratante = ({ idtipoacto, idtipkar, kardex }: Props) => {
 
     const [open, setOpen] = useState(false)
 
@@ -26,6 +28,8 @@ const CreateContratante = ({ idtipoacto }: Props) => {
             >
                 <PreClientForm 
                     idtipoacto={idtipoacto}
+                    idtipkar={idtipkar}
+                    kardex={kardex}
                 />
             </TopModal>
         </div>
