@@ -2,15 +2,17 @@ import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
 import { Cliente2 } from "../../../services/api/clienteService"
 import { Cliente } from "../../../services/api/cliente1Service"
+import ContratantesConditionFilter from "./ContratantesConditionFilter"
 
 interface Props {
     cliente2: Cliente2 | null
     cliente1: Cliente | null
+    idtipoacto: string
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ContratantesForm = ({ cliente1, setShowContratanteForm, setShowClienteForm }: Props) => {
+const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm }: Props) => {
 
     const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
     const [apeMaterno, setApeMaterno] = useState( cliente1 ? cliente1.apemat : '')
@@ -46,16 +48,9 @@ const ContratantesForm = ({ cliente1, setShowContratanteForm, setShowClienteForm
                     horizontal
                 />
             </div>
-            <div className="w-full flex justify-center items-center gap-4">
-                <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
-                    <span className="font-bold text-green-600 text-md">+</span>
-                    <span>Condición</span>
-                </button>
-                <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
-                    <span className="font-bold text-red-600 text-md">-</span>
-                    <span>Condición</span>
-                </button>
-            </div>
+            <ContratantesConditionFilter 
+                idtipoacto={idtipoacto}
+            />
         </div>
         <div className="grid grid-cols-5 gap-4 mt-4">
             <div className="col-span-2">

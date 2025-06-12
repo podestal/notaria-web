@@ -3,7 +3,11 @@ import TopModal from "../../ui/TopModal"
 import { useState } from "react"
 import PreClientForm from "../clientes/PreClientForm"
 
-const CreateContratante = () => {
+interface Props {
+    idtipoacto: string
+}
+
+const CreateContratante = ({ idtipoacto }: Props) => {
 
     const [open, setOpen] = useState(false)
 
@@ -20,7 +24,9 @@ const CreateContratante = () => {
                 isOpen={open}
                 onClose={() => setOpen(false)}
             >
-                <PreClientForm />
+                <PreClientForm 
+                    idtipoacto={idtipoacto}
+                />
             </TopModal>
         </div>
     </>

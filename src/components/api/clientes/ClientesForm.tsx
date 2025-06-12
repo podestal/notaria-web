@@ -546,7 +546,9 @@ const ClientesForm = ({
             <div className="w-full flex justify-center items-center gap-4 col-span-2">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Cargo</p>
                 <SearchableDropdownInput
-                    options={[...cargos.map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
+                    options={[...cargos
+                        .filter(car => car.codcargoprofe === profesion?.id)
+                        .map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
                     selected={cargo}
                     setSelected={setCargo}
                     placeholder="Buscar Cargo"

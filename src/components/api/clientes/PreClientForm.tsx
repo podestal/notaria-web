@@ -7,6 +7,10 @@ import { Cliente } from "../../../services/api/cliente1Service"
 import CreateCliente from "./CreateCliente"
 import UpdateCliente from "./UpdateCliente"
 
+interface Props {
+    idtipoacto: string
+}
+
 const documentNaturalOptions = [
     { value: 0, label: 'Seleccione una opción' },
     { value: 1, label: 'Documento Nacional de Identidad' },
@@ -20,7 +24,7 @@ const documentNaturalOptions = [
     { value: 9, label: 'Otro' }
 ]
 
-const PreClientForm = () => {
+const PreClientForm = ({ idtipoacto }: Props) => {
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
@@ -145,6 +149,7 @@ const PreClientForm = () => {
                 cliente1={cliente1}
                 setShowContratanteForm={setShowContratanteForm}
                 setShowClienteForm={setShowClienteForm}
+                idtipoacto={idtipoacto}
             />
         </div>
     }

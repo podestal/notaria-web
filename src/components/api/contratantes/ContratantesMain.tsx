@@ -12,7 +12,9 @@ const ContratantesMain = ({ kardex }: Props) => {
         <ContratantesTable 
             kardex={kardex} 
         />
-        <CreateContratante />
+        <CreateContratante 
+            idtipoacto={kardex.codactos}
+        />
     </>
   )
 }

@@ -5,16 +5,17 @@ interface TopModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  deepth?: number; // Optional prop to control z-index depth
 }
 
-const TopModal = ({ isOpen, onClose, children }: TopModalProps) => {
+const TopModal = ({ isOpen, onClose, children, deepth }: TopModalProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-0 bg-black/40 z-40"
+            className={`fixed inset-0 bg-black/40 ${deepth ? `z-${deepth}` : 'z-40'}`}
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
