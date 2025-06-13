@@ -31,11 +31,10 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
-    const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(0)
+    const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1)
     const [document, setDocument] = useState('')
     const [showContratanteForm, setShowContratanteForm] = useState(false)
     const [showClienteForm, setShowClienteForm] = useState(false)
-    const [cliente2, setCliente2] = useState(null)
     const [cliente1, setCliente1] = useState<Cliente | null>(null)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
 
@@ -86,7 +85,6 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
         ).then(response => {
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);
-                setCliente2(response.data)
                 setCliente1(response.data)
                 setShowContratanteForm(true)
                 setShowClienteForm(false)
@@ -124,6 +122,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
                     label="Tipo de documento"
                     options={documentNaturalOptions}
                     setter={setSelectedTipoDocumento}
+                    defaultValue={selectedTipoDocumento}
                 />
                 {selectedTipoDocumento > 0 && 
                 <div className="flex flex-col gap-2 col-span-2">
@@ -150,7 +149,6 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
     {showContratanteForm &&
         <div className="mt-10">
             <ContratantesForm 
-                cliente2={cliente2}
                 cliente1={cliente1}
                 setShowContratanteForm={setShowContratanteForm}
                 setShowClienteForm={setShowClienteForm}

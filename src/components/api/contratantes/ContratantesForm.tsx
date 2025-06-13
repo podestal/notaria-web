@@ -1,14 +1,13 @@
 import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
-import { Cliente2 } from "../../../services/api/clienteService"
 import { Cliente } from "../../../services/api/cliente1Service"
 import ContratantesConditionFilter from "./ContratantesConditionFilter"
 import { CreateContratanteData } from "../../../hooks/api/contratantes/useCreateContratantes"
 import { Contratante } from "../../../services/api/contratantesService"
 import { UseMutationResult } from "@tanstack/react-query"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 interface Props {
-    cliente2: Cliente2 | null
     cliente1: Cliente | null
     idtipoacto: string
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
@@ -20,6 +19,7 @@ interface Props {
 
 const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, createContratante, idtipkar, kardex }: Props) => {
 
+    const { setMessage, setShow, setType } = useNotificationsStore()
     const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
     const [apeMaterno, setApeMaterno] = useState( cliente1 ? cliente1.apemat : '')
     const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
@@ -32,7 +32,37 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
         if (selectedActos.length === 0) {
-            console.error('Debe seleccionar al menos una condición')
+            setType('error')
+            setMessage('Debe seleccionar al menos una condición para el contratante.')
+            setShow(true)
+            return
+        }
+
+        if (!apePaterno) {
+            setType('error')
+            setMessage('El apellido paterno es obligatorio.')
+            setShow(true)
+            return
+        }
+
+        if (!prinom) {
+            setType('error')
+            setMessage('El primer nombre es obligatorio.')
+            setShow(true)
+            return
+        }
+
+        if (!apeMaterno) {
+            setType('error')
+            setMessage('El apellido materno es obligatorio.')
+            setShow(true)
+            return
+        }
+
+        if (!address) {
+            setType('error')
+            setMessage('La dirección es obligatoria.')
+            setShow(true)
             return
         }
 
@@ -81,6 +111,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     value={apePaterno}
                     setValue={setApePaterno}
                     horizontal
+                    required
                 />
             </div>
             <div className="col-span-2">
@@ -89,6 +120,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     value={apeMaterno}
                     setValue={setApeMaterno}
                     horizontal
+                    required
                 />
             </div>
             <ContratantesConditionFilter 
@@ -104,6 +136,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     value={prinom}
                     setValue={setPrinom}
                     horizontal
+                    required
                 />
             </div>
             <div className="col-span-2">
@@ -128,6 +161,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     setValue={setAddress}
                     horizontal
                     fullWidth
+                    required
                 />
             </div>
             <div className="w-full flex justify-center items-center gap-4">
