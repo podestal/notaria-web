@@ -1,28 +1,5 @@
 import APIClient from "./apiClient"
 
-// {"idcliente": "0000104251",
-//     "tipper": "N",
-//     "apepat": "Rodriguez",
-//     "apemat": "Ugarteche",
-//     "prinom": "Cneo",
-//     "segnom": "Emilio Paulo",
-//     "nombre": "Cneo Emilio Paulo Rodriguez Ugarteche",
-//     "direccion": "217 first street",
-//     "idubigeo": "",
-//     "idtipdoc": 1,
-//     "numdoc": "55667788",
-//     "email": "",
-//     "telfijo": "",
-//     "telcel": "",
-//     "sexo": "",
-//     "idestcivil": null,
-//     "nacionalidad": "",
-//     "idprofesion": null,
-//     "detaprofesion": null,
-//     "idcargoprofe": null,
-//     "cumpclie": "14/08/1976",
-// }
-
 export interface Cliente {
     idcliente: string;
     tipper: string;

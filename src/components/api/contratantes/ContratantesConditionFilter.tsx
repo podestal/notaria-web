@@ -18,12 +18,16 @@ const ContratantesConditionFilter = ({ idtipoacto, selectedActos, setSelectedAct
     <>
         <div className="w-full flex justify-center items-center gap-4">
             <button 
+                type="button"
                 onClick={() => setOpen(true)}
                 className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
                 <span className="font-bold text-green-600 text-md">+</span>
                 <span>Condición</span>
             </button>
-            <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
+            <button 
+                type="button"
+                onClick={() => setOpen(true)}
+                className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
                 <span className="font-bold text-red-600 text-md">-</span>
                 <span>Condición</span>
             </button>

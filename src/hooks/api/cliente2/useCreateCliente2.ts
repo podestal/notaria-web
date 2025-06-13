@@ -3,16 +3,16 @@ import getCliente2Service, { Cliente2, CreateUpdateCliente2 } from "../../../ser
 
 export interface CreateCliente2Data {
     access: string
-    cliente: CreateUpdateCliente2
+    cliente2: CreateUpdateCliente2
 }
 
 const useCreateCliente2 = (): UseMutationResult<Cliente2, Error, CreateCliente2Data> => {
     const cliente2Service = getCliente2Service({})
 
     return useMutation({
-        mutationFn: async (data: CreateCliente2Data) => cliente2Service.post(data.cliente, data.access),
+        mutationFn: (data: CreateCliente2Data) => cliente2Service.post(data.cliente2, data.access),
         onSuccess: res => {
-            console.log(res)
+            console.log('cliente2 created successfully:', res)
         },
         onError: (error) => {
             console.error("Error creating Cliente2:", error)

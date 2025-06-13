@@ -35,6 +35,7 @@ export interface Cliente2 {
     profesion_plantilla: string; 
     ubigeo_plantilla: string;
     fechaconstitu: string
+    idsedereg: number;
 }
 
 export type CreateUpdateCliente2 = Omit<Cliente2, 'idcliente'>
@@ -45,9 +46,9 @@ interface Props {
 
 const getCliente2Service = ({ clienteId }: Props) => {
 
-    let url = '/clientes2/';
+    let url = '/cliente2/';
     if (clienteId) {
-        url = `/clientes2/${clienteId}/`;
+        url = `/cliente2/${clienteId}/`;
     }
     return new APIClient<Cliente2, CreateUpdateCliente2>(url)
 }
