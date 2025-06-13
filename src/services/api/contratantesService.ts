@@ -18,13 +18,16 @@ export interface Contratante {
 export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente'>
 
 interface Props {
+    contratanteId?: string;
     byKardex?: boolean;
 }
 
-const getContratantesService = ({ byKardex }: Props) => {
+const getContratantesService = ({ byKardex, contratanteId }: Props) => {
     let url = '/contratantes/';
     if (byKardex) {
         url += 'by_kardex/';
+    } else if (contratanteId) {
+        url = `/contratantes/${contratanteId}/`;
     }
     return new APIClient<Contratante, CreateUpdateContratante>(url);
 }

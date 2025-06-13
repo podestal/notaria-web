@@ -454,7 +454,7 @@ const ClientesForm = ({
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Ubigeo</p>
                 <SearchableDropdownInput
                     options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
-                    defaultValue='1'
+                    // defaultValue='1'
                     selected={ubigeo}
                     setSelected={setUbigeo}
                     placeholder="Buscar Ubigeo"
@@ -547,7 +547,6 @@ const ClientesForm = ({
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Cargo</p>
                 <SearchableDropdownInput
                     options={[...cargos
-                        .filter(car => car.codcargoprofe === profesion?.id)
                         .map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
                     selected={cargo}
                     setSelected={setCargo}
