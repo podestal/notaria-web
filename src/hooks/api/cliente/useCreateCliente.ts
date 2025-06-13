@@ -12,6 +12,7 @@ const useCreateCliente = (): UseMutationResult<Cliente, Error, CreateClienteData
         mutationFn: (data: CreateClienteData) => clienteService.post(data.cliente),
         onSuccess: (data) => {
             console.log("Cliente created successfully:", data)
+            
         },
         onError: (error) => {
             console.error("Error creating cliente:", error)

@@ -29,7 +29,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [selectedActos, setSelectedActos] = useState<string[]>([])
     const [firma, setFirma] = useState(false)
     const [incluirIndic, setIncluirIndic] = useState(false)
-    const createCliente2 = useCreateCliente2()
+    const createCliente2 = useCreateCliente2( { kardex })
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
