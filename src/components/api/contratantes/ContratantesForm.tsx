@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
 import { Cliente } from "../../../services/api/cliente1Service"
 import ContratantesConditionFilter from "./ContratantesConditionFilter"
@@ -30,6 +30,23 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [firma, setFirma] = useState(false)
     const [incluirIndic, setIncluirIndic] = useState(false)
     const createCliente2 = useCreateCliente2( { kardex })
+
+    useEffect(() => {
+        console.log('cliente1', cliente1);
+        if (cliente1) {
+            setApePaterno(cliente1.apepat)
+            setApeMaterno(cliente1.apemat)
+            setPrinom(cliente1.prinom)
+            setSegnom(cliente1.segnom)
+            setAddress(cliente1.direccion)
+        } else {
+            setApePaterno('')
+            setApeMaterno('')
+            setPrinom('')
+            setSegnom('')
+            setAddress('')
+        }
+    }, [cliente1])
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()

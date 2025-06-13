@@ -89,10 +89,13 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
                 setShowContratanteForm(true)
                 setShowClienteForm(false)
             } else {
+                console.log('Cliente no encontrado, creando nuevo cliente')
+                setCliente1(null)
                 setShowContratanteForm(false)
                 setShowClienteForm(true)
             }
         }).catch(error => {
+            console.log('Error al buscar el cliente:', error);
             console.error(error);
         })
             
