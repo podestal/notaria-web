@@ -6,19 +6,20 @@ import { CreateContratanteData } from "../../../hooks/api/contratantes/useCreate
 import { Contratante } from "../../../services/api/contratantesService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
-import useCreateCliente2 from "../../../hooks/api/cliente2/useCreateCliente2"
+// import useCreateCliente2 from "../../../hooks/api/cliente2/useCreateCliente2"
 
 interface Props {
     cliente1: Cliente | null
     idtipoacto: string
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
+    setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
     createContratante: UseMutationResult<Contratante, Error, CreateContratanteData>
     idtipkar: number
     kardex: string
 }
 
-const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, createContratante, idtipkar, kardex }: Props) => {
+const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, setClientesCheck, createContratante, idtipkar, kardex }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
@@ -29,7 +30,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [selectedActos, setSelectedActos] = useState<string[]>([])
     const [firma, setFirma] = useState(false)
     const [incluirIndic, setIncluirIndic] = useState(false)
-    const createCliente2 = useCreateCliente2( { kardex })
+    // const createCliente2 = useCreateCliente2( { kardex })
 
     useEffect(() => {
         console.log('cliente1', cliente1);
@@ -89,6 +90,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
         const formattedActos = selectedActos.map(acto => (`${acto}.xxx`)).join('/')
 
         createContratante.mutate({
+            access: '',
             contratante: {
                 idtipkar,
                 kardex,
@@ -106,47 +108,12 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
 
             onSuccess: (res) => {
                 console.log('contratante', res);
-                if (cliente1) {
-                    createCliente2.mutate({
-                        access: '',
-                        cliente2: {
-                            idcontratante: res.idcontratante,
-                            tipper: cliente1.tipper, 
-                            apepat: cliente1.apepat,
-                            apemat: cliente1.apemat,
-                            prinom: cliente1.prinom,
-                            segnom: cliente1.segnom,
-                            nombre: `${cliente1.prinom} ${cliente1.segnom} ${cliente1.apepat} ${cliente1.apemat}`,
-                            direccion: cliente1.direccion,
-                            idtipdoc: cliente1.idtipdoc,
-                            numdoc: cliente1.numdoc,
-                            email: cliente1.email,
-                            telfijo: cliente1.telfijo,
-                            telcel: cliente1.telcel,
-                            telofi: cliente1.telofi || '',
-                            sexo: cliente1.sexo || '',
-                            idestcivil: cliente1.idestcivil || 0,
-                            natper: cliente1.nacionalidad || '',
-                            conyuge: '',
-                            nacionalidad: cliente1.nacionalidad || '',
-                            idprofesion: cliente1.idprofesion || 0,
-                            detaprofesion: cliente1.detaprofesion || '',
-                            idcargoprofe: cliente1.idcargoprofe || 0,
-                            profocupa: cliente1.detaprofesion || '',
-                            dirfer: cliente1.direccion,
-                            idubigeo: cliente1.idubigeo || '.',
-                            cumpclie: cliente1.cumpclie || '.',
-                            razonsocial: cliente1.nombre || '',
-                            fechaing: '',
-                            residente: cliente1.resedente || '0',
-                            tipocli: '0',
-                            profesion_plantilla: cliente1.detaprofesion || '',
-                            ubigeo_plantilla: cliente1.idubigeo || '',
-                            fechaconstitu: '',
-                            idsedereg: 1
-                        }
-                    })
-                }
+                setType('success')
+                setMessage('Contratante creado correctamente.')
+                setShow(true)
+                setShowContratanteForm(false)
+                setShowClienteForm(false)
+                setClientesCheck(false)
             },
             onError: (error) => {
                 console.error('Error creating contratante:', error)

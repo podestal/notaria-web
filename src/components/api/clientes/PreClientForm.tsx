@@ -2,16 +2,16 @@ import { useState } from "react"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import Selector from "../../ui/Selector"
 import axios from "axios"
-import ContratantesForm from "../contratantes/ContratantesForm"
 import { Cliente } from "../../../services/api/cliente1Service"
 import CreateCliente from "./CreateCliente"
 import UpdateCliente from "./UpdateCliente"
-import useCreateContratante from "../../../hooks/api/contratantes/useCreateContratantes"
+import CreateContratante from "../contratantes/CreateContratante"
 
 interface Props {
     idtipoacto: string
     idtipkar: number
     kardex: string
+    setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const documentNaturalOptions = [
@@ -27,7 +27,7 @@ const documentNaturalOptions = [
     { value: 9, label: 'Otro' }
 ]
 
-const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
+const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props) => {
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
@@ -38,7 +38,6 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
     const [cliente1, setCliente1] = useState<Cliente | null>(null)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
 
-    const createContratante = useCreateContratante()
 
     const handleLookup = (e: React.FormEvent) => {
 
@@ -151,14 +150,15 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex }: Props) => {
     </div>
     {showContratanteForm &&
         <div className="mt-10">
-            <ContratantesForm 
+            <CreateContratante 
                 cliente1={cliente1}
                 setShowContratanteForm={setShowContratanteForm}
                 setShowClienteForm={setShowClienteForm}
+                setClientesCheck={setClientesCheck}
                 idtipoacto={idtipoacto}
-                createContratante={createContratante}
                 idtipkar={idtipkar}
                 kardex={kardex}
+                
             />
         </div>
     }

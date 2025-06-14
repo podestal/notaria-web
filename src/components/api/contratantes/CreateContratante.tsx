@@ -1,39 +1,41 @@
-import { UserPlus } from "lucide-react"
-import TopModal from "../../ui/TopModal"
-import { useState } from "react"
-import PreClientForm from "../clientes/PreClientForm"
+import ContratantesForm from "./ContratantesForm"
+import { Cliente } from "../../../services/api/cliente1Service"
+import useCreateContratante from "../../../hooks/api/contratantes/useCreateContratantes"
 
 interface Props {
+    cliente1: Cliente | null
     idtipoacto: string
+    setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
+    setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
+    setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
     idtipkar: number
     kardex: string
 }
 
-const CreateContratante = ({ idtipoacto, idtipkar, kardex }: Props) => {
 
-    const [open, setOpen] = useState(false)
+const CreateContratante = ({ 
+    cliente1,
+    idtipoacto,
+    setShowContratanteForm,
+    setShowClienteForm,
+    setClientesCheck,
+    idtipkar,
+    kardex
+}: Props) => {
+
+    const createContratante = useCreateContratante({ kardex, idcliente: cliente1?.idcliente || '' })
 
   return (
-    <>
-        <div 
-            onClick={() => setOpen(true)}
-            className="flex flex-col items-center justify-center w-20 h-20 bg-white shadow-md rounded-lg mt-4 cursor-pointer hover:bg-gray-100 transition-colors">
-            <UserPlus className="w-6 h-6 text-green-500 hover:text-green-700 cursor-pointer mb-2" />
-            <p className="text-[10px] text-center text-gray-700">Agregar Contratante</p>
-        </div>
-        <div className="z-50">
-            <TopModal
-                isOpen={open}
-                onClose={() => setOpen(false)}
-            >
-                <PreClientForm 
-                    idtipoacto={idtipoacto}
-                    idtipkar={idtipkar}
-                    kardex={kardex}
-                />
-            </TopModal>
-        </div>
-    </>
+    <ContratantesForm 
+        cliente1={cliente1}
+        setShowContratanteForm={setShowContratanteForm}
+        setShowClienteForm={setShowClienteForm}
+        idtipoacto={idtipoacto}
+        createContratante={createContratante}
+        idtipkar={idtipkar}
+        kardex={kardex}
+        setClientesCheck={setClientesCheck}
+    />
   )
 }
 

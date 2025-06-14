@@ -1,6 +1,6 @@
 import { Kardex } from "../../../services/api/kardexService"
+import ClientesCheck from "../clientes/ClientesCheck"
 import ContratantesTable from "./ContratantesTable"
-import CreateContratante from "./CreateContratante"
 
 interface Props {
     kardex: Kardex
@@ -12,7 +12,7 @@ const ContratantesMain = ({ kardex }: Props) => {
         <ContratantesTable 
             kardex={kardex} 
         />
-        <CreateContratante 
+        <ClientesCheck 
             idtipoacto={kardex.codactos}
             idtipkar={kardex.idtipkar}
             kardex={kardex.kardex}
