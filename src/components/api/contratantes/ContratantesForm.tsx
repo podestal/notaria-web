@@ -6,7 +6,6 @@ import { CreateContratanteData } from "../../../hooks/api/contratantes/useCreate
 import { Contratante } from "../../../services/api/contratantesService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
-// import useCreateCliente2 from "../../../hooks/api/cliente2/useCreateCliente2"
 
 interface Props {
     cliente1: Cliente | null
@@ -30,7 +29,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [selectedActos, setSelectedActos] = useState<string[]>([])
     const [firma, setFirma] = useState(false)
     const [incluirIndic, setIncluirIndic] = useState(false)
-    // const createCliente2 = useCreateCliente2( { kardex })
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         console.log('cliente1', cliente1);
@@ -86,7 +85,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
             return
         }
 
-
+        setIsLoading(true)
         const formattedActos = selectedActos.map(acto => (`${acto}.xxx`)).join('/')
 
         createContratante.mutate({
@@ -117,6 +116,12 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
             },
             onError: (error) => {
                 console.error('Error creating contratante:', error)
+                setType('error')
+                setMessage('Error al crear el contratante. Por favor, inténtelo de nuevo.')
+                setShow(true)
+            },
+            onSettled: () => {
+                setIsLoading(false)
             }
         })
 
@@ -174,8 +179,9 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
             </div>
             <div className="w-full flex justify-center items-center gap-4">
                 <button 
+                    disabled={isLoading}
                     className="bg-gray-50 h-full px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">
-                    Grabar Contratante
+                    {isLoading ? 'Un momento...' : 'Crear Contratante'}
                 </button>
             </div>
         </div>

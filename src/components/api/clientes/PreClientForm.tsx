@@ -36,6 +36,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
     const [showContratanteForm, setShowContratanteForm] = useState(false)
     const [showClienteForm, setShowClienteForm] = useState(false)
     const [cliente1, setCliente1] = useState<Cliente | null>(null)
+    const [loading, setLoading] = useState(false)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
 
 
@@ -77,6 +78,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
             setShow(true)
             return
         }
+        setLoading(true)
 
         // get client here
         axios.get(
@@ -96,6 +98,8 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
         }).catch(error => {
             console.log('Error al buscar el cliente:', error);
             console.error(error);
+        }).finally(() => {
+            setLoading(false)
         })
             
     }
@@ -139,10 +143,10 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 </div>}
                 {selectedTipoDocumento > 0 && 
                 <button 
-                    disabled={document.length === 0}
-                    className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 
+                    disabled={document.length === 0 || loading}
+                    className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${loading && 'animate-pulse'} ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 
                     type="submit">
-                    Buscar
+                    {loading ? '...' : 'Buscar'}
                 </button>}
             </>
             }
