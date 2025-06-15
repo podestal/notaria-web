@@ -8,6 +8,7 @@ export interface Contratante {
     firma: string;
     fechafirma: string;
     cliente: string;
+    cliente_id: string;
     resfirma: number;
     tiporepresentacion: string;
     indice: string;
@@ -15,7 +16,7 @@ export interface Contratante {
     inscrito: string;
 }
 
-export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente'>
+export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente' | 'cliente_id'>
 
 interface Props {
     contratanteId?: string;

@@ -153,6 +153,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     setValue={setApePaterno}
                     horizontal
                     required
+                    disabled={true}
                 />
             </div>
             <div className="col-span-2">
@@ -162,6 +163,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     setValue={setApeMaterno}
                     horizontal
                     required
+                    disabled={true}
                 />
             </div>
             <ContratantesConditionFilter 
@@ -178,6 +180,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     setValue={setPrinom}
                     horizontal
                     required
+                    disabled={true}
                 />
             </div>
             <div className="col-span-2">
@@ -186,6 +189,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     value={segnom}
                     setValue={setSegnom}
                     horizontal
+                    disabled={true}
                 />
             </div>
             <div className="w-full flex justify-center items-center gap-4">
@@ -205,6 +209,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     horizontal
                     fullWidth
                     required
+                    disabled={true}
                 />
             </div>
             <div className="w-full flex justify-center items-center gap-4">
@@ -249,6 +254,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     }
                     setSelectedRepresentation(value)
                 }}
+                disabled={selectedActos.length === 0}
             />
         </div>
     </form>

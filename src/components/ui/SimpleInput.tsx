@@ -9,6 +9,7 @@ interface SimpleInputProps {
   horizontal?: boolean;
   required?: boolean;
   fullWidth?: boolean;
+  disabled?: boolean;
 }
 
 const shakeAnimation = {
@@ -25,6 +26,7 @@ const SimpleInput = ({
   horizontal = false,
   required = false,
   fullWidth = false,
+  disabled,
 }: SimpleInputProps) => {
   return (
     <div
@@ -43,6 +45,7 @@ const SimpleInput = ({
                 <motion.input
                     {...(error ? shakeAnimation : {})}
                     value={value}
+                    disabled={disabled}
                     onChange={(e) => {
                       setError && setError('')
                       setValue(e.target.value)
@@ -56,7 +59,8 @@ const SimpleInput = ({
                     error ? 'border-red-500' : 'border-slate-300'
                     } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
                     error ? 'focus:ring-red-300' : 'focus:ring-blue-300'
-                    }`}
+                    }
+                    ${disabled ? 'cursor-not-allowed' : ''}`}
                 />
                 {required && <span className="text-red-500">*</span>}
                 </div>

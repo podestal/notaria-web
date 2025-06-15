@@ -1,4 +1,5 @@
 import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
+import useCreateRepresentante from "../../../hooks/api/representante/useCreateRepresentante"
 import useGetSedesRegistrales from "../../../hooks/api/sedesRegistrales/useGetSedesRegistrales"
 import useAuthStore from "../../../store/useAuthStore"
 import RepresentantesForm from "./RepresentantesForm"
@@ -10,6 +11,7 @@ interface Props {
 const CreateRepresentante = ({ kardex }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+    const createRepresentante = useCreateRepresentante()
     const { data: sedesRegistrales, isLoading: isLoadingSedes, isError: isErrorSedes, isSuccess: isSuccessSedes } = useGetSedesRegistrales({ access })
     const { data: contratantes, isLoading: isLoadingContratantes, isError: isErrorContratantes, isSuccess: isSuccessContratantes } = useGetContratantesByKardex({ kardex })
 
@@ -23,6 +25,8 @@ const CreateRepresentante = ({ kardex }: Props) => {
         <RepresentantesForm 
             sedesRegistrales={sedesRegistrales}
             contratantes={contratantes}
+            kardex={kardex}
+            createRepresentante={createRepresentante}
         />
     </div>
   )
