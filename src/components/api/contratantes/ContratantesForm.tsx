@@ -7,6 +7,7 @@ import { Contratante } from "../../../services/api/contratantesService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import SingleSelect from "../../ui/SingleSelect"
+import CreateRepresentante from "../representantes/CreateRepresentante"
 
 interface Props {
     cliente1: Cliente | null
@@ -28,6 +29,7 @@ const representationOptions = [
 const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, setClientesCheck, createContratante, idtipkar, kardex }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const [openRepForm, setOpenRepForm] = useState(false)
     const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
     const [apeMaterno, setApeMaterno] = useState( cliente1 ? cliente1.apemat : '')
     const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
@@ -240,10 +242,19 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
             <SingleSelect 
                 options={representationOptions}
                 selected={selectedRepresentation}
-                onChange={(value) => setSelectedRepresentation(value)}
+                onChange={(value) => {
+                    if (value !== "0") {
+                        setOpenRepForm(true)
+                    }
+                    setSelectedRepresentation(value)
+                }}
             />
         </div>
     </form>
+    <CreateRepresentante 
+        open={openRepForm}
+        setOpen={setOpenRepForm}
+    />
     </>
   )
 }
