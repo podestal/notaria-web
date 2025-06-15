@@ -14,9 +14,10 @@ interface Props {
     contratantes: Contratante[]
     kardex: string
     createRepresentante: UseMutationResult<Representante, Error, CreateRepresentanteData>
+    setRepresentanteCreated: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepresentante }: Props) => {
+const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepresentante, setRepresentanteCreated }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [facultades, setFacultades] = useState('')
@@ -56,6 +57,19 @@ const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepr
                 id_ro_repre: null,
                 odb: null,
                 ido: null
+            }
+        }, {
+            onSuccess: (data) => {
+                setType("success")
+                setMessage("Representante creado correctamente")
+                setShow(true)
+                setRepresentanteCreated(true)
+                console.log('data', data);
+            }
+            , onError: (error) => {
+                setType("error")
+                setMessage(`Error al crear el representante: ${error.message}`)
+                setShow(true)
             }
         })
         // Aquí puedes manejar el envío del formulario, por ejemplo, enviando los datos a una API

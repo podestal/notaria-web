@@ -36,6 +36,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
     const [segnom, setSegnom] = useState( cliente1 ? cliente1.segnom : '')
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
+    const [representanteCreated, setRepresentanteCreated] = useState(false)
     const [selectedRepresentation, setSelectedRepresentation] = useState('0')
     const [selectedActos, setSelectedActos] = useState<string[]>([])
     const [firma, setFirma] = useState(false)
@@ -61,6 +62,14 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (selectedRepresentation !== "0" && !representanteCreated) {
+            setType('error')
+            setMessage('Debe crear un representante.')
+            setShow(true)
+            return
+        }
+
         if (selectedActos.length === 0) {
             setType('error')
             setMessage('Debe seleccionar al menos una condición para el contratante.')
@@ -264,6 +273,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     >
         <CreateRepresentante 
             kardex={kardex}
+            setRepresentanteCreated={setRepresentanteCreated}
         />
     </TopModal>
     </>

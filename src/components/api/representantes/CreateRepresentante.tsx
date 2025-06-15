@@ -6,9 +6,10 @@ import RepresentantesForm from "./RepresentantesForm"
 
 interface Props {
     kardex: string
+    setRepresentanteCreated: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const CreateRepresentante = ({ kardex }: Props) => {
+const CreateRepresentante = ({ kardex, setRepresentanteCreated }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const createRepresentante = useCreateRepresentante()
@@ -27,6 +28,7 @@ const CreateRepresentante = ({ kardex }: Props) => {
             contratantes={contratantes}
             kardex={kardex}
             createRepresentante={createRepresentante}
+            setRepresentanteCreated={setRepresentanteCreated}
         />
     </div>
   )
