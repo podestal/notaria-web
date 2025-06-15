@@ -6,6 +6,7 @@ import { CreateContratanteData } from "../../../hooks/api/contratantes/useCreate
 import { Contratante } from "../../../services/api/contratantesService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import SingleSelect from "../../ui/SingleSelect"
 
 interface Props {
     cliente1: Cliente | null
@@ -18,6 +19,12 @@ interface Props {
     kardex: string
 }
 
+const representationOptions = [
+    { value: "0", label: "Derecho propio" },
+    { value: "1", label: "Representante" },
+    { value: "2", label: "Por derecho propio y representante" },
+]
+
 const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, setClientesCheck, createContratante, idtipkar, kardex }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -26,6 +33,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
     const [segnom, setSegnom] = useState( cliente1 ? cliente1.segnom : '')
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
+    const [selectedRepresentation, setSelectedRepresentation] = useState('0')
     const [selectedActos, setSelectedActos] = useState<string[]>([])
     const [firma, setFirma] = useState(false)
     const [incluirIndic, setIncluirIndic] = useState(false)
@@ -97,7 +105,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                 firma: firma ? '1' : '0',
                 fechafirma: "0000",
                 resfirma: 0,
-                tiporepresentacion: '0', 
+                tiporepresentacion: selectedRepresentation, 
                 indice: incluirIndic ? '1' : '0',
                 visita: '0',
                 inscrito: '1',
@@ -226,6 +234,14 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                     onChange={(e) => setIncluirIndic(e.target.checked)}
                 />
             </div>
+        </div>
+        <div className="my-6">
+            <p className="text-xs font-semibold text-slate-700 mb-4">Tipo de Representación</p>
+            <SingleSelect 
+                options={representationOptions}
+                selected={selectedRepresentation}
+                onChange={(value) => setSelectedRepresentation(value)}
+            />
         </div>
     </form>
     </>
