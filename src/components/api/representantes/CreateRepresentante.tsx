@@ -1,28 +1,28 @@
+import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
 import useGetSedesRegistrales from "../../../hooks/api/sedesRegistrales/useGetSedesRegistrales"
 import useAuthStore from "../../../store/useAuthStore"
 import RepresentantesForm from "./RepresentantesForm"
 
 interface Props {
-    open: boolean
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    kardex: string
 }
 
-const CreateRepresentante = ({ open, setOpen }: Props) => {
+const CreateRepresentante = ({ kardex }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
-    const { data: sedesRegistrales, isLoading, isError, error, isSuccess } = useGetSedesRegistrales({ access })
+    const { data: sedesRegistrales, isLoading: isLoadingSedes, isError: isErrorSedes, isSuccess: isSuccessSedes } = useGetSedesRegistrales({ access })
+    const { data: contratantes, isLoading: isLoadingContratantes, isError: isErrorContratantes, isSuccess: isSuccessContratantes } = useGetContratantesByKardex({ kardex })
 
-    if (isLoading) return <p className="text-md animate-pulse text-center">Cargando ...</p>
+    if (isLoadingSedes || isLoadingContratantes) return <p className="text-md animate-pulse text-center">Cargando ...</p>
 
-    if (isError) return <p className="text-md text-red-500 text-center">Error: {error.message}</p>
-    if (isSuccess) 
+    if (isErrorSedes || isErrorContratantes) return <p className="text-md text-red-500 text-center">Error</p>
+    if (isSuccessSedes && isSuccessContratantes) 
 
   return (
     <div>
         <RepresentantesForm 
-            open={open}
-            setOpen={setOpen}
             sedesRegistrales={sedesRegistrales}
+            contratantes={contratantes}
         />
     </div>
   )

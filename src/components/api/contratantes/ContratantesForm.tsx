@@ -8,6 +8,7 @@ import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import SingleSelect from "../../ui/SingleSelect"
 import CreateRepresentante from "../representantes/CreateRepresentante"
+import TopModal from "../../ui/TopModal"
 
 interface Props {
     cliente1: Cliente | null
@@ -251,10 +252,14 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
             />
         </div>
     </form>
-    <CreateRepresentante 
-        open={openRepForm}
-        setOpen={setOpenRepForm}
-    />
+    <TopModal
+        isOpen={openRepForm}
+        onClose={() => setOpenRepForm(false)}
+    >
+        <CreateRepresentante 
+            kardex={kardex}
+        />
+    </TopModal>
     </>
   )
 }
