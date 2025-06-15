@@ -2,13 +2,15 @@ import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
 import TopModal from "../../ui/TopModal"
 import SimpleSelector from "../../ui/SimpleSelector"
+import { SedeRegistral } from "../../../services/api/sedesRegistralesService"
 
 interface Props {
     open: boolean
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    sedesRegistrales: SedeRegistral[]
 }
 
-const RepresentantesForm = ({ open, setOpen }: Props) => {
+const RepresentantesForm = ({ open, setOpen, sedesRegistrales }: Props) => {
 
     const [facultades, setFacultades] = useState('')
     const [subscribed, setSubscribed] = useState(1)
@@ -45,13 +47,10 @@ const RepresentantesForm = ({ open, setOpen }: Props) => {
             <div className="grid grid-cols-2 gap-4">
                 <SimpleSelector 
                     label="Sede Registral"
-                    options={[
-                        { label: 'Lima', value: 1 },
-                        { label: 'Arequipa', value: 2 },
-                        { label: 'Trujillo', value: 3},
-                        { label: 'Cusco', value: 4 },
-                        { label: 'Otro', value: 5 }
-                    ]}
+                    options={sedesRegistrales.map(sede => ({
+                        label: sede.dessede,
+                        value: parseInt(sede.idsedereg)
+                    }))}
                     setter={setSedeRegistral}
                     defaultValue={sedeRegistral}
                 />
