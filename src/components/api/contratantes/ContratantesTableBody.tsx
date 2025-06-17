@@ -25,7 +25,7 @@ const ContratantesTableBody = ({ kardex }: Props) => {
         <ContratanteCard 
             key={contratante.idcontratante}
             contratante={contratante}
-            kardexUsuario={kardex.usuario}
+            kardex={kardex}
         />
     ))}
     </>

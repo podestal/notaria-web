@@ -1,14 +1,15 @@
-import { Pencil } from "lucide-react"
 import { Contratante } from "../../../services/api/contratantesService"
+import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
 import RemoveContratante from "./RemoveContratante"
+import UpdateContratante from "./UpdateContratante"
 
 interface Props {
     contratante: Contratante
-    kardexUsuario: string
+    kardex: Kardex
 }
 
-const ContratanteCard = ({ contratante, kardexUsuario }: Props) => {
+const ContratanteCard = ({ contratante, kardex }: Props) => {
   return (
     <div 
         key={contratante.idcontratante}
@@ -17,18 +18,20 @@ const ContratanteCard = ({ contratante, kardexUsuario }: Props) => {
         <p className="col-span-2">{getTitleCase(contratante.condicion)}</p>
         <p className="pl-2">{contratante.firma === '1' ? 'Si' : 'No'}</p>
         <p className="pl-2">{contratante.fechafirma}</p>
-        <p className="pl-2">{getTitleCase(kardexUsuario)}</p>
+        <p className="pl-2">{getTitleCase(kardex.usuario)}</p>
         <p></p>
         <div className="flex items-start justify-start gap-2 pl-4">
         <RemoveContratante 
             contratanteId={contratante.idcontratante}
             kardex={contratante.kardex}
         />
-            <p>|</p>
-            <Pencil 
-                size={20}
-                className="text-blue-500 hover:text-blue-400 cursor-pointer"
-            />
+        <p>|</p>
+        <UpdateContratante 
+            idtipoacto={kardex.codactos}
+            idtipkar={kardex.idtipkar}
+            kardex={kardex.kardex}
+            contratante={contratante}
+        />
         </div>
     </div>
   )

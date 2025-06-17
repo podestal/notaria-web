@@ -42,13 +42,16 @@ export type CreateUpdateCliente2 = Omit<Cliente2, 'idcliente'>
 
 interface Props {
     clienteId?: string
+    byContratante?: boolean
 }
 
-const getCliente2Service = ({ clienteId }: Props) => {
+const getCliente2Service = ({ clienteId, byContratante }: Props) => {
 
     let url = '/cliente2/';
     if (clienteId) {
         url = `/cliente2/${clienteId}/`;
+    } else if (byContratante) {
+        url = `/cliente2/by_contratante/`;
     }
     return new APIClient<Cliente2, CreateUpdateCliente2>(url)
 }

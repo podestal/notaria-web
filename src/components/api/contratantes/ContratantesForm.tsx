@@ -16,9 +16,10 @@ interface Props {
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
     setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
-    createContratante: UseMutationResult<Contratante, Error, CreateContratanteData>
+    createContratante?: UseMutationResult<Contratante, Error, CreateContratanteData>
     idtipkar: number
     kardex: string
+    contratante?: Contratante
 }
 
 const representationOptions = [
@@ -27,7 +28,7 @@ const representationOptions = [
     { value: "2", label: "Por derecho propio y representante" },
 ]
 
-const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, setClientesCheck, createContratante, idtipkar, kardex }: Props) => {
+const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, setClientesCheck, createContratante, idtipkar, kardex, contratante }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [openRepForm, setOpenRepForm] = useState(false)
@@ -39,8 +40,8 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [representanteCreated, setRepresentanteCreated] = useState(false)
     const [selectedRepresentation, setSelectedRepresentation] = useState('0')
     const [selectedActos, setSelectedActos] = useState<string[]>([])
-    const [firma, setFirma] = useState(false)
-    const [incluirIndic, setIncluirIndic] = useState(false)
+    const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : false)
+    const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : false)
     const [isLoading, setIsLoading] = useState(false)
     const [contratanteRepresented, setContratanteRepresented] = useState('')
 
@@ -109,7 +110,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
         setIsLoading(true)
         const joinedActos = selectedActos.join('/')
 
-        createContratante.mutate({
+        createContratante && createContratante.mutate({
             access: '',
             contratante: {
                 idtipkar,
@@ -223,6 +224,23 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                 />
             </div>
             <div className="w-full flex justify-center items-center gap-4">
+                {contratante 
+                ? 
+                <button 
+                    className="bg-gray-50 h-full px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md"
+                    type="button"
+                    onClick={() => {
+                        setShowContratanteForm(false)
+                        setShowClienteForm(true)
+                    }}
+                    // onClick={() => {
+                    //     console.log('contratante', contratante);
+                        
+                    // }}
+                >
+                    Editar Cliente
+                </button> 
+                : 
                 <button 
                     className="bg-gray-50 h-full px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md"
                     type="button"
@@ -233,6 +251,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                 >
                     Editar Cliente
                 </button>
+                }
             </div>
         </div>
         <div className="flex items-center justify-start gap-10 mt-6">
