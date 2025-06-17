@@ -15,9 +15,10 @@ interface Props {
     kardex: string
     createRepresentante: UseMutationResult<Representante, Error, CreateRepresentanteData>
     setRepresentanteCreated: React.Dispatch<React.SetStateAction<boolean>>
+    setContratanteRepresented: React.Dispatch<React.SetStateAction<string>>
 }
 
-const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepresentante, setRepresentanteCreated }: Props) => {
+const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepresentante, setRepresentanteCreated, setContratanteRepresented }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [facultades, setFacultades] = useState('')
@@ -64,6 +65,7 @@ const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepr
                 setMessage("Representante creado correctamente")
                 setShow(true)
                 setRepresentanteCreated(true)
+                setContratanteRepresented(contratante.idcontratante)
                 console.log('data', data);
             }
             , onError: (error) => {

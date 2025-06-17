@@ -14,6 +14,7 @@ export interface Contratante {
     indice: string;
     visita: string;
     inscrito: string;
+    idcontratanterp: string;
 }
 
 export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente' | 'cliente_id'>

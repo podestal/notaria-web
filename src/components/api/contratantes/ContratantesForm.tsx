@@ -42,6 +42,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [firma, setFirma] = useState(false)
     const [incluirIndic, setIncluirIndic] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [contratanteRepresented, setContratanteRepresented] = useState('')
 
     useEffect(() => {
         console.log('cliente1', cliente1);
@@ -121,7 +122,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                 indice: incluirIndic ? '1' : '0',
                 visita: '0',
                 inscrito: '1',
-                
+                idcontratanterp: contratanteRepresented,
             }
         }, {
 
@@ -274,6 +275,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
         <CreateRepresentante 
             kardex={kardex}
             setRepresentanteCreated={setRepresentanteCreated}
+            setContratanteRepresented={setContratanteRepresented}
         />
     </TopModal>
     </>
