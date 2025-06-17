@@ -38,7 +38,7 @@ export interface Cliente2 {
     idsedereg: number;
 }
 
-export type CreateUpdateCliente2 = Omit<Cliente2, 'idcliente'>
+export type CreateUpdateCliente2 = Omit<Cliente2, 'idcliente' | 'idcontratante'>
 
 interface Props {
     clienteId?: string

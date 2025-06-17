@@ -10,9 +10,11 @@ import SingleSelect from "../../ui/SingleSelect"
 import CreateRepresentante from "../representantes/CreateRepresentante"
 import TopModal from "../../ui/TopModal"
 import { UpdateContratanteData } from "../../../hooks/api/contratantes/useUpdateContratante"
+import { Cliente2 } from "../../../services/api/clienteService"
 
 interface Props {
     cliente1: Cliente | null
+    cliente2: Cliente2 | null
     idtipoacto: string
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
@@ -32,6 +34,7 @@ const representationOptions = [
 
 const ContratantesForm = ({ 
     cliente1, 
+    cliente2,
     idtipoacto, 
     setShowContratanteForm, 
     setShowClienteForm, 
@@ -58,13 +61,18 @@ const ContratantesForm = ({
     const [contratanteRepresented, setContratanteRepresented] = useState(contratante ? contratante.idcontratanterp : '')
 
     useEffect(() => {
-        console.log('cliente1', cliente1);
         if (cliente1) {
             setApePaterno(cliente1.apepat)
             setApeMaterno(cliente1.apemat)
             setPrinom(cliente1.prinom)
             setSegnom(cliente1.segnom)
             setAddress(cliente1.direccion)
+        } else if (cliente2) {
+            setApePaterno(cliente2.apepat)
+            setApeMaterno(cliente2.apemat)
+            setPrinom(cliente2.prinom)
+            setSegnom(cliente2.segnom)
+            setAddress(cliente2.direccion)
         } else {
             setApePaterno('')
             setApeMaterno('')

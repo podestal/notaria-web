@@ -28,6 +28,7 @@ const CreateContratante = ({
   return (
     <ContratantesForm 
         cliente1={cliente1}
+        cliente2={null}
         setShowContratanteForm={setShowContratanteForm}
         setShowClienteForm={setShowClienteForm}
         idtipoacto={idtipoacto}

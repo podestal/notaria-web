@@ -14,11 +14,6 @@ import { UseMutationResult } from "@tanstack/react-query"
 import { UpdateClienteData } from "../../../hooks/api/cliente/useUpdateCliente"
 import { CreateClienteData } from "../../../hooks/api/cliente/useCreateCliente"
 
-// nacionalidades={nacionalidades}
-// profesiones={profesiones}
-// cargos={cargos}
-// ubigeos={ubigeos}
-
 interface Props {
     dni: string
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>

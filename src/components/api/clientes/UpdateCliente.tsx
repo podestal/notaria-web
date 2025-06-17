@@ -46,7 +46,7 @@ const UpdateCliente = ({
         cargos={cargos}
         ubigeos={ubigeos}
         cliente1={cliente1} 
-        updateCliente={updateCliente} // Pass the updateCliente mutation
+        updateCliente={updateCliente} 
     />
   )
 }

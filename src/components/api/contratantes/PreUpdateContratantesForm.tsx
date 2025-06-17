@@ -4,6 +4,7 @@ import ContratantesForm from './ContratantesForm'
 import useGetCliente2ByContratante from '../../../hooks/api/cliente2/useGetCliente2ByContratante'
 import useAuthStore from '../../../store/useAuthStore'
 import useUpdateContratante from '../../../hooks/api/contratantes/useUpdateContratante'
+import UpdateCliente2 from '../clientes2/UpdateCliente2'
 
 interface Props {
     idtipoacto: string
@@ -29,7 +30,8 @@ const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante }
     <>
         {showContratanteForm && 
             <ContratantesForm 
-                cliente1={cliente2}
+                cliente1={null}
+                cliente2={cliente2}
                 setShowContratanteForm={setShowContratanteForm}
                 setShowClienteForm={setShowClienteForm}
                 setClientesCheck={() => {}}
@@ -40,17 +42,13 @@ const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante }
                 updateContratante={updateContratante}
             />}
         {showClienteForm &&
-        <div>
-            <p>Cliente updated</p>    
-            <button 
-                onClick={() => {
-                    setShowContratanteForm(true)
-                    setShowClienteForm(false)
-                }}
-                className="text-blue-500 hover:text-blue-400 cursor-pointer"
-            >
-                Click</button>
-        </div>}
+        <UpdateCliente2 
+            dni={cliente2.numdoc}
+            setShowContratanteForm={setShowContratanteForm}
+            setShowClienteForm={setShowClienteForm}
+            // setCliente1={() => {}}
+            cliente2={cliente2}
+        />}
     </>
   )
 }
