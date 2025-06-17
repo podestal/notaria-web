@@ -5,6 +5,7 @@ export interface Contratante {
     idtipkar: number;
     kardex: string;
     condicion: string;
+    condicion_str: string;
     firma: string;
     fechafirma: string;
     cliente: string;
@@ -17,7 +18,7 @@ export interface Contratante {
     idcontratanterp: string;
 }
 
-export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente' | 'cliente_id'>
+export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente' | 'cliente_id' | 'condicion_str'>
 
 interface Props {
     contratanteId?: string;

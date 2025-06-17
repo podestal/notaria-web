@@ -39,11 +39,13 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
     const [representanteCreated, setRepresentanteCreated] = useState(false)
     const [selectedRepresentation, setSelectedRepresentation] = useState('0')
-    const [selectedActos, setSelectedActos] = useState<string[]>([])
+    const [selectedActos, setSelectedActos] = useState<string[]>(contratante ? contratante.condicion.split('/').map(cond => cond.length > 0 ? cond.split('.')[0]: '').filter(cond => cond.length > 0) : [])
     const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : false)
     const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : false)
     const [isLoading, setIsLoading] = useState(false)
     const [contratanteRepresented, setContratanteRepresented] = useState('')
+    // const condiciones =  contratante && contratante.condicion.split('/').map(cond => cond.length > 0 ? cond.split('.')[0]: '').filter(cond => cond.length > 0)
+    // console.log('condiciones sanitized',condiciones);
 
     useEffect(() => {
         console.log('cliente1', cliente1);

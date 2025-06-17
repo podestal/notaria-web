@@ -15,7 +15,7 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
         key={contratante.idcontratante}
         className="grid grid-cols-9 text-xs text-black px-2 my-2 place-content-center border-b-2 border-gray-200">
         <p className="col-span-2">{getTitleCase(contratante.cliente)}</p>
-        <p className="col-span-2">{getTitleCase(contratante.condicion)}</p>
+        <p className="col-span-2">{getTitleCase(contratante.condicion_str)}</p>
         <p className="pl-2">{contratante.firma === '1' ? 'Si' : 'No'}</p>
         <p className="pl-2">{contratante.fechafirma}</p>
         <p className="pl-2">{getTitleCase(kardex.usuario)}</p>
