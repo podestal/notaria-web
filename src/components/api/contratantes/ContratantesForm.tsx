@@ -107,16 +107,16 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
         }
 
         setIsLoading(true)
-        const formattedActos = selectedActos.map(acto => (`${acto}.xxx`)).join('/')
+        const joinedActos = selectedActos.join('/')
 
         createContratante.mutate({
             access: '',
             contratante: {
                 idtipkar,
                 kardex,
-                condicion: formattedActos,
+                condicion: joinedActos,
                 firma: firma ? '1' : '0',
-                fechafirma: "0000",
+                fechafirma: "",
                 resfirma: 0,
                 tiporepresentacion: selectedRepresentation, 
                 indice: incluirIndic ? '1' : '0',
