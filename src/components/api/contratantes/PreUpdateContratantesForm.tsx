@@ -3,6 +3,7 @@ import { Contratante } from '../../../services/api/contratantesService'
 import ContratantesForm from './ContratantesForm'
 import useGetCliente2ByContratante from '../../../hooks/api/cliente2/useGetCliente2ByContratante'
 import useAuthStore from '../../../store/useAuthStore'
+import useUpdateContratante from '../../../hooks/api/contratantes/useUpdateContratante'
 
 interface Props {
     idtipoacto: string
@@ -14,6 +15,7 @@ interface Props {
 const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante }: Props) => {
 
     const access = useAuthStore((state) => state.access_token) || ''
+    const updateContratante = useUpdateContratante({ kardex, contratanteId: contratante.idcontratante })
     const [showContratanteForm, setShowContratanteForm] = useState(true)
     const [showClienteForm, setShowClienteForm] = useState(false)
 
@@ -25,7 +27,6 @@ const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante }
 
   return (
     <>
-        <>{console.log('cliente2', cliente2)}</>
         {showContratanteForm && 
             <ContratantesForm 
                 cliente1={cliente2}
@@ -36,6 +37,7 @@ const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante }
                 idtipkar={idtipkar}
                 kardex={kardex}
                 contratante={contratante}
+                updateContratante={updateContratante}
             />}
         {showClienteForm &&
         <div>

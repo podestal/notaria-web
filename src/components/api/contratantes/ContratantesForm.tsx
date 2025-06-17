@@ -9,6 +9,7 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import SingleSelect from "../../ui/SingleSelect"
 import CreateRepresentante from "../representantes/CreateRepresentante"
 import TopModal from "../../ui/TopModal"
+import { UpdateContratanteData } from "../../../hooks/api/contratantes/useUpdateContratante"
 
 interface Props {
     cliente1: Cliente | null
@@ -17,6 +18,7 @@ interface Props {
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
     setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
     createContratante?: UseMutationResult<Contratante, Error, CreateContratanteData>
+    updateContratante?: UseMutationResult<Contratante, Error, UpdateContratanteData>
     idtipkar: number
     kardex: string
     contratante?: Contratante
@@ -28,7 +30,17 @@ const representationOptions = [
     { value: "2", label: "Por derecho propio y representante" },
 ]
 
-const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setShowClienteForm, setClientesCheck, createContratante, idtipkar, kardex, contratante }: Props) => {
+const ContratantesForm = ({ 
+    cliente1, 
+    idtipoacto, 
+    setShowContratanteForm, 
+    setShowClienteForm, 
+    setClientesCheck, 
+    createContratante, 
+    updateContratante,
+    idtipkar, 
+    kardex, 
+    contratante }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [openRepForm, setOpenRepForm] = useState(false)
@@ -43,9 +55,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
     const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : false)
     const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : false)
     const [isLoading, setIsLoading] = useState(false)
-    const [contratanteRepresented, setContratanteRepresented] = useState('')
-    // const condiciones =  contratante && contratante.condicion.split('/').map(cond => cond.length > 0 ? cond.split('.')[0]: '').filter(cond => cond.length > 0)
-    // console.log('condiciones sanitized',condiciones);
+    const [contratanteRepresented, setContratanteRepresented] = useState(contratante ? contratante.idcontratanterp : '')
 
     useEffect(() => {
         console.log('cliente1', cliente1);
@@ -149,6 +159,42 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
             }
         })
 
+        updateContratante && updateContratante.mutate({
+            access: '',
+            contratante: {
+                idtipkar,
+                kardex,
+                condicion: joinedActos,
+                firma: firma ? '1' : '0',
+                fechafirma: "",
+                resfirma: 0,
+                tiporepresentacion: selectedRepresentation, 
+                indice: incluirIndic ? '1' : '0',
+                visita: '0',
+                inscrito: '1',
+                idcontratanterp: contratanteRepresented,
+            }
+        }, {
+            onSuccess: (res) => {
+                console.log('contratante updated', res);
+                setType('success')
+                setMessage('Contratante actualizado correctamente.')
+                setShow(true)
+                setShowContratanteForm(false)
+                setShowClienteForm(false)
+                setClientesCheck(false)
+            },
+            onError: (error) => {
+                console.error('Error updating contratante:', error)
+                setType('error')
+                setMessage('Error al actualizar el contratante. Por favor, inténtelo de nuevo.')
+                setShow(true)
+            },
+            onSettled: () => {
+                setIsLoading(false)
+            }
+        })
+
 
     }
 
@@ -209,7 +255,7 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                 <button 
                     disabled={isLoading}
                     className="bg-gray-50 h-full px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">
-                    {isLoading ? 'Un momento...' : 'Crear Contratante'}
+                    {isLoading ? 'Un momento...' : `${contratante ? 'Actualizar Contratante' : 'Crear Contratante'}`}
                 </button>
             </div>
         </div>
@@ -235,10 +281,6 @@ const ContratantesForm = ({ cliente1, idtipoacto, setShowContratanteForm, setSho
                         setShowContratanteForm(false)
                         setShowClienteForm(true)
                     }}
-                    // onClick={() => {
-                    //     console.log('contratante', contratante);
-                        
-                    // }}
                 >
                     Editar Cliente
                 </button> 
