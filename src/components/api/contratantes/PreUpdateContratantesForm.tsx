@@ -48,6 +48,7 @@ const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante }
             setShowClienteForm={setShowClienteForm}
             // setCliente1={() => {}}
             cliente2={cliente2}
+            kardex={kardex}
         />}
     </>
   )

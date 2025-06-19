@@ -8,8 +8,9 @@ export interface UpdateCliente2Data {
 
 interface Props {
     clienteId: string
+    kardex: string
 }
-const useUpdateCliente2 = ({ clienteId }: Props): UseMutationResult<Cliente2, Error, UpdateCliente2Data> => {
+const useUpdateCliente2 = ({ clienteId, kardex }: Props): UseMutationResult<Cliente2, Error, UpdateCliente2Data> => {
     const clienteService = getCliente2Service({ clienteId })
     const queryClient = useQueryClient()
 
@@ -17,7 +18,7 @@ const useUpdateCliente2 = ({ clienteId }: Props): UseMutationResult<Cliente2, Er
         mutationFn: (data: UpdateCliente2Data) => clienteService.update(data.cliente, data.access),
         onSuccess: res => {
             console.log('Cliente2 updated successfully', res);
-            queryClient.invalidateQueries({ queryKey: ['clientes2'] })
+            queryClient.invalidateQueries({ queryKey: ['contratantes by kardex', kardex] })
         },
         onError: (error) => {
             console.error("Error updating Cliente2:", error)

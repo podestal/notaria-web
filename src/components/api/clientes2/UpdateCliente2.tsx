@@ -12,6 +12,7 @@ interface Props {
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
     // setCliente1: React.Dispatch<React.SetStateAction<Cliente | null>>
     cliente2: Cliente2
+    kardex: string
 }
 
 const UpdateCliente2 = ({ 
@@ -19,10 +20,11 @@ const UpdateCliente2 = ({
     setShowContratanteForm, 
     setShowClienteForm, 
     // setCliente1, 
-    cliente2
+    cliente2,
+    kardex,
  }: Props) => {
 
-    const updateCliente2 = useUpdateCliente2({ clienteId: cliente2.idcontratante })
+    const updateCliente2 = useUpdateCliente2({ clienteId: cliente2.idcontratante, kardex })
 
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
     const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
