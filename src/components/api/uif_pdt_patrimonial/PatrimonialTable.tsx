@@ -1,11 +1,18 @@
+import { Kardex } from "../../../services/api/kardexService"
 import PatrimonialTableBody from "./PatrimonialTableBody"
 import PatrimonialTableHeader from "./PatrimonialTableHeader"
 
-const PatrimonialTable = () => {
+interface Props {
+    kardex: Kardex
+}
+
+const PatrimonialTable = ({ kardex }: Props) => {
   return (
     <>
         <PatrimonialTableHeader />
-        <PatrimonialTableBody />
+        <PatrimonialTableBody 
+            kardex={kardex}
+        />
     </>
   )
 }

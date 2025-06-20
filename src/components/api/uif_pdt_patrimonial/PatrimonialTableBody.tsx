@@ -1,14 +1,30 @@
-const PatrimonialTableBody = () => {
+import useGetPatrimonialByKardex from "../../../hooks/api/patrimonial/useGetPatrimonialByKardex"
+import { Kardex } from "../../../services/api/kardexService"
+import useAuthStore from "../../../store/useAuthStore"
+
+interface Props {
+    kardex: Kardex
+}
+
+const PatrimonialTableBody = ({ kardex }: Props) => {
+
+    const access = useAuthStore((state) => state.access_token) || ''
+    console.log('kardex', kardex)
+    const { data: patrimonials, isLoading, isError, error, isSuccess } = useGetPatrimonialByKardex({ access, kardex: kardex.kardex })
+
+    if (isLoading) return <p className="text-md animate-pulse text-center my-2">Cargando ...</p>
+    if (isError) return <p className="text-md text-red-500 text-center">Error: {error.message}</p>
+
+    if (isSuccess && patrimonials.length === 0) return <p className="text-md text-center my-2">No hay datos patrimoniales</p>
+    if (isSuccess && patrimonials.length > 0)
+    
+
   return (
-    <div className='grid grid-cols-8 gap-4 text-black text-xs p-2 my-2'>
-        <p>Itenmp</p>
-        <p>Kardex - Año</p>
-        <p className='col-span-2'>Descripción</p>
-        <p>Fecha de acta</p>
-        <p>Moneda</p>
-        <p>Importe</p>
-        <p>Ex. Bien</p>
-    </div>
+    <>
+        {patrimonials.map((patrimonial) => (
+            <p>{patrimonial.kardex}</p>
+        ))}
+    </>
   )
 }
 

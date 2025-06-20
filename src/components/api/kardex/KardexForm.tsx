@@ -229,7 +229,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
                 { id: 'notes', label: 'Digitación', content: <p>notes</p> },
                 { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
-                { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain /> },
+                { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
             ]}
         />
     }
