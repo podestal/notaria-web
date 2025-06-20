@@ -36,6 +36,7 @@ const UpdateContratante = ({ idtipoacto, idtipkar, kardex, contratante }: Props)
             idtipkar={idtipkar}
             kardex={kardex}
             contratante={contratante}
+            setCloseUpdateContratante={setOpen}
         />
     
     </TopModal>

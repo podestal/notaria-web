@@ -19,6 +19,7 @@ interface Props {
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
     setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
+    setCloseUpdateContratante?: React.Dispatch<React.SetStateAction<boolean>>
     createContratante?: UseMutationResult<Contratante, Error, CreateContratanteData>
     updateContratante?: UseMutationResult<Contratante, Error, UpdateContratanteData>
     idtipkar: number
@@ -39,6 +40,7 @@ const ContratantesForm = ({
     setShowContratanteForm, 
     setShowClienteForm, 
     setClientesCheck, 
+    setCloseUpdateContratante,
     createContratante, 
     updateContratante,
     idtipkar, 
@@ -191,6 +193,7 @@ const ContratantesForm = ({
                 setShowContratanteForm(false)
                 setShowClienteForm(false)
                 setClientesCheck(false)
+                setCloseUpdateContratante && setCloseUpdateContratante(false)
             },
             onError: (error) => {
                 console.error('Error updating contratante:', error)

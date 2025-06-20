@@ -32,7 +32,9 @@ const TopModal = ({ isOpen, onClose, children, deepth }: TopModalProps) => {
           >
             {/* Close button */}
             <div className="flex justify-end">
-              <button onClick={onClose} className="text-red-500 hover:text-red-700 cursor-pointer">
+              <button 
+                type="button"
+                onClick={onClose} className="text-red-500 hover:text-red-700 cursor-pointer">
                 ✕
               </button>
             </div>
