@@ -4,7 +4,6 @@ export interface Patrimonial {
     itemmp: string
     kardex: string
     idtipoacto: string
-    tipo_acto: string
     nminuta: string
     idmon: number
     tipocambio: string
@@ -18,9 +17,10 @@ export interface Patrimonial {
     ofondos: string
     item: number
     des_idoppago?: string | null
+    moneda: string
 }
 
-export type PatrimonialCreate = Omit<Patrimonial, 'itemmp' | 'tipo_acto'>;
+export type PatrimonialCreate = Omit<Patrimonial, 'itemmp' | 'moneda'>;
 
 interface Props {
     byKardex: boolean

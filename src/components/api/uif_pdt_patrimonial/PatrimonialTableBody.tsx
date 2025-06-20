@@ -1,6 +1,7 @@
 import useGetPatrimonialByKardex from "../../../hooks/api/patrimonial/useGetPatrimonialByKardex"
 import { Kardex } from "../../../services/api/kardexService"
 import useAuthStore from "../../../store/useAuthStore"
+import PatrimonialCard from "./PatrimonialCard"
 
 interface Props {
     kardex: Kardex
@@ -22,7 +23,14 @@ const PatrimonialTableBody = ({ kardex }: Props) => {
   return (
     <>
         {patrimonials.map((patrimonial) => (
-            <p>{patrimonial.kardex}</p>
+            <div
+                key={patrimonial.itemmp}
+            >
+                <PatrimonialCard 
+                    patrimonial={patrimonial}
+                    contrato={kardex.contrato}
+                />
+            </div>
         ))}
     </>
   )
