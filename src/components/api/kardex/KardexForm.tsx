@@ -17,6 +17,7 @@ import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import KardexFormTabs from "./KardexFormTabs"
 import ContratantesMain from "../contratantes/ContratantesMain"
+import PatrimonialMain from "../uif_pdt_patrimonial/PatrimonialMain"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -228,7 +229,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
                 { id: 'notes', label: 'Digitación', content: <p>notes</p> },
                 { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
-                { id: 'uif', label: 'UIF/PDT Patrimonial', content: <p>details</p> },
+                { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain /> },
             ]}
         />
     }

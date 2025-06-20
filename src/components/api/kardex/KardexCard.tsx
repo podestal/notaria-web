@@ -40,17 +40,6 @@ const KardexCard = ({ kardex }: Props) => {
     >
         <KardexForm kardex={kardex} />
     </TopModal>
-    {/* <TopModalWithTabs 
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        tabs={[
-            { id: 'general', label: 'Kardex Info', content: <KardexForm kardex={kardex} /> },
-            { id: 'details', label: 'Contratantes', content: <ContratantesForm /> },
-            { id: 'notes', label: 'Digitación', content: <p>notes</p> },
-            { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
-            { id: 'uif', label: 'UIF/PDT Patrimonial', content: <p>details</p> },
-          ]}
-    /> */}
     </>
   )
 }
