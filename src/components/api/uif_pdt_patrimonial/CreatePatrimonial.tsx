@@ -1,6 +1,7 @@
 import { Newspaper } from "lucide-react"
 import { useState } from "react"
 import TopModal from "../../ui/TopModal"
+import PatrimonialForm from "./PatrimonialForm"
 
 const CreatePatrimonial = () => {
 
@@ -20,7 +21,7 @@ const CreatePatrimonial = () => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <p>Create patrimonial</p>
+            <PatrimonialForm />
         </TopModal>
     </>
   )

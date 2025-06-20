@@ -1,16 +1,14 @@
 import { motion } from "framer-motion";
 
-
-
 interface Item {
-    value: number;
+    value: string;
     label: string;
 }
 
 interface Props {
     options: Item[];
-    defaultValue?: number;
-    setter: (value: number) => void;
+    defaultValue?: string;
+    setter: (value: string) => void;
     label?: string;
     horizontal?: boolean;
     smallLabel?: boolean;
@@ -25,7 +23,7 @@ const shakeAnimation = {
     animate: { x: [0, -5, 5, -5, 5, 0], transition: { duration: 0.4 } },
 };
 
-const SimpleSelector = ({
+const SimpleSelectorStr = ({
     options,
     defaultValue,
     setter,
@@ -43,7 +41,7 @@ const SimpleSelector = ({
                 defaultValue={defaultValue ? defaultValue.toString() : '0'}
                 onChange={(e) => {
                     setError?.('');
-                    setter(e.target.value ? parseInt(e.target.value) : 0);
+                    setter(e.target.value ? e.target.value : '');
                 }}
                 // className="flex-1 bg-white w-2xl col-span-2 text-slate-700 border border-slate-300 rounded-md py-2  px-2"
                 className={`flex-1 bg-white text-slate-700 border rounded-md py-2 px-2 w-full ${
@@ -62,4 +60,4 @@ const SimpleSelector = ({
   )
 }
 
-export default SimpleSelector
+export default SimpleSelectorStr
