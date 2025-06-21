@@ -2,6 +2,8 @@ import { Newspaper } from "lucide-react"
 import { useState } from "react"
 import TopModal from "../../ui/TopModal"
 import PatrimonialForm from "./PatrimonialForm"
+import KardexFormTabs from "../kardex/KardexFormTabs"
+import VehicleForm from "../vehicle/VehicleForm"
 
 const CreatePatrimonial = () => {
 
@@ -21,7 +23,16 @@ const CreatePatrimonial = () => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <PatrimonialForm />
+            <>
+                <KardexFormTabs 
+                    tabs={[
+                        // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
+                        { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm /> },
+                        { id: 'escrituración', label: 'Información del Bien', content: <VehicleForm /> },
+                    ]}
+                />
+                
+            </>
         </TopModal>
     </>
   )
