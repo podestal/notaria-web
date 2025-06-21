@@ -10,7 +10,6 @@ interface Props {
 const PatrimonialTableBody = ({ kardex }: Props) => {
 
     const access = useAuthStore((state) => state.access_token) || ''
-    console.log('kardex', kardex)
     const { data: patrimonials, isLoading, isError, error, isSuccess } = useGetPatrimonialByKardex({ access, kardex: kardex.kardex })
 
     if (isLoading) return <p className="text-md animate-pulse text-center my-2">Cargando ...</p>
