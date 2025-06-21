@@ -1,11 +1,26 @@
 import axios from "axios"
 import { useState } from "react";
 
+// setColor={setColor}
+// setMarca={setMarca}
+// setModelo={setModelo}
+// setSerie={setNumeroSerie}
+
 interface Props {
     plate: string
+    setColor: React.Dispatch<React.SetStateAction<string>>
+    setMarca: React.Dispatch<React.SetStateAction<string>>
+    setModelo: React.Dispatch<React.SetStateAction<string>>
+    setSerie: React.Dispatch<React.SetStateAction<string>>
 }
 
-const VehicleLooker = ({ plate }: Props) => {
+const VehicleLooker = ({ 
+    plate,
+    setColor,
+    setMarca,
+    setModelo,
+    setSerie
+}: Props) => {
 
     const [disableButton, setDisableButton] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -21,32 +36,17 @@ const VehicleLooker = ({ plate }: Props) => {
         .then(response => {
             console.log('Vehicle data:', response.data);
             setDisableButton(true);
-            // Aquí puedes manejar la respuesta, por ejemplo, mostrarla en un modal o en un componente
+            setColor(response.data.data.color || '');
+            setMarca(response.data.data.marca || '');
+            setModelo(response.data.data.modelo || '');
+            setSerie(response.data.data.serie || '');
         })
         .catch(error => {
             console.error('Error fetching vehicle data:', error);
-            // Aquí puedes manejar el error, por ejemplo, mostrar un mensaje al usuario
         })
         .finally(() => {
             setLoading(false);
         })
-
-
-        
-        // const options = {method: 'GET', headers: {Authorization: `Bearer ${import.meta.env.VITE_FACTILIZA_TOKEN}`}};
-
-        // fetch(`https://api.factiliza.com/v1/placa/info/${plate}`, options)
-        // .then(response => response.json())
-        // .then(response => {
-        //     console.log(response)
-        //     setLoading(false);
-        // })
-        // .catch(err => {
-        //     console.error(err)
-        //     setLoading(false);
-        // });
-        
-
         
     }
 

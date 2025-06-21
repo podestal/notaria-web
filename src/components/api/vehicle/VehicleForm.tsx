@@ -12,6 +12,20 @@ const types = [
 const VehicleForm = () => {
 
     const [plate, setPlate] = useState('');
+    const [carroceria, setCarroceria] = useState('');
+    const [color, setColor] = useState('');
+    const [clase, setClase] = useState('');
+    const [motor, setMotor] = useState('');
+    const [marca, setMarca] = useState('');
+    const [cilindros, setCilindros] = useState('');
+    const [anioFabricacion, setAnioFabricacion] = useState('');
+    const [numeroSerie, setNumeroSerie] = useState('');
+    const [modelo, setModelo] = useState('');
+    const [ruedas, setRuedas] = useState('');
+    const [combustible, setCombustible] = useState('');
+    const [fechaInscripcion, setFechaInscripcion] = useState('');
+    const [partidaRegistral, setPartidaRegistral] = useState('');
+    // const [sedeRegistral, setSedeRegistral] = useState(1);
 //     color: "BLANCO"
 // ​​
 // marca: "JAC"
@@ -38,8 +52,8 @@ const VehicleForm = () => {
                 required
             />
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={carroceria}
+                setValue={setCarroceria}
                 label="Carrocería"
                 horizontal
                 required
@@ -56,12 +70,16 @@ const VehicleForm = () => {
             />
             <VehicleLooker 
                 plate={plate}
+                setColor={setColor}
+                setMarca={setMarca}
+                setModelo={setModelo}
+                setSerie={setNumeroSerie}
             />
             </div>
             <div  className="col-span-2 flex items-center gap-6">
                 <SimpleInput 
-                    value=""
-                    setValue={() => {}}
+                    value={color}
+                    setValue={setColor}
                     label="Color"
                     horizontal
                     required
@@ -72,15 +90,15 @@ const VehicleForm = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={clase}
+                setValue={setClase}
                 label="Clase"
                 horizontal
                 required
             />
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={motor}
+                setValue={setMotor}
                 label="Motor"
                 horizontal
                 required
@@ -88,15 +106,15 @@ const VehicleForm = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={marca}
+                setValue={setMarca}
                 label="Marca"
                 horizontal
                 required
             />
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={cilindros}
+                setValue={setCilindros}
                 label="Cilindros"
                 horizontal
                 required
@@ -104,15 +122,15 @@ const VehicleForm = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={anioFabricacion}
+                setValue={setAnioFabricacion}
                 label="Año fabricación"
                 horizontal
                 required
             />
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={numeroSerie}
+                setValue={setNumeroSerie}
                 label="Numero de serie"
                 horizontal
                 required
@@ -120,15 +138,15 @@ const VehicleForm = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={modelo}
+                setValue={setModelo}
                 label="Modelo"
                 horizontal
                 required
             />
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={ruedas}
+                setValue={setRuedas}
                 label="Ruedas"
                 horizontal
                 required
@@ -136,15 +154,15 @@ const VehicleForm = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={combustible}
+                setValue={setCombustible}
                 label="Combustible"
                 horizontal
                 required
             />
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={fechaInscripcion}
+                setValue={setFechaInscripcion}
                 label="Fecha de inscripción"
                 horizontal
                 required
@@ -152,8 +170,8 @@ const VehicleForm = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput 
-                value=""
-                setValue={() => {}}
+                value={partidaRegistral}
+                setValue={setPartidaRegistral}
                 label="Partida Registral"
                 horizontal
                 required
