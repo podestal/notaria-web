@@ -2,7 +2,7 @@ import { FileText } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
-import { useState } from "react"
+import { act, useState } from "react"
 import Calendar from "../../ui/Calendar"
 import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
@@ -18,6 +18,9 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import KardexFormTabs from "./KardexFormTabs"
 import ContratantesMain from "../contratantes/ContratantesMain"
 import PatrimonialMain from "../uif_pdt_patrimonial/PatrimonialMain"
+import MultiSelect from "../../ui/MultiSelect"
+import { AnimatePresence, motion } from "framer-motion"
+import KardexActosSelector from "./KardexActosSelector"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -28,6 +31,8 @@ interface Props {
 }
 
 const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) => {
+
+    const [open, setOpen] = useState(false)
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
@@ -40,11 +45,13 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
 
     const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
+    const [contratos, setContratos] = useState<string[]>([])
+    const [contratosDes, setContratosDes] = useState<string[]>([])
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (contrato === null) {
+        if (contratos.length === 0) {
             setMessage('No se ha seleccionado un contrato')
             setShow(true)
             setType('error')
@@ -59,13 +66,15 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
             return
         }
 
+        const formattedContratoDes = contratosDes.map(des => des.trim()).join(' / ')
+
         createKardex && createKardex.mutate({
             kardex: {
                 kardex: '',
                 idtipkar: selectedKardexType,
                 fechaingreso: moment(date).format('DD/MM/YYYY'),
                 referencia: karedexReference || 'This is a test reference',
-                codactos: contrato.id,
+                codactos: contratos.join(''),
                 idusuario: Number(responsible.id),
                 responsable: Number(responsible.id),
                 retenido: 0,
@@ -75,7 +84,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                 pagado: 0,
                 visita: 0,
                 idnotario: 1,
-                contrato: contrato.label, 
+                contrato: `${formattedContratoDes} / `, 
                 numescritura: '' 
             }
         }, {
@@ -112,11 +121,13 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
     <form 
         onSubmit={handleSubmit}
         className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
+        <>{console.log('contratosDes', contratosDes)}</>
+
         <div className="flex justify-center items-center gap-2 p-4 rounded-t-lg text-slate-50 ">
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
         </div>
-        <>{console.log('contrato', kardex?.contrato)}</>
+        {/* <>{console.log('contrato', kardex?.contrato)}</> */}
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
             <div className="flex justify-between items-center gap-4 mb-6">
                 <Selector 
@@ -144,17 +155,11 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                 />
                 <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Generar Kardex</button>
             </div>
-            {/* <>{tipoActos
-            .filter(acto => acto.idtipkar === selectedKardexType)
-            .map(tipo => {
-                console.log('tipoActo', tipo.desacto)
-                console.log('kardex.contrato', kardex?.contrato.split('/')[0]);
-                
-            })}</> */}
             <div className="flex justify-between items-center gap-4">
                 <input 
                     // value={contrato ? contrato.id : `${kardex ? tipoActos.find(acto => acto.desacto === kardex.contrato)?.idtipoacto : '00'}`}
-                    value={kardex ? tipoActos.find(acto => acto.desacto === kardex.contrato.split('/')[0].trim())?.idtipoacto || '00' : `${contrato ? contrato.id : ''}`}
+                    // value={kardex ? tipoActos.find(acto => acto.desacto === kardex.contrato.split('/')[0].trim())?.idtipoacto || '00' : `${contrato ? contrato.id : ''}`}
+                    value={contratos.join('')}
                     onChange={() => {}}
                     disabled
                     placeholder="Código de Acto"
@@ -169,7 +174,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                     className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                 />
             </div>
-            <SearchableDropdownInput
+            {/* <SearchableDropdownInput
                 options={tipoActos
                     .filter(acto => acto.idtipkar === selectedKardexType)
                     .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} /` }))}
@@ -177,7 +182,55 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                 // defaultValue={kardex && tipoActos.find(tipoActo => tipoActo.desacto === kardex.contrato) || null}
                 setSelected={setContrato}
                 placeholder="Buscar contrato..."
+            /> */}
+            <div className="grid grid-cols-9 items-start my-4">
+            <div className="col-span-8">
+            <KardexActosSelector 
+                tipoActos={tipoActos.filter(acto => acto.idtipkar === selectedKardexType)}
+                contratos={contratos}
+                setContratosDes={setContratosDes}
             />
+            </div>
+            <div className="w-full flex flex-col justify-center items-center gap-4">
+                <button 
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
+                    <span className="font-bold text-green-600 text-md">+</span>
+                    <span>Mostrar Actos</span>
+                </button>
+                <button 
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
+                    <span className="font-bold text-red-600 text-md">-</span>
+                    <span>Ocultar Actos</span>
+                </button>
+            </div>
+            </div>
+            <AnimatePresence>
+            {open && 
+            <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                // className="w-full my-4"
+            
+            >
+
+
+                <MultiSelect 
+                    options={tipoActos
+                        .filter(acto => acto.idtipkar === selectedKardexType)
+                        .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} /` }))}
+                    placeholder="Buscar contrato..."
+                    label=""
+                    selectedIds={contratos}
+                    setSelectedIds={setContratos}
+                />
+            </motion.div>}
+            </AnimatePresence>
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-center items-center gap-4">
                     <p className="text-md font-bold py-2">Responsable</p>

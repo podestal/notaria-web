@@ -27,6 +27,11 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  const toggleDescription = () => {
+    console.log('selectedIds', selectedIds);
+    
+  }
+
   const toggleOption = (id: string) => {
     if (selectedIds.includes(id)) {
       setSelectedIds(selectedIds.filter(item => item !== id));
@@ -52,7 +57,10 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                 type="checkbox"
                 className="mr-2"
                 checked={selectedIds.includes(option.id)}
-              onChange={() => toggleOption(option.id)}
+              onChange={() => {
+                toggleOption(option.id)
+                toggleDescription()
+              }}
             />
             {option.label}
             </label>
