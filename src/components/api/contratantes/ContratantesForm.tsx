@@ -213,6 +213,7 @@ const ContratantesForm = ({
     <>
     <form
         onSubmit={handleCreateContratante}
+        className="text-black"
     >
         <h2 className="text-xl text-center font-bold mb-6">Nuevo Contratante</h2>
         <div className="grid grid-cols-5 gap-4">

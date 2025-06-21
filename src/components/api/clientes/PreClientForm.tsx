@@ -108,10 +108,10 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
   return (
     <>
         <div>
-        <h2 className="text-xl font-bold text-center mb-10">Buscar Cliente</h2>
+        <h2 className="text-xl font-bold text-center mb-10 text-black">Buscar Cliente</h2>
         <form
             onSubmit={handleLookup}
-            className="grid grid-cols-5 items-center gap-6"
+            className="grid grid-cols-5 items-center gap-6 text-black"
         >
             <Selector 
                 label="Tipo de Persona"

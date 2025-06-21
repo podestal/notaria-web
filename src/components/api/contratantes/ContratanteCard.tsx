@@ -18,7 +18,7 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
         <p className="col-span-2">{getTitleCase(contratante.condicion_str)}</p>
         <p className="pl-2">{contratante.firma === '1' ? 'Si' : 'No'}</p>
         <p className="pl-2">{contratante.fechafirma}</p>
-        <p className="pl-2">{getTitleCase(kardex.usuario)}</p>
+        <p className="pl-2">{kardex.usuario ? getTitleCase(kardex.usuario) : ''}</p>
         <p></p>
         <div className="flex items-start justify-start gap-2 pl-4">
         <RemoveContratante 

@@ -390,11 +390,11 @@ const ClientesForm = ({
     >
         <div className="grid grid-cols-3 items-center gap-6 mb-10">
             <div></div>
-            <h2 className="text-xl font-bold text-center">Nuevo Cliente</h2>
+            <h2 className="text-xl font-bold text-center text-black">Nuevo Cliente</h2>
             <button
                 type="button"
                 onClick={handleReniec}
-                className="bg-gray-50 px-2 py-1 w-[60%] text-sm h-full transition duration-300 border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex justify-center items-center gap-1"
+                className="bg-gray-50 text-black px-2 py-1 w-[60%] text-sm h-full transition duration-300 border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex justify-center items-center gap-1"
             >Consulta Reniec</button>
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">

@@ -3,6 +3,7 @@ import KardexForm from "./KardexForm"
 import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import TopModal from "../../ui/TopModal"
+import { Kardex } from "../../../services/api/kardexService"
 
 
 const CreateKardex = () => {
@@ -10,6 +11,7 @@ const CreateKardex = () => {
     const [open, setOpen] = useState(false)
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const createKardex = useCreateKardex({ idtipkar: bodyRender }) 
+    const [kardex, setKardex] = useState<Kardex | null>(null)
 
   return (
     <>
@@ -23,9 +25,16 @@ const CreateKardex = () => {
     </div>
     <TopModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+            setOpen(false)
+            setKardex(null)
+        }}
     >
-        <KardexForm createKardex={createKardex} />
+        <KardexForm 
+            createKardex={createKardex} 
+            setKardex={setKardex}
+            kardex={kardex}
+        />
     </TopModal>
     </>
   )

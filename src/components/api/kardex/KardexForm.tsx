@@ -21,12 +21,13 @@ import PatrimonialMain from "../uif_pdt_patrimonial/PatrimonialMain"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
-    kardex?: Kardex
+    kardex?: Kardex | null
+    setKardex?: React.Dispatch<React.SetStateAction<Kardex | null>>
     createKardex?: UseMutationResult<KardexPage, Error, CreateKardexData>
     
 }
 
-const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
+const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
@@ -78,11 +79,15 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex }: Props) => {
                 numescritura: '' 
             }
         }, {
-            onSuccess: () => {
+            onSuccess: (res) => {
                 setMessage('Kardex creado exitosamente')
                 setShow(true)
                 setType('success')
                 setNotAllowed && setNotAllowed(false)
+                const newKardex = res as unknown as Kardex
+                setKardex && setKardex(newKardex)
+                
+                // setKardex && setKardex(res.)
             }, 
             onError: (error) => {
                 setMessage(`Error al crear el kardex: ${error.message}`)
