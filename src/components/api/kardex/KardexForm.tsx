@@ -164,7 +164,10 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                     placeholder="Referencia del Kardex"
                     className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                 />
-                <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Generar Kardex</button>
+                <button 
+                    type={kardex ? 'button' : 'submit'}
+                    disabled={!!kardex}
+                    className={`bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300   rounded-md ${kardex ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-300'}`}>Generar Kardex</button>
             </div>
             <div className="flex justify-between items-center gap-4">
                 <input 
