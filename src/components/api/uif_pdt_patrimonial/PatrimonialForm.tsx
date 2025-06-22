@@ -12,6 +12,7 @@ import moment from "moment";
 import { Kardex } from "../../../services/api/kardexService";
 import PatrimonialTipoActoSelector from "./PatrimonialTipoActoSelector";
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray";
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore";
 
 interface Props {
     createPatrimonial: UseMutationResult<Patrimonial, Error, CreatePatrimonialData>
@@ -24,6 +25,8 @@ const exhibiompOptions = [
 ]
 
 const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
+
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const access = useAuthStore(s => s.access_token) || ''
 
@@ -43,6 +46,7 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
     const [formaDePagoError, setFormaDePagoError] = useState('');
     const [oportunidadError, setOportunidadError] = useState('');
     const [selectedTipoDeActoError, setSelectedTipoDeActoError] = useState('');
+    const [importeTransaccionError, setImporteTransaccionError] = useState('');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -59,6 +63,18 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
 
         if (!selectedTipoDeActo) {
             setSelectedTipoDeActoError('Debe seleccionar un tipo de acto');
+            return;
+        }
+
+        if (!selectedDate) {
+            setMessage('Debe seleccionar una fecha de acta');
+            setShow(true);
+            setType('error');
+            return
+        }
+
+        if (!inporteTransaccion) {
+            setImporteTransaccionError('Debe ingresar un importe de transacción');
             return;
         }
 
@@ -86,10 +102,16 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
         }, {
             onSuccess: res => {
                 console.log('response', res);
+                setMessage('Patrimonial creado exitosamente');
+                setShow(true);
+                setType('success');
                 
             },
             onError: err => {
                 console.error('Error creating patrimonial:', err);
+                setMessage(`Error al crear patrimonial: ${err.message}`);
+                setShow(true);
+                setType('error');
             }
         })
     }
@@ -152,6 +174,9 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
                 setValue={setImporteTransaccion}
                 label="Importe de la Transacción"
                 horizontal
+                error={importeTransaccionError}
+                setError={setImporteTransaccionError}
+                required
             />
             <SimpleSelector 
                 options={MONEDAS.map((moneda) => ({
