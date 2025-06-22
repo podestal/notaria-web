@@ -4,10 +4,16 @@ import TopModal from "../../ui/TopModal"
 import PatrimonialForm from "./PatrimonialForm"
 import KardexFormTabs from "../kardex/KardexFormTabs"
 import VehicleForm from "../vehicle/VehicleForm"
+import useCreatePatrimonial from "../../../hooks/api/patrimonial/useCreatePatrimonial"
 
-const CreatePatrimonial = () => {
+interface Props {
+    kardex: string
+}
+
+const CreatePatrimonial = ({ kardex }: Props) => {
 
     const [open, setOpen] = useState(false)
+    const createPatrimonial = useCreatePatrimonial({ kardex })
 
   return (
     <>
@@ -27,7 +33,7 @@ const CreatePatrimonial = () => {
                 <KardexFormTabs 
                     tabs={[
                         // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
-                        { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm /> },
+                        { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm createPatrimonial={createPatrimonial} kardex={kardex}/> },
                         { id: 'escrituración', label: 'Información del Bien', content: <VehicleForm /> },
                     ]}
                 />

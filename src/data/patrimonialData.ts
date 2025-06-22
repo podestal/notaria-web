@@ -23,9 +23,9 @@ export const OPPORTUNIDADES_PAGO = [
 ]
 
 export const FORMAS_PAGO = [
-    { idtipoacto: 'C', des_idtipoacto: 'AL CONTADO' },
-    { idtipoacto: 'P', des_idtipoacto: 'A PLAZOS (MAS DE UNA CUOTA)' },
-    { idtipoacto: 'S', des_idtipoacto: 'SALDO PENDIENTE DE PAGO (UNA CUOTA)' },
-    { idtipoacto: 'D', des_idtipoacto: 'DONACIONES O ANTICIPOS' },
-    { idtipoacto: 'N', des_idtipoacto: 'NO APLICA' }    
+    { id_fpago: '1', codigo: 'C', descripcion: 'AL CONTADO' },
+    { id_fpago: '2', codigo: 'P', descripcion: 'A PLAZOS (MAS DE UNA CUOTA)' },
+    { id_fpago: '3', codigo: 'S', descripcion: 'SALDO PENDIENTE DE PAGO (UNA CUOTA)' },
+    { id_fpago: '4', codigo: 'D', descripcion: 'DONACIONES O ANTICIPOS' },
+    { id_fpago: '5', codigo: 'N', descripcion: 'NO APLICA' }    
 ] 

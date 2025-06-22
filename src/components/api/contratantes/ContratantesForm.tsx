@@ -56,7 +56,7 @@ const ContratantesForm = ({
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
     const [representanteCreated, setRepresentanteCreated] = useState(false)
     const [selectedRepresentation, setSelectedRepresentation] = useState('0')
-    const [selectedActos, setSelectedActos] = useState<string[]>(contratante ? contratante.condicion.split('/').map(cond => cond.length > 0 ? cond.split('.')[0]: '').filter(cond => cond.length > 0) : [])
+    const [selectedActos, setSelectedActos] = useState<string[]>(contratante ? contratante.condicion.split('/') : [])
     const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : false)
     const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : false)
     const [isLoading, setIsLoading] = useState(false)
@@ -215,7 +215,7 @@ const ContratantesForm = ({
         onSubmit={handleCreateContratante}
         className="text-black"
     >
-        <>{console.log("selectedActos", selectedActos)}</>
+        <>{console.log("condiciones", contratante?.condicion)}</>
         <h2 className="text-xl text-center font-bold mb-6">Nuevo Contratante</h2>
         <div className="grid grid-cols-5 gap-4">
             <div className="col-span-2">

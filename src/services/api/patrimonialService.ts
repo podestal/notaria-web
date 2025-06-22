@@ -20,10 +20,10 @@ export interface Patrimonial {
     moneda: string
 }
 
-export type PatrimonialCreate = Omit<Patrimonial, 'itemmp' | 'moneda'>;
+export type PatrimonialCreateUpdate = Omit<Patrimonial, 'moneda'>;
 
 interface Props {
-    byKardex: boolean
+    byKardex?: boolean
 }
 
 const getPatrimonialService = ({ byKardex }: Props) => {
@@ -32,7 +32,7 @@ const getPatrimonialService = ({ byKardex }: Props) => {
         url = '/patrimonial/by_kardex/'
     }
 
-    return new APIClient<Patrimonial, PatrimonialCreate>(url)
+    return new APIClient<Patrimonial, PatrimonialCreateUpdate>(url)
 }
 
 export default getPatrimonialService

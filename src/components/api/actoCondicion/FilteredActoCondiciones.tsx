@@ -14,7 +14,7 @@ const FilteredActoCondiciones = ({ idtipoacto, kardex, selectedActos, setSelecte
 
     const access = useAuthStore((state) => state.access_token) || ''
     const { data: actoCondiciones, isLoading: isLoadingCondicion, isError: isErrorCondicion, isSuccess: isSuccessCondicion } = useGetActoCondicionByTipoActo({ idtipoacto })
-    const { data: detalleActos, isLoading: isLoadingDetalleActos, isError: isErrorDetalleActos, isSuccess: isSuccessDetalleActos } = useGetDetalleActosByKardexAndTipoActo({ access, kardex, tipoacto: idtipoacto })
+    const { data: detalleActo, isLoading: isLoadingDetalleActos, isError: isErrorDetalleActos, isSuccess: isSuccessDetalleActos } = useGetDetalleActosByKardexAndTipoActo({ access, kardex, tipoacto: idtipoacto })
 
     if (isLoadingCondicion || isLoadingDetalleActos) return <p className="animate-pulse text-center text-xs my-6">Cargando condiciones...</p>
 
@@ -27,11 +27,10 @@ const FilteredActoCondiciones = ({ idtipoacto, kardex, selectedActos, setSelecte
 
   return (
     <>
-        <p className="text-lg text-center font-semibold">Seleccione condiciones</p>
-        <>{console.log('detalleActos', detalleActos)}</>
+        <p className="text-lg text-center font-semibold">{detalleActo.desacto}</p>
         <MultiSelect 
             options={actoCondiciones.map(condicion => ({
-                id: condicion.idcondicion,
+                id: `${condicion.idcondicion}.${detalleActo.item}`,
                 label: condicion.condicion
             }))}
             placeholder="Seleccione condiciones"
