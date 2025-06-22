@@ -5,15 +5,16 @@ import PatrimonialForm from "./PatrimonialForm"
 import KardexFormTabs from "../kardex/KardexFormTabs"
 import VehicleForm from "../vehicle/VehicleForm"
 import useCreatePatrimonial from "../../../hooks/api/patrimonial/useCreatePatrimonial"
+import { Kardex } from "../../../services/api/kardexService"
 
 interface Props {
-    kardex: string
+    kardex: Kardex
 }
 
 const CreatePatrimonial = ({ kardex }: Props) => {
 
     const [open, setOpen] = useState(false)
-    const createPatrimonial = useCreatePatrimonial({ kardex })
+    const createPatrimonial = useCreatePatrimonial({ kardex: kardex.kardex })
 
   return (
     <>

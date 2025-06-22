@@ -9,10 +9,13 @@ import { CreatePatrimonialData } from "../../../hooks/api/patrimonial/useCreateP
 import { Patrimonial } from "../../../services/api/patrimonialService";
 import useAuthStore from "../../../store/useAuthStore";
 import moment from "moment";
+import { Kardex } from "../../../services/api/kardexService";
+import PatrimonialTipoActoSelector from "./PatrimonialTipoActoSelector";
+import getTipoActoIdArray from "../../../utils/getTipoActoIdArray";
 
 interface Props {
     createPatrimonial: UseMutationResult<Patrimonial, Error, CreatePatrimonialData>
-    kardex: string
+    kardex: Kardex
 }
 
 const exhibiompOptions = [
@@ -20,17 +23,13 @@ const exhibiompOptions = [
     { value: 'No', label: 'No' }
 ]
 
-const provisionalTipoActoOprions = [
-    { value: 'C', label: 'Seleccione' },
-    { value: 'P', label: 'COMPRA VENTA DE VEHICULO AUTOMOTOR' },
-] 
-
 const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
 
     const [formaDePagoSelected, setFormaDePagoSelected] = useState('');
     const [oportunidadSelected, setOportunidadSelected] = useState('');
+    const [selectedTipoDeActo, setSelectedTipoDeActo] = useState('');
 
     const [inporteTransaccion, setImporteTransaccion] = useState('');
     const [monedaSelected, setMonedaSelected] = useState(1);
@@ -43,6 +42,7 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
     // ERROR HANDLING
     const [formaDePagoError, setFormaDePagoError] = useState('');
     const [oportunidadError, setOportunidadError] = useState('');
+    const [selectedTipoDeActoError, setSelectedTipoDeActoError] = useState('');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -57,13 +57,18 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
             return;
         }
 
+        if (!selectedTipoDeActo) {
+            setSelectedTipoDeActoError('Debe seleccionar un tipo de acto');
+            return;
+        }
+
         // after validation
         createPatrimonial.mutate({
             access,
             patrimonial: {
                 itemmp: 'xxxxxx',
-                kardex: kardex,
-                idtipoacto: provisionalTipoActoOprions.find(op => op.value === 'C')?.value || '',
+                kardex: kardex.kardex,
+                idtipoacto: selectedTipoDeActo,
                 nminuta: moment(selectedDate).format('DD/MM/YYYY'),
                 idmon: monedaSelected,
                 tipocambio: tipoDeCambio,
@@ -95,6 +100,7 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
         className="flex flex-col gap-4 p-4 bg-white rounded shadow-md"
     >
         <h2 className="text-lg font-semibold text-gray-700 mb-4 text-center">Formulario Patrimonial</h2>
+        <>{console.log('kardex', kardex)}</>
         <div className="grid grid-cols-2 gap-4">
             <SimpleSelectorStr 
                 options={[{ value: '', label: 'Seleccione' }, ...FORMAS_PAGO.map((tipo) => ({
@@ -106,6 +112,7 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
                 label="Tipo de Pago"
                 error={formaDePagoError}
                 setError={setFormaDePagoError}
+                required
             />
             <SimpleSelectorStr 
                 options={[{ value: '', label: 'Seleccione' }, ...OPPORTUNIDADES_PAGO.map((oportunidad) => ({
@@ -117,14 +124,17 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
                 label="Oportunidad de Pago"
                 error={oportunidadError}
                 setError={setOportunidadError}
+                required
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
-            <SimpleSelectorStr 
-                options={provisionalTipoActoOprions}
-                defaultValue={''}
-                setter={() => {}}
-                label="Tipo de Acto"
+            <PatrimonialTipoActoSelector 
+                idtipkar={kardex.idtipkar}
+                kardexActos={getTipoActoIdArray(kardex.codactos)}
+                selectedTipoDeActo={selectedTipoDeActo}
+                setSelectedTipoDeActo={setSelectedTipoDeActo}
+                error={selectedTipoDeActoError}
+                setError={setSelectedTipoDeActoError}
             />
             <div className="grid grid-cols-2 gap-2 items-center">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">

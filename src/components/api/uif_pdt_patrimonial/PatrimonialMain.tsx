@@ -9,7 +9,9 @@ interface Props {
 const PatrimonialMain = ({ kardex }: Props) => {
   return (
     <div>
-        <CreatePatrimonial />
+        <CreatePatrimonial 
+            kardex={kardex}
+        />
         <PatrimonialTable 
             kardex={kardex}
         />
