@@ -30,6 +30,17 @@ interface Props {
     
 }
 
+const getTipoActoIdArray = (codactos: string) => {
+    if (!codactos) return []
+    const tipoActoIdArray = []
+    let i = 0
+    while (i < codactos.length) {
+        tipoActoIdArray.push(codactos.substring(i, i + 3))
+        i += 3
+    }
+    return tipoActoIdArray
+}
+
 const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) => {
 
     const [open, setOpen] = useState(false)
@@ -45,8 +56,8 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
 
     const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
-    const [contratos, setContratos] = useState<string[]>([])
-    const [contratosDes, setContratosDes] = useState<string[]>([])
+    const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
+    const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -218,8 +229,6 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                 // className="w-full my-4"
             
             >
-
-
                 <MultiSelect 
                     options={tipoActos
                         .filter(acto => acto.idtipkar === selectedKardexType)
