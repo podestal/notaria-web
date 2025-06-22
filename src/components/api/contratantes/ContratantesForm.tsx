@@ -215,6 +215,7 @@ const ContratantesForm = ({
         onSubmit={handleCreateContratante}
         className="text-black"
     >
+        <>{console.log("selectedActos", selectedActos)}</>
         <h2 className="text-xl text-center font-bold mb-6">Nuevo Contratante</h2>
         <div className="grid grid-cols-5 gap-4">
             <div className="col-span-2">
@@ -239,6 +240,7 @@ const ContratantesForm = ({
             </div>
             <ContratantesConditionFilter 
                 idtipoacto={idtipoacto}
+                kardex={kardex}
                 selectedActos={selectedActos}
                 setSelectedActos={setSelectedActos}
             />

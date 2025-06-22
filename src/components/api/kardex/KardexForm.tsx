@@ -2,7 +2,7 @@ import { FileText } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
-import { act, useState } from "react"
+import { useState } from "react"
 import Calendar from "../../ui/Calendar"
 import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
@@ -21,6 +21,7 @@ import PatrimonialMain from "../uif_pdt_patrimonial/PatrimonialMain"
 import MultiSelect from "../../ui/MultiSelect"
 import { AnimatePresence, motion } from "framer-motion"
 import KardexActosSelector from "./KardexActosSelector"
+import getTipoActoIdArray from "../../../utils/getTipoActoIdArray"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -28,17 +29,6 @@ interface Props {
     setKardex?: React.Dispatch<React.SetStateAction<Kardex | null>>
     createKardex?: UseMutationResult<KardexPage, Error, CreateKardexData>
     
-}
-
-const getTipoActoIdArray = (codactos: string) => {
-    if (!codactos) return []
-    const tipoActoIdArray = []
-    let i = 0
-    while (i < codactos.length) {
-        tipoActoIdArray.push(codactos.substring(i, i + 3))
-        i += 3
-    }
-    return tipoActoIdArray
 }
 
 const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) => {
@@ -55,7 +45,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
     const [date, setDate] = useState<Date | undefined>(kardex ? new Date(kardexDate) || new Date() : undefined)
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
 
-    const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
+    // const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
     const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
