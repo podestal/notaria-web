@@ -115,40 +115,45 @@ const KardexForm = ({
             }
         })
 
-        updateKardex && updateKardex.mutate({
-            kardex: {
-                // idkardex: kardex?.idkardex || 0,
-                kardex: karedexReference,
-                idtipkar: selectedKardexType,
-                fechaingreso: moment(date).format('DD/MM/YYYY'),
-                referencia: karedexReference || 'This is a test reference',
-                codactos: contratos.join(''),
-                idusuario: Number(responsible.id),
-                responsable: Number(responsible.id),
-                retenido: 0,
-                desistido: 0,
-                autorizado: 0,
-                idrecogio: 0,
-                pagado: 0,
-                visita: 0,
-                idnotario: 1,
-                contrato: `${formattedContratoDes} / `, 
-                numescritura: '' 
-            },
-            access: 'access_token'
-        }, {
-            onSuccess: (res) => {
-                console.log('res', res)
-                setMessage('Kardex actualizado exitosamente')
-                setShow(true)
-                setType('success')
-            }, 
-            onError: (error) => {
-                setMessage(`Error al actualizar el kardex: ${error.message}`)
-                setShow(true)
-                setType('error')
-            }
-        })
+        console.log('contratos before updating', contratos)
+
+        if (kardex && updateKardex) {
+            updateKardex.mutate({
+                kardex: {
+                    // idkardex: kardex?.idkardex || 0,
+                    kardex: karedexReference,
+                    idtipkar: selectedKardexType,
+                    fechaingreso:kardex.fechaingreso,
+                    referencia: karedexReference || 'This is a test reference',
+                    codactos: contratos.join(''),
+                    idusuario: Number(responsible.id),
+                    responsable: Number(responsible.id),
+                    retenido: 0,
+                    desistido: 0,
+                    autorizado: 0,
+                    idrecogio: 0,
+                    pagado: 0,
+                    visita: 0,
+                    idnotario: 1,
+                    contrato: `${formattedContratoDes} / `, 
+                    numescritura: '' 
+                },
+                access: 'access_token'
+            }, {
+                onSuccess: (res) => {
+                    console.log('res', res)
+                    setMessage('Kardex actualizado exitosamente')
+                    setShow(true)
+                    setType('success')
+                }, 
+                onError: (error) => {
+                    const errorMessage = (error as any)?.response?.data?.error || error.message
+                    setMessage(`Error al actualizar el kardex: ${errorMessage}`)
+                    setShow(true)
+                    setType('error')
+                }
+            })
+        }
 
     }
 
@@ -167,7 +172,7 @@ const KardexForm = ({
     <form 
         onSubmit={handleSubmit}
         className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
-        <>{console.log('contratosDes', contratosDes)}</>
+        {/* <>{console.log('contratosDes', contratosDes)}</> */}
 
         <div className="flex justify-center items-center gap-2 p-4 rounded-t-lg text-slate-50 ">
             <FileText className="text-green-600"/>

@@ -9,8 +9,6 @@ interface Props {
 }
 
 const KardexActosSelector = ({ tipoActos, contratos, setContratosDes }: Props) => {
-
-    console.log('contratos', contratos);
     
 
     const [actos, setActos] = useState<TipoActo[]>(tipoActos.filter(acto => contratos.includes(acto.idtipoacto)))
@@ -22,7 +20,6 @@ const KardexActosSelector = ({ tipoActos, contratos, setContratosDes }: Props) =
 
   return (
     <AnimatePresence>
-        <>{console.log('actos', actos)}</>
         {actos
             .map( acto => (
                 <motion.div
