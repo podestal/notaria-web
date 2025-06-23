@@ -1,6 +1,6 @@
 const PatrimonialTableHeader = () => {
   return (
-    <div className='grid grid-cols-8 gap-4 bg-slate-100 text-black text-xs font-semibold p-2 mb-4'>
+    <div className='grid grid-cols-9 gap-4 bg-slate-100 text-black text-xs font-semibold p-2 mb-4'>
         <p>Itenmp</p>
         <p>Kardex - Año</p>
         <p className='col-span-2'>Descripción</p>

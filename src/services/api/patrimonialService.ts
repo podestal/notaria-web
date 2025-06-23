@@ -23,11 +23,15 @@ export interface Patrimonial {
 export type PatrimonialCreateUpdate = Omit<Patrimonial, 'moneda'>;
 
 interface Props {
+    idPatrimonial?: string
     byKardex?: boolean
 }
 
-const getPatrimonialService = ({ byKardex }: Props) => {
+const getPatrimonialService = ({ byKardex, idPatrimonial }: Props) => {
     let url = '/patrimonial/'
+    if (idPatrimonial) {
+        url += `${idPatrimonial}/`
+    }
     if (byKardex) {
         url = '/patrimonial/by_kardex/'
     }
