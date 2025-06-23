@@ -27,7 +27,6 @@ const PatrimonialTableBody = ({ kardex }: Props) => {
             >
                 <PatrimonialCard 
                     patrimonial={patrimonial}
-                    contrato={kardex.contrato}
                 />
             </div>
         ))}

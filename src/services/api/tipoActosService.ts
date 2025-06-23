@@ -24,8 +24,15 @@ export interface TipoActo {
     impuestos: number;
 }
 
-const getTipoActosService = () => {
+interface Props {
+    idtipoacto?: string;
+}
+
+const getTipoActosService = ({ idtipoacto }: Props) => {
     let url = '/tiposdeactos/'
+    if (idtipoacto) {
+        url += `${idtipoacto}/`;
+    }
     return new APIClient<TipoActo, TipoActo>(url);
 }
 
