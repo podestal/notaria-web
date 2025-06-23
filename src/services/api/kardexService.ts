@@ -53,13 +53,16 @@ export type CreateUpdateKardex = Omit<Kardex,
     idnotario: number;
 }
 
+export const getSingleKardexService = (id: number) => {
+    return new APIClient<Kardex, CreateUpdateKardex>(`/kardex/${id}/`)
+}
+
 interface Props {
     id?: number
     byCorrelative?: boolean
     byDocument?: boolean
     byName?: boolean
     byNumescritura?: boolean
-
 }
 
 const getKardexService =({ id, byCorrelative, byDocument, byName, byNumescritura }: Props) => {

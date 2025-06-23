@@ -22,16 +22,25 @@ import MultiSelect from "../../ui/MultiSelect"
 import { AnimatePresence, motion } from "framer-motion"
 import KardexActosSelector from "./KardexActosSelector"
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray"
+import SimpleInput from "../../ui/SimpleInput"
+import SimpleSelector from "../../ui/SimpleSelector"
+import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
     kardex?: Kardex | null
     setKardex?: React.Dispatch<React.SetStateAction<Kardex | null>>
     createKardex?: UseMutationResult<KardexPage, Error, CreateKardexData>
-    
+    updateKardex?: UseMutationResult<Kardex, Error, UpdateKardexData>
 }
 
-const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) => {
+const KardexForm = ({ 
+    setNotAllowed, 
+    createKardex, 
+    updateKardex, 
+    kardex, 
+    setKardex 
+}: Props) => {
 
     const [open, setOpen] = useState(false)
 
@@ -105,6 +114,42 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                 setType('error')
             }
         })
+
+        updateKardex && updateKardex.mutate({
+            kardex: {
+                // idkardex: kardex?.idkardex || 0,
+                kardex: karedexReference,
+                idtipkar: selectedKardexType,
+                fechaingreso: moment(date).format('DD/MM/YYYY'),
+                referencia: karedexReference || 'This is a test reference',
+                codactos: contratos.join(''),
+                idusuario: Number(responsible.id),
+                responsable: Number(responsible.id),
+                retenido: 0,
+                desistido: 0,
+                autorizado: 0,
+                idrecogio: 0,
+                pagado: 0,
+                visita: 0,
+                idnotario: 1,
+                contrato: `${formattedContratoDes} / `, 
+                numescritura: '' 
+            },
+            access: 'access_token'
+        }, {
+            onSuccess: (res) => {
+                console.log('res', res)
+                setMessage('Kardex actualizado exitosamente')
+                setShow(true)
+                setType('success')
+            }, 
+            onError: (error) => {
+                setMessage(`Error al actualizar el kardex: ${error.message}`)
+                setShow(true)
+                setType('error')
+            }
+        })
+
     }
 
     const { data: tipoActos, isLoading, isError, error, isSuccess } = useGetTipoActo()
@@ -280,9 +325,34 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                     horizontal
                 />
             </div>
+            {kardex && 
+            <div className="w-full grid grid-cols-3 gap-3 items-center my-10">
+                <SimpleInput 
+                    value=""
+                    setValue={() => {}}
+                    label="Kardex Conexo"
+                    horizontal
+                />
+                <SimpleSelector 
+                    options={[{ value: 0, label: 'Seleccionar Notaría' }]}
+                    defaultValue={0}
+                    setter={() => {}}
+                    horizontal
+                />
+                <div className="flex justify-center items-center gap-4">
+                    <button
+                        type="submit"
+                        className=" bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    >
+                        Grabar Cambios
+                    </button>
+                </div>
+            </div>}
+            
         </div>
     </form>
     {kardex && 
+        <>
         <KardexFormTabs 
             tabs={[
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
@@ -292,6 +362,7 @@ const KardexForm = ({ setNotAllowed, createKardex, kardex, setKardex }: Props) =
                 { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
             ]}
         />
+        </>
     }
     </>
   )

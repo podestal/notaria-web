@@ -3,6 +3,7 @@ import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
 import KardexForm from "./KardexForm"
 import TopModal from "../../ui/TopModal"
+import useUpdateKardex from "../../../hooks/api/kardex/useUpdateKardex"
 
 interface Props {
     kardex: Kardex
@@ -11,6 +12,7 @@ interface Props {
 const KardexCard = ({ kardex }: Props) => {
 
     const [open, setOpen] = useState(false)
+    const updateKardex = useUpdateKardex({ kardexId: kardex.idkardex })
 
   return (
     <>
@@ -38,7 +40,9 @@ const KardexCard = ({ kardex }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <KardexForm kardex={kardex} />
+        <KardexForm 
+            updateKardex={updateKardex}
+            kardex={kardex} />
     </TopModal>
     </>
   )
