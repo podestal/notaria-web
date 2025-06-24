@@ -15,8 +15,9 @@ import getTipoActoIdArray from "../../../utils/getTipoActoIdArray";
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore";
 
 interface Props {
-    createPatrimonial: UseMutationResult<Patrimonial, Error, CreatePatrimonialData>
+    createPatrimonial?: UseMutationResult<Patrimonial, Error, CreatePatrimonialData>
     kardex: Kardex
+    patrimonial?: Patrimonial
 }
 
 const exhibiompOptions = [
@@ -24,23 +25,26 @@ const exhibiompOptions = [
     { value: 'No', label: 'No' }
 ]
 
-const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
+const PatrimonialForm = ({ 
+    createPatrimonial, 
+    kardex,
+    patrimonial, }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
 
     const access = useAuthStore(s => s.access_token) || ''
 
-    const [formaDePagoSelected, setFormaDePagoSelected] = useState('');
-    const [oportunidadSelected, setOportunidadSelected] = useState('');
-    const [selectedTipoDeActo, setSelectedTipoDeActo] = useState('');
+    const [formaDePagoSelected, setFormaDePagoSelected] = useState(patrimonial ? patrimonial.fpago : '');
+    const [oportunidadSelected, setOportunidadSelected] = useState( patrimonial ? patrimonial.idoppago : '');
+    const [selectedTipoDeActo, setSelectedTipoDeActo] = useState( patrimonial ? patrimonial.idtipoacto : '');
 
-    const [inporteTransaccion, setImporteTransaccion] = useState('');
-    const [monedaSelected, setMonedaSelected] = useState(1);
+    const [inporteTransaccion, setImporteTransaccion] = useState(patrimonial ? patrimonial.importetrans.toString() : '');
+    const [monedaSelected, setMonedaSelected] = useState(patrimonial ? patrimonial.idmon : 2);
 
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(patrimonial ? moment(patrimonial.nminuta, "DD/MM/YYYY").toDate() : undefined);
 
-    const [exhibiompSelected, setExhibiompSelected] = useState('Si');
-    const [tipoDeCambio, setTipoDeCambio] = useState('');
+    const [exhibiompSelected, setExhibiompSelected] = useState(patrimonial ? patrimonial.exhibiomp : 'Si');
+    const [tipoDeCambio, setTipoDeCambio] = useState(patrimonial ? patrimonial.tipocambio : '');
 
     // ERROR HANDLING
     const [formaDePagoError, setFormaDePagoError] = useState('');
@@ -79,7 +83,7 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
         }
 
         // after validation
-        createPatrimonial.mutate({
+        createPatrimonial && createPatrimonial.mutate({
             access,
             patrimonial: {
                 itemmp: 'xxxxxx',
@@ -122,7 +126,7 @@ const PatrimonialForm = ({ createPatrimonial, kardex }: Props) => {
         className="flex flex-col gap-4 p-4 bg-white rounded shadow-md"
     >
         <h2 className="text-lg font-semibold text-gray-700 mb-4 text-center">Formulario Patrimonial</h2>
-        <>{console.log('kardex', kardex)}</>
+        <>{console.log('patrimonial', patrimonial)}</>
         <div className="grid grid-cols-2 gap-4">
             <SimpleSelectorStr 
                 options={[{ value: '', label: 'Seleccione' }, ...FORMAS_PAGO.map((tipo) => ({

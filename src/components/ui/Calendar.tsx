@@ -39,7 +39,7 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
         onClick={() => setOpen(true)}
       >
         <span className="font-bold"></span>{' '}
-        {selectedDate ? moment(selectedDate).format('MMMM-DD-YYYY') : 'Seleccione Fecha'}
+        {selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : 'Seleccione Fecha'}
         <CalendarIcon />
       </p>
       <AnimatePresence>

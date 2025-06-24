@@ -11,6 +11,7 @@ interface Props {
 }
 
 const useRemovePatrimonial = ({ idPatrimonial, kardex }: Props): UseMutationResult<Patrimonial, Error, RemovePatrimonialData> => {
+    console.log('idPatrimonial', idPatrimonial);
     const queryClient = useQueryClient();
     const patrimonialService = getPatrimonialService({ idPatrimonial });
 
