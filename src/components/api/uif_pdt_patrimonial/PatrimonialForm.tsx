@@ -63,7 +63,7 @@ const PatrimonialForm = ({
             return;
         }
 
-        if (!oportunidadSelected) {
+        if (oportunidadSelected === 'S' || oportunidadSelected === '') {
             setOportunidadError('Debe seleccionar una oportunidad de pago');
             return;
         }
@@ -165,7 +165,7 @@ const PatrimonialForm = ({
         className="flex flex-col gap-4 p-4 bg-white rounded shadow-md"
     >
         <h2 className="text-lg font-semibold text-gray-700 mb-4 text-center">Formulario Patrimonial</h2>
-        <>{console.log('patrimonial', patrimonial)}</>
+        {/* <>{console.log('patrimonial', patrimonial)}</> */}
         <div className="grid grid-cols-2 gap-4">
             <SimpleSelectorStr 
                 options={[{ value: '', label: 'Seleccione' }, ...FORMAS_PAGO.map((tipo) => ({
@@ -180,7 +180,7 @@ const PatrimonialForm = ({
                 required
             />
             <SimpleSelectorStr 
-                options={[{ value: '', label: 'Seleccione' }, ...OPPORTUNIDADES_PAGO.map((oportunidad) => ({
+                options={[{ value: 'S', label: 'Seleccione' }, ...OPPORTUNIDADES_PAGO.map((oportunidad) => ({
                     value: oportunidad.codoppago,
                     label: oportunidad.desoppago
                 }))]}

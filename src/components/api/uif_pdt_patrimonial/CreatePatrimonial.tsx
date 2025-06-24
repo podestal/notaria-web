@@ -3,9 +3,9 @@ import { useState } from "react"
 import TopModal from "../../ui/TopModal"
 import PatrimonialForm from "./PatrimonialForm"
 import KardexFormTabs from "../kardex/KardexFormTabs"
-import VehicleForm from "../vehicle/VehicleForm"
 import useCreatePatrimonial from "../../../hooks/api/patrimonial/useCreatePatrimonial"
 import { Kardex } from "../../../services/api/kardexService"
+import VehicleMain from "../vehicle/VehicleMain"
 
 interface Props {
     kardex: Kardex
@@ -33,9 +33,8 @@ const CreatePatrimonial = ({ kardex }: Props) => {
             <>
                 <KardexFormTabs 
                     tabs={[
-                        // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                         { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm createPatrimonial={createPatrimonial} kardex={kardex}/> },
-                        { id: 'escrituración', label: 'Información del Bien', content: <VehicleForm /> },
+                        { id: 'escrituración', label: 'Información del Bien', content: <VehicleMain /> },
                     ]}
                 />
                 

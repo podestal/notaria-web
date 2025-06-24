@@ -28,6 +28,7 @@ const PatrimonialTableBody = ({ kardex }: Props) => {
                 <PatrimonialCard 
                     patrimonial={patrimonial}
                     kardex={kardex}
+                    key={patrimonial.itemmp}
                 />
             </div>
         ))}
