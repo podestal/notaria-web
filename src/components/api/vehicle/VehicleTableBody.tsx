@@ -4,12 +4,13 @@ import VehicleCard from "./VehicleCard"
 
 interface Props {
     kardex: string
+    idtipoacto: string
 }
 
-const VehicleTableBody = ({ kardex }: Props) => {
+const VehicleTableBody = ({ kardex, idtipoacto }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
-    const { data: vehicles, isLoading, isError, error, isSuccess } = useGetVehicularesByKardex({ access, kardex })
+    const { data: vehicles, isLoading, isError, error, isSuccess } = useGetVehicularesByKardex({ access, kardex, idtipoacto })
 
     if (isLoading) return <p className="text-md animate-pulse text-center my-2">Cargando ...</p>
     if (isError) return <p className="text-md text-red-500 text-center">Error: {error.message}</p>

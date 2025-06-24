@@ -4,11 +4,12 @@ import getVehicleService, {Vehicle} from "../../../services/api/vehicleService"
 interface Props {
     access: string
     kardex: string
+    idtipoacto: string
 }
 
-const useGetVehicularesByKardex = ({ access, kardex }: Props): UseQueryResult<Vehicle[], Error> => {
+const useGetVehicularesByKardex = ({ access, kardex, idtipoacto }: Props): UseQueryResult<Vehicle[], Error> => {
     const vehicleService = getVehicleService({ byKardex: true })
-    const params = {kardex}
+    const params = {kardex, idtipoacto}
 
     return useQuery({
         queryKey: ['vehiculares by kardex', kardex],
