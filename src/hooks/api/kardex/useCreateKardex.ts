@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult, useQueryClient } from "@tanstack/react-query"
-import getKardexService, { KardexPage, CreateUpdateKardex } from "../../../services/api/kardexService"
+import { CreateUpdateKardex, getSingleKardexService, Kardex } from "../../../services/api/kardexService"
 
 export interface CreateKardexData {
     kardex: CreateUpdateKardex
@@ -9,15 +9,16 @@ interface Props {
     idtipkar: number
 }
 
-const useCreateKardex = ({ idtipkar }: Props): UseMutationResult<KardexPage, Error, CreateKardexData> => {
+const useCreateKardex = ({ idtipkar }: Props): UseMutationResult<Kardex, Error, CreateKardexData> => {
     const queryClient = useQueryClient()
-    const kardexService = getKardexService({})
+    const kardexService = getSingleKardexService({})
 
     return useMutation({
         mutationFn: (data: CreateKardexData) => kardexService.post(data.kardex),
         onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['kardex list', "1", idtipkar] })
-            console.log('Kardex created successfully:', res);
+            queryClient.invalidateQueries({ queryKey: ["contratantes by kardex",res.kardex] })
+            // console.log('Kardex created successfully:', res);
             
         },
         onError: (error) => {

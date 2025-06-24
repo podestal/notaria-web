@@ -53,8 +53,17 @@ export type CreateUpdateKardex = Omit<Kardex,
     idnotario: number;
 }
 
-export const getSingleKardexService = (id: number) => {
-    return new APIClient<Kardex, CreateUpdateKardex>(`/kardex/${id}/`)
+
+interface SingleKardexProps {
+    id?: number
+}
+
+export const getSingleKardexService = ({ id }: SingleKardexProps) => {
+    let url = '/kardex/';
+    if (id) {
+        url += `${id}/`;
+    }
+    return new APIClient<Kardex, CreateUpdateKardex>(url)
 }
 
 interface Props {
