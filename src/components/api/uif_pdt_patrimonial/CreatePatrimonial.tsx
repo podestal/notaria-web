@@ -34,7 +34,7 @@ const CreatePatrimonial = ({ kardex }: Props) => {
                 <KardexFormTabs 
                     tabs={[
                         { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm createPatrimonial={createPatrimonial} kardex={kardex}/> },
-                        { id: 'escrituración', label: 'Información del Bien', content: <VehicleMain /> },
+                        { id: 'escrituración', label: 'Información del Bien', content: <VehicleMain kardex={kardex.kardex} /> },
                     ]}
                 />
                 

@@ -1,11 +1,17 @@
 import CreateVehicle from "./CreateVehicle"
 import VehicleTable from "./VehicleTable"
 
-const VehicleMain = () => {
+interface Props {
+    kardex: string
+}
+
+const VehicleMain = ({ kardex }: Props) => {
   return (
     <>
         <CreateVehicle />
-        <VehicleTable />
+        <VehicleTable 
+            kardex={kardex}
+        />
     </>
   )
 }

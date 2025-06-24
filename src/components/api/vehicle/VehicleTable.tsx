@@ -1,9 +1,17 @@
+import VehicleTableBody from "./VehicleTableBody"
 import VehicleTableHeader from "./VehicleTableHeader"
 
-const VehicleTable = () => {
+interface Props {
+    kardex: string
+}
+
+const VehicleTable = ({ kardex }: Props) => {
   return (
     <>
         <VehicleTableHeader />
+        <VehicleTableBody 
+            kardex={kardex}
+        />
     </>
   )
 }
