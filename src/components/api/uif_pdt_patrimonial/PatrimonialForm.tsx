@@ -13,9 +13,11 @@ import { Kardex } from "../../../services/api/kardexService";
 import PatrimonialTipoActoSelector from "./PatrimonialTipoActoSelector";
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray";
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore";
+import { UpdatePatrimonialData } from "../../../hooks/api/patrimonial/useUpdatePatrimonial";
 
 interface Props {
     createPatrimonial?: UseMutationResult<Patrimonial, Error, CreatePatrimonialData>
+    updatePatrimonial?: UseMutationResult<Patrimonial, Error, UpdatePatrimonialData>
     kardex: Kardex
     patrimonial?: Patrimonial
 }
@@ -27,6 +29,7 @@ const exhibiompOptions = [
 
 const PatrimonialForm = ({ 
     createPatrimonial, 
+    updatePatrimonial,
     kardex,
     patrimonial, }: Props) => {
 
@@ -118,6 +121,42 @@ const PatrimonialForm = ({
                 setType('error');
             }
         })
+
+        if (updatePatrimonial && patrimonial) {
+            updatePatrimonial.mutate({
+                access,
+                patrimonial: {
+                    itemmp: patrimonial.itemmp,
+                    kardex: kardex.kardex,
+                    idtipoacto: selectedTipoDeActo,
+                    nminuta: moment(selectedDate).format('DD/MM/YYYY'),
+                    idmon: monedaSelected,
+                    tipocambio: tipoDeCambio,
+                    importetrans: parseFloat(inporteTransaccion),
+                    exhibiomp: exhibiompSelected,
+                    presgistral: patrimonial.presgistral,
+                    nregistral: patrimonial.nregistral,
+                    idsedereg: '0',  // sede regional add
+                    fpago: formaDePagoSelected,
+                    idoppago: oportunidadSelected,
+                    ofondos: '',
+                    item: patrimonial.item
+                }
+            }, {
+                onSuccess: res => {
+                    console.log('response', res);
+                    setMessage('Patrimonial actualizado exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: err => {
+                    console.error('Error updating patrimonial:', err);
+                    setMessage(`Error al actualizar patrimonial: ${err.message}`);
+                    setShow(true);
+                    setType('error');
+                }
+            })
+        }
     }
 
   return (

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Patrimonial } from "../../../services/api/patrimonialService"
 import PatrimonialForm from "./PatrimonialForm"
 import { Kardex } from "../../../services/api/kardexService"
+import useUpdatePatrimonial from "../../../hooks/api/patrimonial/useUpdatePatrimonial"
 
 interface Props {
     patrimonial: Patrimonial
@@ -13,6 +14,7 @@ interface Props {
 const UpdatePatrimonial = ({ patrimonial, kardex }: Props) => {
 
     const [open, setOpen] = useState(false)
+    const updatePatrimonial = useUpdatePatrimonial({ idPatrimonial: patrimonial.itemmp })
 
   return (
     <>
@@ -32,6 +34,7 @@ const UpdatePatrimonial = ({ patrimonial, kardex }: Props) => {
         <PatrimonialForm 
             kardex={kardex}
             patrimonial={patrimonial}
+            updatePatrimonial={updatePatrimonial}
         />
     
     </TopModal>
