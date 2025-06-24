@@ -7,7 +7,6 @@ const VehicleTableHeader = () => {
         <p>Marca</p>
         <p>Color</p>
         <p>Motor</p>
-        <p>Editar</p>
     </div>
   )
 }
