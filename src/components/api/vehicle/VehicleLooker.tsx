@@ -17,6 +17,7 @@ interface Props {
     setFechaInscripcion: React.Dispatch<React.SetStateAction<string>>
     setPartidaRegistral: React.Dispatch<React.SetStateAction<string>>
     setClase: React.Dispatch<React.SetStateAction<string>>
+    setSelectedSedesRegistral: React.Dispatch<React.SetStateAction<string>>
 }
 
 const VehicleLooker = ({ 
@@ -34,6 +35,7 @@ const VehicleLooker = ({
     setFechaInscripcion,
     setPartidaRegistral,
     setClase,
+    setSelectedSedesRegistral,
 }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
@@ -48,8 +50,6 @@ const VehicleLooker = ({
             headers: { Authorization: `JWT ${access}` }
         })
         .then(response => {
-
-            console.log('Vehicle data:', response.data);
             setDisableButton(true);
             setColor(response.data.color || '');
             setMarca(response.data.marca || '');
@@ -64,6 +64,8 @@ const VehicleLooker = ({
             setFechaInscripcion(response.data.fecinsc || '');
             setPartidaRegistral(response.data.pregistral || '');
             setClase(response.data.clase || '');
+            console.log('response.data.idsedereg ', response.data.idsedereg )
+            setSelectedSedesRegistral(response.data.idsedereg || '');
         })
         .catch(() => {            
             axios.get(`${import.meta.env.VITE_FACTILIZA_PLATE_URL}${sanitaziedPlate}`, {

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface Item {
     value: string;
@@ -32,13 +33,23 @@ const SimpleSelectorStr = ({
     error,
     setError,
 }: Props) => {
+
+    const [value, setValue] = useState<string>(defaultValue ?? '');
+
+    useEffect(() => {
+        if (defaultValue) {
+            setValue(defaultValue);
+        }
+    }, [defaultValue]);
+
   return (
     <div className="grid grid-cols-3 items-center gap-2 w-full">
         <p className="pl-2 block text-xs font-semibold text-slate-700">{label}</p>
         <div className="flex items-center gap-1 w-full col-span-2">
             <motion.select 
                 {...(error ? shakeAnimation : {})}
-                defaultValue={defaultValue ? defaultValue.toString() : '0'}
+                // defaultValue={value ? value?.toString() : '0'}
+                value={value ? value?.toString() : '0'}
                 onChange={(e) => {
                     setError?.('');
                     setter(e.target.value ? e.target.value : '');

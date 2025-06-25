@@ -1,6 +1,5 @@
 import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
-import SimpleSelector from "../../ui/SimpleSelector"
 import VehicleLooker from "./VehicleLooker"
 import { CreateVehicularData } from "../../../hooks/api/vehiculares/useCreateVehicular"
 import { Vehicle } from "../../../services/api/vehicleService"
@@ -9,39 +8,63 @@ import useAuthStore from "../../../store/useAuthStore"
 import { VEHICLE_SEARCH_TYPES } from "../../../data/patrimonialData" 
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import useGetSedesRegistrales from "../../../hooks/api/sedesRegistrales/useGetSedesRegistrales"
 
 interface Props {
     createVehicle?: UseMutationResult<Vehicle, Error, CreateVehicularData>
     kardex: string
     idtipoacto: string
+    vehicle?: Vehicle
 }
 
 
-const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
+const VehicleForm = ({ createVehicle, kardex, idtipoacto, vehicle }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [loading, setLoading] = useState(false)
     
-    const [plateId, setPlateId] = useState('P'); // Default value for plate type
-    const [plate, setPlate] = useState('');
-    const [carroceria, setCarroceria] = useState('');
-    const [color, setColor] = useState('');
-    const [clase, setClase] = useState('');
-    const [motor, setMotor] = useState('');
-    const [marca, setMarca] = useState('');
-    const [cilindros, setCilindros] = useState('');
-    const [anioFabricacion, setAnioFabricacion] = useState('');
-    const [numeroSerie, setNumeroSerie] = useState('');
-    const [modelo, setModelo] = useState('');
-    const [ruedas, setRuedas] = useState('');
-    const [combustible, setCombustible] = useState('');
-    const [fechaInscripcion, setFechaInscripcion] = useState('');
-    const [partidaRegistral, setPartidaRegistral] = useState('');
+    const [plateId, setPlateId] = useState(vehicle ? vehicle.idplaca : 'P'); 
+    const [plate, setPlate] = useState( vehicle ? vehicle.numplaca : ''); 
+    const [carroceria, setCarroceria] = useState( vehicle ? vehicle.carroceria : '');
+    const [color, setColor] = useState( vehicle ? vehicle.color : '');
+    const [clase, setClase] = useState( vehicle ? vehicle.clase : '');
+    const [motor, setMotor] = useState( vehicle ? vehicle.motor : '');
+    const [marca, setMarca] = useState( vehicle ? vehicle.marca : '');
+    const [cilindros, setCilindros] = useState(vehicle ? vehicle.numcil : '');
+    const [anioFabricacion, setAnioFabricacion] = useState( vehicle ? vehicle.anofab : '');
+    const [numeroSerie, setNumeroSerie] = useState( vehicle ? vehicle.numserie : '');
+    const [modelo, setModelo] = useState(vehicle ? vehicle.modelo : '');
+    const [ruedas, setRuedas] = useState(vehicle ? vehicle.numrueda : '');
+    const [combustible, setCombustible] = useState( vehicle ? vehicle.combustible : '');
+    const [fechaInscripcion, setFechaInscripcion] = useState( vehicle ? vehicle.fecinsc : '');
+    const [partidaRegistral, setPartidaRegistral] = useState( vehicle ? vehicle.pregistral : '');
+    const [selectedSedesRegistral, setSelectedSedesRegistral] = useState(vehicle ? vehicle.idsedereg : '0'); 
+
+    // ERROR HANDLING
+    const [plateError, setPlateError] = useState('')
+    const [motorError, setMotorError] = useState('')
+
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
         e.preventDefault()
+
+        // Validate required fields
+        if (!plate) {
+            setPlateError('El campo Placa es obligatorio')
+            return
+        }
+
+        if (!motor) {
+            setMotorError('El campo Motor es obligatorio')
+            return
+        }
+
         setLoading(true)
+
+
+
         createVehicle && createVehicle.mutate({
             vehicle: {
                 kardex, // This should be set based on your application logic
@@ -64,7 +87,7 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 precio: '0', // Assuming a default value for price
                 codmepag: '1', // Assuming a default value for payment method
                 pregistral: partidaRegistral, 
-                idsedereg: '1', // Assuming a default value for registry office
+                idsedereg: selectedSedesRegistral, // Assuming a default value for registry office
             },
             access 
         }, {
@@ -88,6 +111,7 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setCombustible('')
                 setFechaInscripcion('')
                 setPartidaRegistral('')
+                setSelectedSedesRegistral('0')
             },
             onError: (error) => {
                 console.error("Error creating vehicle:", error);
@@ -101,12 +125,19 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
         })
     }
 
+    const { data: sedes, isLoading, isError, error, isSuccess } = useGetSedesRegistrales({ access })
+
+    if (isLoading) return <p className="text-md animate-pulse text-center my-2">Cargando sedes registrales...</p>
+    if (isError) return <p className="text-md text-red-500 text-center">Error: {error.message}</p>
+    if (isSuccess)
 
   return (
     <form 
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 p-4 bg-white rounded shadow-md">
         <div className="grid grid-cols-2 gap-4 items-center">
+        <>{console.log('vehicle', vehicle)}</>
+            <>{console.log('selectedSedesRegistral', selectedSedesRegistral)}</>
             <SimpleSelectorStr 
                 options={VEHICLE_SEARCH_TYPES.map(type => ({
                     value: type.idPlaca,
@@ -122,7 +153,6 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setValue={setCarroceria}
                 label="Carrocería"
                 horizontal
-                required
             />
         </div>
         <div className="grid grid-cols-4 gap-4">
@@ -133,6 +163,8 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 label="N Placa/Poliza"
                 horizontal
                 required
+                error={plateError}
+                setError={setPlateError}
             />
             {plateId === 'P' && 
             <VehicleLooker 
@@ -150,6 +182,7 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setFechaInscripcion={setFechaInscripcion}
                 setPartidaRegistral={setPartidaRegistral}
                 setClase={setClase}
+                setSelectedSedesRegistral={setSelectedSedesRegistral}
             />}
             </div>
             <div  className="col-span-2 flex items-center gap-6">
@@ -158,7 +191,6 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                     setValue={setColor}
                     label="Color"
                     horizontal
-                    required
                 />
             </div>
     
@@ -170,7 +202,6 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setValue={setClase}
                 label="Clase"
                 horizontal
-                required
             />
             <SimpleInput 
                 value={motor}
@@ -178,6 +209,8 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 label="Motor"
                 horizontal
                 required
+                error={motorError}
+                setError={setMotorError}
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -186,14 +219,12 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setValue={setMarca}
                 label="Marca"
                 horizontal
-                required
             />
             <SimpleInput 
                 value={cilindros}
                 setValue={setCilindros}
                 label="Cilindros"
                 horizontal
-                required
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -202,14 +233,12 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setValue={setAnioFabricacion}
                 label="Año fabricación"
                 horizontal
-                required
             />
             <SimpleInput 
                 value={numeroSerie}
                 setValue={setNumeroSerie}
                 label="Numero de serie"
                 horizontal
-                required
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -218,14 +247,12 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setValue={setModelo}
                 label="Modelo"
                 horizontal
-                required
             />
             <SimpleInput 
                 value={ruedas}
                 setValue={setRuedas}
                 label="Ruedas"
                 horizontal
-                required
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -234,14 +261,12 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setValue={setCombustible}
                 label="Combustible"
                 horizontal
-                required
             />
             <SimpleInput 
                 value={fechaInscripcion}
                 setValue={setFechaInscripcion}
                 label="Fecha de inscripción"
                 horizontal
-                required
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -250,22 +275,20 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setValue={setPartidaRegistral}
                 label="Partida Registral"
                 horizontal
-                required
             />
-            <SimpleSelector
-                options={[
-                    {value: 1, label: 'Seleccionar'},
-                    {value: 2, label: 'Inactivo'},
-                ]}
-                defaultValue={1}
-                setter={() => {}}
+            <SimpleSelectorStr 
+                options={[{value: '0', label: 'Selecciona'}, ...sedes.map(sede => ({
+                    value: sede.idsedereg,
+                    label: sede.dessede
+                }))]}
+                defaultValue={selectedSedesRegistral}
+                setter={setSelectedSedesRegistral}
                 label="Sede Registral"
-                required
             />
         </div>
         <div className="w-full flex justify-items-center items-center my-4 text-center">
             <button className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors cursor-pointer ${loading && 'animate-pulse'}`} type="submit">
-                {loading ? 'Creando ...' : 'Guardar Vehículo'}
+                {loading ? 'Cargando ...' : 'Guardar'}
             </button>
         </div>
     </form>

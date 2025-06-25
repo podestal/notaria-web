@@ -1,5 +1,6 @@
 import { Vehicle } from "../../../services/api/vehicleService"
 import RemoveVehicle from "./RemoveVehicle"
+import UpdateVehicle from "./UpdateVehicle"
 
 interface Props {
     vehicle: Vehicle
@@ -20,11 +21,9 @@ const VehicleCard = ({ vehicle }: Props) => {
             idVehicular={vehicle.detveh}
           />
           |
-          {/* <UpdatePatrimonial 
-            patrimonial={patrimonial}
-            kardex={kardex}
-          /> */}
-          X
+          <UpdateVehicle 
+            vehicle={vehicle}
+          />
         </div>
     </div>
   )
