@@ -2,17 +2,21 @@ import axios from "axios"
 import { useState } from "react";
 import useAuthStore from "../../../store/useAuthStore";
 
-// setColor={setColor}
-// setMarca={setMarca}
-// setModelo={setModelo}
-// setSerie={setNumeroSerie}
-
 interface Props {
     plate: string
     setColor: React.Dispatch<React.SetStateAction<string>>
     setMarca: React.Dispatch<React.SetStateAction<string>>
     setModelo: React.Dispatch<React.SetStateAction<string>>
     setSerie: React.Dispatch<React.SetStateAction<string>>
+    setCarroceria: React.Dispatch<React.SetStateAction<string>>
+    setMotor: React.Dispatch<React.SetStateAction<string>>
+    setCilindros: React.Dispatch<React.SetStateAction<string>>
+    setAnioFabricacion: React.Dispatch<React.SetStateAction<string>>
+    setRuedas: React.Dispatch<React.SetStateAction<string>>
+    setCombustible: React.Dispatch<React.SetStateAction<string>>
+    setFechaInscripcion: React.Dispatch<React.SetStateAction<string>>
+    setPartidaRegistral: React.Dispatch<React.SetStateAction<string>>
+    setClase: React.Dispatch<React.SetStateAction<string>>
 }
 
 const VehicleLooker = ({ 
@@ -20,7 +24,16 @@ const VehicleLooker = ({
     setColor,
     setMarca,
     setModelo,
-    setSerie
+    setSerie,
+    setCarroceria,
+    setMotor,
+    setCilindros,
+    setAnioFabricacion,
+    setRuedas,
+    setCombustible,
+    setFechaInscripcion,
+    setPartidaRegistral,
+    setClase,
 }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
@@ -35,12 +48,22 @@ const VehicleLooker = ({
             headers: { Authorization: `JWT ${access}` }
         })
         .then(response => {
+
             console.log('Vehicle data:', response.data);
             setDisableButton(true);
-            // setColor(response.data.color || '');
-            // setMarca(response.data.marca || '');
-            // setModelo(response.data.modelo || '');
-            // setSerie(response.data.serie || '');
+            setColor(response.data.color || '');
+            setMarca(response.data.marca || '');
+            setModelo(response.data.modelo || '');
+            setSerie(response.data.numserie || '');
+            setCarroceria(response.data.carroceria || '');
+            setMotor(response.data.motor || '');
+            setCilindros(response.data.numcil || '');
+            setAnioFabricacion(response.data.anofab || '');
+            setRuedas(response.data.numrueda || '');
+            setCombustible(response.data.combustible || '');
+            setFechaInscripcion(response.data.fecinsc || '');
+            setPartidaRegistral(response.data.pregistral || '');
+            setClase(response.data.clase || '');
         })
         .catch(() => {            
             axios.get(`${import.meta.env.VITE_FACTILIZA_PLATE_URL}${sanitaziedPlate}`, {

@@ -25,20 +25,6 @@ const VehicleForm = () => {
     const [combustible, setCombustible] = useState('');
     const [fechaInscripcion, setFechaInscripcion] = useState('');
     const [partidaRegistral, setPartidaRegistral] = useState('');
-    // const [sedeRegistral, setSedeRegistral] = useState(1);
-//     color: "BLANCO"
-// ​​
-// marca: "JAC"
-// ​​
-// modelo: "T8"
-// ​​
-// motor: "HFC1037D3KSVM4100645"
-// ​​
-// placa: "X4X948"
-// ​​
-// serie: "LJ11PABD0NC080391"
-// ​​
-// vin: "LJ11PABD0NC080391"
 
 
   return (
@@ -74,6 +60,15 @@ const VehicleForm = () => {
                 setMarca={setMarca}
                 setModelo={setModelo}
                 setSerie={setNumeroSerie}
+                setCarroceria={setCarroceria}
+                setMotor={setMotor}
+                setCilindros={setCilindros}
+                setAnioFabricacion={setAnioFabricacion}
+                setRuedas={setRuedas}
+                setCombustible={setCombustible}
+                setFechaInscripcion={setFechaInscripcion}
+                setPartidaRegistral={setPartidaRegistral}
+                setClase={setClase}
             />
             </div>
             <div  className="col-span-2 flex items-center gap-6">
