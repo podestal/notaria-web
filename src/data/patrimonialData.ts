@@ -29,3 +29,8 @@ export const FORMAS_PAGO = [
     { id_fpago: '4', codigo: 'D', descripcion: 'DONACIONES O ANTICIPOS' },
     { id_fpago: '5', codigo: 'N', descripcion: 'NO APLICA' }    
 ] 
+
+export const VEHICLE_SEARCH_TYPES = [
+    { id: '1', idPlaca:'P', descripcion: 'PLACA' },
+    { id: '2', idPlaca:'L', descripcion: 'POLIZA' },
+]

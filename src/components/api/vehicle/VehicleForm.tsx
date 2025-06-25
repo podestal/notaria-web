@@ -6,11 +6,9 @@ import { CreateVehicularData } from "../../../hooks/api/vehiculares/useCreateVeh
 import { Vehicle } from "../../../services/api/vehicleService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useAuthStore from "../../../store/useAuthStore"
-
-const types = [
-    {value: 1, label: 'Placa'},
-    {value: 2, label: 'Poliza'},
-]
+import { VEHICLE_SEARCH_TYPES } from "../../../data/patrimonialData" 
+import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 interface Props {
     createVehicle?: UseMutationResult<Vehicle, Error, CreateVehicularData>
@@ -22,7 +20,10 @@ interface Props {
 const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
- 
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    const [loading, setLoading] = useState(false)
+    
+    const [plateId, setPlateId] = useState('P'); // Default value for plate type
     const [plate, setPlate] = useState('');
     const [carroceria, setCarroceria] = useState('');
     const [color, setColor] = useState('');
@@ -40,11 +41,12 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setLoading(true)
         createVehicle && createVehicle.mutate({
             vehicle: {
                 kardex, // This should be set based on your application logic
                 idtipacto: idtipoacto, // Default value for type, adjust as needed
-                idplaca: plate,
+                idplaca: plateId,
                 numplaca: plate,
                 clase,
                 marca,
@@ -65,6 +67,37 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 idsedereg: '1', // Assuming a default value for registry office
             },
             access 
+        }, {
+            onSuccess: () => {
+                setMessage('Vehículo creado correctamente')
+                setShow(true)
+                setType('success')
+                // Reset form fields after successful submission
+                setPlateId('P')
+                setPlate('')
+                setCarroceria('')
+                setColor('')
+                setClase('')
+                setMotor('')
+                setMarca('')
+                setCilindros('')
+                setAnioFabricacion('')
+                setNumeroSerie('')
+                setModelo('')
+                setRuedas('')
+                setCombustible('')
+                setFechaInscripcion('')
+                setPartidaRegistral('')
+            },
+            onError: (error) => {
+                console.error("Error creating vehicle:", error);
+                setMessage('Error al crear el vehículo')
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
         })
     }
 
@@ -74,10 +107,13 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 p-4 bg-white rounded shadow-md">
         <div className="grid grid-cols-2 gap-4 items-center">
-            <SimpleSelector
-                options={types}
-                defaultValue={1}
-                setter={() => {}}
+            <SimpleSelectorStr 
+                options={VEHICLE_SEARCH_TYPES.map(type => ({
+                    value: type.idPlaca,
+                    label: type.descripcion
+                }))}
+                defaultValue={plateId}
+                setter={setPlateId}
                 label="Tipo de vehiculo"
                 required
             />
@@ -98,6 +134,7 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 horizontal
                 required
             />
+            {plateId === 'P' && 
             <VehicleLooker 
                 plate={plate}
                 setColor={setColor}
@@ -113,7 +150,7 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
                 setFechaInscripcion={setFechaInscripcion}
                 setPartidaRegistral={setPartidaRegistral}
                 setClase={setClase}
-            />
+            />}
             </div>
             <div  className="col-span-2 flex items-center gap-6">
                 <SimpleInput 
@@ -227,8 +264,8 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
             />
         </div>
         <div className="w-full flex justify-items-center items-center my-4 text-center">
-            <button className=" bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors cursor-pointer" type="submit">
-                Grabar
+            <button className={`bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors cursor-pointer ${loading && 'animate-pulse'}`} type="submit">
+                {loading ? 'Creando ...' : 'Guardar Vehículo'}
             </button>
         </div>
     </form>
