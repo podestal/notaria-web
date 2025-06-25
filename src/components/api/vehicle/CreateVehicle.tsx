@@ -12,7 +12,7 @@ interface Props {
 const CreateVehicle = ({ kardex, idtipoacto }: Props) => {
 
     const [open, setOpen] = useState(false)
-    const createVehicle = useCreateVehicular()
+    const createVehicle = useCreateVehicular({ kardex })
 
   return (
     <>
