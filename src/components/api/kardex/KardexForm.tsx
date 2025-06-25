@@ -1,4 +1,4 @@
-import { FileText, TriangleAlert } from "lucide-react"
+import { FileText } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
@@ -26,6 +26,7 @@ import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import TopModal from "../../ui/TopModal"
+import ExplanationMessage from "../../ui/ExplanationMessage"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -371,21 +372,13 @@ const KardexForm = ({
             setCannotUpdateKardexMessage('')
         }}
     >
-        <div className="flex flex-col items-center justify-center gap-4 p-8">
-            <TriangleAlert className="text-amber-400"/>
-            <h2 className="text-lg text-center font-bold">{cannotUpdateKardexMessage}</h2>
-            <div className="my-6">
-                <button 
-                    onClick={() => {
-                        setCannotUpdateKardex(false)
-                        setCannotUpdateKardexMessage('')
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition-colors cursor-pointer"
-                >
-                    Aceptar
-                </button>
-            </div>
-        </div>
+        <ExplanationMessage 
+            onClick={() => {
+                setCannotUpdateKardex(false)
+                setCannotUpdateKardexMessage('')
+            }}
+            message={cannotUpdateKardexMessage}
+        />
     </TopModal>
     {kardex && 
         <>

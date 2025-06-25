@@ -14,6 +14,8 @@ import PatrimonialTipoActoSelector from "./PatrimonialTipoActoSelector";
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray";
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore";
 import { UpdatePatrimonialData } from "../../../hooks/api/patrimonial/useUpdatePatrimonial";
+import TopModal from "../../ui/TopModal";
+import ExplanationMessage from "../../ui/ExplanationMessage";
 
 interface Props {
     createPatrimonial?: UseMutationResult<Patrimonial, Error, CreatePatrimonialData>
@@ -36,6 +38,8 @@ const PatrimonialForm = ({
     setIdTipoActo }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const [cannotUpdatePatrimonial, setCannotUpdatePatrimonial] = useState(false)
+    const [cannotUpdatePatrimonialMessage, setCannotUpdatePatrimonialMessage] = useState('')
 
     const access = useAuthStore(s => s.access_token) || ''
 
@@ -152,18 +156,25 @@ const PatrimonialForm = ({
                     setShow(true);
                     setType('success');
                 },
-                onError: err => {
-                    console.error('Error updating patrimonial:', err);
-                    setMessage(`Error al actualizar patrimonial: ${err.message}`);
-                    setShow(true);
-                    setType('error');
+                onError: error => {
+                    console.error('Error updating patrimonial:', error);
+                    let errorMessage = ''
+                    if ((error as any)?.response?.data?.error ) {
+                        setCannotUpdatePatrimonial(true)
+                        setCannotUpdatePatrimonialMessage((error as any)?.response?.data?.error)
+                    } else {
+                        setMessage(`Error al actualizar el kardex: ${errorMessage}`)
+                        setShow(true)
+                        setType('error')
+                    }
                 }
             })
         }
     }
 
   return (
-    <form
+    <>
+        <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 p-4 bg-white rounded shadow-md"
     >
@@ -254,6 +265,19 @@ const PatrimonialForm = ({
             </button>
         </div>
     </form>
+    <TopModal
+        isOpen={cannotUpdatePatrimonial}
+        onClose={() => setCannotUpdatePatrimonial(false)}
+    >
+        <ExplanationMessage
+            onClick={() => {
+                setCannotUpdatePatrimonial(false)
+                setCannotUpdatePatrimonialMessage('')}}
+            message={cannotUpdatePatrimonialMessage}
+        />
+
+    </TopModal>
+    </>
   )
 }
 

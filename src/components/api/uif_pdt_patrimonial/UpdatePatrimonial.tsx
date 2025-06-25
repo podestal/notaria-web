@@ -29,17 +29,6 @@ const UpdatePatrimonial = ({ patrimonial, kardex }: Props) => {
             className="text-blue-500 hover:text-blue-400 cursor-pointer"
         />
     </button>
-    {/* <TopModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-    >
-        <PatrimonialForm 
-            kardex={kardex}
-            patrimonial={patrimonial}
-            updatePatrimonial={updatePatrimonial}
-        />
-    
-    </TopModal> */}
         <TopModal
             isOpen={open}
             onClose={() => setOpen(false)}
