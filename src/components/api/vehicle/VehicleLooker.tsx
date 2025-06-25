@@ -1,5 +1,6 @@
 import axios from "axios"
 import { useState } from "react";
+import useAuthStore from "../../../store/useAuthStore";
 
 // setColor={setColor}
 // setMarca={setMarca}
@@ -22,31 +23,49 @@ const VehicleLooker = ({
     setSerie
 }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
     const [disableButton, setDisableButton] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleLookup = () => {
 
         setLoading(true);
-        const sanitaziedPlate = plate.replace('-', '').replace(' ', '').toUpperCase();
 
-        axios.get(`${import.meta.env.VITE_FACTILIZA_PLATE_URL}${sanitaziedPlate}`, {
-            headers: { Authorization: `Bearer ${import.meta.env.VITE_FACTILIZA_TOKEN}` }
+        axios.get(`${import.meta.env.VITE_API_URL}detallevehicular/by_numplaca/?numplaca=${plate}`, {
+            headers: { Authorization: `JWT ${access}` }
         })
         .then(response => {
             console.log('Vehicle data:', response.data);
             setDisableButton(true);
-            setColor(response.data.data.color || '');
-            setMarca(response.data.data.marca || '');
-            setModelo(response.data.data.modelo || '');
-            setSerie(response.data.data.serie || '');
+            // setColor(response.data.color || '');
+            // setMarca(response.data.marca || '');
+            // setModelo(response.data.modelo || '');
+            // setSerie(response.data.serie || '');
         })
-        .catch(error => {
-            console.error('Error fetching vehicle data:', error);
+        .catch(() => {            
+            axios.get(`${import.meta.env.VITE_FACTILIZA_PLATE_URL}${sanitaziedPlate}`, {
+                headers: { Authorization: `Bearer ${import.meta.env.VITE_FACTILIZA_TOKEN}` }
+            })
+            .then(response => {
+                console.log('Vehicle data:', response.data);
+                setDisableButton(true);
+                setColor(response.data.data.color || '');
+                setMarca(response.data.data.marca || '');
+                setModelo(response.data.data.modelo || '');
+                setSerie(response.data.data.serie || '');
+            })
+            .catch(error => {
+                console.error('Error fetching vehicle data:', error);
+            })
+            .finally(() => {
+                setLoading(false);
+            })
         })
         .finally(() => {
             setLoading(false);
-        })
+        });
+
+        const sanitaziedPlate = plate.replace('-', '').replace(' ', '').toUpperCase();
         
     }
 
