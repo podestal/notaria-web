@@ -20,6 +20,7 @@ interface Props {
     updatePatrimonial?: UseMutationResult<Patrimonial, Error, UpdatePatrimonialData>
     kardex: Kardex
     patrimonial?: Patrimonial
+    setIdTipoActo?: React.Dispatch<React.SetStateAction<string>>
 }
 
 const exhibiompOptions = [
@@ -31,7 +32,8 @@ const PatrimonialForm = ({
     createPatrimonial, 
     updatePatrimonial,
     kardex,
-    patrimonial, }: Props) => {
+    patrimonial,
+    setIdTipoActo }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
 
@@ -109,6 +111,7 @@ const PatrimonialForm = ({
         }, {
             onSuccess: res => {
                 console.log('response', res);
+                setIdTipoActo && setIdTipoActo(res.idtipoacto);
                 setMessage('Patrimonial creado exitosamente');
                 setShow(true);
                 setType('success');

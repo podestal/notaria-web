@@ -2,10 +2,17 @@ import { Car } from "lucide-react"
 import { useState } from "react"
 import TopModal from "../../ui/TopModal"
 import VehicleForm from "./VehicleForm"
+import useCreateVehicular from "../../../hooks/api/vehiculares/useCreateVehicular"
 
-const CreateVehicle = () => {
+interface Props {
+    kardex: string
+    idtipoacto: string
+}
+
+const CreateVehicle = ({ kardex, idtipoacto }: Props) => {
 
     const [open, setOpen] = useState(false)
+    const createVehicle = useCreateVehicular()
 
   return (
     <>
@@ -21,7 +28,11 @@ const CreateVehicle = () => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <VehicleForm />
+            <VehicleForm 
+                createVehicle={createVehicle}
+                kardex={kardex}
+                idtipoacto={idtipoacto}
+            />
         </TopModal>
     </>
   )

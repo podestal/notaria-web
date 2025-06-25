@@ -3,17 +3,27 @@ import VehicleTable from "./VehicleTable"
 
 interface Props {
     kardex: string
-    idtipoacto?: string
+    idtipoacto: string
 }
 
 const VehicleMain = ({ kardex, idtipoacto }: Props) => {
   return (
     <>
-        <CreateVehicle />
+        {idtipoacto 
+        ? 
+        <>
+        <CreateVehicle 
+            kardex={kardex}
+            idtipoacto={idtipoacto} 
+        />
         <VehicleTable 
             kardex={kardex}
-            idtipoacto={idtipoacto} // Assuming idtipoacto is not needed here, otherwise pass it as a prop
+            idtipoacto={idtipoacto} 
         />
+        </> 
+        : 
+        <p className="text-center text-xs my-6">Es necesario crear un patrimonial primero</p>
+        }
     </>
   )
 }

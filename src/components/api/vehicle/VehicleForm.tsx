@@ -2,15 +2,27 @@ import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import VehicleLooker from "./VehicleLooker"
+import { CreateVehicularData } from "../../../hooks/api/vehiculares/useCreateVehicular"
+import { Vehicle } from "../../../services/api/vehicleService"
+import { UseMutationResult } from "@tanstack/react-query"
+import useAuthStore from "../../../store/useAuthStore"
 
 const types = [
     {value: 1, label: 'Placa'},
     {value: 2, label: 'Poliza'},
 ]
 
+interface Props {
+    createVehicle?: UseMutationResult<Vehicle, Error, CreateVehicularData>
+    kardex: string
+    idtipoacto: string
+}
 
-const VehicleForm = () => {
 
+const VehicleForm = ({ createVehicle, kardex, idtipoacto }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
+ 
     const [plate, setPlate] = useState('');
     const [carroceria, setCarroceria] = useState('');
     const [color, setColor] = useState('');
@@ -26,9 +38,41 @@ const VehicleForm = () => {
     const [fechaInscripcion, setFechaInscripcion] = useState('');
     const [partidaRegistral, setPartidaRegistral] = useState('');
 
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        createVehicle && createVehicle.mutate({
+            vehicle: {
+                kardex, // This should be set based on your application logic
+                idtipacto: idtipoacto, // Default value for type, adjust as needed
+                idplaca: plate,
+                numplaca: plate,
+                clase,
+                marca,
+                anofab: anioFabricacion,
+                modelo,
+                combustible,
+                carroceria,
+                fecinsc: fechaInscripcion,
+                color,
+                motor,
+                numcil: cilindros,
+                numserie: numeroSerie,
+                numrueda: ruedas,
+                idmon: '1', // Assuming a default value for currency
+                precio: '0', // Assuming a default value for price
+                codmepag: '1', // Assuming a default value for payment method
+                pregistral: partidaRegistral, 
+                idsedereg: '1', // Assuming a default value for registry office
+            },
+            access 
+        })
+    }
+
 
   return (
-    <form className="flex flex-col gap-4 p-4 bg-white rounded shadow-md">
+    <form 
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 p-4 bg-white rounded shadow-md">
         <div className="grid grid-cols-2 gap-4 items-center">
             <SimpleSelector
                 options={types}
