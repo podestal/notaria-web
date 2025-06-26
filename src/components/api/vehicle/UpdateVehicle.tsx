@@ -3,6 +3,7 @@ import TopModal from "../../ui/TopModal";
 import { useState } from "react";
 import VehicleForm from "./VehicleForm";
 import { Vehicle } from "../../../services/api/vehicleService";
+import useUpdateVehicular from "../../../hooks/api/vehiculares/useUpdateVehicular";
 
 interface Props {
     vehicle: Vehicle
@@ -11,6 +12,7 @@ interface Props {
 
 const UpdateVehicle = ({ vehicle }: Props) => {
 
+    const updateVehicular = useUpdateVehicular({ kardex: vehicle.kardex, vehicleId: vehicle.detveh });
     const [open, setOpen] = useState(false);
 
   return (
@@ -32,6 +34,7 @@ const UpdateVehicle = ({ vehicle }: Props) => {
                 kardex={vehicle.kardex}
                 idtipoacto={vehicle.idtipacto}
                 vehicle={vehicle}
+                updateVehicular={updateVehicular}
             />
         </TopModal>
 

@@ -9,16 +9,18 @@ import { VEHICLE_SEARCH_TYPES } from "../../../data/patrimonialData"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useGetSedesRegistrales from "../../../hooks/api/sedesRegistrales/useGetSedesRegistrales"
+import { UpdateVehicleData } from "../../../hooks/api/vehiculares/useUpdateVehicular"
 
 interface Props {
     createVehicle?: UseMutationResult<Vehicle, Error, CreateVehicularData>
+    updateVehicular?: UseMutationResult<Vehicle, Error, UpdateVehicleData>
     kardex: string
     idtipoacto: string
     vehicle?: Vehicle
 }
 
 
-const VehicleForm = ({ createVehicle, kardex, idtipoacto, vehicle }: Props) => {
+const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehicle }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -62,8 +64,6 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto, vehicle }: Props) => {
         }
 
         setLoading(true)
-
-
 
         createVehicle && createVehicle.mutate({
             vehicle: {
@@ -116,6 +116,48 @@ const VehicleForm = ({ createVehicle, kardex, idtipoacto, vehicle }: Props) => {
             onError: (error) => {
                 console.error("Error creating vehicle:", error);
                 setMessage('Error al crear el vehículo')
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
+
+        updateVehicular && updateVehicular.mutate({
+            access,
+            vehicle: {
+                kardex, // This should be set based on your application logic
+                idtipacto: idtipoacto, // Default value for type, adjust as needed
+                idplaca: plateId,
+                numplaca: plate,
+                clase,
+                marca,
+                anofab: anioFabricacion,
+                modelo,
+                combustible,
+                carroceria,
+                fecinsc: fechaInscripcion,
+                color,
+                motor,
+                numcil: cilindros,
+                numserie: numeroSerie,
+                numrueda: ruedas,
+                idmon: '1', // Assuming a default value for currency
+                precio: '0', // Assuming a default value for price
+                codmepag: '1', // Assuming a default value for payment method
+                pregistral: partidaRegistral, 
+                idsedereg: selectedSedesRegistral, // Assuming a default value for registry office
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Vehículo actualizado correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: (error) => {
+                console.error("Error updating vehicle:", error);
+                setMessage('Error al actualizar el vehículo')
                 setShow(true)
                 setType('error')
             },
