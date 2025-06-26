@@ -1,10 +1,15 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import abogadosService, { Abogado } from "../../../services/api/abogadosService"
 
-const useGetAbogados = (): UseQueryResult<Abogado[]> => {
+interface Props {
+  access: string
+}
+
+
+const useGetAbogados = ({ access }: Props): UseQueryResult<Abogado[]> => {
   return useQuery({
     queryKey: ['abogados'],
-    queryFn: () => abogadosService.get(),
+    queryFn: () => abogadosService.get(access),
   })
 }
 

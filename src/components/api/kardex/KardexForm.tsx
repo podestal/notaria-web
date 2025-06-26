@@ -28,6 +28,8 @@ import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
 import ParticipaMain from "../uif_pdt_participa/ParticipaMain"
+import useAuthStore from "../../../store/useAuthStore"
+import useGetTemplatesByActos from "../../../hooks/api/templates/useGetTemplatesByActos"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -45,6 +47,7 @@ const KardexForm = ({
     setKardex 
 }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
     const [open, setOpen] = useState(false)
     const [cannotUpdateKardex, setCannotUpdateKardex] = useState(false)
     const [cannotUpdateKardexMessage, setCannotUpdateKardexMessage] = useState('')
@@ -167,15 +170,17 @@ const KardexForm = ({
 
     }
 
-    const { data: tipoActos, isLoading, isError, error, isSuccess } = useGetTipoActo()
-    const { data: usuarios, isLoading: isLoadingUsuarios, isError: isErrorUsuarios, error: errorUsuarios, isSuccess: isSuccessUsuarios } = useGetUsuarios()
-    const { data: abogados, isLoading: isLoadingAbogados, isError: isErrorAbogados, error: errorAbogados, isSuccess: isSuccessAbogados } = useGetAbogados()
+    const { data: tipoActos, isLoading, isError, error, isSuccess } = useGetTipoActo({ access })
+    const { data: usuarios, isLoading: isLoadingUsuarios, isError: isErrorUsuarios, error: errorUsuarios, isSuccess: isSuccessUsuarios } = useGetUsuarios({ access })
+    const { data: abogados, isLoading: isLoadingAbogados, isError: isErrorAbogados, error: errorAbogados, isSuccess: isSuccessAbogados } = useGetAbogados({ access })
+    const { data: templates, isSuccess: isSuccessTemplates } = useGetTemplatesByActos({ access, codactos: contratos.join('') })
 
     if (isLoading || isLoadingUsuarios || isLoadingAbogados) return <p className="text-sm animate-pulse text-center my-10">Cargando ....</p>
     if (isError) return <p className="text-center my-8">Error: {error.message}</p>
     if (isErrorUsuarios) return <p className="text-center my-8">Error: {errorUsuarios.message}</p>
     if (isErrorAbogados) return <p className="text-center my-8">Error: {errorAbogados.message}</p>
-    if (isSuccess && isSuccessUsuarios && isSuccessAbogados) 
+    // if (isErrorTemplates) return <p className="text-center my-8">Error: {errorTemplates.message}</p>
+    if (isSuccess && isSuccessUsuarios && isSuccessAbogados )
 
   return (
     <>
@@ -183,7 +188,7 @@ const KardexForm = ({
         onSubmit={handleSubmit}
         className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
         {/* <>{console.log('contratosDes', contratosDes)}</> */}
-
+        <>{console.log('templates', templates)}</>
         <div className="flex justify-center items-center gap-2 p-4 rounded-t-lg text-slate-50 ">
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
@@ -334,7 +339,7 @@ const KardexForm = ({
                     horizontal
                 />
                 <Selector 
-                    options={[{ value: 0, label: 'Seleccionar Plantilla' }]}
+                    options={(isSuccessTemplates && templates.length > 0) ? [{ value: 0, label: 'Seleccione Plantilla' }, ...templates.map(template => ({ value: template.pktemplate, label: getTitleCase(template.nametemplate) }))] : [{ value: 0, label: 'No hay plantillas disponibles' }]}
                     setter={() => {}}
                     label="Plantilla"
                     horizontal
