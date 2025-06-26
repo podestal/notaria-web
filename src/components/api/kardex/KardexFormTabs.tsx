@@ -24,7 +24,7 @@ const KardexFormTabs = ({ tabs }: Props) => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     disabled={tab.notAllowed}
-                    className={`px-4 py-2 rounded-full font-medium text-sm transition-all
+                    className={`px-4 py-2 rounded-full font-medium text-sm transition-all cursor-pointer
                     ${tab.notAllowed && 'opacity-50 cursor-not-allowed'}
                     ${
                         activeTab === tab.id

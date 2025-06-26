@@ -27,6 +27,7 @@ import SimpleSelector from "../../ui/SimpleSelector"
 import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
+import ParticipaMain from "../uif_pdt_participa/ParticipaMain"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -389,6 +390,7 @@ const KardexForm = ({
                 { id: 'notes', label: 'Digitación', content: <p>notes</p> },
                 { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
                 { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
+                { id: 'uifp', label: 'UIF/PDT Participa', content: <ParticipaMain kardex={kardex}/> },
             ]}
         />
         </>
