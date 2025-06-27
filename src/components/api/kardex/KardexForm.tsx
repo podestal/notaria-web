@@ -66,6 +66,7 @@ const KardexForm = ({
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
     const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
+    const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -103,7 +104,8 @@ const KardexForm = ({
                 visita: 0,
                 idnotario: 1,
                 contrato: `${formattedContratoDes} / `, 
-                numescritura: '' 
+                numescritura: '', 
+                fktemplate: selectedTemplate
             }
         }, {
             onSuccess: (res) => {
@@ -144,7 +146,8 @@ const KardexForm = ({
                     visita: 0,
                     idnotario: 1,
                     contrato: `${formattedContratoDes} / `, 
-                    numescritura: '' 
+                    numescritura: '',
+                    fktemplate: selectedTemplate
                 },
                 access: 'access_token'
             }, {
@@ -338,9 +341,10 @@ const KardexForm = ({
                     label="Presentante"
                     horizontal
                 />
-                <Selector 
+                <SimpleSelector 
                     options={(isSuccessTemplates && templates.length > 0) ? [{ value: 0, label: 'Seleccione Plantilla' }, ...templates.map(template => ({ value: template.pktemplate, label: getTitleCase(template.nametemplate) }))] : [{ value: 0, label: 'No hay plantillas disponibles' }]}
-                    setter={() => {}}
+                    setter={setSelectedTemplate}
+                    defaultValue={selectedTemplate}
                     label="Plantilla"
                     horizontal
                 />

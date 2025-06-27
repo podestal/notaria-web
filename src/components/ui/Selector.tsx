@@ -13,6 +13,7 @@ interface Props {
 }
 
 const Selector = ({ options, defaultValue, setter, label, horizontal, smallLabel }: Props) => {
+
   return (
     <div className={`flex ${!horizontal && 'flex-col'} gap-2`}>
         <p className={`${smallLabel ? 'pl-2 block text-xs font-semibold text-slate-700' : 'text-md font-bold py-2'}`}>{label}</p>

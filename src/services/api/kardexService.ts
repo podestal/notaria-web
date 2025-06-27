@@ -17,6 +17,7 @@ export interface Kardex {
     idtipkar: number;
     cliente: string;
     codactos: string;
+    fktemplate: number;
 }
 
 export interface KardexPage {
