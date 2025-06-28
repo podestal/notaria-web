@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Input from '../ui/Input';
 import AIButton from '../ui/AIButton';
+import useLogin from '../../hooks/auth/useLogin';
 
 interface DecodedToken {
     user_id: number;
@@ -20,31 +21,50 @@ const Login = () => {
     const navigate = useNavigate()
 
     const URL = import.meta.env.VITE_BASE_URL
+    const login = useLogin()
 
-    const handleLogin = () => {
-        console.log('loging');
-        console.log('URL', URL)
-        axios.post(`${URL}/login`, {
-            usuario: username,
-            clave: password
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+    const handleLogin = (e: React.FormEvent ) => {
+      e.preventDefault()
+      login.mutate({
+            credentials: {
+                username: username,
+                password: password
             }
-        })
-        .then(response => {
-            console.log('Response',response)
-            console.log('Response Data', response.data);
-            const decoded = jwtDecode<DecodedToken>(response.data.access_token)
-            clearTokens()
-            setTokens(response.data.access_token, response.data.refresh_token)
-            setUserId(decoded.user_id)
-            navigate('/')
-        })
-        .catch(error => {
-            console.error('Error', error);
-        });
+        }, {
+            onSuccess: (jwtData) => {
+                const decoded = jwtDecode<DecodedToken>(jwtData.access)
+                clearTokens()
+                setTokens(jwtData.access, jwtData.refresh)
+                setUserId(decoded.user_id)
+                navigate('/app')
+            },
+            onError: (err) => {
+                console.error('Login error:', err);
+            }
+      })
+        // console.log('loging');
+        // console.log('URL', URL)
+        // axios.post(`${URL}/login`, {
+        //     usuario: username,
+        //     clave: password
+        // }, {
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Accept': 'application/json'
+        //     }
+        // })
+        // .then(response => {
+        //     console.log('Response',response)
+        //     console.log('Response Data', response.data);
+        //     const decoded = jwtDecode<DecodedToken>(response.data.access_token)
+        //     clearTokens()
+        //     setTokens(response.data.access_token, response.data.refresh_token)
+        //     setUserId(decoded.user_id)
+        //     navigate('/')
+        // })
+        // .catch(error => {
+        //     console.error('Error', error);
+        // });
     }
 
   return (

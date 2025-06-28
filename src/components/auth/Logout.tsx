@@ -9,7 +9,7 @@ const Logout = () => {
 
     const handleLogout = () => {
         clearTokens()
-        navigate('/login')
+        navigate('/')
     }
 
   return (
