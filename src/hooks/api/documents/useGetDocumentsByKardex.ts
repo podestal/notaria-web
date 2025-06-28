@@ -1,12 +1,12 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
-import getDocumentService, { Document } from "../../../services/api/documentsService"
+import getDocumentService, { Documento } from "../../../services/api/documentsService"
 
 interface Props {
     access: string
     kardex: string
 }
 
-const useGetDocumentsByKardex = ({ access, kardex }: Props): UseQueryResult<Document[], Error> => {
+const useGetDocumentsByKardex = ({ access, kardex }: Props): UseQueryResult<Documento[], Error> => {
     const documentService = getDocumentService({ byKardex: true })
     const params = { kardex }
     

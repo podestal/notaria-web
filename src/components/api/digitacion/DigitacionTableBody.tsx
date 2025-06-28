@@ -1,6 +1,7 @@
 import useGetDocumentsByKardex from "../../../hooks/api/documents/useGetDocumentsByKardex"
 import { Kardex } from "../../../services/api/kardexService"
 import useAuthStore from "../../../store/useAuthStore"
+import DigitacionDocumentCard from "./DigitacionDocumentCard"
 
 interface Props {
     kardex: Kardex
@@ -22,16 +23,14 @@ const DigitacionTableBody = ({ kardex }: Props) => {
         ? 
         <>
         {documents.map( document => (
-            <div
-                key={document.id}
-                className="grid grid-cols-14 text-xs text-black px-2 my-2 place-content-center border-b-2 border-gray-200"
-            >
-                <p>{document.id}</p>
-            </div>
+            <DigitacionDocumentCard 
+                key={document.id} 
+                document={document} 
+            />
         ))} 
         </>
         : 
-        <div className="text-center text-gray-500">No hay proyecto para este kardex</div>}
+        <div className="text-center text-gray-500 text-xs">No hay proyecto para este kardex</div>}
     </>
   )
 }

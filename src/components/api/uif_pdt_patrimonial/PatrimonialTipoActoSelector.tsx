@@ -1,4 +1,5 @@
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
+import useAuthStore from "../../../store/useAuthStore"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 
 interface Props {
@@ -12,7 +13,8 @@ interface Props {
 
 const PatrimonialTipoActoSelector = ({ idtipkar, kardexActos, error, setError, selectedTipoDeActo, setSelectedTipoDeActo }: Props) => {
 
-    const { data: tiposActo, isLoading, isError, error: tipoActoError, isSuccess } = useGetTipoActo()
+    const access = useAuthStore(s => s.access_token) || ''
+    const { data: tiposActo, isLoading, isError, error: tipoActoError, isSuccess } = useGetTipoActo({ access })
 
     if (isLoading) return <p>Cargando tipos de acto...</p>
     if (isError) return <p>Error al cargar tipos de acto: {tipoActoError.message}</p>
