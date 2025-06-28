@@ -133,11 +133,11 @@ const Input = forwardRef<HTMLInputElement, Props>(({
                         )}
                     </button>
                 )}
-                {error &&
+                {showError &&
                 <RiErrorWarningFill 
-                className={`absolute ${label ? 'inset-y-12' : 'inset-y-2'} right-0 pr-3 flex items-center text-red-500`}
-                size={30}
-            />}
+                    className={`absolute ${label ? 'inset-y-12' : 'inset-y-2'} right-0 pr-3 flex items-center text-red-500`}
+                    size={30}
+                />}
             </div>
             {showError && <p className="text-xs text-red-500 mx-2">{error}</p>}
         </div>

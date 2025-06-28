@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import axios from 'axios';
 import useAuthStore from '../../store/useAuthStore';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Input from '../ui/Input';
-import AIButton from '../ui/AIButton';
 import useLogin from '../../hooks/auth/useLogin';
 
 interface DecodedToken {
     user_id: number;
 }
-
 
 const Login = () => {
 
@@ -20,11 +17,30 @@ const Login = () => {
     const {setTokens, setUserId, clearTokens} = useAuthStore()
     const navigate = useNavigate()
 
-    const URL = import.meta.env.VITE_BASE_URL
     const login = useLogin()
+    const [loading, setLoading] = useState(false);
+
+    const [usernameError, setUsernameError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [messageError, setMessageError] = useState('');
 
     const handleLogin = (e: React.FormEvent ) => {
+
       e.preventDefault()
+      setMessageError('')
+
+      if (!username) {
+        setUsernameError('El nombre de usuario es requerido');
+        return;
+      } 
+
+      if (!password) {
+        setPasswordError('La contraseña es requerida');
+        return;
+      }
+
+      setLoading(true);
+
       login.mutate({
             credentials: {
                 username: username,
@@ -40,31 +56,12 @@ const Login = () => {
             },
             onError: (err) => {
                 console.error('Login error:', err);
+                setMessageError('Usuario o contraseña incorrectos');
+            },
+            onSettled: () => {
+              setLoading(false);
             }
       })
-        // console.log('loging');
-        // console.log('URL', URL)
-        // axios.post(`${URL}/login`, {
-        //     usuario: username,
-        //     clave: password
-        // }, {
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Accept': 'application/json'
-        //     }
-        // })
-        // .then(response => {
-        //     console.log('Response',response)
-        //     console.log('Response Data', response.data);
-        //     const decoded = jwtDecode<DecodedToken>(response.data.access_token)
-        //     clearTokens()
-        //     setTokens(response.data.access_token, response.data.refresh_token)
-        //     setUserId(decoded.user_id)
-        //     navigate('/')
-        // })
-        // .catch(error => {
-        //     console.error('Error', error);
-        // });
     }
 
   return (
@@ -84,7 +81,7 @@ const Login = () => {
     >
         Accede
     </motion.h2>
-
+    <p className='text-center text-sm text-red-600 my-4'>{messageError}</p>
     {/* Form */}
     <motion.form 
         onSubmit={handleLogin} 
@@ -98,8 +95,8 @@ const Login = () => {
           value={username}
           setValue={setUsername}
           placeholder='Usuario'
-          // error={usernameError}
-          // setError={setUsernameError}
+          error={usernameError}
+          setError={setUsernameError}
       />
       <Input 
             // label='Contraseña'
@@ -107,8 +104,8 @@ const Login = () => {
             setValue={setPassword}
             type='password'
             placeholder='Contraseña'
-            // error={passwordError}
-            // setError={setPasswordError}
+            error={passwordError}
+            setError={setPasswordError}
         />
 
 
@@ -117,7 +114,7 @@ const Login = () => {
             <button
               className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm cursor-pointer"
             >
-              Entrar
+              {loading ? 'Cargando...' : 'Ingresar'}
             </button>
         </div>
         {/* <Link 
