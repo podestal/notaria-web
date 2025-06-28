@@ -1,30 +1,17 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainPage from "../pages/MainPage";
 import Login from "../components/auth/Login";
-// import KardexMain from "../components/api/kardex/KardexMain";
-// import PrivateRoutes from "../components/auth/PrivateRoutes";
-
-// path: "/app",
-// element: <MainPage />,
-// errorElement: <div>404</div>,
-// children: [
-//     {
-//         path: "students-main",
-//         element: 
-//         <PrivateRoutes>
-//             <StudentsPage />
-//         </PrivateRoutes>
-//     },
+import PrivateRoutes from "../components/auth/PrivateRoutes";
 
 const routes = createBrowserRouter([
     {
-        path: "/login",
+        path: "/",
         element: <Login />,
     },
     {
-        path: "/",
-        element: <MainPage />,
-        errorElement: <div>Error</div>,
+        path: "/app",
+        element: <PrivateRoutes ><MainPage /></PrivateRoutes>,
+        errorElement: <div>404</div>,
     },
     // {
     //     path: "/",

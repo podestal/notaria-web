@@ -10,6 +10,7 @@ interface SimpleInputProps {
   required?: boolean;
   fullWidth?: boolean;
   disabled?: boolean;
+  type?: string
 }
 
 const shakeAnimation = {
@@ -27,6 +28,7 @@ const SimpleInput = ({
   required = false,
   fullWidth = false,
   disabled,
+  type = 'text'
 }: SimpleInputProps) => {
   return (
     <div
@@ -44,6 +46,7 @@ const SimpleInput = ({
             <div className='flex items-center gap-2'>
                 <motion.input
                     {...(error ? shakeAnimation : {})}
+                    type={type}
                     value={value}
                     disabled={disabled}
                     onChange={(e) => {
