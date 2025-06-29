@@ -14,7 +14,7 @@ const PrivateRoutes = ({ children }: Props) => {
     useEffect(() => {
         console.log("Access Token:", access);
         if (!access) {
-            navigate("/login", { replace: true }); // Use replace to prevent back navigation
+            navigate("/", { replace: true }); // Use replace to prevent back navigation
         }
     }, [access]);
 

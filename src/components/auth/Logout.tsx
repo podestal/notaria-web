@@ -8,8 +8,8 @@ const Logout = () => {
     const navigate = useNavigate()
 
     const handleLogout = () => {
-        clearTokens()
         navigate('/')
+        clearTokens()
     }
 
   return (
