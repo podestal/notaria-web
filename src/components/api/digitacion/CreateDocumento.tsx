@@ -1,12 +1,18 @@
 const CreateDocumento = () => {
 
-    const openInWord = async () => {
-        // const templateId = 3;
-        // const url = `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=${templateId}`;
-        const cleanURL = `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=3`;
-        const officeURL = `ms-word:ofe|u|${cleanURL}`;
+    const openInWord = () => {
+        const rawURL = "https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=3";
+        const officeURL = `ms-word:ofe|u|${encodeURIComponent(rawURL)}`;
         window.location.href = officeURL;
       };
+
+    // const openInWord = async () => {
+    //     // const templateId = 3;
+    //     // const url = `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=${templateId}`;
+    //     const cleanURL = `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=3`;
+    //     const officeURL = `ms-word:ofe|u|${cleanURL}`;
+    //     window.location.href = officeURL;
+    //   };
 
     // const handleOpenInWord = async () => {
     //     try {
