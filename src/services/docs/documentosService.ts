@@ -1,4 +1,4 @@
-import APIClient from "./apiClient";
+import DocClient from "./docClient";
 
 export interface Documento {
     id: number;
@@ -34,7 +34,7 @@ const getDocumentService = ({ byKardex, documentId }: Props) => {
     } else if (documentId) {
         url += `${documentId}/`;
     }
-    return new APIClient<Documento, CreateUpdateDocument>(url);
+    return new DocClient<Documento, CreateUpdateDocument>(url);
 }; 
 
 export default getDocumentService;

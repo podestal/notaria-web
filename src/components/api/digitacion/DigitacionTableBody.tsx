@@ -1,4 +1,4 @@
-import useGetDocumentsByKardex from "../../../hooks/api/documents/useGetDocumentsByKardex"
+import useGetDocumentsByKardex from "../../../hooks/docs/documents/useGetDocumentsByKardex"
 import { Kardex } from "../../../services/api/kardexService"
 import useAuthStore from "../../../store/useAuthStore"
 import DigitacionDocumentCard from "./DigitacionDocumentCard"

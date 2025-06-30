@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
-import getDocumentService, { Documento } from "../../../services/api/documentsService"
+import getDocumentService, { Documento} from "../../../services/docs/documentosService"
 
 interface Props {
     access: string

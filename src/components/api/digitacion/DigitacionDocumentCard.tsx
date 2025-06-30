@@ -1,5 +1,5 @@
 import moment from "moment"
-import { Documento } from "../../../services/api/documentsService"
+import { Documento } from "../../../services/docs/documentosService"
 
 interface Props {
     document: Documento
