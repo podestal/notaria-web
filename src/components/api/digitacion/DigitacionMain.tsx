@@ -10,7 +10,9 @@ const DigitacionMain = ({ kardex }: Props) => {
 
   return (
     <div>
-        <DigitacionMutations />
+        <DigitacionMutations 
+            kardex={kardex}
+        />
         <DigitacionTable 
             kardex={kardex}
         />
