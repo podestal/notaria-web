@@ -10,6 +10,7 @@ interface Props {
     setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
     idtipkar: number
     kardex: string
+    selectedTipoPersona: number
 }
 
 
@@ -20,7 +21,8 @@ const CreateContratante = ({
     setShowClienteForm,
     setClientesCheck,
     idtipkar,
-    kardex
+    kardex,
+    selectedTipoPersona,
 }: Props) => {
 
     const createContratante = useCreateContratante({ kardex, idcliente: cliente1?.idcliente || '' })
@@ -36,6 +38,7 @@ const CreateContratante = ({
         idtipkar={idtipkar}
         kardex={kardex}
         setClientesCheck={setClientesCheck}
+        selectedTipoPersona={selectedTipoPersona}
     />
   )
 }

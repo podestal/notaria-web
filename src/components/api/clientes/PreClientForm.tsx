@@ -223,7 +223,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 idtipoacto={idtipoacto}
                 idtipkar={idtipkar}
                 kardex={kardex}
-                
+                selectedTipoPersona={selectedTipoPersona}
             />
         </div>
     }

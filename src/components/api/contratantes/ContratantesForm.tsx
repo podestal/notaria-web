@@ -25,6 +25,7 @@ interface Props {
     idtipkar: number
     kardex: string
     contratante?: Contratante
+    selectedTipoPersona: number
 }
 
 const representationOptions = [
@@ -45,7 +46,8 @@ const ContratantesForm = ({
     updateContratante,
     idtipkar, 
     kardex, 
-    contratante }: Props) => {
+    contratante,
+    selectedTipoPersona }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [openRepForm, setOpenRepForm] = useState(false)
@@ -215,9 +217,10 @@ const ContratantesForm = ({
         onSubmit={handleCreateContratante}
         className="text-black"
     >
-        <>{console.log("condiciones", contratante?.condicion)}</>
         <h2 className="text-xl text-center font-bold mb-6">Nuevo Contratante</h2>
         <div className="grid grid-cols-5 gap-4">
+            {selectedTipoPersona === 1 && 
+            <>
             <div className="col-span-2">
                 <SimpleInput 
                     label="Apellido Paterno"
@@ -238,6 +241,19 @@ const ContratantesForm = ({
                     disabled={true}
                 />
             </div>
+            </>}
+            {selectedTipoPersona === 2 && 
+            <div className="col-span-4">
+                <SimpleInput 
+                    label="Razon Social"
+                    value={apePaterno}
+                    setValue={setApePaterno}
+                    horizontal
+                    required
+                    disabled={true}
+                    fullWidth   
+                />
+            </div>}
             <ContratantesConditionFilter 
                 idtipoacto={idtipoacto}
                 kardex={kardex}
@@ -246,6 +262,8 @@ const ContratantesForm = ({
             />
         </div>
         <div className="grid grid-cols-5 gap-4 mt-4">
+            {selectedTipoPersona === 1 &&
+            <>
             <div className="col-span-2">
                 <SimpleInput 
                     label="Primer Nombre"
@@ -265,6 +283,21 @@ const ContratantesForm = ({
                     disabled={true}
                 />
             </div>
+            </>
+            }
+            {selectedTipoPersona === 2 && 
+            <div className="col-span-4">
+                <SimpleInput 
+                    label="Dirección Fiscal"
+                    value={apePaterno}
+                    setValue={setApePaterno}
+                    horizontal
+                    required
+                    disabled={true}
+                    fullWidth   
+                />
+            </div>
+            }
             <div className="w-full flex justify-center items-center gap-4">
                 <button 
                     disabled={isLoading}
@@ -274,6 +307,7 @@ const ContratantesForm = ({
             </div>
         </div>
         <div className="grid grid-cols-5 gap-4 mt-4">
+            {selectedTipoPersona === 1 &&
             <div className="col-span-4 w-full">
                 <SimpleInput 
                     label="Dirección"
@@ -284,8 +318,17 @@ const ContratantesForm = ({
                     required
                     disabled={true}
                 />
-            </div>
-            <div className="w-full flex justify-center items-center gap-4">
+            </div>}
+            {selectedTipoPersona === 2 &&
+            <div className="col-span-4 flex items-center justify-start gap-4">
+                <p className="pl-2 block text-xs font-semibold text-slate-700">Firma</p>
+                <input 
+                    type="checkbox"  
+                    checked={firma}
+                    onChange={(e) => setFirma(e.target.checked)}    
+                />
+            </div>}
+            <div className="w-full flex justify-center items-center gap-4 h-10">
                 {contratante 
                 ? 
                 <button 
@@ -312,6 +355,7 @@ const ContratantesForm = ({
                 }
             </div>
         </div>
+        {selectedTipoPersona === 1 &&
         <div className="flex items-center justify-start gap-10 mt-6">
             <div className="flex items-center justify-center gap-4">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Firma</p>
@@ -329,7 +373,7 @@ const ContratantesForm = ({
                     onChange={(e) => setIncluirIndic(e.target.checked)}
                 />
             </div>
-        </div>
+        </div>}
         <div className="my-6">
             <p className="text-xs font-semibold text-slate-700 mb-4">Tipo de Representación</p>
             <SingleSelect 
