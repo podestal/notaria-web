@@ -36,6 +36,7 @@ export interface Cliente2 {
     ubigeo_plantilla: string;
     fechaconstitu: string
     idsedereg: number;
+    domfiscal: string;
 }
 
 export type CreateUpdateCliente2 = Omit<Cliente2, 'idcliente' | 'idcontratante'>

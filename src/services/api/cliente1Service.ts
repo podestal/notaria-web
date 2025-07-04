@@ -24,7 +24,8 @@ export interface Cliente {
     idcargoprofe?: number | null;
     cumpclie?: string; // Date in 'DD/MM/YYYY' format
     resedente?: string; // '1' for resident, '0' for non-resident
-    razonsocial?: string;
+    razonsocial: string;
+    domfiscal: string;
     
 }
 

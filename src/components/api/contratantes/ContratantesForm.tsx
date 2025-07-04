@@ -51,6 +51,8 @@ const ContratantesForm = ({
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [openRepForm, setOpenRepForm] = useState(false)
+    const [razonSocial, setRazonSocial] = useState(cliente1 ? cliente1.razonsocial : '')
+    const [domFiscal, setDomFiscal] = useState(cliente1 ? cliente1.domfiscal : '')
     const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
     const [apeMaterno, setApeMaterno] = useState( cliente1 ? cliente1.apemat : '')
     const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
@@ -244,10 +246,11 @@ const ContratantesForm = ({
             </>}
             {selectedTipoPersona === 2 && 
             <div className="col-span-4">
+                <>{console.log('razonSocial', razonSocial)}</>
                 <SimpleInput 
                     label="Razon Social"
-                    value={apePaterno}
-                    setValue={setApePaterno}
+                    value={razonSocial}
+                    setValue={setRazonSocial}
                     horizontal
                     required
                     disabled={true}
@@ -289,8 +292,8 @@ const ContratantesForm = ({
             <div className="col-span-4">
                 <SimpleInput 
                     label="Dirección Fiscal"
-                    value={apePaterno}
-                    setValue={setApePaterno}
+                    value={domFiscal}
+                    setValue={setDomFiscal}
                     horizontal
                     required
                     disabled={true}
