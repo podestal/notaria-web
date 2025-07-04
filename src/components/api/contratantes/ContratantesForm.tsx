@@ -67,24 +67,33 @@ const ContratantesForm = ({
     const [contratanteRepresented, setContratanteRepresented] = useState(contratante ? contratante.idcontratanterp : '')
 
     useEffect(() => {
+        console.log('cliente1', cliente1)
+        console.log('cliente2', cliente2)
+        
         if (cliente1) {
             setApePaterno(cliente1.apepat)
             setApeMaterno(cliente1.apemat)
             setPrinom(cliente1.prinom)
             setSegnom(cliente1.segnom)
             setAddress(cliente1.direccion)
+            setRazonSocial(cliente1.razonsocial)
+            setDomFiscal(cliente1.domfiscal)
         } else if (cliente2) {
             setApePaterno(cliente2.apepat)
             setApeMaterno(cliente2.apemat)
             setPrinom(cliente2.prinom)
             setSegnom(cliente2.segnom)
             setAddress(cliente2.direccion)
+            setRazonSocial(cliente2.razonsocial)
+            setDomFiscal(cliente2.domfiscal)
         } else {
             setApePaterno('')
             setApeMaterno('')
             setPrinom('')
             setSegnom('')
             setAddress('')
+            setRazonSocial('')
+            setDomFiscal('')
         }
     }, [cliente1])
 

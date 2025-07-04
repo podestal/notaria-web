@@ -42,6 +42,7 @@ const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante, 
                 kardex={kardex}
                 contratante={contratante}
                 updateContratante={updateContratante}
+                selectedTipoPersona={cliente2.numdoc.length > 8 ? 2 : 1}
             />}
         {showClienteForm &&
         <UpdateCliente2 
