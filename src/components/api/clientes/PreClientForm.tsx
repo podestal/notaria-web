@@ -14,6 +14,12 @@ interface Props {
     setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+const documentoJuridicaOptions = [
+    { value: 0, label: 'Seleccione una opción' },
+    { value: 1, label: 'R.U.C.' },
+    { value: 2, label: 'Sin Documento'},
+]
+
 const documentNaturalOptions = [
     { value: 0, label: 'Seleccione una opción' },
     { value: 1, label: 'Documento Nacional de Identidad' },
@@ -26,6 +32,8 @@ const documentNaturalOptions = [
     { value: 8, label: 'Partida de Nacimiento' },
     { value: 9, label: 'Otro' }
 ]
+
+
 
 const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props) => {
 
@@ -81,26 +89,52 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
         setLoading(true)
 
         // get client here
-        axios.get(
-            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
-        ).then(response => {
-            if (response.data.idcliente) {
-                console.log('Cliente encontrado:', response.data);
-                setCliente1(response.data)
-                setShowContratanteForm(true)
-                setShowClienteForm(false)
-            } else {
-                console.log('Cliente no encontrado, creando nuevo cliente')
-                setCliente1(null)
-                setShowContratanteForm(false)
-                setShowClienteForm(true)
-            }
-        }).catch(error => {
-            console.log('Error al buscar el cliente:', error);
-            console.error(error);
-        }).finally(() => {
-            setLoading(false)
-        })
+        if (selectedTipoPersona === 1) {
+            axios.get(
+                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
+            ).then(response => {
+                if (response.data.idcliente) {
+                    console.log('Cliente encontrado:', response.data);
+                    setCliente1(response.data)
+                    setShowContratanteForm(true)
+                    setShowClienteForm(false)
+                } else {
+                    console.log('Cliente no encontrado, creando nuevo cliente')
+                    setCliente1(null)
+                    setShowContratanteForm(false)
+                    setShowClienteForm(true)
+                }
+            }).catch(error => {
+                console.log('Error al buscar el cliente:', error);
+                console.error(error);
+            }).finally(() => {
+                setLoading(false)
+            })
+        }
+
+        if (selectedTipoPersona === 2) {
+            axios.get(
+                `${import.meta.env.VITE_API_URL}cliente/by_ruc/?ruc=${document}`
+            ).then(response => {
+                if (response.data.idcliente) {
+                    console.log('Cliente encontrado:', response.data);
+                    setCliente1(response.data)
+                    setShowContratanteForm(true)
+                    setShowClienteForm(false)
+                } else {
+                    console.log('Cliente no encontrado, creando nuevo cliente')
+                    setCliente1(null)
+                    setShowContratanteForm(false)
+                    setShowClienteForm(true)
+                }
+            }).catch(error => {
+                console.log('Error al buscar el cliente:', error);
+                console.error(error);
+            }).finally(() => {
+                setLoading(false)
+            })
+        }
+
             
     }
 
@@ -122,7 +156,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 ]}
                 setter={setSelectedTipoPersona}
             />
-            {selectedTipoPersona > 0 && 
+            {selectedTipoPersona === 1 && 
             <>
                 <Selector 
                     label="Tipo de documento"
@@ -141,6 +175,33 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                         className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                     />
                 </div>}
+                {selectedTipoDocumento > 0 && 
+                <button 
+                    disabled={document.length === 0 || loading}
+                    className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${loading && 'animate-pulse'} ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 
+                    type="submit">
+                    {loading ? '...' : 'Buscar'}
+                </button>}
+            </>
+            }
+            {selectedTipoPersona === 2 && 
+            <>
+                <Selector 
+                    label="Tipo de documento"
+                    options={documentoJuridicaOptions}
+                    setter={setSelectedTipoDocumento}
+                    defaultValue={selectedTipoDocumento}
+                />
+                <div className="flex flex-col gap-2 col-span-2">
+                    <p className="text-md font-bold py-2">RUC</p>
+                    <input 
+                        type="text"
+                        value={document}
+                        onChange={e => setDocument(e.target.value)}
+                        placeholder={'Ingrese el RUC'}
+                        className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
+                    />
+                </div>
                 {selectedTipoDocumento > 0 && 
                 <button 
                     disabled={document.length === 0 || loading}
