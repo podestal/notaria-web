@@ -37,6 +37,10 @@ export interface Cliente2 {
     fechaconstitu: string
     idsedereg: number;
     domfiscal: string;
+    numpartida: string;
+    telempresa: string;
+    actmunicipal: string;
+    contacempresa: string;
 }
 
 export type CreateUpdateCliente2 = Omit<Cliente2, 'idcliente' | 'idcontratante'>

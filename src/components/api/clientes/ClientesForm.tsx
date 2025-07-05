@@ -13,6 +13,8 @@ import { Ubigeo } from "../../../services/api/ubigeoService"
 import { UseMutationResult } from "@tanstack/react-query"
 import { UpdateClienteData } from "../../../hooks/api/cliente/useUpdateCliente"
 import { CreateClienteData } from "../../../hooks/api/cliente/useCreateCliente"
+import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
+import { SEDES_REGISTRALES, GIRO_NEGOCIO } from "../../../data/patrimonialData"
 
 interface Props {
     dni: string
@@ -149,8 +151,25 @@ const ClientesForm = ({
     const [domFiscal, setDomFiscal] = useState(cliente1 ? cliente1.domfiscal : '')
     const [fechaConstitucion, setFechaConstitucion] = useState(cliente1 ? cliente1.cumpclie || '' : '')
     const [numeroDeRegistro, setNumeroDeRegistro] = useState(cliente1 ? cliente1.numdoc : '')
-    const [objetoSocial, setObjetaSocial] = useState(cliente1 ? cliente1.detaprofesion || '' : '')
+    // const [objetoSocial, setObjetaSocial] = useState(cliente1 ? cliente1.detaprofesion || '' : '')
     const [correoDeEmpresa, setCorreoDeEmpresa] = useState(cliente1 ? cliente1.email || '' : '')
+    const [selectedSedeRegistral, setSelectedSedeRegistral] = useState<{ id: string; label: string } | null>(() => { 
+        if (cliente1 && cliente1.idsedereg) {
+          const match = SEDES_REGISTRALES.find(sede => parseInt(sede.idsedereg) === cliente1.idsedereg);
+          if (match) {
+            return {
+              id: match.idsedereg,
+              label: match.dessede,
+            };
+          }
+        }
+        return null;
+      }
+    )
+    const [numeroPartida, setNumeroPartida] = useState(cliente1 ? cliente1.numpartida : '')
+    const [teleEmpresa, setTeleEmpresa] = useState(cliente1 ? cliente1.telempresa || '' : '')
+    const [ciiu, setCiiu] = useState(cliente1 ? cliente1.actmunicipal || '' : '')
+    const [contacEmpresa, setContacEmpresa] = useState(cliente1 ? cliente1.contacempresa || '' : '')
     
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -665,11 +684,42 @@ const ClientesForm = ({
                 horizontal={true}
             />
         </div>
+        <div className="flex justify-center items-center gap-6 mb-6">
+            <SimpleSelectorStr 
+                label="Sede Registral"
+                setter={(value: string) => {
+                    const selected = SEDES_REGISTRALES.find(sede => sede.idsedereg === value);
+                    setSelectedSedeRegistral(selected ? { id: selected.idsedereg, label: selected.dessede } : null);
+                }}
+                options={[{ value: '0', label: 'Seleccionar Sede Registral' }, ...SEDES_REGISTRALES.map(sede => ({ value: sede.idsedereg, label: sede.dessede }))]}
+                horizontal={true}
+            />
+            <SimpleInput 
+                label="Número de Partida"
+                value={numeroPartida}
+                setValue={setNumeroPartida}
+                horizontal={true}
+            />
+        </div>
+        <div className="flex justify-center items-center gap-6 mb-6">
+            <SimpleInput 
+                label="Teléfono"
+                value={numeroPartida}
+                setValue={setNumeroPartida}
+                horizontal={true}
+            />
+            <SimpleSelectorStr 
+                label="CIIU"
+                setter={setCiiu}
+                options={[{ value: '0', label: 'Seleccionar CIIU' }, ...GIRO_NEGOCIO.map(giro => ({ value: giro.coddivi, label: giro.nombre }))]}
+                horizontal={true}
+            />
+        </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
                 label="Objeto Social"
-                value={objetoSocial}
-                setValue={setObjetaSocial}
+                value={contacEmpresa}
+                setValue={setContacEmpresa}
                 horizontal={true}
                 required
                 fullWidth
@@ -683,6 +733,13 @@ const ClientesForm = ({
                 horizontal={true}
                 fullWidth
             />
+        </div>
+        <div className="flex justify-center items-center gap-6 mb-4">
+            <button 
+                type="submit"
+                className="mt-8 bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
+                {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
+            </button>
         </div>
         </>
         }

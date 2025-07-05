@@ -26,6 +26,11 @@ export interface Cliente {
     resedente?: string; // '1' for resident, '0' for non-resident
     razonsocial: string;
     domfiscal: string;
+    idsedereg: number; // Sede Registral
+    numpartida: string;
+    telempresa: string;
+    actmunicipal: string; // CIIU code
+    contacempresa: string; // Contact person in the company
     
 }
 
