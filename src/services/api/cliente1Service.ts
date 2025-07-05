@@ -31,7 +31,7 @@ export interface Cliente {
     telempresa: string;
     actmunicipal: string; // CIIU code
     contacempresa: string; // Contact person in the company
-    
+    fechaconstitu: string; // Date in 'DD/MM/YYYY' format
 }
 
 export type CreateUpdateCliente1 = Omit<Cliente, 'idcliente'> 

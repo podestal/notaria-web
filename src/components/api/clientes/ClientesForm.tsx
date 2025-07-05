@@ -173,225 +173,377 @@ const ClientesForm = ({
     
     const handleSubmit = (e: React.FormEvent) => {
 
-        console.log('ubigeo', ubigeo);
-        
         e.preventDefault()
-        if (!apepat) {
-            setApepatError('Apellido Paterno es requerido')
-            setType('error')
-            setMessage('Apellido Paterno es requerido')
-            setShow(true)
-            return
-        }
 
-        if (!prinom) {
-            setPrinomError('Primer Nombre es requerido')
-            setType('error')
-            setMessage('Primer Nombre es requerido')
-            setShow(true)
-            return
-        }
-
-        if (!apemat) {
-            setApematError('Apellido Materno es requerido')
-            setType('error')
-            setMessage('Apellido Materno es requerido')
-            setShow(true)
-            return
-        }
-
-        setNombre(`${apepat} ${apemat}, ${prinom} ${segnom}`)
-
-        if (!direccion) {
-            setDireccionError('Dirección es requerida')
-            setType('error')
-            setMessage('Dirección es requerida')
-            setShow(true)
-            return
-        }
-
-        if (!ubigeo) {
-            setUbigeoError('Ubigeo es requerido')
-            setType('error')
-            setMessage('Ubigeo es requerido')
-            setShow(true)
-            return
-        }
-
-        if (civilStatus === 0) {
-            setCivilStatusError('Estado Civil es requerido')
-            setType('error')
-            setMessage('Estado Civil es requerido')
-            setShow(true)
-            return
-        }
-
-        if (gender === 0) {
-            setGenderError('Sexo es requerido')
-            setType('error')
-            setMessage('Sexo es requerido')
-            setShow(true)
-            return  
-        }
-
-        if (nationality === null) {
-            setNationalityError('Nacionalidad es requerida')
-            setType('error')
-            setMessage('Nacionalidad es requerida')
-            setShow(true)
-            return
-        }
-
-        if (!birthdate) {
-            setBirthdateError('Fecha de Nacimiento es requerida')
-            setType('error')
-            setMessage('Fecha de Nacimiento es requerida')
-            setShow(true)
-            return
-        }
-
-        const rawBirthdate = birthdate.split('/')
-
-        if (rawBirthdate.length !== 3 || rawBirthdate[0].length !== 2 || rawBirthdate[1].length !== 2 || rawBirthdate[2].length !== 4) {
-            setBirthdateError('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
-            setType('error')
-            setMessage('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
-            setShow(true)
-            return
-        }
-
-        if (parseInt(rawBirthdate[0]) < 1 || parseInt(rawBirthdate[0]) > 31) {
-            setBirthdateError('Día de Nacimiento debe ser entre 01 y 31')
-            setType('error')
-            setMessage('Día de Nacimiento debe ser entre 01 y 31')
-            setShow(true)
-            return  
-        }
-
-        if (parseInt(rawBirthdate[1]) < 1 || parseInt(rawBirthdate[1]) > 12) {
-            setBirthdateError('Mes de Nacimiento debe ser entre 01 y 12')
-            setType('error')
-            setMessage('Mes de Nacimiento debe ser entre 01 y 12')
-            setShow(true)
-            return  
-        }
-
-        if (parseInt(rawBirthdate[2]) < 1900 || parseInt(rawBirthdate[2]) > new Date().getFullYear()) {
-            setBirthdateError('Año de Nacimiento debe ser válido')
-            setType('error')
-            setMessage('Año de Nacimiento debe ser válido')
-            setShow(true)
-            return  
-        }
-
-        if (profesion === null) {
-            setProfesionError('Profesión es requerida')
-            setType('error')
-            setMessage('Profesión es requerida')
-            setShow(true)
-            return
-        }
-
-        if (cargo === null) {
-            setCargoError('Cargo es requerido')
-            setType('error')
-            setMessage('Cargo es requerido')
-            setShow(true)
-            return
-        }
-
-        createCliente && createCliente.mutate({
-            cliente: {
-                tipper: 'N',
-                apepat,
-                apemat,
-                prinom,
-                segnom,
-                nombre,
-                direccion,
-                idubigeo: ubigeo.id,
-                resedente: resident === 1 ? '1' : '0',
-                idtipdoc: 1,
-                numdoc: dni,
-                email,
-                nacionalidad: nationality.id,
-                idestcivil: civilStatus,
-                sexo: gender === 1 ? 'M' : 'F',
-                telfijo: fixedPhone,
-                telcel: celphone,
-                telofi: officePhone,
-                idcargoprofe: parseInt(cargo.id),
-                idprofesion: parseInt(profesion.id),
-                detaprofesion: profesion.label,
-                cumpclie: birthdate,
-                razonsocial: razonSocial,
-                domfiscal: domFiscal,
-            }
-        }, {
-            onSuccess: (data) => {
-                console.log('Cliente creado:', data)
-                setType('success')
-                setMessage('Cliente creado exitosamente')
-                setShow(true)
-                setShowClienteForm(false)
-                setShowContratanteForm(true)
-                setCliente1(data)
-
-            },
-            onError: (error) => {
-                console.error('Error al crear cliente:', error)
+        if (selectedTipoPersona === 1) {
+            if (!apepat) {
+                setApepatError('Apellido Paterno es requerido')
                 setType('error')
-                setMessage('Error al crear cliente')
+                setMessage('Apellido Paterno es requerido')
                 setShow(true)
+                return
             }
-        })
-
-        updateCliente && updateCliente.mutate({
-            cliente: {
-                tipper: 'N',
-                apepat,
-                apemat,
-                prinom,
-                segnom,
-                nombre,
-                direccion,
-                idubigeo: ubigeo.id,
-                resedente: resident === 1 ? '1' : '0',
-                idtipdoc: 1,
-                numdoc: dni,
-                email,
-                nacionalidad: nationality.id,
-                idestcivil: civilStatus,
-                sexo: gender === 1 ? 'M' : 'F',
-                telfijo: fixedPhone,
-                telcel: celphone,
-                telofi: officePhone,
-                idcargoprofe: parseInt(cargo.id),
-                idprofesion: parseInt(profesion.id),
-                detaprofesion: profesion.label,
-                cumpclie: birthdate,
-                razonsocial: razonSocial,
-                domfiscal: domFiscal,
-            }
-        }, {
-            onSuccess: (data) => {
-                console.log('Cliente actualizado:', data)
-                setType('success')
-                setMessage('Cliente actualizado exitosamente')
-                setShow(true)
-                setShowClienteForm(false)
-                setShowContratanteForm(true)
-                setCliente1(data)
-
-            },
-            onError: (error) => {
-                console.error('Error al actualizar cliente:', error)
+    
+            if (!prinom) {
+                setPrinomError('Primer Nombre es requerido')
                 setType('error')
-                setMessage('Error al actualizar cliente')
+                setMessage('Primer Nombre es requerido')
                 setShow(true)
-            }   
-        })
+                return
+            }
+    
+            if (!apemat) {
+                setApematError('Apellido Materno es requerido')
+                setType('error')
+                setMessage('Apellido Materno es requerido')
+                setShow(true)
+                return
+            }
+    
+            setNombre(`${apepat} ${apemat}, ${prinom} ${segnom}`)
+    
+            if (!direccion) {
+                setDireccionError('Dirección es requerida')
+                setType('error')
+                setMessage('Dirección es requerida')
+                setShow(true)
+                return
+            }
+    
+            if (!ubigeo) {
+                setUbigeoError('Ubigeo es requerido')
+                setType('error')
+                setMessage('Ubigeo es requerido')
+                setShow(true)
+                return
+            }
+    
+            if (civilStatus === 0) {
+                setCivilStatusError('Estado Civil es requerido')
+                setType('error')
+                setMessage('Estado Civil es requerido')
+                setShow(true)
+                return
+            }
+    
+            if (gender === 0) {
+                setGenderError('Sexo es requerido')
+                setType('error')
+                setMessage('Sexo es requerido')
+                setShow(true)
+                return  
+            }
+    
+            if (nationality === null) {
+                setNationalityError('Nacionalidad es requerida')
+                setType('error')
+                setMessage('Nacionalidad es requerida')
+                setShow(true)
+                return
+            }
+    
+            if (!birthdate) {
+                setBirthdateError('Fecha de Nacimiento es requerida')
+                setType('error')
+                setMessage('Fecha de Nacimiento es requerida')
+                setShow(true)
+                return
+            }
+    
+            const rawBirthdate = birthdate.split('/')
+    
+            if (rawBirthdate.length !== 3 || rawBirthdate[0].length !== 2 || rawBirthdate[1].length !== 2 || rawBirthdate[2].length !== 4) {
+                setBirthdateError('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
+                setType('error')
+                setMessage('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
+                setShow(true)
+                return
+            }
+    
+            if (parseInt(rawBirthdate[0]) < 1 || parseInt(rawBirthdate[0]) > 31) {
+                setBirthdateError('Día de Nacimiento debe ser entre 01 y 31')
+                setType('error')
+                setMessage('Día de Nacimiento debe ser entre 01 y 31')
+                setShow(true)
+                return  
+            }
+    
+            if (parseInt(rawBirthdate[1]) < 1 || parseInt(rawBirthdate[1]) > 12) {
+                setBirthdateError('Mes de Nacimiento debe ser entre 01 y 12')
+                setType('error')
+                setMessage('Mes de Nacimiento debe ser entre 01 y 12')
+                setShow(true)
+                return  
+            }
+    
+            if (parseInt(rawBirthdate[2]) < 1900 || parseInt(rawBirthdate[2]) > new Date().getFullYear()) {
+                setBirthdateError('Año de Nacimiento debe ser válido')
+                setType('error')
+                setMessage('Año de Nacimiento debe ser válido')
+                setShow(true)
+                return  
+            }
+    
+            if (profesion === null) {
+                setProfesionError('Profesión es requerida')
+                setType('error')
+                setMessage('Profesión es requerida')
+                setShow(true)
+                return
+            }
+    
+            if (cargo === null) {
+                setCargoError('Cargo es requerido')
+                setType('error')
+                setMessage('Cargo es requerido')
+                setShow(true)
+                return
+            }
+            createCliente && createCliente.mutate({
+                cliente: {
+                    tipper: 'N',
+                    apepat,
+                    apemat,
+                    prinom,
+                    segnom,
+                    nombre,
+                    direccion,
+                    idubigeo: ubigeo.id,
+                    resedente: resident === 1 ? '1' : '0',
+                    idtipdoc: 1,
+                    numdoc: dni,
+                    email,
+                    nacionalidad: nationality.id,
+                    idestcivil: civilStatus,
+                    sexo: gender === 1 ? 'M' : 'F',
+                    telfijo: fixedPhone,
+                    telcel: celphone,
+                    telofi: officePhone,
+                    idcargoprofe: parseInt(cargo.id),
+                    idprofesion: parseInt(profesion.id),
+                    detaprofesion: profesion.label,
+                    cumpclie: birthdate,
+                    razonsocial: razonSocial,
+                    domfiscal: domFiscal,
+                    idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
+                    numpartida: numeroPartida,
+                    telempresa: teleEmpresa,
+                    actmunicipal: ciiu,
+                    contacempresa: contacEmpresa,
+                    fechaconstitu: fechaConstitucion,
+                }
+            }, {
+                onSuccess: (data) => {
+                    console.log('Cliente creado:', data)
+                    setType('success')
+                    setMessage('Cliente creado exitosamente')
+                    setShow(true)
+                    setShowClienteForm(false)
+                    setShowContratanteForm(true)
+                    setCliente1(data)
+    
+                },
+                onError: (error) => {
+                    console.error('Error al crear cliente:', error)
+                    setType('error')
+                    setMessage('Error al crear cliente')
+                    setShow(true)
+                }
+            })
+    
+            updateCliente && updateCliente.mutate({
+                cliente: {
+                    tipper: 'N',
+                    apepat,
+                    apemat,
+                    prinom,
+                    segnom,
+                    nombre,
+                    direccion,
+                    idubigeo: ubigeo.id,
+                    resedente: resident === 1 ? '1' : '0',
+                    idtipdoc: 1,
+                    numdoc: dni,
+                    email,
+                    nacionalidad: nationality.id,
+                    idestcivil: civilStatus,
+                    sexo: gender === 1 ? 'M' : 'F',
+                    telfijo: fixedPhone,
+                    telcel: celphone,
+                    telofi: officePhone,
+                    idcargoprofe: parseInt(cargo.id),
+                    idprofesion: parseInt(profesion.id),
+                    detaprofesion: profesion.label,
+                    cumpclie: birthdate,
+                    razonsocial: razonSocial,
+                    domfiscal: domFiscal,
+                    idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
+                    numpartida: numeroPartida,
+                    telempresa: teleEmpresa,
+                    actmunicipal: ciiu,
+                    contacempresa: contacEmpresa,
+                    fechaconstitu: fechaConstitucion,
+                }
+            }, {
+                onSuccess: (data) => {
+                    console.log('Cliente actualizado:', data)
+                    setType('success')
+                    setMessage('Cliente actualizado exitosamente')
+                    setShow(true)
+                    setShowClienteForm(false)
+                    setShowContratanteForm(true)
+                    setCliente1(data)
+    
+                },
+                onError: (error) => {
+                    console.error('Error al actualizar cliente:', error)
+                    setType('error')
+                    setMessage('Error al actualizar cliente')
+                    setShow(true)
+                }   
+            })
+        }
 
+        if (selectedTipoPersona === 2) {
+            if (!razonSocial) {
+                setType('error')
+                setMessage('Razón Social es requerida')
+                setShow(true)
+                return
+            }
+
+            if (!domFiscal) {
+                setType('error')
+                setMessage('Domicilio Fiscal es requerido')
+                setShow(true)
+                return
+            }
+
+            if (ubigeo === null) {
+                setType('error')
+                setMessage('Ubigeo es requerido')
+                setShow(true)
+                return
+            }
+
+            if (!ciiu) {
+                setType('error')
+                setMessage('CIIU es requerido')
+                setShow(true)
+                return
+            }
+
+            if (!contacEmpresa) {
+                setType('error')
+                setMessage('Objeto social es requerido')
+                setShow(true)
+                return
+            }
+
+            createCliente && createCliente.mutate({
+                cliente: {
+                    tipper: 'J',
+                    apepat,
+                    apemat,
+                    prinom,
+                    segnom,
+                    nombre,
+                    direccion,
+                    idubigeo: ubigeo.id,
+                    resedente: resident === 1 ? '1' : '0',
+                    idtipdoc: 1,
+                    numdoc: dni,
+                    email,
+                    nacionalidad: '',
+                    idestcivil: civilStatus,
+                    sexo: '',
+                    telfijo: fixedPhone,
+                    telcel: celphone,
+                    telofi: officePhone,
+                    idcargoprofe: 0,
+                    idprofesion: 0,
+                    detaprofesion: '',
+                    cumpclie: birthdate,
+                    razonsocial: razonSocial,
+                    domfiscal: domFiscal,
+                    idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
+                    numpartida: numeroPartida,
+                    telempresa: teleEmpresa,
+                    actmunicipal: ciiu,
+                    contacempresa: contacEmpresa,
+                    fechaconstitu: fechaConstitucion,
+                }
+            }, {
+                onSuccess: (data) => {
+                    console.log('Cliente creado:', data)
+                    setType('success')
+                    setMessage('Cliente creado exitosamente')
+                    setShow(true)
+                    setShowClienteForm(false)
+                    setShowContratanteForm(true)
+                    setCliente1(data)
+    
+                },
+                onError: (error) => {
+                    console.error('Error al crear cliente:', error)
+                    setType('error')
+                    setMessage('Error al crear cliente')
+                    setShow(true)
+                }
+            })
+    
+            updateCliente && updateCliente.mutate({
+                cliente: {
+                    tipper: 'N',
+                    apepat,
+                    apemat,
+                    prinom,
+                    segnom,
+                    nombre,
+                    direccion,
+                    idubigeo: ubigeo.id,
+                    resedente: resident === 1 ? '1' : '0',
+                    idtipdoc: 1,
+                    numdoc: dni,
+                    email,
+                    nacionalidad: '',
+                    idestcivil: civilStatus,
+                    sexo: gender === 1 ? 'M' : 'F',
+                    telfijo: fixedPhone,
+                    telcel: celphone,
+                    telofi: officePhone,
+                    idcargoprofe: 0,
+                    idprofesion: 0,
+                    detaprofesion: '',
+                    cumpclie: birthdate,
+                    razonsocial: razonSocial,
+                    domfiscal: domFiscal,
+                    idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
+                    numpartida: numeroPartida,
+                    telempresa: teleEmpresa,
+                    actmunicipal: ciiu,
+                    contacempresa: contacEmpresa,
+                    fechaconstitu: fechaConstitucion,
+                }
+            }, {
+                onSuccess: (data) => {
+                    console.log('Cliente actualizado:', data)
+                    setType('success')
+                    setMessage('Cliente actualizado exitosamente')
+                    setShow(true)
+                    setShowClienteForm(false)
+                    setShowContratanteForm(true)
+                    setCliente1(data)
+    
+                },
+                onError: (error) => {
+                    console.error('Error al actualizar cliente:', error)
+                    setType('error')
+                    setMessage('Error al actualizar cliente')
+                    setShow(true)
+                }   
+            })
+        }
 
     }
 
@@ -687,10 +839,8 @@ const ClientesForm = ({
         <div className="flex justify-center items-center gap-6 mb-6">
             <SimpleSelectorStr 
                 label="Sede Registral"
-                setter={(value: string) => {
-                    const selected = SEDES_REGISTRALES.find(sede => sede.idsedereg === value);
-                    setSelectedSedeRegistral(selected ? { id: selected.idsedereg, label: selected.dessede } : null);
-                }}
+                defaultValue={selectedSedeRegistral ? selectedSedeRegistral.id : '0'}
+                setter={(value: string) => setSelectedSedeRegistral(value ? { id: value, label: '' } : null)}
                 options={[{ value: '0', label: 'Seleccionar Sede Registral' }, ...SEDES_REGISTRALES.map(sede => ({ value: sede.idsedereg, label: sede.dessede }))]}
                 horizontal={true}
             />
@@ -704,8 +854,8 @@ const ClientesForm = ({
         <div className="flex justify-center items-center gap-6 mb-6">
             <SimpleInput 
                 label="Teléfono"
-                value={numeroPartida}
-                setValue={setNumeroPartida}
+                value={teleEmpresa}
+                setValue={setTeleEmpresa}
                 horizontal={true}
             />
             <SimpleSelectorStr 
@@ -713,6 +863,8 @@ const ClientesForm = ({
                 setter={setCiiu}
                 options={[{ value: '0', label: 'Seleccionar CIIU' }, ...GIRO_NEGOCIO.map(giro => ({ value: giro.coddivi, label: giro.nombre }))]}
                 horizontal={true}
+                defaultValue={ciiu}
+                required
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
