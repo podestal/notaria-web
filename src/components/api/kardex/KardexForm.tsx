@@ -31,6 +31,7 @@ import ParticipaMain from "../uif_pdt_participa/ParticipaMain"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetTemplatesByActos from "../../../hooks/api/templates/useGetTemplatesByActos"
 import DigitacionMain from "../digitacion/DigitacionMain"
+import EscrituracionMain from "../escrituracion/EscrituracionMain"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -398,7 +399,7 @@ const KardexForm = ({
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
                 { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardex} /> },
-                { id: 'escrituración', label: 'Escrituración', content: <p>notes</p> },
+                { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardex} /> },
                 { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
                 { id: 'uifp', label: 'UIF/PDT Participa', content: <ParticipaMain kardex={kardex}/> },
             ]}
