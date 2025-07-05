@@ -100,46 +100,62 @@ const ContratantesForm = ({
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (selectedRepresentation !== "0" && !representanteCreated) {
-            setType('error')
-            setMessage('Debe crear un representante.')
-            setShow(true)
-            return
-        }
+        if (selectedTipoPersona === 1) {
+            if (selectedRepresentation !== "0" && !representanteCreated) {
+                setType('error')
+                setMessage('Debe crear un representante.')
+                setShow(true)
+                return
+            }
+    
+            if (selectedActos.length === 0) {
+                setType('error')
+                setMessage('Debe seleccionar al menos una condición para el contratante.')
+                setShow(true)
+                return
+            }
+    
+            if (!apePaterno) {
+                setType('error')
+                setMessage('El apellido paterno es obligatorio.')
+                setShow(true)
+                return
+            }
+    
+            if (!prinom) {
+                setType('error')
+                setMessage('El primer nombre es obligatorio.')
+                setShow(true)
+                return
+            }
+    
+            if (!apeMaterno) {
+                setType('error')
+                setMessage('El apellido materno es obligatorio.')
+                setShow(true)
+                return
+            }
+    
+            if (!address) {
+                setType('error')
+                setMessage('La dirección es obligatoria.')
+                setShow(true)
+                return
+            }
+        } else if (selectedTipoPersona === 2) {
+            if(!razonSocial) {
+                setType('error')
+                setMessage('La razón social es obligatoria.')
+                setShow(true)
+                return
+            }
 
-        if (selectedActos.length === 0) {
-            setType('error')
-            setMessage('Debe seleccionar al menos una condición para el contratante.')
-            setShow(true)
-            return
-        }
-
-        if (!apePaterno) {
-            setType('error')
-            setMessage('El apellido paterno es obligatorio.')
-            setShow(true)
-            return
-        }
-
-        if (!prinom) {
-            setType('error')
-            setMessage('El primer nombre es obligatorio.')
-            setShow(true)
-            return
-        }
-
-        if (!apeMaterno) {
-            setType('error')
-            setMessage('El apellido materno es obligatorio.')
-            setShow(true)
-            return
-        }
-
-        if (!address) {
-            setType('error')
-            setMessage('La dirección es obligatoria.')
-            setShow(true)
-            return
+            if (!domFiscal) {
+                setType('error')
+                setMessage('La dirección fiscal es obligatoria.')
+                setShow(true)
+                return
+            }
         }
 
         setIsLoading(true)
