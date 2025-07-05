@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import Selector from "../../ui/Selector"
 import axios from "axios"
@@ -46,6 +46,12 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
     const [cliente1, setCliente1] = useState<Cliente | null>(null)
     const [loading, setLoading] = useState(false)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
+
+    useEffect(() => {
+        if (selectedTipoPersona === 2 && selectedTipoDocumento === 2) {
+            setShowClienteForm(true)
+        }
+    }, [selectedTipoPersona, selectedTipoDocumento])
 
 
     const handleLookup = (e: React.FormEvent) => {
@@ -204,7 +210,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 </div>
                 {selectedTipoDocumento > 0 && 
                 <button 
-                    disabled={document.length === 0 || loading}
+                    disabled={loading}
                     className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${loading && 'animate-pulse'} ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 
                     type="submit">
                     {loading ? '...' : 'Buscar'}
