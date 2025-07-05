@@ -37,14 +37,12 @@ const CreateDocumento = ({ kardex }: Props) => {
     //   };
 
   const handleOpenWord = async () => {
+
     try {
-      // const templateId = 3;
-      // console.log('kardex.fktemplate:', kardex.fktemplate);
-      // console.log('kardex.kardex:', kardex.kardex);
       
       // Step 1: Call Django to get the populated .docx file as a Blob
       const response = await axios.get(
-        `${import.meta.env.VITE_DOC_URL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}`,
+        `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}`,
         {
           responseType: 'blob', // IMPORTANT: to get binary data
         }

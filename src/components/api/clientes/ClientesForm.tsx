@@ -26,6 +26,7 @@ interface Props {
     ubigeos: Ubigeo []
     updateCliente?: UseMutationResult<Cliente, Error, UpdateClienteData>
     createCliente?: UseMutationResult<Cliente, Error, CreateClienteData>
+    selectedTipoPersona: number
 }
 
 const civilStatusOptions = [
@@ -54,10 +55,13 @@ const ClientesForm = ({
     cargos,
     ubigeos, 
     updateCliente,
-    createCliente
+    createCliente,
+    selectedTipoPersona
     }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
+
+    // NATURAL PERSON
 
     const [apepat, setApepat] = useState(cliente1 ? cliente1.apepat : '')
     const [apemat, setApemat] = useState( cliente1 ? cliente1.apemat : '')
@@ -139,6 +143,14 @@ const ClientesForm = ({
     const [birthdateError, setBirthdateError] = useState('')
     const [profesionError, setProfesionError] = useState('')
     const [cargoError, setCargoError] = useState('')
+
+    // JURIDICAL PERSON
+    const [razonSocial, setRazonSocial] = useState(cliente1 ? cliente1.razonsocial : '')
+    const [domFiscal, setDomFiscal] = useState(cliente1 ? cliente1.domfiscal : '')
+    const [fechaConstitucion, setFechaConstitucion] = useState(cliente1 ? cliente1.cumpclie || '' : '')
+    const [numeroDeRegistro, setNumeroDeRegistro] = useState(cliente1 ? cliente1.numdoc : '')
+    const [objetoSocial, setObjetaSocial] = useState(cliente1 ? cliente1.detaprofesion || '' : '')
+    const [correoDeEmpresa, setCorreoDeEmpresa] = useState(cliente1 ? cliente1.email || '' : '')
     
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -293,6 +305,8 @@ const ClientesForm = ({
                 idprofesion: parseInt(profesion.id),
                 detaprofesion: profesion.label,
                 cumpclie: birthdate,
+                razonsocial: razonSocial,
+                domfiscal: domFiscal,
             }
         }, {
             onSuccess: (data) => {
@@ -337,6 +351,8 @@ const ClientesForm = ({
                 idprofesion: parseInt(profesion.id),
                 detaprofesion: profesion.label,
                 cumpclie: birthdate,
+                razonsocial: razonSocial,
+                domfiscal: domFiscal,
             }
         }, {
             onSuccess: (data) => {
@@ -380,7 +396,10 @@ const ClientesForm = ({
         }).catch(error => {
             console.error('Error al consultar RENIEC:', error)
         });
-            
+    }
+
+    const handleSunat = () => {
+        console.log('Consulta SUNAT');
         
     }
 
@@ -388,6 +407,8 @@ const ClientesForm = ({
     <form
         onSubmit={handleSubmit}
     >
+        {selectedTipoPersona === 1 && 
+        <>
         <div className="grid grid-cols-3 items-center gap-6 mb-10">
             <div></div>
             <h2 className="text-xl font-bold text-center text-black">Nuevo Cliente</h2>
@@ -417,7 +438,6 @@ const ClientesForm = ({
                 setError={setApematError}
             />
         </div>
-        <>{console.log('ubigeos', ubigeos)}</>
         <div className="flex justify-center items-center gap-6 mb-6">
             <SimpleInput 
                 label="Primer Nombre"
@@ -587,6 +607,85 @@ const ClientesForm = ({
                 {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
             </button>
         </div>
+        </>}
+        {selectedTipoPersona === 2 &&
+        <>
+        <div className="grid grid-cols-3 items-center gap-6 mb-10">
+            <div></div>
+            <h2 className="text-xl font-bold text-center text-black">Nuevo Cliente</h2>
+            <button
+                type="button"
+                onClick={handleSunat}
+                className="bg-gray-50 text-black px-2 py-1 w-[60%] text-sm h-full transition duration-300 border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex justify-center items-center gap-1"
+            >Consulta Sunat</button>
+        </div>
+        <div className="flex justify-center items-center gap-6 mb-4">
+            <SimpleInput 
+                label="Razón Social"
+                value={razonSocial}
+                setValue={setRazonSocial}
+                horizontal={true}
+                required
+                fullWidth
+            />
+        </div>
+        <div className="flex justify-center items-center gap-6 mb-4">
+            <SimpleInput 
+                label="Domicilio Fiscal"
+                value={domFiscal}
+                setValue={setDomFiscal}
+                horizontal={true}
+                required
+                fullWidth
+            />
+        </div>
+        <div className="w-full flex justify-center items-center gap-4 col-span-2">
+            <p className="pl-2 block text-xs font-semibold text-slate-700">Ubigeo</p>
+            <SearchableDropdownInput
+                options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
+                selected={ubigeo}
+                setSelected={setUbigeo}
+                placeholder="Buscar Ubigeo"
+                required
+                error={ubigeoError}
+                setError={setUbigeoError}
+            />
+        </div>
+        <div className="flex justify-center items-center gap-6 mb-6">
+            <DateInput 
+                label="Fecha de constitución"
+                value={fechaConstitucion}
+                setValue={setFechaConstitucion}
+                horizontal
+            />
+            <SimpleInput 
+                label="Número de Registro"
+                value={numeroDeRegistro}
+                setValue={setNumeroDeRegistro}
+                horizontal={true}
+            />
+        </div>
+        <div className="flex justify-center items-center gap-6 mb-4">
+            <SimpleInput 
+                label="Objeto Social"
+                value={objetoSocial}
+                setValue={setObjetaSocial}
+                horizontal={true}
+                required
+                fullWidth
+            />
+        </div>
+        <div className="flex justify-center items-center gap-6 mb-4">
+            <SimpleInput 
+                label="Correo de la Empresa"
+                value={correoDeEmpresa}
+                setValue={setCorreoDeEmpresa}
+                horizontal={true}
+                fullWidth
+            />
+        </div>
+        </>
+        }
     </form>
   )
 }

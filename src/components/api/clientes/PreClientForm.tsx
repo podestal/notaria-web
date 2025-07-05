@@ -237,6 +237,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 setCliente1={setCliente1}
                 dni={document}
                 cliente1={cliente1}
+                // selectedTipoPersona={selectedTipoPersona}
             />
             : 
             <CreateCliente 
@@ -245,6 +246,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 setCliente1={setCliente1}
                 dni={document}
                 cliente1={null}
+                selectedTipoPersona={selectedTipoPersona}
             />}
         </div>
     }

@@ -12,6 +12,7 @@ interface Props {
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
     setCliente1: React.Dispatch<React.SetStateAction<Cliente | null>>
     cliente1: Cliente | null
+    selectedTipoPersona: number
 }
 
 const CreateCliente = ({ 
@@ -19,6 +20,7 @@ const CreateCliente = ({
     setShowContratanteForm, 
     setShowClienteForm, 
     setCliente1, 
+    selectedTipoPersona
  }: Props) => {
 
     const createCliente = useCreateCliente()
@@ -46,6 +48,7 @@ const CreateCliente = ({
         ubigeos={ubigeos}
         cliente1={null} // Since this is for creating a new client, we pass null
         createCliente={createCliente} // Pass the createCliente mutation
+        selectedTipoPersona={selectedTipoPersona} // Assuming 1 is for natural person, adjust as needed
     />
   )
 }
