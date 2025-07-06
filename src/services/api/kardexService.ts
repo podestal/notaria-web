@@ -20,6 +20,8 @@ export interface Kardex {
     fktemplate: number;
     papelini: string;
     papelfin: string;
+    responsable: number;
+    referencia: string;
 }
 
 export interface KardexPage {
@@ -41,9 +43,7 @@ export type CreateUpdateKardex = Omit<Kardex,
     kardex: string;
     idtipkar: number;
     fechaingreso: string;
-    referencia?: string;
     idusuario: number;
-    responsable: number;
     retenido: number
     desistido: number;
     autorizado: number;

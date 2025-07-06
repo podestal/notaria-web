@@ -2,13 +2,21 @@ import { useState } from "react"
 import { Kardex } from "../../../services/api/kardexService"
 import DateInput from "../../ui/DateInput"
 import SimpleInput from "../../ui/SimpleInput"
+import { UseMutationResult } from "@tanstack/react-query"
+import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
+import useAuthStore from "../../../store/useAuthStore"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 interface Props {
     kardex: Kardex
+    updateKardex: UseMutationResult<Kardex, Error, UpdateKardexData>
 }
 
 
-const EscrituracionForm = ({ kardex }: Props) => {
+const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [numActa, setNumActa] = useState(kardex.numescritura || '')
     const [follioIni, setFolioIni] = useState(kardex.folioini || '')
@@ -17,8 +25,69 @@ const EscrituracionForm = ({ kardex }: Props) => {
     const [serieNotarialFin, setSerieNotarialFin] = useState(kardex.papelfin || '')
     const [fechaActa, setFechaActa] = useState(kardex.fechaescritura || '')
 
+    // ERRORS
+    const [errorNumActa, setErrorNumActa] = useState('')
+    const [errorFechaActa, setErrorFechaActa] = useState('')
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+
+        if (!numActa) {
+            setErrorNumActa('El número de acta es requerido')
+            return
+        }
+
+        if (!fechaActa) {
+            setErrorFechaActa('La fecha de acta es requerida')
+            return
+        }
+
+        updateKardex.mutate({
+            kardex: {
+                // idkardex: kardex?.idkardex || 0,
+                kardex: kardex.kardex,
+                idtipkar: kardex.idtipkar,
+                fechaingreso:kardex.fechaingreso,
+                referencia: kardex.referencia,
+                codactos: kardex.codactos,
+                idusuario: kardex.idusuario,
+                responsable: kardex.responsable,
+                retenido: 0,
+                desistido: 0,
+                autorizado: 0,
+                idrecogio: 0,
+                pagado: 0,
+                visita: 0,
+                idnotario: 1,
+                contrato: kardex.contrato, 
+                numescritura: numActa,
+                fktemplate: kardex.fktemplate,
+                papelini: serieNotarialIni,
+                papelfin: serieNotarialFin,
+                folioini: follioIni,
+                foliofin: folioFin,
+                fechaescritura: fechaActa,
+            },
+            access
+        }, {
+            onSuccess: (res) => {
+                console.log('Escrituración actualizada:', res);
+                setMessage('Escrituración actualizada correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: (err) => {
+                setMessage(err.message)
+                setShow(true)
+                setType('error')
+            }
+        })
+    }
+
   return (
-    <form className="flex flex-col justify-center items-center gap-6 w-full my-6">
+    <form 
+        onSubmit={handleSubmit}
+        className="flex flex-col justify-center items-center gap-6 w-full my-6">
             <div className=" w-[80%]">
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
@@ -27,13 +96,9 @@ const EscrituracionForm = ({ kardex }: Props) => {
                         horizontal
                         label="N° de Acta"
                         required
+                        error={errorNumActa}
+                        setError={setErrorNumActa}
                     />
-                    {/* <SimpleInput 
-                        setValue={() => {}}
-                        value=""
-                        horizontal
-                        label="Al"
-                    /> */}
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
@@ -99,6 +164,8 @@ const EscrituracionForm = ({ kardex }: Props) => {
                         horizontal
                         label="Fecha de Acta"
                         required
+                        error={errorFechaActa}
+                        setError={setErrorFechaActa}
                     />
                     <div className="flex items-center justify-start">
                     <button
