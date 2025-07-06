@@ -1,5 +1,6 @@
 import { useState } from "react";
 import TopModal from "../../ui/TopModal";
+import DetalleMediosDePagoForm from "./DetalleMediosDePagoForm";
 
 const CreateDetalleMediosDePago = () => {
 
@@ -19,7 +20,7 @@ const CreateDetalleMediosDePago = () => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <p>Registrar</p>
+        <DetalleMediosDePagoForm />
     </TopModal>
     </>
   )
