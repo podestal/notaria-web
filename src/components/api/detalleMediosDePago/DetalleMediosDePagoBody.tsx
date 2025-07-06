@@ -1,19 +1,34 @@
-import RemoveDetalleMediosDePago from "./RemoveDetalleMediosDePago"
-import UpdateDetalleMediosDePago from "./UpdateDetalleMediosDePago"
+import useGetDetalleMedioDePagoByPatrimonial from "../../../hooks/api/detalleMedioDePago/useGetDetalleMedioDePagoByPatrimonial"
+import useAuthStore from "../../../store/useAuthStore"
+import DetalleMediosDePagoCard from "./DetalleMediosDePagoCard"
 
-const DetalleMediosDePagoBody = () => {
+interface Props {
+    itemmp: string
+}
+
+
+const DetalleMediosDePagoBody = ({ itemmp }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
+    const { data: detalleMediosDePago, isLoading, isError, error, isSuccess } = useGetDetalleMedioDePagoByPatrimonial({ access, itemmp })
+
+    if (isLoading) return <p className="text-center text-xs animate-pulse">Cargando...</p>
+
+    if (isError) return <p className="text-center text-xs text-red-500">{error.message}</p>
+
+    if (isSuccess && detalleMediosDePago.length === 0)  return <p className="text-center text-xs">No hay medios de pago registrados</p>
+
+    if (isSuccess && detalleMediosDePago.length > 0) 
+
   return (
-    <div className='grid grid-cols-8 gap-4 text-black text-xs p-2'>
-        <p>ACT412-2025</p>
-        <p className='col-span-2'>Depósito en cuenta</p>
-        <p className='col-span-2'>BBVA Banco Continental</p>
-        <p>50000.00</p>
-        <p>29/03/1991</p>
-        <div className="flex items-center justify-start gap-6">
-        <UpdateDetalleMediosDePago />
-        <RemoveDetalleMediosDePago />
-        </div>
-    </div>
+    <>
+        {detalleMediosDePago.map(detalleMedioDePago => (
+            <DetalleMediosDePagoCard 
+                key={detalleMedioDePago.detmp}
+                detalleMedioDePago={detalleMedioDePago}
+            />
+        ))}
+    </>
   )
 }
 

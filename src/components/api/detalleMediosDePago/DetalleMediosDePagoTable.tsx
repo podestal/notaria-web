@@ -1,11 +1,17 @@
 import DetalleMediosDePagoBody from "./DetalleMediosDePagoBody"
 import DetalleMediosDePagoHeader from "./DetalleMediosDePagoHeader"
 
-const DetalleMediosDePagoTable = () => {
+interface Props {
+    itemmp: string
+}
+
+const DetalleMediosDePagoTable = ({ itemmp }: Props) => {
   return (
     <div className="my-6">
         <DetalleMediosDePagoHeader />
-        <DetalleMediosDePagoBody />
+        <DetalleMediosDePagoBody 
+            itemmp={itemmp}
+        />
     </div>
   )
 }

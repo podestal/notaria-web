@@ -282,7 +282,9 @@ const PatrimonialForm = ({
         />
 
     </TopModal>
-    <DetalleMediosDePagoTable />
+    {patrimonial && <DetalleMediosDePagoTable 
+        itemmp={patrimonial.itemmp}
+    />}
     </>
   )
 }
