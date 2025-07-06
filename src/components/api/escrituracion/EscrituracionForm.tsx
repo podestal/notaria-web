@@ -1,14 +1,29 @@
+import { useState } from "react"
+import { Kardex } from "../../../services/api/kardexService"
 import DateInput from "../../ui/DateInput"
 import SimpleInput from "../../ui/SimpleInput"
 
-const EscrituracionForm = () => {
+interface Props {
+    kardex: Kardex
+}
+
+
+const EscrituracionForm = ({ kardex }: Props) => {
+
+    const [numActa, setNumActa] = useState(kardex.numescritura || '')
+    const [follioIni, setFolioIni] = useState(kardex.folioini || '')
+    const [folioFin, setFolioFin] = useState(kardex.foliofin || '')
+    const [serieNotarialIni, setSerieNotarialIni] = useState(kardex.papelini || '')
+    const [serieNotarialFin, setSerieNotarialFin] = useState(kardex.papelfin || '')
+    const [fechaActa, setFechaActa] = useState(kardex.fechaescritura || '')
+
   return (
     <form className="flex flex-col justify-center items-center gap-6 w-full my-6">
             <div className=" w-[80%]">
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setNumActa}
+                        value={numActa}
                         horizontal
                         label="N° de Acta"
                         required
@@ -22,28 +37,29 @@ const EscrituracionForm = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setFolioIni}
+                        value={follioIni}
                         horizontal
                         label="N° de Folio del"
                     />
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setFolioFin}
+                        value={folioFin}
                         horizontal
                         label="Al"
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setSerieNotarialIni}
+                        value={serieNotarialIni}
                         horizontal
                         label="Serie Notarial del"
                     />
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+
+                        setValue={setSerieNotarialFin}
+                        value={serieNotarialFin}
                         horizontal
                         label="Al"
                     />
@@ -78,8 +94,8 @@ const EscrituracionForm = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <DateInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setFechaActa}
+                        value={fechaActa}
                         horizontal
                         label="Fecha de Acta"
                         required

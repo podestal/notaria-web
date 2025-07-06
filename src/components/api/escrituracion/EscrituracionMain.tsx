@@ -11,7 +11,9 @@ const EscrituracionMain = ({ kardex }: Props) => {
     
   return (
     <>
-        <CreateEscrituracion />
+        <CreateEscrituracion 
+          kardex={kardex}
+        />
     </>
   )
 }

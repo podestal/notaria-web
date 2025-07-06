@@ -18,6 +18,8 @@ export interface Kardex {
     cliente: string;
     codactos: string;
     fktemplate: number;
+    papelini: string;
+    papelfin: string;
 }
 
 export interface KardexPage {

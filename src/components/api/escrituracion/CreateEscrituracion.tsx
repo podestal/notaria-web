@@ -1,10 +1,16 @@
+import { Kardex } from "../../../services/api/kardexService"
 import EscrituracionForm from "./EscrituracionForm"
 
+interface Props {
+    kardex: Kardex
+}
 
-const CreateEscrituracion = () => {
+const CreateEscrituracion = ({ kardex }: Props) => {
   return (
     <>
-    <EscrituracionForm />
+    <EscrituracionForm 
+      kardex={kardex} 
+    />
     </>
   )
 }
