@@ -6,6 +6,7 @@ import { UseMutationResult } from "@tanstack/react-query"
 import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import moment from "moment"
 
 interface Props {
     kardex: Kardex
@@ -82,6 +83,11 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 setType('error')
             }
         })
+    }
+
+    const generateDate = () => {
+        const currentDate = moment().format('DD/MM/YYYY');
+        setFechaActa(currentDate);
     }
 
   return (
@@ -171,7 +177,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     <button
                         className="gap-1 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors cursor-pointer flex flex-col my-4 justify-center items-center"
                         type="button"
-                        // onClick={() => setOpen(true)}
+                        onClick={generateDate}
                     >
                         {/* <Newspaper /> */}
                         <p className="text-xs">Generar</p>
