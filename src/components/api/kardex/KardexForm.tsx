@@ -10,7 +10,7 @@ import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
 import useGetAbogados from "../../../hooks/api/abogados/useGetAbogados"
 import { CreateKardexData } from "../../../hooks/api/kardex/useCreateKardex"
-import { Kardex, KardexPage } from "../../../services/api/kardexService"
+import { Kardex } from "../../../services/api/kardexService"
 import { UseMutationResult } from "@tanstack/react-query"
 import moment from "moment"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
@@ -37,7 +37,7 @@ interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
     kardex?: Kardex | null
     setKardex?: React.Dispatch<React.SetStateAction<Kardex | null>>
-    createKardex?: UseMutationResult<KardexPage, Error, CreateKardexData>
+    createKardex: UseMutationResult<Kardex, Error, CreateKardexData>
     updateKardex?: UseMutationResult<Kardex, Error, UpdateKardexData>
 }
 
@@ -107,7 +107,12 @@ const KardexForm = ({
                 idnotario: 1,
                 contrato: `${formattedContratoDes} / `, 
                 numescritura: '', 
-                fktemplate: selectedTemplate
+                fktemplate: selectedTemplate,
+                papelini: '',
+                papelfin: '',
+                folioini: '',
+                foliofin: '',
+                fechaescritura: '',
             }
         }, {
             onSuccess: (res) => {
@@ -149,7 +154,12 @@ const KardexForm = ({
                     idnotario: 1,
                     contrato: `${formattedContratoDes} / `, 
                     numescritura: '',
-                    fktemplate: selectedTemplate
+                    fktemplate: selectedTemplate,
+                    papelini: kardex.papelini,
+                    papelfin: kardex.papelfin,
+                    folioini: kardex.folioini,
+                    foliofin: kardex.foliofin,
+                    fechaescritura: kardex.fechaescritura,
                 },
                 access: 'access_token'
             }, {

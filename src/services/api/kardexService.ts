@@ -32,11 +32,8 @@ export interface KardexPage {
 export type CreateUpdateKardex = Omit<Kardex, 
     'idkardex' | 
     'usuario' | 
-    'fechaescritura' | 
     'cliente' | 
     'numminuta' | 
-    'folioini' |
-    'foliofin' |
     'numinstrmento' |
     'txa_minuta' |
     'cliente'> & {
