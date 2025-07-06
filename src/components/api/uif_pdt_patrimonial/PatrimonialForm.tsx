@@ -16,6 +16,8 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore";
 import { UpdatePatrimonialData } from "../../../hooks/api/patrimonial/useUpdatePatrimonial";
 import TopModal from "../../ui/TopModal";
 import ExplanationMessage from "../../ui/ExplanationMessage";
+import CreateDetalleMediosDePago from "../detalleMediosDePago/CreateDetalleMediosDePago";
+import DetalleMediosDePagoTable from "../detalleMediosDePago/DetalleMediosDePagoTable";
 
 interface Props {
     createPatrimonial?: UseMutationResult<Patrimonial, Error, CreatePatrimonialData>
@@ -259,10 +261,13 @@ const PatrimonialForm = ({
                 horizontal
             />
         </div>
-        <div className="w-full flex justify-center items-center my-4">
+        <div className="w-full grid grid-cols-3 my-4">
+            <CreateDetalleMediosDePago />
+            <div className="flex justify-center items-center">
             <button className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer" type="submit">
                 Grabar
             </button>
+            </div>
         </div>
     </form>
     <TopModal
@@ -277,6 +282,7 @@ const PatrimonialForm = ({
         />
 
     </TopModal>
+    <DetalleMediosDePagoTable />
     </>
   )
 }
