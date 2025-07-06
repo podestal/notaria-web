@@ -262,7 +262,11 @@ const PatrimonialForm = ({
             />
         </div>
         <div className="w-full grid grid-cols-3 my-4">
-            <CreateDetalleMediosDePago />
+            {patrimonial && 
+            <CreateDetalleMediosDePago 
+                itemmp={patrimonial.itemmp}
+                patrimonial={patrimonial}
+            />}
             <div className="flex justify-center items-center">
             <button className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer" type="submit">
                 Grabar
@@ -282,7 +286,8 @@ const PatrimonialForm = ({
         />
 
     </TopModal>
-    {patrimonial && <DetalleMediosDePagoTable 
+    {patrimonial && 
+    <DetalleMediosDePagoTable 
         itemmp={patrimonial.itemmp}
     />}
     </>

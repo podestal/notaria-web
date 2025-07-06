@@ -1,10 +1,17 @@
 import { useState } from "react";
 import TopModal from "../../ui/TopModal";
 import DetalleMediosDePagoForm from "./DetalleMediosDePagoForm";
+import useCreateDetalleMedioDePago from "../../../hooks/api/detalleMedioDePago/useCreateDetalleMedioDePago";
+import { Patrimonial } from "../../../services/api/patrimonialService";
 
-const CreateDetalleMediosDePago = () => {
+interface Props {
+    patrimonial: Patrimonial
+}
+
+const CreateDetalleMediosDePago = ({ patrimonial }: Props) => {
 
     const [open, setOpen] = useState(false);
+    const createDetalleMedioDePago = useCreateDetalleMedioDePago({ itemmp: patrimonial.itemmp });
 
   return (
     <>
@@ -20,7 +27,10 @@ const CreateDetalleMediosDePago = () => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <DetalleMediosDePagoForm />
+        <DetalleMediosDePagoForm 
+            createDetalleMedioDePago={createDetalleMedioDePago} 
+            patrimonial={patrimonial}
+        />
     </TopModal>
     </>
   )
