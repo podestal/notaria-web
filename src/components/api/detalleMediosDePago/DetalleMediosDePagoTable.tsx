@@ -1,16 +1,17 @@
+import { Patrimonial } from "../../../services/api/patrimonialService"
 import DetalleMediosDePagoBody from "./DetalleMediosDePagoBody"
 import DetalleMediosDePagoHeader from "./DetalleMediosDePagoHeader"
 
 interface Props {
-    itemmp: string
+    patrimonial: Patrimonial
 }
 
-const DetalleMediosDePagoTable = ({ itemmp }: Props) => {
+const DetalleMediosDePagoTable = ({ patrimonial }: Props) => {
   return (
     <div className="my-6">
         <DetalleMediosDePagoHeader />
         <DetalleMediosDePagoBody 
-            itemmp={itemmp}
+            patrimonial={patrimonial}
         />
     </div>
   )

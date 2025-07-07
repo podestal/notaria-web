@@ -11,7 +11,7 @@ export interface DetalleMedioDePago {
     importemp: string;
     idmon: string;
     foperacion: string;
-    documentos?: string;
+    documentos: string;
 }
 
 export type CreateUpdateDetalleMedioDePago = Omit<DetalleMedioDePago, 'detmp'>

@@ -10,23 +10,26 @@ import { Patrimonial } from "../../../services/api/patrimonialService"
 import { useState } from "react"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { TriangleAlert } from "lucide-react"
+import { UpdateDetalleMedioDePagoData } from "../../../hooks/api/detalleMedioDePago/useUpdateDetalleMedioDePago"
 
 interface Props {
     patrimonial: Patrimonial
-    createDetalleMedioDePago: UseMutationResult<DetalleMedioDePago, Error, CreateDetalleMedioDePagoData>
+    detalleMedioDePago?: DetalleMedioDePago
+    createDetalleMedioDePago?: UseMutationResult<DetalleMedioDePago, Error, CreateDetalleMedioDePagoData>
+    updateDetalleMedioDePago?: UseMutationResult<DetalleMedioDePago, Error, UpdateDetalleMedioDePagoData>
 }
 
-const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago }: Props) => {
+const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, updateDetalleMedioDePago, detalleMedioDePago }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
 
-    const [medioPago, setMedioPago] = useState(0)
-    const [importe, setImporte] = useState("")
-    const [banco, setBanco] = useState(0)
-    const [moneda, setMoneda] = useState(0)
-    const [documentos, setDocumentos] = useState("")
-    const [fechaOperacion, setFechaOperacion] = useState("")
+    const [medioPago, setMedioPago] = useState(detalleMedioDePago ? detalleMedioDePago.codmepag : 0)
+    const [importe, setImporte] = useState( detalleMedioDePago ? detalleMedioDePago.importemp.toString() : "")
+    const [banco, setBanco] = useState(detalleMedioDePago ? detalleMedioDePago.idbancos : 0)
+    const [moneda, setMoneda] = useState(detalleMedioDePago ? parseInt(detalleMedioDePago.idmon) : 0)
+    const [documentos, setDocumentos] = useState( detalleMedioDePago ? detalleMedioDePago.documentos : "")
+    const [fechaOperacion, setFechaOperacion] = useState( detalleMedioDePago ? detalleMedioDePago.foperacion : "")
     const notExceedImport = patrimonial.importetrans - patrimonial.medios_pago_sum
 
     // ERRORS
@@ -44,7 +47,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago }: Prop
             return
         }
 
-        createDetalleMedioDePago.mutate({
+        createDetalleMedioDePago && createDetalleMedioDePago.mutate({
             access,// Replace with actual access token
             detalleMedioDePago: {
                 itemmp: patrimonial.itemmp, // Replace with actual itemmp
@@ -56,7 +59,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago }: Prop
                 importemp: importe, // Replace with actual importemp
                 idmon: moneda.toString(), // Replace with actual idmon
                 foperacion: fechaOperacion, // Replace with actual foperacion
-                documentos: documentos // Replace with actual documentos
+                documentos // Replace with actual documentos
             }
         }, {
             onSuccess: (data) => {
@@ -77,6 +80,35 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago }: Prop
                 setShow(true)
                 setType("error")
                 console.error("Error creating Detalle Medio de Pago:", error);
+            }
+        })
+
+        updateDetalleMedioDePago && updateDetalleMedioDePago.mutate({
+            access, // Replace with actual access token
+            detalleMedioDePago: {
+                itemmp: patrimonial.itemmp, // Replace with actual itemmp
+                kardex: patrimonial.kardex, // Replace with actual kardex
+                tipacto: patrimonial.idtipoacto, // Replace with actual tipacto
+                codmepag: medioPago, // Replace with actual codmepag
+                fpago: patrimonial.fpago, // Replace with actual fpago
+                idbancos: banco, // Replace with actual idbancos
+                importemp: importe, // Replace with actual importemp
+                idmon: moneda.toString(), // Replace with actual idmon
+                foperacion: fechaOperacion, // Replace with actual foperacion
+                documentos // Replace with actual documentos
+            },
+        }, {
+            onSuccess: (data) => {
+                setMessage("Medio de pago actualizado exitosamente")
+                setShow(true)
+                setType("success")
+                console.log("Detalle Medio de Pago updated successfully:", data);
+            },
+            onError: (error) => {
+                setMessage("Error al actualizar medio de pago")
+                setShow(true)
+                setType("error")
+                console.error("Error updating Detalle Medio de Pago:", error);
             }
         })
     }

@@ -1,16 +1,17 @@
 import useGetDetalleMedioDePagoByPatrimonial from "../../../hooks/api/detalleMedioDePago/useGetDetalleMedioDePagoByPatrimonial"
+import { Patrimonial } from "../../../services/api/patrimonialService"
 import useAuthStore from "../../../store/useAuthStore"
 import DetalleMediosDePagoCard from "./DetalleMediosDePagoCard"
 
 interface Props {
-    itemmp: string
+    patrimonial: Patrimonial
 }
 
 
-const DetalleMediosDePagoBody = ({ itemmp }: Props) => {
+const DetalleMediosDePagoBody = ({ patrimonial }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
-    const { data: detalleMediosDePago, isLoading, isError, error, isSuccess } = useGetDetalleMedioDePagoByPatrimonial({ access, itemmp })
+    const { data: detalleMediosDePago, isLoading, isError, error, isSuccess } = useGetDetalleMedioDePagoByPatrimonial({ access, itemmp: patrimonial.itemmp })
 
     if (isLoading) return <p className="text-center text-xs animate-pulse">Cargando...</p>
 
@@ -26,6 +27,7 @@ const DetalleMediosDePagoBody = ({ itemmp }: Props) => {
             <DetalleMediosDePagoCard 
                 key={detalleMedioDePago.detmp}
                 detalleMedioDePago={detalleMedioDePago}
+                patrimonial={patrimonial}
             />
         ))}
     </>

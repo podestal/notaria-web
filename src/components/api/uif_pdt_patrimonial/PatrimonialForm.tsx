@@ -264,7 +264,6 @@ const PatrimonialForm = ({
         <div className="w-full grid grid-cols-3 my-4">
             {patrimonial && 
             <CreateDetalleMediosDePago 
-                itemmp={patrimonial.itemmp}
                 patrimonial={patrimonial}
             />}
             <div className="flex justify-center items-center">
@@ -288,7 +287,7 @@ const PatrimonialForm = ({
     </TopModal>
     {patrimonial && 
     <DetalleMediosDePagoTable 
-        itemmp={patrimonial.itemmp}
+        patrimonial={patrimonial}
     />}
     </>
   )

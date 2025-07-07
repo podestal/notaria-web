@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 
 
@@ -35,9 +35,6 @@ const SimpleSelector = ({
     error,
     setError,
 }: Props) => {
-
-
-    const [value, setValue] = useState<number>(defaultValue || 0);
 
     useEffect(() => {
         if (defaultValue !== undefined) {
