@@ -14,7 +14,7 @@ const RemoveDetalleMediosDePago = ({ detalleMedioDePago }: Props) => {
 
   const access = useAuthStore(s => s.access_token) || '';
   const { setMessage, setShow, setType } = useNotificationsStore()
-  const removeMedioDePago = useRemoveDetalleMedioDePago({ itemmp: detalleMedioDePago.itemmp, medioDePagoId: detalleMedioDePago.detmp });
+  const removeMedioDePago = useRemoveDetalleMedioDePago({ itemmp: detalleMedioDePago.itemmp, medioDePagoId: detalleMedioDePago.detmp, kardex: detalleMedioDePago.kardex });
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 

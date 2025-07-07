@@ -8,9 +8,10 @@ export interface RemoveDetalleMedioDePagoData {
 interface Props {
     itemmp: string;
     medioDePagoId: number; 
+    kardex: string
 }
 
-const useRemoveDetalleMedioDePago = ({ itemmp, medioDePagoId }: Props): UseMutationResult<DetalleMedioDePago, Error, RemoveDetalleMedioDePagoData> => {
+const useRemoveDetalleMedioDePago = ({ itemmp, medioDePagoId, kardex }: Props): UseMutationResult<DetalleMedioDePago, Error, RemoveDetalleMedioDePagoData> => {
     const detalleMedioDePagoService = getDetalleMedioDePagoService({ medioDePagoId });
     const queryClient = useQueryClient();
 
@@ -20,6 +21,9 @@ const useRemoveDetalleMedioDePago = ({ itemmp, medioDePagoId }: Props): UseMutat
             console.log("Detalle Medio de Pago removed successfully:", data);
             queryClient.invalidateQueries({
                 queryKey: ['detalle_medio_de_pago', 'by_patrimonial', itemmp]
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["patrimonial by kardex", kardex]
             });
         },
         onError: (error) => {

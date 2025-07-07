@@ -64,6 +64,13 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago }: Prop
                 setShow(true)
                 setType("success")
                 console.log("Detalle Medio de Pago created successfully:", data);
+                // Reset form fields
+                setMedioPago(0)
+                setImporte("")
+                setBanco(0)
+                setMoneda(0)
+                setDocumentos("")
+                setFechaOperacion("")
             },
             onError: (error) => {
                 setMessage("Error al crear medio de pago")

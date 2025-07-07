@@ -20,6 +20,9 @@ const useCreateDetalleMedioDePago = ({ itemmp }: Props): UseMutationResult<Detal
             console.log("Detalle Medio de Pago created successfully:", data);
             queryClient.invalidateQueries({
                 queryKey:['detalle_medio_de_pago', 'by_patrimonial', itemmp]
+            })
+            queryClient.invalidateQueries({
+                queryKey: ["patrimonial by kardex", data.kardex]
             });
         },
         onError: (error) => {

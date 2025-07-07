@@ -37,11 +37,11 @@ const SimpleSelector = ({
 }: Props) => {
 
 
-    const [value, setValue] = useState<number>(defaultValue ?? 0);
+    const [value, setValue] = useState<number>(defaultValue || 0);
 
     useEffect(() => {
-        if (defaultValue) {
-            setValue(defaultValue);
+        if (defaultValue !== undefined) {
+            setter(defaultValue);
         }
     }, [defaultValue]);
 
@@ -52,10 +52,10 @@ const SimpleSelector = ({
             <motion.select 
                 {...(error ? shakeAnimation : {})}
                 defaultValue={defaultValue ? defaultValue.toString() : '0'}
-                value={value ? value.toString() : '0'}
+                value={defaultValue !== undefined ? defaultValue.toString() : '0'}
                 onChange={(e) => {
                     setError?.('');
-                    setter(e.target.value ? parseInt(e.target.value) : 0);
+                    setter(parseInt(e.target.value));
                 }}
                 // className="flex-1 bg-white w-2xl col-span-2 text-slate-700 border border-slate-300 rounded-md py-2  px-2"
                 className={`flex-1 bg-white text-slate-700 border rounded-md py-2 px-2 w-full ${
