@@ -39,6 +39,8 @@ const PatrimonialForm = ({
     patrimonial,
     setIdTipoActo }: Props) => {
 
+    const [currentPatrimonial, setCurrentPatrimonial] = useState<Patrimonial | undefined>(patrimonial);
+
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [cannotUpdatePatrimonial, setCannotUpdatePatrimonial] = useState(false)
     const [cannotUpdatePatrimonialMessage, setCannotUpdatePatrimonialMessage] = useState('')
@@ -121,6 +123,7 @@ const PatrimonialForm = ({
                 setMessage('Patrimonial creado exitosamente');
                 setShow(true);
                 setType('success');
+                setCurrentPatrimonial(res)
                 
             },
             onError: err => {
@@ -157,6 +160,7 @@ const PatrimonialForm = ({
                     setMessage('Patrimonial actualizado exitosamente');
                     setShow(true);
                     setType('success');
+                    setCurrentPatrimonial(res);
                 },
                 onError: error => {
                     console.error('Error updating patrimonial:', error);
@@ -261,10 +265,11 @@ const PatrimonialForm = ({
                 horizontal
             />
         </div>
+        <>{console.log('currentPatrimonial', currentPatrimonial)}</>
         <div className="w-full grid grid-cols-3 my-4">
-            {patrimonial && 
+            {currentPatrimonial && 
             <CreateDetalleMediosDePago 
-                patrimonial={patrimonial}
+                patrimonial={currentPatrimonial}
             />}
             <div className="flex justify-center items-center">
             <button className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer" type="submit">
@@ -285,9 +290,9 @@ const PatrimonialForm = ({
         />
 
     </TopModal>
-    {patrimonial && 
+    {currentPatrimonial && 
     <DetalleMediosDePagoTable 
-        patrimonial={patrimonial}
+        patrimonial={currentPatrimonial}
     />}
     </>
   )
