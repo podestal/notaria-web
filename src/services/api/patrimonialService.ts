@@ -18,9 +18,10 @@ export interface Patrimonial {
     item: number
     des_idoppago?: string | null
     moneda: string
+    medios_pago_sum: number
 }
 
-export type PatrimonialCreateUpdate = Omit<Patrimonial, 'moneda'>;
+export type PatrimonialCreateUpdate = Omit<Patrimonial, 'moneda' | 'medios_pago_sum'>;
 
 interface Props {
     idPatrimonial?: string
