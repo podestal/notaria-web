@@ -49,7 +49,7 @@ const SimpleSelector = ({
             <motion.select 
                 {...(error ? shakeAnimation : {})}
                 defaultValue={defaultValue ? defaultValue.toString() : '0'}
-                value={defaultValue !== undefined ? defaultValue.toString() : '0'}
+                value={defaultValue !== undefined ? defaultValue?.toString() : '0'}
                 onChange={(e) => {
                     setError?.('');
                     setter(parseInt(e.target.value));

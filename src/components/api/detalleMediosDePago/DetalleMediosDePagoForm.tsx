@@ -32,6 +32,8 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
     const [fechaOperacion, setFechaOperacion] = useState( detalleMedioDePago ? detalleMedioDePago.foperacion : "")
     const notExceedImport = patrimonial.importetrans - patrimonial.medios_pago_sum
 
+    const [loading, setLoading] = useState(false)
+
     // ERRORS
     const [importeError, setImporteError] = useState('')
 
@@ -46,6 +48,8 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
             setImporteError(`El importe no puede exceder los ${MONEDAS.find(moneda => patrimonial.idmon === moneda.idmon)?.simbolo || ''} ${notExceedImport}`)
             return
         }
+
+        setLoading(true)
 
         createDetalleMedioDePago && createDetalleMedioDePago.mutate({
             access,// Replace with actual access token
@@ -80,6 +84,9 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 setShow(true)
                 setType("error")
                 console.error("Error creating Detalle Medio de Pago:", error);
+            },
+            onSettled: () => {
+                setLoading(false)
             }
         })
 
@@ -109,6 +116,9 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 setShow(true)
                 setType("error")
                 console.error("Error updating Detalle Medio de Pago:", error);
+            },
+            onSettled: () => {
+                setLoading(false)
             }
         })
     }
@@ -181,9 +191,10 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
             <button
                 onClick={handleSubmit}
                 type="button"
-                className=" bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300"
+                disabled={loading}
+                className={`bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 ${loading ? 'opacity-50 animate-pulse cursor-not-allowed' : ''}`}
             >
-                Guardar
+                {loading ? '...' : 'Guardar'}
             </button>
         </div>
     </div>

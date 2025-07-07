@@ -7,34 +7,7 @@ interface Props {
 
 const CreateDocumento = ({ kardex }: Props) => {
 
-    // const openInWord = () => {
-    //     const rawURL = "https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=3";
-    //     const officeURL = `ms-word:ofe|u|${encodeURIComponent(rawURL)}`;
-    //     window.location.href = officeURL;
-    //   };
-
-    // const openInWord = async () => {
-    //     // const templateId = 3;
-    //     // const url = `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=${templateId}`;
-    //     const cleanURL = `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=3`;
-    //     const officeURL = `ms-word:ofe|u|${cleanURL}`;
-    //     window.location.href = officeURL;
-    //   };
-
-    // const handleOpenInWord = async () => {
-    //     try {
-    //       const res = await axios.get(
-    //         'http://127.0.0.1:8001/docs/documentos/template-download/?template_id=3'
-    //       );
-    
-    //       const { url } = res.data;
-    
-    //       // This opens the file in Microsoft Word (only works on desktop with MS Word installed)
-    //       window.location.href = `ms-word:ofe|u|${url}`;
-    //     } catch (err) {
-    //       console.error('Error opening Word:', err);
-    //     }
-    //   };
+    const docsURL = import.meta.env.VITE_DOC_URL
 
   const handleOpenWord = async () => {
 
@@ -42,7 +15,7 @@ const CreateDocumento = ({ kardex }: Props) => {
       
       // Step 1: Call Django to get the populated .docx file as a Blob
       const response = await axios.get(
-        `https://quenteh.podestalservers.com/docs/documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}`,
+        `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}`,
         {
           responseType: 'blob', // IMPORTANT: to get binary data
         }
