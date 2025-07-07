@@ -17,7 +17,9 @@ const DetalleMediosDePagoCard = ({ detalleMedioDePago }: Props) => {
         <p>{detalleMedioDePago.foperacion}</p>
         <div className="flex items-center justify-start gap-6">
             <UpdateDetalleMediosDePago />
-            <RemoveDetalleMediosDePago />
+            <RemoveDetalleMediosDePago 
+              detalleMedioDePago={detalleMedioDePago}
+            />
         </div>
     </div>
   )
