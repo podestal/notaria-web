@@ -143,6 +143,14 @@ const ContratantesForm = ({
                 return
             }
         } else if (selectedTipoPersona === 2) {
+
+            if (selectedActos.length === 0) {
+                setType('error')
+                setMessage('Debe seleccionar al menos una condición para el contratante.')
+                setShow(true)
+                return
+            }
+
             if(!razonSocial) {
                 setType('error')
                 setMessage('La razón social es obligatoria.')
