@@ -17,7 +17,7 @@ export interface Cliente2 {
     telcel: string;
     telofi: string;
     sexo: string;
-    idestcivil: number;
+    idestcivil?: number;
     natper: string;
     conyuge: string | null;
     nacionalidad: string;
@@ -26,6 +26,7 @@ export interface Cliente2 {
     idcargoprofe: number;
     profocupa: string;
     dirfer: string; 
+    resedent?: string;
     idubigeo: string; 
     cumpclie: string ; 
     razonsocial: string;

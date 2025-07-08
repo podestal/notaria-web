@@ -24,6 +24,8 @@ const UpdateCliente2 = ({
     kardex,
  }: Props) => {
 
+
+    const tipoPersona = cliente2.tipper === 'N' ? 1 : 2
     const updateCliente2 = useUpdateCliente2({ clienteId: cliente2.idcontratante, kardex })
 
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
@@ -50,6 +52,7 @@ const UpdateCliente2 = ({
         ubigeos={ubigeos}
         cliente2={cliente2} 
         updateCliente2={updateCliente2}
+        selectedTipoPersona={tipoPersona}
     />
   )
 }
