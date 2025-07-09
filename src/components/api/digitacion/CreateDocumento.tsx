@@ -31,7 +31,7 @@ const CreateDocumento = ({ kardex }: Props) => {
       // This fallback just opens the file locally
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = 'documento.docx';
+      link.download = `__PROY__${kardex.kardex}.docx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
