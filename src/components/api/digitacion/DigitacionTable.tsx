@@ -4,10 +4,11 @@ import DigitacionTableHeader from "./DigitacionTableHeader"
 
 interface Props {
     kardex: Kardex
+    setEnableCreate: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-const DigitacionTable = ({ kardex }: Props) => {
+const DigitacionTable = ({ kardex, setEnableCreate }: Props) => {
 
     console.log(kardex);
     
@@ -16,6 +17,7 @@ const DigitacionTable = ({ kardex }: Props) => {
         <DigitacionTableHeader />
         <DigitacionTableBody 
             kardex={kardex}
+            setEnableCreate={setEnableCreate}
         />
     </>
   )
