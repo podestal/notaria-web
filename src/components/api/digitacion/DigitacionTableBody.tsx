@@ -26,6 +26,7 @@ const DigitacionTableBody = ({ kardex }: Props) => {
             <DigitacionDocumentCard 
                 key={document.id} 
                 document={document} 
+                kardex={kardex}
             />
         ))} 
         </>
