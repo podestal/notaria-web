@@ -32,6 +32,8 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
+        console.log('Submitting EscrituracionForm with values:');
+        
 
         if (!numActa) {
             setErrorNumActa('El número de acta es requerido')
@@ -49,7 +51,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 kardex: kardex.kardex,
                 idtipkar: kardex.idtipkar,
                 fechaingreso:kardex.fechaingreso,
-                referencia: kardex.referencia,
+                referencia: kardex.referencia || '',
                 codactos: kardex.codactos,
                 idusuario: kardex.idusuario,
                 responsable: kardex.responsable,
@@ -68,6 +70,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 folioini: follioIni,
                 foliofin: folioFin,
                 fechaescritura: fechaActa,
+                
             },
             access
         }, {
@@ -185,6 +188,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     </div>
                 </div>
                 <button
+
                     className="mt-8 bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300"
                 >
                     Guardar
