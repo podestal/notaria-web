@@ -90,6 +90,7 @@ const KardexForm = ({
         const formattedContratoDes = contratosDes.map(des => des.trim()).join(' / ')
 
         createKardex && createKardex.mutate({
+            access,
             kardex: {
                 kardex: '',
                 idtipkar: selectedKardexType,
@@ -161,7 +162,7 @@ const KardexForm = ({
                     foliofin: kardex.foliofin,
                     fechaescritura: kardex.fechaescritura,
                 },
-                access: 'access_token'
+                access
             }, {
                 onSuccess: (res) => {
                     console.log('res', res)

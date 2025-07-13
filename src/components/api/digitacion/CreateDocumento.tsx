@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Kardex } from "../../../services/api/kardexService";
+import useAuthStore from "../../../store/useAuthStore";
 
 interface Props {
   kardex: Kardex
@@ -8,6 +9,9 @@ interface Props {
 const CreateDocumento = ({ kardex }: Props) => {
 
     const docsURL = import.meta.env.VITE_DOC_URL
+    const access = useAuthStore((s) => s.access_token) || ''
+    console.log('access', access)
+    
 
   const handleOpenWord = async () => {
 
@@ -18,6 +22,9 @@ const CreateDocumento = ({ kardex }: Props) => {
         `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}`,
         {
           responseType: 'blob', // IMPORTANT: to get binary data
+          headers: {
+            'Authorization': `Bearer ${access}`,
+          }
         }
       );
 

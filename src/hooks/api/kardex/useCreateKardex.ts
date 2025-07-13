@@ -3,6 +3,7 @@ import { CreateUpdateKardex, getSingleKardexService, Kardex } from "../../../ser
 
 export interface CreateKardexData {
     kardex: CreateUpdateKardex
+    access: string
 }
 
 interface Props {
