@@ -31,7 +31,7 @@ const CreateDocumento = ({ kardex }: Props) => {
           console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
 
           const response = await axios.get(
-            `${docsURL}documentos/open-document/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
+            `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
             {
               responseType: mode === 'download' ? 'blob' : 'json',
               headers: {
@@ -45,7 +45,7 @@ const CreateDocumento = ({ kardex }: Props) => {
             try {
               // Download the file first
               const downloadResponse = await axios.get(
-                `${docsURL}documentos/open-document/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=download`,
+                `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=download`,
                 {
                   responseType: 'blob',
                   headers: {
