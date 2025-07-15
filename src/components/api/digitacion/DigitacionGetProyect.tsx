@@ -31,7 +31,14 @@ const DigitacionGetProyect = ({ kardex }: Props) => {
 
       if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
         // Windows: Open in Word using the secure backend URL
+        const wordUrl1 = `ms-word:ofe|u|${response.data.url}`;
+        const wordUrl2 = `ms-word:ofe|${response.data.url}`;
+        const wordUrl3 = `ms-word:ofe|u|${response.data.url}`
+        console.log('Opening document in Word:', response.data.url);
+        console.log('response data', response.data);
+
         const wordUrl = `ms-word:ofe|u|${response.data.url}`;
+        console.log('whole command', wordUrl);
         window.open(wordUrl, '_blank');
         return;
       } else {
