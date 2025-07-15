@@ -18,98 +18,54 @@ const CreateDocumento = ({ kardex }: Props) => {
     const [open, setOpen] = useState(false)
     
     const handleOpenDocument = async () => {
-
       if (kardex.fktemplate === 0) {
         setOpen(true);
         return;
       }
 
       try {
-          const isWindows = /Windows/.test(navigator.userAgent);
-          const mode = isWindows ? 'open' : 'download';
-          
-          console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
+        const isWindows = /Windows/.test(navigator.userAgent);
+        const mode = isWindows ? 'open' : 'download';
 
-          const response = await axios.get(
-            `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
-            {
-              responseType: mode === 'download' ? 'blob' : 'json',
-              headers: {
-                'Authorization': `Bearer ${access}`,
-              }
+        console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
+
+        const response = await axios.get(
+          `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
+          {
+            responseType: mode === 'download' ? 'blob' : 'json',
+            headers: {
+              'Authorization': `Bearer ${access}`,
             }
-          );
-
-          if (mode === 'open' && response.data.mode === 'open') {
-            // Windows: Try to open Word
-            try {
-              // Download the file first
-              const downloadResponse = await axios.get(
-                `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=download`,
-                {
-                  responseType: 'blob',
-                  headers: {
-                    'Authorization': `Bearer ${access}`,
-                  }
-                }
-              );
-
-              const blob = new Blob([downloadResponse.data], {
-                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-              });
-              
-              // Try to open with Word protocol
-              const fileName = `__PROY__${kardex.kardex}.docx`;
-              const wordUrl = `ms-word:ofe|u|${window.location.origin}/temp/${fileName}`;
-              window.open(wordUrl, '_blank');
-              
-              // Also download as fallback
-              const blobUrl = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = blobUrl;
-              link.download = fileName;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-              
-            } catch (error) {
-              console.error('Error opening Word:', error);
-              // Fallback to download
-              const blob = new Blob([response.data], {
-                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-              });
-              const blobUrl = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = blobUrl;
-              link.download = `__PROY__${kardex.kardex}.docx`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-            }
-          } else {
-            // Download mode (iOS, Mac, Linux, or fallback)
-            const blob = new Blob([response.data], {
-              type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            });
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = `__PROY__${kardex.kardex}.docx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
           }
-          
-        } catch (error) {
-          console.error('Error opening Word document:', error);
-          alert('Error opening document. Please try again.');
-        } finally {
-          queryClient.invalidateQueries({ queryKey: ["documents by kardex", `${kardex.kardex}`] })
+        );
+
+        if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
+          // Windows: Open in Word using the secure backend URL
+          const wordUrl = `ms-word:ofe|u|${response.data.url}`;
+          window.open(wordUrl, '_blank');
+          // Optionally, you can show a message or return here
+          return;
+        } else {
+          // Download mode (iOS, Mac, Linux, or fallback)
+          const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          });
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = `__PROY__${kardex.kardex}.docx`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
         }
+
+      } catch (error) {
+        console.error('Error opening Word document:', error);
+        alert('Error opening document. Please try again.');
+      } finally {
+        queryClient.invalidateQueries({ queryKey: ["documents by kardex", `${kardex.kardex}`] })
+      }
     };
 
   return (

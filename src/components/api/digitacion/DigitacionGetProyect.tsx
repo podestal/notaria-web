@@ -13,59 +13,29 @@ const DigitacionGetProyect = ({ kardex }: Props) => {
   const access = useAuthStore((s) => s.access_token) || ''
 
   const handleOpenDocument = async () => {
-  try {
-    const isWindows = /Windows/.test(navigator.userAgent);
-    const mode = isWindows ? 'open' : 'download';
-    
-    console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
+    try {
+      const isWindows = /Windows/.test(navigator.userAgent);
+      const mode = isWindows ? 'open' : 'download';
 
-    const response = await axios.get(
-      `${docsURL}documentos/open-document/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
-      {
-        responseType: mode === 'download' ? 'blob' : 'json',
-        headers: {
-          'Authorization': `Bearer ${access}`,
-        }
-      }
-    );
+      console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
 
-    if (mode === 'open' && response.data.mode === 'open') {
-      // Windows: Try to open Word
-      try {
-        // Download the file first
-        const downloadResponse = await axios.get(
-          `${docsURL}documentos/open-document/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=download`,
-          {
-            responseType: 'blob',
-            headers: {
-              'Authorization': `Bearer ${access}`,
-            }
+      const response = await axios.get(
+        `${docsURL}documentos/open-document/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
+        {
+          responseType: mode === 'download' ? 'blob' : 'json',
+          headers: {
+            'Authorization': `Bearer ${access}`,
           }
-        );
+        }
+      );
 
-        const blob = new Blob([downloadResponse.data], {
-          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        });
-        
-        // Try to open with Word protocol
-        const fileName = `__PROY__${kardex.kardex}.docx`;
-        const wordUrl = `ms-word:ofe|u|${window.location.origin}/temp/${fileName}`;
+      if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
+        // Windows: Open in Word using the secure backend URL
+        const wordUrl = `ms-word:ofe|u|${response.data.url}`;
         window.open(wordUrl, '_blank');
-        
-        // Also download as fallback
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-        
-      } catch (error) {
-        console.error('Error opening Word:', error);
-        // Fallback to download
+        return;
+      } else {
+        // Download mode (iOS, Mac, Linux, or fallback)
         const blob = new Blob([response.data], {
           type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         });
@@ -78,26 +48,12 @@ const DigitacionGetProyect = ({ kardex }: Props) => {
         document.body.removeChild(link);
         setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
       }
-    } else {
-      // Download mode (iOS, Mac, Linux, or fallback)
-      const blob = new Blob([response.data], {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      });
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `__PROY__${kardex.kardex}.docx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+
+    } catch (error) {
+      console.error('Error opening Word document:', error);
+      alert('Error opening document. Please try again.');
     }
-    
-  } catch (error) {
-    console.error('Error opening Word document:', error);
-    alert('Error opening document. Please try again.');
-  }
-};
+  };
 
   return (
     <div className="w-full flex items-start justify-center">
