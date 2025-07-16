@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { TipoActo } from "../../../services/api/tipoActosService"
 import { useEffect, useState } from "react"
+import SimpleInput from "../../ui/SimpleInput"
 
 interface Props {
     tipoActos: TipoActo[]
@@ -10,7 +11,6 @@ interface Props {
 
 const KardexActosSelector = ({ tipoActos, contratos, setContratosDes }: Props) => {
     
-
     const [actos, setActos] = useState<TipoActo[]>(tipoActos.filter(acto => contratos.includes(acto.idtipoacto)))
 
     useEffect(() => {

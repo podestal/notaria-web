@@ -53,6 +53,7 @@ const KardexForm = ({
     const [open, setOpen] = useState(false)
     const [cannotUpdateKardex, setCannotUpdateKardex] = useState(false)
     const [cannotUpdateKardexMessage, setCannotUpdateKardexMessage] = useState('')
+    const [filteredActos, setFilteredActos] = useState('')
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
@@ -293,9 +294,17 @@ const KardexForm = ({
                 // className="w-full my-4"
             
             >
+                <input 
+                    type="text"
+                    value={filteredActos}
+                    onChange={(e) => setFilteredActos(e.target.value)}
+                    placeholder="Buscar Acto..."
+                    className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none mb-4"
+                />
                 <MultiSelect 
                     options={tipoActos
                         .filter(acto => acto.idtipkar === selectedKardexType)
+                        .filter(acto => acto.desacto.toLowerCase().includes(filteredActos.toLowerCase()))
                         .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} /` }))}
                     placeholder="Buscar contrato..."
                     label=""
