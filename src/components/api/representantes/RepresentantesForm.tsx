@@ -8,6 +8,7 @@ import { CreateRepresentanteData } from "../../../hooks/api/representante/useCre
 import { Representante } from "../../../services/api/representantesService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
     sedesRegistrales: SedeRegistral[]
@@ -25,6 +26,7 @@ const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepr
     const [subscribed, setSubscribed] = useState(1)
     const [sedeRegistral, setSedeRegistral] = useState(1)
     const [nPartida, setNPartida] = useState('')
+    const access = useAuthStore((s) => s.access_token) || ''
 
     // ERROR HANDLING
     const [facultadesError, setFacultadesError] = useState('')
@@ -45,7 +47,7 @@ const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepr
         
 
         createRepresentante.mutate({
-            access: kardex,
+            access,
             representante: {
                 facultades,
                 inscrito: subscribed.toString(),
