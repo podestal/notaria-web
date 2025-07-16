@@ -57,11 +57,11 @@ const KardexForm = ({
     const { setMessage, setShow, setType } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
-    const [karedexReference, setKardexReference] = useState(kardex?.kardex || '') 
+    const [karedexReference, setKardexReference] = useState(kardex?.referencia || '') 
     const [selectedKardexType, setSelectedKardexType] = useState(kardex?.idtipkar || bodyRender) 
     const kardexDateArray = kardex ? kardex?.fechaescritura?.split('-') : ''
     const kardexDate = kardexDateArray && `${kardexDateArray[1]}-${kardexDateArray[2]}-${kardexDateArray[0]}`
-    const [date, setDate] = useState<Date | undefined>(kardex ? new Date(kardexDate) || new Date() : undefined)
+    const [date, setDate] = useState<Date | undefined>(kardex ? new Date(kardexDate) : new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
 
     // const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
@@ -92,10 +92,9 @@ const KardexForm = ({
         createKardex && createKardex.mutate({
             access,
             kardex: {
-                kardex: '',
                 idtipkar: selectedKardexType,
                 fechaingreso: moment(date).format('DD/MM/YYYY'),
-                referencia: karedexReference || 'This is a test reference',
+                referencia: karedexReference,
                 codactos: contratos.join(''),
                 idusuario: Number(responsible.id),
                 responsable: Number(responsible.id),
@@ -139,10 +138,9 @@ const KardexForm = ({
             updateKardex.mutate({
                 kardex: {
                     // idkardex: kardex?.idkardex || 0,
-                    kardex: karedexReference,
                     idtipkar: selectedKardexType,
                     fechaingreso:kardex.fechaingreso,
-                    referencia: karedexReference || 'This is a test reference',
+                    referencia: karedexReference,
                     codactos: contratos.join(''),
                     idusuario: Number(responsible.id),
                     responsable: Number(responsible.id),
@@ -203,8 +201,6 @@ const KardexForm = ({
     <form 
         onSubmit={handleSubmit}
         className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
-        {/* <>{console.log('contratosDes', contratosDes)}</> */}
-        <>{console.log('templates', templates)}</>
         <div className="flex justify-center items-center gap-2 p-4 rounded-t-lg text-slate-50 ">
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
@@ -227,6 +223,9 @@ const KardexForm = ({
                         setSelectedTime={setSelectedTime}
                     />
                 </div>
+            </div>
+            <div className="my-6 w-full flex justify-end items-center gap-4">
+                <p className="font-bold">{kardex?.kardex}</p>
             </div>
             <div className="flex justify-between items-center gap-4 mb-6">
                 <input 
@@ -259,15 +258,6 @@ const KardexForm = ({
                     className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                 />
             </div>
-            {/* <SearchableDropdownInput
-                options={tipoActos
-                    .filter(acto => acto.idtipkar === selectedKardexType)
-                    .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} /` }))}
-                selected={contrato}
-                // defaultValue={kardex && tipoActos.find(tipoActo => tipoActo.desacto === kardex.contrato) || null}
-                setSelected={setContrato}
-                placeholder="Buscar contrato..."
-            /> */}
             <div className="grid grid-cols-9 items-start my-4">
             <div className="col-span-8">
             <KardexActosSelector 
