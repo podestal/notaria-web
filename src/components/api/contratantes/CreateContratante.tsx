@@ -26,8 +26,9 @@ const CreateContratante = ({
 }: Props) => {
 
     const createContratante = useCreateContratante({ kardex, idcliente: cliente1?.idcliente || '' })
-
+    
   return (
+    <>
     <ContratantesForm 
         cliente1={cliente1}
         cliente2={null}
@@ -40,6 +41,8 @@ const CreateContratante = ({
         setClientesCheck={setClientesCheck}
         selectedTipoPersona={selectedTipoPersona}
     />
+
+    </>
   )
 }
 

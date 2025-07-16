@@ -47,7 +47,8 @@ const ContratantesForm = ({
     idtipkar, 
     kardex, 
     contratante,
-    selectedTipoPersona }: Props) => {
+    selectedTipoPersona,
+ }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [openRepForm, setOpenRepForm] = useState(false)

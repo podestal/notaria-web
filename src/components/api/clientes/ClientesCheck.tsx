@@ -2,6 +2,7 @@ import { useState } from "react"
 import TopModal from "../../ui/TopModal"
 import { UserPlus } from "lucide-react"
 import PreClientForm from "./PreClientForm"
+import ExplanationMessage from "../../ui/ExplanationMessage"
 
 interface Props {
     idtipoacto: string
@@ -12,6 +13,7 @@ interface Props {
 const ClientesCheck = ({ idtipkar, idtipoacto, kardex }: Props) => {
 
     const [open, setOpen] = useState(false)
+    const [openWarning, setOpenWarning] = useState(false)
 
   return (
     <>
@@ -24,13 +26,31 @@ const ClientesCheck = ({ idtipkar, idtipoacto, kardex }: Props) => {
         <div className="z-50">
             <TopModal
                 isOpen={open}
-                onClose={() => setOpen(false)}
+                onClose={() => {
+                    setOpenWarning(true);
+            }}
             >
                 <PreClientForm 
                     idtipoacto={idtipoacto}
                     idtipkar={idtipkar}
                     kardex={kardex}
                     setClientesCheck={setOpen}
+                />
+            </TopModal>
+            <TopModal
+                isOpen={openWarning}
+                onClose={() => {
+                    setOpenWarning(false)
+                }}
+            >
+                <ExplanationMessage 
+                    message="¿Está seguro de que desea cerrar el formulario?"
+                    onClick={() => setOpenWarning(false)}
+                    onClickMessage="Cancelar"
+                    onClickSecondary={() => {
+                        setOpenWarning(false)
+                        setOpen(false)}}
+                    onClickSecondaryMessage="Aceptar"
                 />
             </TopModal>
         </div>
