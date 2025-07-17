@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { TipoActo } from "../../../services/api/tipoActosService"
 import { useEffect, useState } from "react"
-import SimpleInput from "../../ui/SimpleInput"
 
 interface Props {
     tipoActos: TipoActo[]
