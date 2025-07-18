@@ -28,7 +28,7 @@ const CreateDocumento = ({ kardex }: Props) => {
         const mode = isWindows ? 'open' : 'download';
 
         console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
-
+// generate-document
         const response = await axios.get(
           `${docsURL}documentos/open-template/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
           {
@@ -62,7 +62,6 @@ const CreateDocumento = ({ kardex }: Props) => {
 
       } catch (error) {
         console.error('Error opening Word document:', error);
-        alert('Error opening document. Please try again.');
       } finally {
         queryClient.invalidateQueries({ queryKey: ["documents by kardex", `${kardex.kardex}`] })
       }

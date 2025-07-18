@@ -55,7 +55,6 @@ const DigitacionGetProyect = ({ kardex }: Props) => {
 
     } catch (error) {
       console.error('Error opening Word document:', error);
-      alert('Error opening document. Please try again.');
     }
   };
 
