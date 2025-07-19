@@ -404,6 +404,16 @@ const KardexForm = ({
     </TopModal>
     {kardex && 
         <>
+        {kardex.idtipkar === 2 || kardex.idtipkar === 5 ? 
+        <KardexFormTabs 
+            tabs={[
+                // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
+                { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
+                { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardex} /> },
+                { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardex} /> },
+            ]}
+        /> 
+        : 
         <KardexFormTabs 
             tabs={[
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
@@ -413,7 +423,7 @@ const KardexForm = ({
                 { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
                 { id: 'uifp', label: 'UIF/PDT Participa', content: <ParticipaMain kardex={kardex}/> },
             ]}
-        />
+        />}
         </>
     }
     </>
