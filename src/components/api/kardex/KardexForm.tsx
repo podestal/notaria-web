@@ -60,9 +60,7 @@ const KardexForm = ({
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const [karedexReference, setKardexReference] = useState(kardex?.referencia || '') 
     const [selectedKardexType, setSelectedKardexType] = useState(kardex?.idtipkar || bodyRender) 
-    const kardexDateArray = kardex ? kardex?.fechaescritura?.split('-') : ''
-    const kardexDate = kardexDateArray && `${kardexDateArray[1]}-${kardexDateArray[2]}-${kardexDateArray[0]}`
-    const [date, setDate] = useState<Date | undefined>(kardex ? new Date(kardexDate) : new Date())
+    const [date, setDate] = useState<Date | undefined>(kardex ? moment(kardex?.fechaingreso, 'DD/MM/YYYY').toDate() : new Date())
     const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
 
     // const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
@@ -206,6 +204,7 @@ const KardexForm = ({
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
         </div>
+        <>{console.log('kardex', kardex )}</>
         {/* <>{console.log('contrato', kardex?.contrato)}</> */}
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
             <div className="flex justify-between items-center gap-4 mb-6">
