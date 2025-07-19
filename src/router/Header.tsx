@@ -13,6 +13,7 @@ import useBodyRenderStore from '../hooks/store/bodyRenderStore'
 import useCorrelativeStore from '../hooks/store/useCorrelativeStore'
 import getTitleCase from '../utils/getTitleCase'
 import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
+import { useNavigate } from 'react-router-dom'
 
 interface MenuOptions {
     name: string;
@@ -38,6 +39,8 @@ const Header = ({ kardexTypes }: Props) => {
 
     const [openDropdown, setOpenDropdown] = useState<number | null>(null);
     const [openSubDropdown, setOpenSubDropdown] = useState<number | null>(null);
+
+    const navigate = useNavigate()
 
     const setBodyRender = useBodyRenderStore((state) => state.setBodyRender)
 
@@ -177,6 +180,7 @@ const Header = ({ kardexTypes }: Props) => {
               className="relative"
               onMouseEnter={() => setOpenDropdown(index)}
               onMouseLeave={() => setOpenDropdown(null)}
+              onClick={() => navigate(`/app/${item.label.toLowerCase()}`)}
             >
               {/* Main Item */}
               <li className="cursor-pointer hover:text-slate-50 px-4 py-2">
@@ -188,18 +192,13 @@ const Header = ({ kardexTypes }: Props) => {
                 <div className="absolute left-0 w-60 bg-gradient-to-b from-neutral-600 to-gray-950 text-neutral-400 rounded-md shadow-lg">
                   <ul>
                     {item.options.map((option, idx) => (
-                    //   <li
-                    //     key={idx}
-                    //     className="px-4 py-2 hover:bg-sky-600 hover:text-slate-50 cursor-pointer w-full border-b border-neutral-600"
-                    //   >
-                    //     {option.name}
-                    //   </li>
                     <div
                         key={idx}
                         className="relative"
                         onMouseEnter={() => option.subOptions && setOpenSubDropdown(idx)}
                         onMouseLeave={() => setOpenSubDropdown(null)}
                         onClick={() => {
+                          navigate(`/app/${item.label.toLowerCase()}`)
                           setCorrelative('')
                           option.docType && setBodyRender(option.docType)
                           setKardexFilter({
@@ -238,7 +237,7 @@ const Header = ({ kardexTypes }: Props) => {
         </div>
 
         {/* SISGEN - No Dropdown */}
-        <li className="cursor-pointer hover:text-slate-50 mt-3 px-4">SISGEN</li>
+        <li className="cursor-pointer hover:text-slate-50 mt-3 px-4" onClick={() => navigate(`/app/sisgen`)}>SISGEN</li>
       </ul>
     </div>
 

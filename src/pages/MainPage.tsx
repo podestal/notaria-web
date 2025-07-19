@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import useKardexTypesStore from '../hooks/store/useKardexTypesStore'
 import useNotificationsStore from '../hooks/store/useNotificationsStore'
 import NotificationCard from '../components/ui/NotificationCard'
+import { Outlet } from 'react-router-dom'
 
 const MainPage = () => {
 
@@ -37,9 +38,10 @@ const MainPage = () => {
         message={message}
         reset={reset}
     />}
-    <KardexMain 
+    {/* <KardexMain 
 
-    />
+    /> */}
+    <Outlet />
     </>
   )
 }
