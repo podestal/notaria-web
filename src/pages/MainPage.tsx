@@ -1,5 +1,4 @@
 import Header from '../router/Header'
-import KardexMain from '../components/api/kardex/KardexMain'
 import useGetTipoKardexList from '../hooks/api/tipoKardex/useGetTipoKardexList'
 import { useEffect } from 'react'
 import useKardexTypesStore from '../hooks/store/useKardexTypesStore'
