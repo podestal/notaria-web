@@ -17,8 +17,8 @@ const KardexFormTabs = ({ tabs }: Props) => {
     const [activeTab, setActiveTab] = useState(tabs[0]?.id ?? '')
 
   return (
-    <div>
-        <div className="bg-slate-100 border-t border-slate-200 flex justify-center gap-2 p-4 sticky bottom-0">
+    <div className="flex flex-col h-full w-full">
+        <div className="bg-slate-100 border-t border-slate-200 flex justify-center gap-2 p-4 sticky bottom-0 w-full">
             {tabs.map((tab) => (
                 <motion.button
                     key={tab.id}

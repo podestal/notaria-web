@@ -3,14 +3,17 @@ import SisgenSearchForm from "./SisgenSearchForm";
 
 interface Props {
     typekardex: string;
+    instrumentType: number
 }
 
-const SisgenBody = ({ typekardex }: Props) => {
+const SisgenBody = ({ typekardex, instrumentType }: Props) => {
 
   return (
-    <div className="w-fullflex flex-col items-start justify-center h-full my-6 gap-6">
+    <div className="w-full my-6">
         <h2 className="text-xl font-bold">{typekardex}</h2>
-        <SisgenSearchForm />
+        <SisgenSearchForm 
+          instrumentType={instrumentType}
+        />
     </div>
   )
 }
