@@ -1,6 +1,9 @@
 import Calendar from "../../ui/Calendar";
 import { useState } from "react";
 import SimpleSelector from "../../ui/SimpleSelector";
+import useSearchSisgen from "../../../hooks/sisgen/useSearchSisgen";
+import useAuthStore from "../../../store/useAuthStore";
+import moment from "moment";
 
 const estadoSisgenOptions = [
     { value: -1, label: "Todos" },
@@ -18,18 +21,21 @@ interface Props {
 
 const SisgenSearchForm = ({ instrumentType }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
+
     const [selectedFromDate, setSelectedFromDate] = useState<Date | undefined>(undefined);
     const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
     const [selectedEstado, setSelectedEstado] = useState(-1);
 
     const [errorDisplay, setErrorDisplay] = useState('');
 
+    const searchSisgen = useSearchSisgen()
+
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         setErrorDisplay('');
-        console.log('instrumentType:', instrumentType);
         
         if (!selectedFromDate) {
             setErrorDisplay('Por favor, seleccione una fecha de inicio.');
@@ -46,6 +52,25 @@ const SisgenSearchForm = ({ instrumentType }: Props) => {
             return;
         }
 
+        console.log("Datos de búsqueda:", {
+            tipoInstrumento: instrumentType,
+            fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
+            fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
+            estado: selectedEstado,
+            codigoActo: 0
+        });
+        
+
+        searchSisgen.mutate({
+            access,
+            sisgen: {
+                tipoInstrumento: instrumentType,
+                fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
+                fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
+                estado: selectedEstado,
+                codigoActo: 0
+            }
+        })
 
     }
 

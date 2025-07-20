@@ -54,4 +54,4 @@ export const ESTADO_SISGEN = {
     TODOS_DOCUMENTOS: 5
 }
 
-export default new SisgenClient<SISGENSearchResponse, SISGENSearchRequest>("/search");
+export default new SisgenClient<SISGENSearchResponse, SISGENSearchRequest>("/search/");
