@@ -7,6 +7,7 @@ import { Kardex } from "../../../services/api/kardexService"
 import useUpdatePatrimonial from "../../../hooks/api/patrimonial/useUpdatePatrimonial"
 import KardexFormTabs from "../kardex/KardexFormTabs"
 import VehicleMain from "../vehicle/VehicleMain"
+import DetalleBienMain from "../detalleBien/DetalleBienMain"
 
 interface Props {
     patrimonial: Patrimonial
@@ -37,7 +38,7 @@ const UpdatePatrimonial = ({ patrimonial, kardex }: Props) => {
                 <KardexFormTabs 
                     tabs={[
                         { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm updatePatrimonial={updatePatrimonial} patrimonial={patrimonial} kardex={kardex}/> },
-                        { id: 'escrituración', label: 'Información del Bien', content: <VehicleMain kardex={kardex.kardex} idtipoacto={patrimonial.idtipoacto} /> },
+                        { id: 'escrituración', label: 'Información del Bien', content: <>{kardex.idtipkar === 3 ? <VehicleMain kardex={kardex.kardex} idtipoacto={patrimonial.idtipoacto} /> : <DetalleBienMain />}</>},
                     ]}
                 />
                 

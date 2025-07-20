@@ -6,6 +6,7 @@ import KardexFormTabs from "../kardex/KardexFormTabs"
 import useCreatePatrimonial from "../../../hooks/api/patrimonial/useCreatePatrimonial"
 import { Kardex } from "../../../services/api/kardexService"
 import VehicleMain from "../vehicle/VehicleMain"
+import DetalleBienMain from "../detalleBien/DetalleBienMain"
 
 interface Props {
     kardex: Kardex
@@ -27,6 +28,7 @@ const CreatePatrimonial = ({ kardex }: Props) => {
             <Newspaper />
             <p className="text-xs">Nuevo</p>
         </button>
+        <>{console.log('kardex', kardex.idtipkar)}</>
         <TopModal
             isOpen={open}
             onClose={() => setOpen(false)}
@@ -35,7 +37,7 @@ const CreatePatrimonial = ({ kardex }: Props) => {
                 <KardexFormTabs 
                     tabs={[
                         { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm createPatrimonial={createPatrimonial} kardex={kardex} setIdTipoActo={setIdTipoActo}/> },
-                        { id: 'escrituración', label: 'Información del Bien', content: <VehicleMain kardex={kardex.kardex} idtipoacto={idtipoacto} /> },
+                        { id: 'escrituración', label: 'Información del Bien', content: <>{kardex.idtipkar === 3 ? <VehicleMain kardex={kardex.kardex} idtipoacto={idtipoacto} /> : <DetalleBienMain />}</> },
                     ]}
                 />
                 
