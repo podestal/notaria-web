@@ -17,7 +17,9 @@ const DetalleBienCard = ({ detalleBien }: Props) => {
         <div className="flex justify-end space-x-2">
             <RemoveDetalleBien />
             <div>|</div>
-            <UpdateDetalleBien />
+            <UpdateDetalleBien 
+                detalleBien={detalleBien}
+            />
         </div>
     </div>
   )

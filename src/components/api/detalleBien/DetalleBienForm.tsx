@@ -3,29 +3,33 @@ import SimpleSelector from "../../ui/SimpleSelector"
 import { TIPOS_BIENES, BIEN_ACTO_JURIDICO, SEDES_REGISTRALES } from "../../../data/patrimonialData"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
-import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import { DetalleBien } from "../../../services/api/detalleBienService"
 import DateInput from "../../ui/DateInput"
+import { Ubigeo } from "../../../services/api/ubigeoService"
 // import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
-  kardex: string
-  idtipoacto: string
+  kardex?: string
+  idtipoacto?: string
   detalleBien?: DetalleBien
+  ubigeos: Ubigeo[]
 }
 
-const DetalleBienForm = ({ kardex, idtipoacto, detalleBien }: Props) => {
+const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos }: Props) => {
 
     // const access = useAuthStore(s => s.access_token) || ''
-
-    const [tipoBien, setTipoBien] = useState(0)
-    const [partida, setPartida] = useState('')
-    const [tipoBienJuridico, setTipoBienJuridico] = useState(0)
-    const [sedeRegistral, setSedeRegistral] = useState('')
+    console.log('idtipoacto', idtipoacto);
+    console.log('detalleBien', detalleBien);
+    console.log('kardex', kardex);
+    
+    const [tipoBien, setTipoBien] = useState(detalleBien ? (detalleBien.tipob === 'BIENES' ? 1 : 2) : 0)
+    const [partida, setPartida] = useState(detalleBien ? detalleBien.pregistral : '')
+    const [tipoBienJuridico, setTipoBienJuridico] = useState(detalleBien ? detalleBien.idtipbien : 0)
+    const [sedeRegistral, setSedeRegistral] = useState(detalleBien ? detalleBien.idsedereg : '')
     const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(() => {
         if (detalleBien && detalleBien.coddis) {
-          const match = ubigeos?.find(ubi => ubi.coddis === detalleBien.coddis);
+          const match = ubigeos.find(ubi => ubi.coddis === detalleBien.coddis);
           if (match) {
             return {
               id: match.coddis,
@@ -35,15 +39,7 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien }: Props) => {
         }
         return null;
       });
-    const [fecha, setFecha] = useState('')
-
-    const { data: ubigeos, isLoading, isError, error, isSuccess } = useGetUbigeos()
-
-    if (isLoading) return <p className="text-center animate-pulse my-4">Cargando...</p>
-
-    if (isError) return <p className="text-center text-red-500 my-4">Error: {error.message}</p>
-
-    if (isSuccess)
+    const [fecha, setFecha] = useState(detalleBien ? detalleBien.fechaconst : '')
 
   return (
     <form className="flex flex-col gap-4">

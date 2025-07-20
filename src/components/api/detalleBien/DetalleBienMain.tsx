@@ -14,8 +14,6 @@ const DetalleBienMain = ({kardex, idtipoacto }: Props) => {
         ? 
         <>
         <CreateDetalleBien 
-            kardex={kardex}
-            idtipoacto={idtipoacto}
         />
         <DetalleBienTable 
             kardex={kardex}

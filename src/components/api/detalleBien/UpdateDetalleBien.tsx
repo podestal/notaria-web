@@ -1,9 +1,15 @@
 import { useState } from "react"
 import TopModal from "../../ui/TopModal"
 import { Pencil } from "lucide-react"
+import { DetalleBien } from "../../../services/api/detalleBienService"
+import PreDetalleBienForm from "./PreDetalleBienForm"
+
+interface Props {
+    detalleBien: DetalleBien
+}
 
 
-const UpdateDetalleBien = () => {
+const UpdateDetalleBien = ({ detalleBien }: Props) => {
 
     const [open, setOpen] = useState(false)
 
@@ -22,14 +28,9 @@ const UpdateDetalleBien = () => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        {/* <PreUpdateContratantesForm 
-            idtipoacto={idtipoacto}
-            idtipkar={idtipkar}
-            kardex={kardex}
-            contratante={contratante}
-            setCloseUpdateContratante={setOpen}
-        /> */}
-        <p>Actualizar detalle de bien</p>
+        <PreDetalleBienForm 
+            detalleBien={detalleBien}
+        />
 
     </TopModal>
 
