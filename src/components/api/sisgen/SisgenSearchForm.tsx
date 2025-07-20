@@ -4,6 +4,7 @@ import SimpleSelector from "../../ui/SimpleSelector";
 import useSearchSisgen from "../../../hooks/sisgen/useSearchSisgen";
 import useAuthStore from "../../../store/useAuthStore";
 import moment from "moment";
+import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
 
 const estadoSisgenOptions = [
     { value: -1, label: "Todos" },
@@ -17,9 +18,10 @@ const estadoSisgenOptions = [
 
 interface Props {
     instrumentType: number
+    setSisgenDocs: React.Dispatch<React.SetStateAction<SISGENDocument[]>>
 }
 
-const SisgenSearchForm = ({ instrumentType }: Props) => {
+const SisgenSearchForm = ({ instrumentType, setSisgenDocs }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
 
@@ -52,15 +54,6 @@ const SisgenSearchForm = ({ instrumentType }: Props) => {
             return;
         }
 
-        console.log("Datos de búsqueda:", {
-            tipoInstrumento: instrumentType,
-            fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
-            fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
-            estado: selectedEstado,
-            codigoActo: 0
-        });
-        
-
         searchSisgen.mutate({
             access,
             sisgen: {
@@ -69,6 +62,17 @@ const SisgenSearchForm = ({ instrumentType }: Props) => {
                 fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
                 estado: selectedEstado,
                 codigoActo: 0
+            }
+        }, {
+            onSuccess: (data) => {
+                if (data.error === 0) {
+                    setSisgenDocs(data.data);
+                } else {
+                    setErrorDisplay(data.message || 'Error al buscar documentos SISGEN.');
+                }
+            },
+            onError: (error) => {
+                setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
             }
         })
 
