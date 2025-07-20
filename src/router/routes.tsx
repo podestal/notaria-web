@@ -9,6 +9,7 @@ import CajaMain from "../components/api/caja/CajaMain";
 import UsuariosMain from "../components/api/usuarios/UsuariosMain";
 import HerramientasMain from "../components/api/herramientas/HerramientasMain";
 import ConfiguracionMain from "../components/api/configuracion/ConfiguracionMain";
+import SisgenMain from "../components/api/sisgen/SisgenMain";
 
 const routes = createBrowserRouter([
     {
@@ -73,7 +74,7 @@ const routes = createBrowserRouter([
                 path: "sisgen",
                 element: 
                 <PrivateRoutes>
-                    <p>Sisgen</p>
+                    <SisgenMain />
                 </PrivateRoutes>
             },
         ]

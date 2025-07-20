@@ -189,7 +189,7 @@ const Header = ({ kardexTypes }: Props) => {
 
               {/* Dropdown Menu */}
               {openDropdown === index && (
-                <div className="absolute left-0 w-60 bg-gradient-to-b from-neutral-600 to-gray-950 text-neutral-400 rounded-md shadow-lg">
+                <div className="absolute z-100 left-0 w-60 bg-gradient-to-b from-neutral-600 to-gray-950 text-neutral-400 rounded-md shadow-lg">
                   <ul>
                     {item.options.map((option, idx) => (
                     <div
