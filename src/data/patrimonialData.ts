@@ -141,4 +141,22 @@ export const BANCOS = [
     { idbancos: 48, codbancos: '99', desbanco: 'CAJA RURAL DE AHORRO Y CREDITO RAIZ S.A.A.' },
     { idbancos: 49, codbancos: '99', desbanco: 'CAJA LOS ANDES' },
     { idbancos: 50, codbancos: '99', desbanco: 'CAJA TRUJILLO' }
-]   
+]
+
+export const TIPOS_BIENES = [
+    { id_tipbien: 1, des_tipbien: 'BIENES' },
+    { id_tipbien: 2, des_tipbien: 'ACCIONES Y DERECHOS' },
+]
+
+export const BIEN_ACTO_JURIDICO = [
+    { idtipbien: 1, codbien: '01', uif: 1, desestcivil: 'AERONAVES' },
+    { idtipbien: 2, codbien: '02', uif: 0, desestcivil: 'CONCESIONES' },
+    { idtipbien: 3, codbien: '03', uif: 0, desestcivil: 'DERECHOS DE PROPIEDAD INTELECTUAL' },
+    { idtipbien: 4, codbien: '04', uif: 0, desestcivil: 'PREDIOS' },
+    { idtipbien: 5, codbien: '05', uif: 2, desestcivil: 'MAQUINARIAS Y EQUIPOS' },
+    { idtipbien: 6, codbien: '06', uif: 0, desestcivil: 'MINAS / CANTERAS Y DEPOSITOS DE HIDROCARBUROS' },
+    { idtipbien: 7, codbien: '07', uif: 1, desestcivil: 'NAVES' },
+    { idtipbien: 8, codbien: '09', uif: 1, desestcivil: 'VEHICULOS TERRESTRES' },
+    { idtipbien: 9, codbien: '11', uif: 0, desestcivil: 'CREDITOS' },
+    { idtipbien: 10, codbien: '99', uif: 3, desestcivil: 'OTROS NO ESPECIFICADOS' }
+]
