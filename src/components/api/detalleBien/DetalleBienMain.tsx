@@ -1,20 +1,31 @@
-import useGetDetalleBienesByKardex from "../../../hooks/api/detalleBien/useGetDetalleBienesByKardex"
-import useAuthStore from "../../../store/useAuthStore"
+import CreateDetalleBien from "./CreateDetalleBien"
+import DetalleBienTable from "./DetalleBienTable"
 
 interface Props {
   kardex: string
+  idtipoacto: string
 }
 
-const DetalleBienMain = ({kardex }: Props) => {
-
-  const access = useAuthStore(s => s.access_token) || ''
-  const { data: detalleBienes } = useGetDetalleBienesByKardex({ access, kardex })
+const DetalleBienMain = ({kardex, idtipoacto }: Props) => {
 
   return (
-    <div>
-      <p>detalle bienes</p>
-      <>{console.log("detalleBienes", detalleBienes)}</>
-    </div>
+      <>
+        {idtipoacto 
+        ? 
+        <>
+        <CreateDetalleBien 
+            kardex={kardex}
+            idtipoacto={idtipoacto}
+        />
+        <DetalleBienTable 
+            kardex={kardex}
+            idtipoacto={idtipoacto}
+        />
+        </> 
+        : 
+        <p className="text-center text-xs my-6">Es necesario crear un patrimonial primero</p>
+        }
+    </>
   )
 }
 

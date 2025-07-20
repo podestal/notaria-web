@@ -38,7 +38,7 @@ const UpdatePatrimonial = ({ patrimonial, kardex }: Props) => {
                 <KardexFormTabs 
                     tabs={[
                         { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm updatePatrimonial={updatePatrimonial} patrimonial={patrimonial} kardex={kardex}/> },
-                        { id: 'escrituración', label: 'Información del Bien', content: <>{kardex.idtipkar === 3 ? <VehicleMain kardex={kardex.kardex} idtipoacto={patrimonial.idtipoacto} /> : <DetalleBienMain kardex={kardex.kardex}/>}</>},
+                        { id: 'escrituración', label: 'Información del Bien', content: <>{kardex.idtipkar === 3 ? <VehicleMain kardex={kardex.kardex} idtipoacto={patrimonial.idtipoacto} /> : <DetalleBienMain kardex={kardex.kardex} idtipoacto={patrimonial.idtipoacto} />}</>},
                     ]}
                 />
                 
