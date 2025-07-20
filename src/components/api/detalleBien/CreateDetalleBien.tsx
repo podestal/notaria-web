@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import TopModal from '../../ui/TopModal'
 import { Building2 } from 'lucide-react'
+import DetalleBienForm from './DetalleBienForm'
 
 interface Props {
   kardex: string
@@ -24,13 +25,10 @@ const CreateDetalleBien = ({ kardex, idtipoacto }: Props) => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <div>
-                <p>Detalle bienes form</p>
-                <p>{kardex}</p>
-                <p>{idtipoacto}</p>
-                {/* Aquí puedes agregar el formulario para crear un detalle de bien */}
-            </div>
-
+            <DetalleBienForm 
+                kardex={kardex}
+                idtipoacto={idtipoacto}
+            />
         </TopModal>
     </>
   )
