@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import SimpleSelector from "../../ui/SimpleSelector"
 import { TIPOS_BIENES, BIEN_ACTO_JURIDICO, SEDES_REGISTRALES } from "../../../data/patrimonialData"
 import SimpleInput from "../../ui/SimpleInput"
@@ -12,6 +12,8 @@ import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateD
 import useAuthStore from "../../../store/useAuthStore"
 import SingleSelect from "../../ui/SingleSelect"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import TopModal from "../../ui/TopModal"
+import DetalleBienPredioForm from "./DetalleBienPredioForm"
 // import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
@@ -28,6 +30,7 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const [openPredioForm, setOpenPredioForm] = useState(false)
 
     const [tipoBien, setTipoBien] = useState(detalleBien ? (detalleBien.tipob === 'BIENES' ? 1 : 2) : 0)
     const [partida, setPartida] = useState(detalleBien ? detalleBien.pregistral : '')
@@ -54,6 +57,14 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
     const [otherSpecific, setOtherSpecific] = useState(detalleBien ? detalleBien.oespecific : '')
 
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (tipoBienJuridico === 4 && !detalleBien) {
+            setOpenPredioForm(true)
+        } else {
+            setOpenPredioForm(false)
+        }
+    }, [tipoBienJuridico])
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,7 +106,8 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
     }
 
   return (
-    <form 
+    <>
+        <form 
         onSubmit={handleSubmit}
         className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-center mt-2 mb-6">{detalleBien ? 'Editar Detalle de Bien' : 'Agregar Detalle de Bien'}</h2>
@@ -196,6 +208,14 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
             </div>
         </div>
     </form>
+    <TopModal
+        isOpen={openPredioForm}
+        onClose={() => setOpenPredioForm(false)}
+    >
+        <DetalleBienPredioForm />
+
+    </TopModal>
+    </>
   )
 }
 
