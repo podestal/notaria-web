@@ -8,7 +8,7 @@ export interface DetalleBienCreateData {
 
 const useCreateDetalleBienes = (): UseMutationResult<DetalleBien, Error, DetalleBienCreateData> => {
     const queryClient = useQueryClient()
-    const detalleBienService = getDetalleBienService({ byKardex: false })
+    const detalleBienService = getDetalleBienService({ })
 
     return useMutation({
         mutationFn: ({ access, detalleBien }: DetalleBienCreateData) => detalleBienService.post(detalleBien, access),

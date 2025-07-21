@@ -17,7 +17,7 @@ export interface DetalleBien {
     idsedereg: string
 }
 
-export type DetalleBienCreateUpdate = Omit<DetalleBien, 'detbien' | 'itemmp' | 'kardex'>;
+export type DetalleBienCreateUpdate = Omit<DetalleBien, 'detbien'>;
 
 interface Props {
     detalleBienId?: number

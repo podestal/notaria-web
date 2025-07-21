@@ -9,11 +9,12 @@ import DateInput from "../../ui/DateInput"
 import { Ubigeo } from "../../../services/api/ubigeoService"
 import { UseMutationResult } from "@tanstack/react-query"
 import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateDetalleBienes"
+import useAuthStore from "../../../store/useAuthStore"
 // import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
-    kardex?: string
-    idtipoacto?: string
+    kardex: string
+    idtipoacto: string
     detalleBien?: DetalleBien
     ubigeos: Ubigeo[]
     itemmp: string
@@ -21,6 +22,8 @@ interface Props {
 }
 
 const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, createDetalleBien }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
 
     const [tipoBien, setTipoBien] = useState(detalleBien ? (detalleBien.tipob === 'BIENES' ? 1 : 2) : 0)
     const [partida, setPartida] = useState(detalleBien ? detalleBien.pregistral : '')
@@ -55,6 +58,25 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
             fecha,
             itemmp
         });
+
+        createDetalleBien && createDetalleBien.mutate({
+            access,
+            detalleBien: {
+                kardex,
+                idtipacto: idtipoacto,
+                tipob: tipoBien === 1 ? 'BIENES' : 'SERVICIOS',
+                pregistral: partida,
+                idtipbien: tipoBienJuridico,
+                idsedereg: sedeRegistral,
+                coddis: ubigeo ? ubigeo.id : '',
+                fechaconst: fecha,
+                itemmp,
+                oespecific: detalleBien?.oespecific ?? '',
+                smaquiequipo: detalleBien?.smaquiequipo ?? '',
+                tpsm: detalleBien?.tpsm ?? '',
+                npsm: detalleBien?.npsm ?? ''
+            }
+        })
     }
 
   return (

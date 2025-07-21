@@ -23,7 +23,7 @@ const DetalleBienTableBody = ({ kardex, idtipoacto }: Props) => {
         detalleBienes
         .filter(detalle => detalle.idtipacto === idtipoacto)
         .map(detalle => (
-            <DetalleBienCard key={detalle.kardex} detalleBien={detalle} />
+            <DetalleBienCard key={detalle.detbien} detalleBien={detalle} />
     )) : <p className="text-center text-xs my-6">No hay detalles disponibles</p>}</>
   )
 }
