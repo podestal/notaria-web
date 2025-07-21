@@ -7,22 +7,21 @@ import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import { DetalleBien } from "../../../services/api/detalleBienService"
 import DateInput from "../../ui/DateInput"
 import { Ubigeo } from "../../../services/api/ubigeoService"
+import { UseMutationResult } from "@tanstack/react-query"
+import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateDetalleBienes"
 // import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
-  kardex?: string
-  idtipoacto?: string
-  detalleBien?: DetalleBien
-  ubigeos: Ubigeo[]
+    kardex?: string
+    idtipoacto?: string
+    detalleBien?: DetalleBien
+    ubigeos: Ubigeo[]
+    itemmp: string
+    createDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienCreateData>
 }
 
-const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos }: Props) => {
+const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, createDetalleBien }: Props) => {
 
-    // const access = useAuthStore(s => s.access_token) || ''
-    console.log('idtipoacto', idtipoacto);
-    console.log('detalleBien', detalleBien);
-    console.log('kardex', kardex);
-    
     const [tipoBien, setTipoBien] = useState(detalleBien ? (detalleBien.tipob === 'BIENES' ? 1 : 2) : 0)
     const [partida, setPartida] = useState(detalleBien ? detalleBien.pregistral : '')
     const [tipoBienJuridico, setTipoBienJuridico] = useState(detalleBien ? detalleBien.idtipbien : 0)
@@ -41,8 +40,27 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos }: Props) =>
       });
     const [fecha, setFecha] = useState(detalleBien ? detalleBien.fechaconst : '')
 
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Aquí puedes manejar el envío del formulario, por ejemplo, llamar a un servicio API para crear o actualizar el detalle del bien
+        console.log({
+            kardex,
+            idtipoacto,
+            tipoBien,
+            partida,
+            tipoBienJuridico,
+            sedeRegistral,
+            ubigeo,
+            fecha,
+            itemmp
+        });
+    }
+
   return (
-    <form className="flex flex-col gap-4">
+    <form 
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-center mt-2 mb-6">{detalleBien ? 'Editar Detalle de Bien' : 'Agregar Detalle de Bien'}</h2>
         <div className="grid grid-cols-2 gap-4">
             <SimpleSelector 

@@ -17,7 +17,7 @@ export interface DetalleBien {
     idsedereg: string
 }
 
-export type DetalleBienCreate = Omit<DetalleBien, 'detbien' | 'itemmp' | 'kardex'>;
+export type DetalleBienCreateUpdate = Omit<DetalleBien, 'detbien' | 'itemmp' | 'kardex'>;
 
 interface Props {
     detalleBienId?: number
@@ -31,7 +31,7 @@ const getDetalleBienService = ({ detalleBienId, byKardex }: Props) => {
     } else if (byKardex) {
         endpoint += 'by_kardex/'
     }
-    return new APIClient<DetalleBien, DetalleBienCreate>(endpoint);
+    return new APIClient<DetalleBien, DetalleBienCreateUpdate>(endpoint);
 }
 
 export default getDetalleBienService

@@ -17,6 +17,7 @@ const CreatePatrimonial = ({ kardex }: Props) => {
     const [open, setOpen] = useState(false)
     const createPatrimonial = useCreatePatrimonial({ kardex: kardex.kardex })
     const [idtipoacto, setIdTipoActo] = useState('')
+    const [itemmp, setItemMp] = useState('')
 
   return (
     <>
@@ -36,8 +37,8 @@ const CreatePatrimonial = ({ kardex }: Props) => {
             <>
                 <KardexFormTabs 
                     tabs={[
-                        { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm createPatrimonial={createPatrimonial} kardex={kardex} setIdTipoActo={setIdTipoActo}/> },
-                        { id: 'escrituración', label: 'Información del Bien', content: <>{kardex.idtipkar === 3 ? <VehicleMain kardex={kardex.kardex} idtipoacto={idtipoacto} /> : <DetalleBienMain kardex={kardex.kardex} dtipoacto={idtipoacto} />}</> },
+                        { id: 'notes', label: 'Medio de Pago/Tipo de Fondo', content: <PatrimonialForm setItemMp={setItemMp} createPatrimonial={createPatrimonial} kardex={kardex} setIdTipoActo={setIdTipoActo}/>},
+                        { id: 'escrituración', label: 'Información del Bien', content: <>{kardex.idtipkar === 3 ? <VehicleMain kardex={kardex.kardex} idtipoacto={idtipoacto} /> : <DetalleBienMain itemmp={itemmp} kardex={kardex.kardex} idtipoacto={idtipoacto} />}</> },
                     ]}
                 />
                 

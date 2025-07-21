@@ -2,8 +2,8 @@ import DetalleBienTableBody from "./DetalleBienTableBody"
 import DetalleBienTableHeader from "./DetalleBienTableHeader"
 
 interface Props {
-  kardex: string
-  idtipoacto: string
+    kardex: string
+    idtipoacto: string
 }
 
 const DetalleBienTable = ({ kardex, idtipoacto }: Props) => {

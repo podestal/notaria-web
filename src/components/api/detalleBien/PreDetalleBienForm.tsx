@@ -1,12 +1,18 @@
+import { UseMutationResult } from "@tanstack/react-query"
 import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
 import { DetalleBien } from "../../../services/api/detalleBienService"
 import DetalleBienForm from "./DetalleBienForm"
+import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateDetalleBienes"
 
 interface Props {
     detalleBien?: DetalleBien
+    kardex: string
+    idtipoacto: string
+    itemmp: string
+    createDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienCreateData>
 }
 
-const PreDetalleBienForm = ({ detalleBien }: Props) => {
+const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDetalleBien }: Props) => {
 
     const { data: ubigeos, isLoading, isError, error, isSuccess } = useGetUbigeos()
 
@@ -20,6 +26,10 @@ const PreDetalleBienForm = ({ detalleBien }: Props) => {
     <DetalleBienForm 
         ubigeos={ubigeos}
         detalleBien={detalleBien}
+        kardex={kardex}
+        idtipoacto={idtipoacto}
+        itemmp={itemmp}
+        createDetalleBien={createDetalleBien}
     />
   )
 }

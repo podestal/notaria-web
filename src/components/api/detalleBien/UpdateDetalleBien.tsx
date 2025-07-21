@@ -30,6 +30,9 @@ const UpdateDetalleBien = ({ detalleBien }: Props) => {
     >
         <PreDetalleBienForm 
             detalleBien={detalleBien}
+            kardex={detalleBien.kardex}
+            idtipoacto={detalleBien.idtipacto}
+            itemmp={detalleBien.itemmp}
         />
 
     </TopModal>

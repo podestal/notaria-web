@@ -4,16 +4,20 @@ import DetalleBienTable from "./DetalleBienTable"
 interface Props {
   kardex: string
   idtipoacto: string
+  itemmp: string
 }
 
-const DetalleBienMain = ({kardex, idtipoacto }: Props) => {
+const DetalleBienMain = ({kardex, idtipoacto, itemmp }: Props) => {
 
   return (
       <>
-        {idtipoacto 
+        {itemmp 
         ? 
         <>
         <CreateDetalleBien 
+            kardex={kardex}
+            idtipoacto={idtipoacto}
+            itemmp={itemmp}
         />
         <DetalleBienTable 
             kardex={kardex}

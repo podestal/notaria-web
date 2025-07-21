@@ -2,9 +2,18 @@ import { useState } from 'react'
 import TopModal from '../../ui/TopModal'
 import { Building2 } from 'lucide-react'
 import PreDetalleBienForm from './PreDetalleBienForm'
+import useCreateDetalleBienes from '../../../hooks/api/detalleBien/useCreateDetalleBienes'
 
-const CreateDetalleBien = () => {
+interface Props {
+    kardex: string
+    idtipoacto: string
+    itemmp: string
+}
+
+const CreateDetalleBien = ({kardex, idtipoacto, itemmp}: Props) => {
+
     const [open, setOpen] = useState(false)
+    const createDetalleBien = useCreateDetalleBienes()
 
   return (
     <>
@@ -21,7 +30,10 @@ const CreateDetalleBien = () => {
             onClose={() => setOpen(false)}
         >
             <PreDetalleBienForm 
-                
+                kardex={kardex}
+                idtipoacto={idtipoacto}
+                itemmp={itemmp}
+                createDetalleBien={createDetalleBien}
             />
         </TopModal>
     </>

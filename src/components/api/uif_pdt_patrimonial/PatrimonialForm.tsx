@@ -25,6 +25,7 @@ interface Props {
     kardex: Kardex
     patrimonial?: Patrimonial
     setIdTipoActo?: React.Dispatch<React.SetStateAction<string>>
+    setItemMp?: React.Dispatch<React.SetStateAction<string>>
 }
 
 const exhibiompOptions = [
@@ -37,7 +38,9 @@ const PatrimonialForm = ({
     updatePatrimonial,
     kardex,
     patrimonial,
-    setIdTipoActo }: Props) => {
+    setIdTipoActo,
+    setItemMp
+}: Props) => {
 
     const [currentPatrimonial, setCurrentPatrimonial] = useState<Patrimonial | undefined>(patrimonial);
 
@@ -120,6 +123,7 @@ const PatrimonialForm = ({
             onSuccess: res => {
                 console.log('response', res);
                 setIdTipoActo && setIdTipoActo(res.idtipoacto);
+                setItemMp && setItemMp(res.itemmp);
                 setMessage('Patrimonial creado exitosamente');
                 setShow(true);
                 setType('success');
