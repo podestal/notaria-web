@@ -3,6 +3,7 @@ import TopModal from "../../ui/TopModal"
 import { Pencil } from "lucide-react"
 import { DetalleBien } from "../../../services/api/detalleBienService"
 import PreDetalleBienForm from "./PreDetalleBienForm"
+import useUpdateDetalleBien from "../../../hooks/api/detalleBien/useUpdateDetalleBien"
 
 interface Props {
     detalleBien: DetalleBien
@@ -12,6 +13,7 @@ interface Props {
 const UpdateDetalleBien = ({ detalleBien }: Props) => {
 
     const [open, setOpen] = useState(false)
+    const updateDetalleBien = useUpdateDetalleBien({ detalleBienId: detalleBien.detbien })
 
   return (
     <>
@@ -34,6 +36,7 @@ const UpdateDetalleBien = ({ detalleBien }: Props) => {
             idtipoacto={detalleBien.idtipacto}
             itemmp={detalleBien.itemmp}
             setOpen={setOpen}
+            updateDetalleBien={updateDetalleBien}
         />
 
     </TopModal>

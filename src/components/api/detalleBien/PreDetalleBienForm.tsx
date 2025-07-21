@@ -3,6 +3,7 @@ import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
 import { DetalleBien } from "../../../services/api/detalleBienService"
 import DetalleBienForm from "./DetalleBienForm"
 import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateDetalleBienes"
+import { DetalleBienUpdateData } from "../../../hooks/api/detalleBien/useUpdateDetalleBien"
 
 interface Props {
     detalleBien?: DetalleBien
@@ -10,10 +11,11 @@ interface Props {
     idtipoacto: string
     itemmp: string
     createDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienCreateData>
+    updateDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienUpdateData>
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDetalleBien, setOpen }: Props) => {
+const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDetalleBien, setOpen, updateDetalleBien }: Props) => {
 
     const { data: ubigeos, isLoading, isError, error, isSuccess } = useGetUbigeos()
 
@@ -31,6 +33,7 @@ const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDet
         idtipoacto={idtipoacto}
         itemmp={itemmp}
         createDetalleBien={createDetalleBien}
+        updateDetalleBien={updateDetalleBien}
         setOpen={setOpen}
     />
   )

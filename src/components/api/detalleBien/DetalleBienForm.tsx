@@ -14,6 +14,7 @@ import SingleSelect from "../../ui/SingleSelect"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import TopModal from "../../ui/TopModal"
 import DetalleBienPredioForm from "./DetalleBienPredioForm"
+import { DetalleBienUpdateData } from "../../../hooks/api/detalleBien/useUpdateDetalleBien"
 // import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
@@ -23,10 +24,19 @@ interface Props {
     ubigeos: Ubigeo[]
     itemmp: string
     createDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienCreateData>
+    updateDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienUpdateData>
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, createDetalleBien, setOpen }: Props) => {
+const DetalleBienForm = ({ 
+    kardex, 
+    idtipoacto, 
+    detalleBien, 
+    ubigeos, 
+    itemmp, 
+    createDetalleBien, 
+    updateDetalleBien, 
+    setOpen }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -96,6 +106,40 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
             },
             onError: (error) => {
                 setMessage(error.message)
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
+
+        updateDetalleBien && updateDetalleBien.mutate({
+            access,
+            detalleBien: {
+                kardex,
+                idtipacto: idtipoacto,
+                tipob: tipoBien === 1 ? 'BIENES' : 'SERVICIOS',
+                pregistral: partida,
+                idtipbien: tipoBienJuridico,
+                idsedereg: sedeRegistral,
+                coddis: ubigeo ? ubigeo.id : '',
+                fechaconst: fecha,
+                itemmp,
+                oespecific: otherSpecific,
+                smaquiequipo: serieMaqEq,
+                tpsm: tpsm,
+                npsm: npsm
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Detalle de Bien actualizado correctamente')
+                setShow(true)
+                setType('success')
+                setOpen(false)
+            },
+            onError: (err) => {
+                setMessage(err.message)
                 setShow(true)
                 setType('error')
             },
@@ -184,13 +228,17 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
                 horizontal
             />
         </div>}
+        <div className="flex items-center justify-start gap-4 px-2">
+        <p>Ubigeo</p>
         <SearchableDropdownInput
             options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
             selected={ubigeo}
             setSelected={setUbigeo}
             placeholder="Buscar Ubigeo"
             required
+            
         />
+        </div>
         <div className="grid grid-cols-2 gap-4">
             <DateInput 
                 label="Fecha de Inscripción"
