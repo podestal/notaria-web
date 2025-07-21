@@ -1,10 +1,43 @@
 import { SquareX } from "lucide-react"
 import TopModal from "../../ui/TopModal"
 import { useState } from "react"
+import useRemoveDetalleBien from "../../../hooks/api/detalleBien/useRemoveDetalleBien"
+import { DetalleBien } from "../../../services/api/detalleBienService"
+import useAuthStore from "../../../store/useAuthStore"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
-const RemoveDetalleBien = () => {
+interface Props {
+    detalleBien: DetalleBien
+}
+const RemoveDetalleBien = ({ detalleBien }: Props) => {
+
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    const access = useAuthStore(s => s.access_token) || ''
 
     const [open, setOpen] = useState(false)
+    const removeDetalleBien = useRemoveDetalleBien({ detalleBienId: detalleBien.detbien, kardex: detalleBien.kardex })
+    const [loading, setLoading] = useState(false)
+
+    const handleRemove = () => {
+        setLoading(true)
+        removeDetalleBien.mutate({
+            access
+        }, {
+            onSuccess: () => {
+                setMessage('Detalle de Bien eliminado correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: (error) => {
+                setMessage(error.message)
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
+    }
 
   return (
     <>
@@ -21,7 +54,7 @@ const RemoveDetalleBien = () => {
             onClose={() => setOpen(false)}
         >
             <div>
-                {/* <h2 className="text-2xl text-center font-bold my-10">Está seguro de eliminar a este contratante</h2>
+                <h2 className="text-2xl text-center font-bold my-10">Está seguro de eliminar a este contratante</h2>
                 <div className="flex items-center justify-center gap-10 mt-4">
                     <button 
                         onClick={() => {
@@ -38,7 +71,7 @@ const RemoveDetalleBien = () => {
                     >
                         Cancelar
                     </button>
-                </div> */}
+                </div>
             </div>
 
         </TopModal>
