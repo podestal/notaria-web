@@ -34,6 +34,7 @@ const CreateDetalleBien = ({kardex, idtipoacto, itemmp}: Props) => {
                 idtipoacto={idtipoacto}
                 itemmp={itemmp}
                 createDetalleBien={createDetalleBien}
+                setOpen={setOpen}
             />
         </TopModal>
     </>

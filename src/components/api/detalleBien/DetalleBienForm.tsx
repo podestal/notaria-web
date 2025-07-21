@@ -10,6 +10,8 @@ import { Ubigeo } from "../../../services/api/ubigeoService"
 import { UseMutationResult } from "@tanstack/react-query"
 import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateDetalleBienes"
 import useAuthStore from "../../../store/useAuthStore"
+import SingleSelect from "../../ui/SingleSelect"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 // import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
@@ -19,11 +21,13 @@ interface Props {
     ubigeos: Ubigeo[]
     itemmp: string
     createDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienCreateData>
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, createDetalleBien }: Props) => {
+const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, createDetalleBien, setOpen }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [tipoBien, setTipoBien] = useState(detalleBien ? (detalleBien.tipob === 'BIENES' ? 1 : 2) : 0)
     const [partida, setPartida] = useState(detalleBien ? detalleBien.pregistral : '')
@@ -42,22 +46,18 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
         return null;
       });
     const [fecha, setFecha] = useState(detalleBien ? detalleBien.fechaconst : '')
+    
+    // CONDITIONAL FIELDS
+    const [serieMaqEq, setSerieMaqEq] = useState(detalleBien ? detalleBien.smaquiequipo : '')
+    const [tpsm, setTpsm] = useState(detalleBien ? detalleBien.tpsm : '')
+    const [npsm, setNpsm] = useState(detalleBien ? detalleBien.npsm : '')
+    const [otherSpecific, setOtherSpecific] = useState(detalleBien ? detalleBien.oespecific : '')
 
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Aquí puedes manejar el envío del formulario, por ejemplo, llamar a un servicio API para crear o actualizar el detalle del bien
-        console.log({
-            kardex,
-            idtipoacto,
-            tipoBien,
-            partida,
-            tipoBienJuridico,
-            sedeRegistral,
-            ubigeo,
-            fecha,
-            itemmp
-        });
+        setLoading(true)
 
         createDetalleBien && createDetalleBien.mutate({
             access,
@@ -71,10 +71,25 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
                 coddis: ubigeo ? ubigeo.id : '',
                 fechaconst: fecha,
                 itemmp,
-                oespecific: detalleBien?.oespecific ?? '',
-                smaquiequipo: detalleBien?.smaquiequipo ?? '',
-                tpsm: detalleBien?.tpsm ?? '',
-                npsm: detalleBien?.npsm ?? ''
+                oespecific: otherSpecific,
+                smaquiequipo: serieMaqEq,
+                tpsm: tpsm,
+                npsm: npsm
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Detalle de Bien creado correctamente')
+                setShow(true)
+                setType('success')
+                setOpen(false)
+            },
+            onError: (error) => {
+                setMessage(error.message)
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
             }
         })
     }
@@ -121,6 +136,42 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
                 setter={setSedeRegistral}
             />
         </div>
+        {tipoBienJuridico === 5 && 
+        <div className="grid grid-cols-2 gap-4">
+            <SimpleInput
+                label="N° de Serie para Maquinaria y Equipos"
+                value={serieMaqEq}
+                setValue={setSerieMaqEq}
+                horizontal
+            />
+        </div>}
+        {tipoBienJuridico === 8 && 
+        <div className="grid grid-cols-2 gap-4">
+            <SingleSelect 
+                options={[
+                    { value: 'P', label: 'N° de Placa' },
+                    { value: 'S', label: 'N° de Serie' },
+                    { value: 'M', label: 'N° de Motor' }
+                ]}
+                selected={tpsm}
+                onChange={setTpsm}
+            />
+            <SimpleInput
+                label={tpsm === 'P' ? 'N° de Placa' : tpsm === 'S' ? 'N° de Serie' : 'N° de Motor'}
+                value={npsm}
+                setValue={setNpsm}
+                horizontal
+            />
+        </div>}
+        {tipoBienJuridico === 10 && 
+        <div className="grid grid-cols-2 gap-4">
+            <SimpleInput
+                label="Detalle del bien materia del acto juridico"
+                value={otherSpecific}
+                setValue={setOtherSpecific}
+                horizontal
+            />
+        </div>}
         <SearchableDropdownInput
             options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
             selected={ubigeo}
@@ -140,7 +191,7 @@ const DetalleBienForm = ({ kardex, idtipoacto, detalleBien, ubigeos, itemmp, cre
                     type="submit"
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors cursor-pointer"
                 >
-                    Guardar
+                    {loading ? 'Guardando...' : detalleBien ? 'Actualizar Detalle' : 'Crear Detalle'}
                 </button>
             </div>
         </div>

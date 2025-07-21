@@ -10,9 +10,10 @@ interface Props {
     idtipoacto: string
     itemmp: string
     createDetalleBien?: UseMutationResult<DetalleBien, Error, DetalleBienCreateData>
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDetalleBien }: Props) => {
+const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDetalleBien, setOpen }: Props) => {
 
     const { data: ubigeos, isLoading, isError, error, isSuccess } = useGetUbigeos()
 
@@ -30,6 +31,7 @@ const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDet
         idtipoacto={idtipoacto}
         itemmp={itemmp}
         createDetalleBien={createDetalleBien}
+        setOpen={setOpen}
     />
   )
 }

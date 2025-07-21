@@ -33,6 +33,7 @@ const UpdateDetalleBien = ({ detalleBien }: Props) => {
             kardex={detalleBien.kardex}
             idtipoacto={detalleBien.idtipacto}
             itemmp={detalleBien.itemmp}
+            setOpen={setOpen}
         />
 
     </TopModal>
