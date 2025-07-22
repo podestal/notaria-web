@@ -192,6 +192,18 @@ const DetalleBienForm = ({
                 setter={setSedeRegistral}
             />
         </div>
+        {tipoBienJuridico === 4 && 
+        <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center justify-end gap-4">
+                <button
+                    type="button"
+                    onClick={() => setOpenPredioForm(true)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-100 cursor-pointer"
+                >
+                    {detalleBien ? 'Mostrar Detalle del Predio' : 'Agregar Detalle del Predio'}
+                </button>
+            </div>
+        </div>}
         {tipoBienJuridico === 5 && 
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput
