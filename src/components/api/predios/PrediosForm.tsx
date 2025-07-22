@@ -2,8 +2,12 @@ import { useState } from "react"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import SimpleInput from "../../ui/SimpleInput"
 
+interface Props {
+    kardex: string
+}
 
-const PrediosForm = () => {
+
+const PrediosForm = ({ kardex }: Props) => {
 
         const [topoZona, setTopoZona] = useState('')
         const [zona, setZona] = useState('')

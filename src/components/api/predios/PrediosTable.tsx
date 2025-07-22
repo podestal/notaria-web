@@ -1,12 +1,17 @@
 import PrediosTableBody from "./PrediosTableBody"
 import PrediosTableHeader from "./PrediosTableHeader"
 
+interface Props {
+    kardex: string
+}
 
-const PrediosTable = () => {
+const PrediosTable = ({ kardex }: Props) => {
   return (
     <div className="my-6">
         <PrediosTableHeader />
-        <PrediosTableBody />
+        <PrediosTableBody 
+            kardex={kardex}
+        />
     </div>
   )
 }

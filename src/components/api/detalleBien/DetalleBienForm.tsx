@@ -13,7 +13,6 @@ import useAuthStore from "../../../store/useAuthStore"
 import SingleSelect from "../../ui/SingleSelect"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import TopModal from "../../ui/TopModal"
-import DetalleBienPredioForm from "./DetalleBienPredioForm"
 import { DetalleBienUpdateData } from "../../../hooks/api/detalleBien/useUpdateDetalleBien"
 import PrediosMain from "../predios/PrediosMain"
 // import useAuthStore from "../../../store/useAuthStore"
@@ -273,7 +272,9 @@ const DetalleBienForm = ({
         isOpen={openPredioForm}
         onClose={() => setOpenPredioForm(false)}
     >
-        <PrediosMain />
+        <PrediosMain 
+            kardex={kardex}
+        />
 
     </TopModal>
     </>

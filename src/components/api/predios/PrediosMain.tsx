@@ -1,11 +1,19 @@
 import PrediosForm from "./PrediosForm"
 import PrediosTable from "./PrediosTable"
 
-const PrediosMain = () => {
+interface Props {
+    kardex: string
+}
+
+const PrediosMain = ({ kardex }: Props) => {
   return (
     <>
-        <PrediosForm />
-        <PrediosTable />
+        <PrediosForm 
+            kardex={kardex}
+        />
+        <PrediosTable 
+            kardex={kardex}
+        />
     </>
   )
 }

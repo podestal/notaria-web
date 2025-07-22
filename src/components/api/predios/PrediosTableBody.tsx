@@ -1,16 +1,34 @@
-const PrediosTableBody = () => {
-  return (
-    <div className="grid grid-cols-11 gap-4 text-xs text-center items-center">
-        <p>Tipo de Zona</p>
-        <p className="col-span-2">Zona</p>
-        <p className="col-span-2">Denominación</p>
-        <p>Tipo de Vía</p>
-        <p className="col-span-2">Nombre de Vía</p>
-        <p>Número</p>
-        <p>Manzana</p>
-        <p>Lote</p>
+import useGetPrediosByKardex from "../../../hooks/api/predios/useGetPrediosByKardex"
+import useAuthStore from "../../../store/useAuthStore"
+import PrediosCard from "./PrediosCard"
 
-    </div>
+interface Props {
+    kardex: string
+}
+
+const PrediosTableBody = ({ kardex }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
+    const { data: predios, isLoading, isError, error, isSuccess } = useGetPrediosByKardex({ access, kardex })
+
+    if ( isLoading) return <p className="text-center animate-pulse my-4">Cargando...</p>
+
+    if (isError) return <p className="text-center text-red-500 my-4">Error: {error.message}</p>
+
+    if (isSuccess)
+
+  return (
+    <>
+      {predios.length > 0 ? (
+        <>
+          {predios.map((predio) => (
+            <PrediosCard key={predio.id_predio} predio={predio} />
+          ))}
+        </>
+      ) : (
+        <p className="text-center my-4">No hay predios disponibles</p>
+      )}
+    </>
   )
 }
 
