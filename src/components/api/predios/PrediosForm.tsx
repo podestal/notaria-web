@@ -1,6 +1,10 @@
 import { useState } from "react"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import SimpleInput from "../../ui/SimpleInput"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import useAuthStore from "../../../store/useAuthStore"
+import useCreatePredio from "../../../hooks/api/predios/useCreatePredio"
+import moment from "moment"
 
 interface Props {
     kardex: string
@@ -9,14 +13,57 @@ interface Props {
 
 const PrediosForm = ({ kardex }: Props) => {
 
-        const [topoZona, setTopoZona] = useState('')
-        const [zona, setZona] = useState('')
-        const [denominacion, setDenominacion] = useState('')
-        const [tipoVia, setTipoVia] = useState('')
-        const [nombreVia, setNombreVia] = useState('')
-        const [numero, setNumero] = useState('')
-        const [manzana, setManzana] = useState('')
-        const [lote, setLote] = useState('')
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    const access = useAuthStore(s => s.access_token) || ''
+
+    const [topoZona, setTopoZona] = useState('')
+    const [zona, setZona] = useState('')
+    const [denominacion, setDenominacion] = useState('')
+    const [tipoVia, setTipoVia] = useState('')
+    const [nombreVia, setNombreVia] = useState('')
+    const [numero, setNumero] = useState('')
+    const [manzana, setManzana] = useState('')
+    const [lote, setLote] = useState('')
+
+    const [loading, setLoading] = useState(false)
+
+    const createPredio = useCreatePredio()
+
+    const handleCreatePredio = () => {
+
+        setLoading(true)
+
+        createPredio.mutate({
+            access,
+            predio: {
+                kardex,
+                tipo: topoZona === 'URB.' ? 'Urbano' : topoZona === 'BAR.' ? 'Barrio' : 'Villa',
+                tipo_zona: topoZona,
+                zona,
+                denominacion,
+                tipo_via: tipoVia,
+                nombre_via: nombreVia,
+                numero,
+                manzana,
+                lote,
+                fecha_registro: moment().format('YYYY-MM-DD')
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Predio creado correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: (error) => {
+                setMessage(error.message)
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
+    }
 
   return (
     <div className="flex flex-col gap-4">
@@ -116,10 +163,11 @@ const PrediosForm = ({ kardex }: Props) => {
                 Buscar
             </button>
             <button
+                onClick={handleCreatePredio}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors cursor-pointer"
                 type="button"
             >
-                Guardar
+                {loading ? 'Cargando' : 'Guardar'}
             </button>
         </div>
     </div>
