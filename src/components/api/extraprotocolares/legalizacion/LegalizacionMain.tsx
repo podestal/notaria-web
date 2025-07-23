@@ -1,4 +1,5 @@
 import GenericHeader from "../../../ui/GenericHeader"
+import LegalizacionTable from "./LegalizacionTable"
 
 
 const LegalizacionMain = () => {
@@ -8,7 +9,8 @@ const LegalizacionMain = () => {
           title="Legalización de Firmas"
           setOpen={() => {}}
         />
-        <p>dafadfasdf</p>
+        <p>Filters</p>
+        <LegalizacionTable />
     </div>
   )
 }

@@ -126,11 +126,6 @@ const routes = createBrowserRouter([
             },
         ]
     },
-    // {
-    //     path: "/",
-    //     element: <PrivateRoutes><MainPage /></PrivateRoutes>,
-    //     errorElement: <div>Error</div>,
-    // }
 ]);
 
 export default routes
