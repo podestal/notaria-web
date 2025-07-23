@@ -13,6 +13,12 @@ import SisgenMain from "../components/api/sisgen/SisgenMain";
 import LegalizacionMain from "../components/api/extraprotocolares/legalizacion/LegalizacionMain";
 import PermisosMain from "../components/api/extraprotocolares/permisosViaje/PermisosMain";
 import PoderesFueraDeRegistroMain from "../components/api/extraprotocolares/poderesFueraDeRegistro/PoderesFueraDeRegistroMain";
+import CartasNotarialesMain from "../components/api/extraprotocolares/cartasNotariales/CartasNotarialesMain";
+import AperturaDeLibrosMain from "../components/api/extraprotocolares/AperturaDeLibros/AperturaDeLibrosMain";
+import SuperCapazMain from "../components/api/extraprotocolares/supervivenciaCapaz/SuperCapazMain";
+import SuperIncapazMain from "../components/api/extraprotocolares/supervivenciaIncapaz/SuperIncapazMain";
+import CertDomiciliarioMain from "../components/api/extraprotocolares/certificadoDomiciliario/CertDomiciliarioMain";
+import CambioCaracteristicasMain from "../components/api/extraprotocolares/cambioCaracteristicas/CambioCaracteristicasMain";
 
 const routes = createBrowserRouter([
     {
@@ -49,6 +55,30 @@ const routes = createBrowserRouter([
                     {
                         path:"poderesFueraDeRegistro",
                         element: <PrivateRoutes><PoderesFueraDeRegistroMain /></PrivateRoutes>
+                    },
+                    {
+                        path:"cartaNotarial",
+                        element: <PrivateRoutes><CartasNotarialesMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "aperturaLibros",
+                        element: <PrivateRoutes><AperturaDeLibrosMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "supervivenciaCapaz",
+                        element: <PrivateRoutes><SuperCapazMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "supervivenciaIncapaz",
+                        element: <PrivateRoutes><SuperIncapazMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "certificadoDomiciliario",
+                        element: <PrivateRoutes><CertDomiciliarioMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "cambioCaracteristicas",
+                        element: <PrivateRoutes><CambioCaracteristicasMain /></PrivateRoutes>
                     }
                 ]
             },
