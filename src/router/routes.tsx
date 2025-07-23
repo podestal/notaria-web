@@ -10,7 +10,9 @@ import UsuariosMain from "../components/api/usuarios/UsuariosMain";
 import HerramientasMain from "../components/api/herramientas/HerramientasMain";
 import ConfiguracionMain from "../components/api/configuracion/ConfiguracionMain";
 import SisgenMain from "../components/api/sisgen/SisgenMain";
-import LegalizacionMain from "../components/api/legalizacion/LegalizacionMain";
+import LegalizacionMain from "../components/api/extraprotocolares/legalizacion/LegalizacionMain";
+import PermisosMain from "../components/api/extraprotocolares/permisosViaje/PermisosMain";
+import PoderesFueraDeRegistroMain from "../components/api/extraprotocolares/poderesFueraDeRegistro/PoderesFueraDeRegistroMain";
 
 const routes = createBrowserRouter([
     {
@@ -39,6 +41,14 @@ const routes = createBrowserRouter([
                     {
                         path:"certificacionFirmas",
                         element: <PrivateRoutes><LegalizacionMain /></PrivateRoutes>
+                    },
+                    {
+                        path:"permisosViaje",
+                        element: <PrivateRoutes><PermisosMain /></PrivateRoutes>
+                    },
+                    {
+                        path:"poderesFueraDeRegistro",
+                        element: <PrivateRoutes><PoderesFueraDeRegistroMain /></PrivateRoutes>
                     }
                 ]
             },

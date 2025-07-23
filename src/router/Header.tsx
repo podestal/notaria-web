@@ -59,14 +59,14 @@ const Header = ({ kardexTypes }: Props) => {
       },
         { label: "EXTRAPROTOCOLARES", options: 
             [   {name: "Certificación de Firmas", path: "/app/extraprotocolares/certificacionFirmas"},
-                {name: "Cert. Autorización de viaje"},
-                {name: "Poderes Fuera de Registro"},
-                {name: "Cartas Notariales"},
-                {name: "Cert. Apertura de Libros"},
-                {name: "Cert. Supervivencia Persona Capaz"},
-                {name: "Cert. Supervivencia Persona Incapaz"},
-                {name: "Certificado Domiciliario"},
-                {name: "Cambio de Características"},
+                {name: "Cert. Autorización de viaje", path: "/app/extraprotocolares/permisosViaje"},
+                {name: "Poderes Fuera de Registro", path: "/app/extraprotocolares/poderesFueraDeRegistro"},
+                {name: "Cartas Notariales", path: "/app/extraprotocolares/cartaNotarial"},
+                {name: "Cert. Apertura de Libros", path: "/app/extraprotocolares/aperturaLibros"},
+                {name: "Cert. Supervivencia Persona Capaz", path: "/app/extraprotocolares/supervivenciaCapaz"},
+                {name: "Cert. Supervivencia Persona Incapaz", path: "/app/extraprotocolares/supervivenciaIncapaz"},
+                {name: "Certificado Domiciliario", path: "/app/extraprotocolares/certificadoDomiciliario"},
+                {name: "Cambio de Características", path: "/app/extraprotocolares/cambioCaracteristicas"},
                 {name: "Busqueda Avanzada"}
             ]},
         { label: "REPORTES", options: 

@@ -1,4 +1,4 @@
-import GenericHeader from "../../ui/GenericHeader"
+import GenericHeader from "../../../ui/GenericHeader"
 
 
 const LegalizacionMain = () => {
