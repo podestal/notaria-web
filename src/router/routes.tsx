@@ -10,6 +10,7 @@ import UsuariosMain from "../components/api/usuarios/UsuariosMain";
 import HerramientasMain from "../components/api/herramientas/HerramientasMain";
 import ConfiguracionMain from "../components/api/configuracion/ConfiguracionMain";
 import SisgenMain from "../components/api/sisgen/SisgenMain";
+import LegalizacionMain from "../components/api/legalizacion/LegalizacionMain";
 
 const routes = createBrowserRouter([
     {
@@ -33,7 +34,13 @@ const routes = createBrowserRouter([
                 element: 
                 <PrivateRoutes>
                     <ExtraprotocolaresMain />
-                </PrivateRoutes>
+                </PrivateRoutes>,
+                children: [
+                    {
+                        path:"certificacionFirmas",
+                        element: <PrivateRoutes><LegalizacionMain /></PrivateRoutes>
+                    }
+                ]
             },
             {
                 path: "reportes",

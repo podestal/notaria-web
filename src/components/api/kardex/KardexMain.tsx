@@ -9,7 +9,7 @@ const KardexMain = () => {
   const bodyRender = useBodyRenderStore(s => s.bodyRender)
 
   return (
-    <div className="mt-[80px] w-[65%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
+    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
         {bodyRender !== 0 
         ?
         <>

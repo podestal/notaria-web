@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom'
 
 interface MenuOptions {
     name: string;
+    path?: string
     subOptions?: string[]
     docType?: number
 }
@@ -57,7 +58,7 @@ const Header = ({ kardexTypes }: Props) => {
           ],
       },
         { label: "EXTRAPROTOCOLARES", options: 
-            [   {name: "Calificacíon de Firmas"},
+            [   {name: "Certificación de Firmas", path: "/app/extraprotocolares/certificacionFirmas"},
                 {name: "Cert. Autorización de viaje"},
                 {name: "Poderes Fuera de Registro"},
                 {name: "Cartas Notariales"},
@@ -180,7 +181,7 @@ const Header = ({ kardexTypes }: Props) => {
               className="relative"
               onMouseEnter={() => setOpenDropdown(index)}
               onMouseLeave={() => setOpenDropdown(null)}
-              onClick={() => navigate(`/app/${item.label.toLowerCase()}`)}
+              // onClick={() => navigate(`/app/${item.label.toLowerCase()}`)}
             >
               {/* Main Item */}
               <li className="cursor-pointer hover:text-slate-50 px-4 py-2">
@@ -198,14 +199,16 @@ const Header = ({ kardexTypes }: Props) => {
                         onMouseEnter={() => option.subOptions && setOpenSubDropdown(idx)}
                         onMouseLeave={() => setOpenSubDropdown(null)}
                         onClick={() => {
+                          console.log('option', option)
                           navigate(`/app/${item.label.toLowerCase()}`)
                           setCorrelative('')
                           option.docType && setBodyRender(option.docType)
+                          option.path && navigate(option.path)
                           setKardexFilter({
                             type: '',
                             value: ''
                         })
-                          console.log('option.docType', option)}}
+                          }}
                       >
                         <li className="px-4 py-2 hover:bg-sky-500 hover:text-slate-50 cursor-pointer w-full border-b border-neutral-600 flex justify-between">
                           {getTitleCase(option.name)}
