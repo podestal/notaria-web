@@ -3,14 +3,16 @@ import getLegalizacionService, {LegalizacionPage} from "../../../../services/api
 
 interface Props {
     access: string
+    page: number
 }
 
-const useGetLegalizaciones = ({ access }: Props): UseQueryResult<LegalizacionPage, Error> => {
+const useGetLegalizaciones = ({ access, page }: Props): UseQueryResult<LegalizacionPage, Error> => {
     const legalizacionService = getLegalizacionService()
+    const params = { page: page.toString() }
 
     return useQuery({
-        queryKey: ['legalizaciones'],
-        queryFn: () => legalizacionService.get(access),
+        queryKey: ['legalizaciones', params],
+        queryFn: () => legalizacionService.get(access, params),
     })
 }
 
