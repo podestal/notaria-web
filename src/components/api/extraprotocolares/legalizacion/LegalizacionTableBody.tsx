@@ -26,7 +26,6 @@ const LegalizacionTableBody = ({ dateFrom, dateTo }: Props) => {
     if (isSuccess)
   return (
     <>
-        <>{console.log(legalizaciones)}</>
         {legalizaciones.results.length > 0 ? (
             <div className="pb-2">
                 {legalizaciones.results.map((legalizacion) => (

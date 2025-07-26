@@ -1,5 +1,6 @@
 import GenericHeader from "../../../ui/GenericHeader"
 import PermisosFilter from "./PermisosFilter"
+import PermisosTable from "./PermisosTable"
 
 const PermisosMain = () => {
   return (
@@ -14,7 +15,7 @@ const PermisosMain = () => {
           dateTo={undefined}
           setDateTo={() => {}}
         />
-        {/* Aquí se incluiría la tabla de permisos de viaje */}
+        <PermisosTable />
     </div>
   )
 }
