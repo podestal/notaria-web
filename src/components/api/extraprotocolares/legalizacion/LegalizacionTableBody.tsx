@@ -1,7 +1,8 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useGetLegalizaciones from "../../../../hooks/api/extraprotocolares/legalizacion/useGetLegalizaciones"
 import useAuthStore from "../../../../store/useAuthStore"
 import Paginator from "../../../ui/Paginator"
+import LegalizacionCard from "./LegalizacionCard"
 
 interface Props {
     dateFrom: Date | undefined
@@ -12,6 +13,11 @@ const LegalizacionTableBody = ({ dateFrom, dateTo }: Props) => {
 
     const [page, setPage] = useState(1)
     const access = useAuthStore(s => s.access_token) || ''
+
+    useEffect(() => {
+        setPage(1)
+    }, [dateFrom, dateTo])
+
     const { data: legalizaciones, isLoading, isError, error, isSuccess } = useGetLegalizaciones({ access, page, dateFrom, dateTo })
 
     if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>
@@ -24,15 +30,14 @@ const LegalizacionTableBody = ({ dateFrom, dateTo }: Props) => {
         {legalizaciones.results.length > 0 ? (
             <div className="pb-2">
                 {legalizaciones.results.map((legalizacion) => (
-                    <div key={legalizacion.idlegalizacion} className="grid grid-cols-3 gap-4 justify-center items-center text-center text-xs mt-4">
-                        <p>{legalizacion.idlegalizacion}</p>
-                        <p>{legalizacion.fechaingreso}</p>
-                        <p>{legalizacion.dni}</p>
-                    </div>
+                    <LegalizacionCard 
+                        key={legalizacion.idlegalizacion}
+                        legalizacion={legalizacion}
+                    />
                 ))}
             </div>
         ) : (
-            <p className="text-center text-xs my-4">No hay legalizaciones disponibles</p>
+            <p className="text-center text-xs my-4 pb-4">No hay legalizaciones disponibles</p>
         )}
         <Paginator
           page={page}

@@ -8,6 +8,12 @@ interface Props {
 }
 
 const LegalizacionFilters = ({ dateFrom, setDateFrom, dateTo, setDateTo }: Props ) => {
+
+    const handleCleanFilters = () => {
+        setDateFrom(undefined);
+        setDateTo(undefined);
+    }
+
   return (
     <div className="w-full grid grid-cols-3 gap-4 justify-center items-center text-center my-6">
         <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
@@ -19,7 +25,9 @@ const LegalizacionFilters = ({ dateFrom, setDateFrom, dateTo, setDateTo }: Props
             <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
         </div>
         <div>
-            <button className="bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
+            <button 
+                onClick={handleCleanFilters}
+                className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Limpiar</button>
         </div>
     </div>
   )
