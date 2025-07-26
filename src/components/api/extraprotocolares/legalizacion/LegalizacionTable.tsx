@@ -1,12 +1,20 @@
 import LegalizacionTableBody from "./LegalizacionTableBody"
 import LegalizacionTableHeader from "./LegalizacionTableHeader"
 
-const LegalizacionTable = () => {
+interface Props {
+    dateFrom: Date | undefined
+    dateTo: Date | undefined
+}
+
+const LegalizacionTable = ({ dateFrom, dateTo }: Props) => {
   return (
     <>
       <LegalizacionTableHeader />
-      <LegalizacionTableBody />
-    
+      <LegalizacionTableBody 
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+      />
+
     </>
   )
 }

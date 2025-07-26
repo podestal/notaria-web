@@ -21,7 +21,10 @@ const LegalizacionMain = () => {
           dateTo={dateTo}
           setDateTo={setDateTo}
         />
-        <LegalizacionTable />
+        <LegalizacionTable 
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+        />
     </div>
   )
 }
