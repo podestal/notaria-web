@@ -6,6 +6,7 @@ import { Cliente } from "../../../services/api/cliente1Service"
 import CreateCliente from "./CreateCliente"
 import UpdateCliente from "./UpdateCliente"
 import CreateContratante from "../contratantes/CreateContratante"
+import { documentoJuridicaOptions, documentNaturalOptions } from "../../../data/clienteData"
 
 interface Props {
     idtipoacto: string
@@ -13,27 +14,6 @@ interface Props {
     kardex: string
     setClientesCheck: React.Dispatch<React.SetStateAction<boolean>>
 }
-
-const documentoJuridicaOptions = [
-    { value: 0, label: 'Seleccione una opción' },
-    { value: 1, label: 'R.U.C.' },
-    { value: 2, label: 'Sin Documento'},
-]
-
-const documentNaturalOptions = [
-    { value: 0, label: 'Seleccione una opción' },
-    { value: 1, label: 'Documento Nacional de Identidad' },
-    { value: 2, label: 'Carnet de Extranjería' },
-    { value: 3, label: 'Carnet de Identidad de las Fuerzas Armadas' },
-    { value: 4, label: 'Carnet de Identidad de las Fuerzas Policiales' },
-    { value: 5, label: 'Pasaporte' },
-    { value: 6, label: 'Cédula de Ciudadanía' },
-    { value: 7, label: 'Cédula Diplomática de Identidad'},
-    { value: 8, label: 'Partida de Nacimiento' },
-    { value: 9, label: 'Otro' }
-]
-
-
 
 const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props) => {
 

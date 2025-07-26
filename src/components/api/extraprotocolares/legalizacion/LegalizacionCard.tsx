@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Legalizacion } from "../../../../services/api/extraprotocolares/legalizacionService"
 import TopModal from "../../../ui/TopModal"
+import UpdateLegalizacion from "./UpdateLegalizacion"
 
 interface Props {
     legalizacion: Legalizacion
@@ -23,7 +24,7 @@ const LegalizacionCard = ({ legalizacion }: Props) => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <p>Modal legalizacion</p>
+            <UpdateLegalizacion />
         </TopModal>
     </>
   )
