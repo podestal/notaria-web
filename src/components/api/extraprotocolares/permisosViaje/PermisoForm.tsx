@@ -39,6 +39,8 @@ const PermisoForm = ({ permisoViaje }: Props) => {
 
   return (
     <div>
+        <h2 className="text-lg font-semibold text-center mb-8">Formulario del Permiso de Viaje</h2>
+        <>{console.log('permisoViaje', permisoViaje)}</>
         <div className="grid grid-cols-8 gap-2">
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <Save className="text-xl"/>

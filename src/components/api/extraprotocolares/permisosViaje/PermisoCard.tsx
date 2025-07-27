@@ -2,7 +2,7 @@ import { PermisoViaje } from "../../../../services/api/extraprotocolares/permiso
 import { PERMISO_VIAJE_CONDICIONES, PERMISO_VIAJE_ASUNTOS } from "../../../../data/permisoViajeData"
 import TopModal from "../../../ui/TopModal";
 import { useState } from "react";
-import PermisoForm from "./PermisoForm";
+import UpdatePermiso from "./UpdatePermiso";
 
 interface Props {
     permisoViaje: PermisoViaje
@@ -41,7 +41,7 @@ const PermisoCard = ({ permisoViaje }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
       >
-        <PermisoForm 
+        <UpdatePermiso 
             permisoViaje={permisoViaje}
         />
       </TopModal>

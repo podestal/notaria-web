@@ -18,8 +18,8 @@ export const PERMISO_VIAJE_ASUNTOS = [
 ];
 
 export const PERMISO_VIAJE_VIA = [
-    { id_via: 1, cod_via: '001', des_via: 'Aérea' },
-    { id_via: 2, cod_via: '002', des_via: 'Terrestre' },
-    { id_via: 3, cod_via: '003', des_via: 'Marítima' },
-    { id_via: 4, cod_via: '004', des_via: 'Area - Terrestre' },
+    { id_via: 1, cod_via: '001', des_via: 'AEREA' },
+    { id_via: 2, cod_via: '002', des_via: 'TERRESTRE' },
+    { id_via: 3, cod_via: '003', des_via: 'MARITIMA' },
+    { id_via: 4, cod_via: '004', des_via: 'AREA - TERRESTRE' },
 ]
