@@ -7,6 +7,12 @@ export interface PermisoViajePage {
     results: PermisoViaje[];
 }
 
+export interface PermisoViajeSimpleContratante {
+    id_contratante: number;
+    c_descontrat: string;
+    c_condicontrat: string;
+}
+
 export interface PermisoViaje {
     id_viaje: number;
     num_kardex: string;
@@ -31,6 +37,7 @@ export interface PermisoViaje {
     via: string;
     fecha_desde: Date;
     fecha_hasta: Date;
+    contratantes: PermisoViajeSimpleContratante[];
 }
 
 export type CreateUpdatePermisoViaje = Omit<PermisoViaje, 'id_viaje'>;
