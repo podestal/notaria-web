@@ -55,7 +55,7 @@ const SimpleInput = ({
                     }}
                     placeholder={label}
                     className={`bg-white text-slate-700 border ${
-                    fullWidth ? 'w-full' : 'w-64'
+                    fullWidth ? 'w-full' : 'min-w-64'
                     } ${
                     horizontal && 'col-span-2'
                     } ${

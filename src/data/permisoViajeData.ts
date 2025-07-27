@@ -11,3 +11,15 @@ export const PERMISO_VIAJE_CONDICIONES = [
   { id: 11, id_condicion: '010', des_condicion: 'TESTIGO', swt_condicion: 'V' },
   { id: 12, id_condicion: '011', des_condicion: 'REPRESENTANTE', swt_condicion: 'P' },
 ];
+
+export const PERMISO_VIAJE_ASUNTOS = [
+  { id_asunto: 1, cod_asunto: '001', des_asunto: 'Permiso de viaje al interior' },
+  { id_asunto: 2, cod_asunto: '002', des_asunto: 'Permiso de viaje al exterior' },
+];
+
+export const PERMISO_VIAJE_VIA = [
+    { id_via: 1, cod_via: '001', des_via: 'Aérea' },
+    { id_via: 2, cod_via: '002', des_via: 'Terrestre' },
+    { id_via: 3, cod_via: '003', des_via: 'Marítima' },
+    { id_via: 4, cod_via: '004', des_via: 'Area - Terrestre' },
+]

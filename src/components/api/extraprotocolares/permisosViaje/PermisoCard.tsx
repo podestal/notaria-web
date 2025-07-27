@@ -1,5 +1,8 @@
 import { PermisoViaje } from "../../../../services/api/extraprotocolares/permisoViajeService"
-import { PERMISO_VIAJE_CONDICIONES } from "../../../../data/permisoViajeData"
+import { PERMISO_VIAJE_CONDICIONES, PERMISO_VIAJE_ASUNTOS } from "../../../../data/permisoViajeData"
+import TopModal from "../../../ui/TopModal";
+import { useState } from "react";
+import PermisoForm from "./PermisoForm";
 
 interface Props {
     permisoViaje: PermisoViaje
@@ -7,12 +10,18 @@ interface Props {
 
 const PermisoCard = ({ permisoViaje }: Props) => {
 
+    const [open, setOpen] = useState(false);
+    
+
   return (
-      <div
+    <>
+    <div
         className="grid grid-cols-9 gap-4 p-2 my-4 mx-6 text-xs"
       >
-        <div className="text-center">{permisoViaje.num_formu}</div>
-        <div className="text-center">{permisoViaje.num_kardex}</div>
+        <p 
+            onClick={() => setOpen(true)}
+            className="text-center text-blue-600 cursor-pointer hover:text-blue-500">{permisoViaje.num_formu}</p>
+        <p className="text-center">{permisoViaje.num_kardex}</p>
         <div className="col-span-2 text-center">
             {permisoViaje.contratantes.map((contratante) => (
                 <div 
@@ -23,11 +32,20 @@ const PermisoCard = ({ permisoViaje }: Props) => {
                 </div>
             ))}
         </div>
-        <div className="text-center">{permisoViaje.fecha_crono}</div>
-        <div className="text-center">tipo permiso</div>
-        <div className="text-center">{permisoViaje.fec_ingreso}</div>
-        <div className="col-span-2 text-center">{permisoViaje.lugar_formu}</div>
+        <p className="text-center">{permisoViaje.fecha_crono}</p>
+        <p className="text-center">{PERMISO_VIAJE_ASUNTOS.find(asunto => asunto.cod_asunto === permisoViaje.asunto)?.des_asunto}</p>
+        <p className="text-center">{permisoViaje.fec_ingreso}</p>
+        <p className="col-span-2 text-center">{permisoViaje.lugar_formu}</p>
       </div>
+      <TopModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+      >
+        <PermisoForm 
+            permisoViaje={permisoViaje}
+        />
+      </TopModal>
+    </>
   )
 }
 
