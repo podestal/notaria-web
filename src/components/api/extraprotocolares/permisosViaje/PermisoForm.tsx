@@ -7,6 +7,7 @@ import { useState } from "react"
 import TimePicker from "../../../ui/TimePicker"
 import moment from "moment"
 import Calendar from "../../../ui/Calendar"
+import ParticipantesMain from "./participantes/ParticipantesMain"
 
 interface Props {
     permisoViaje?: PermisoViaje
@@ -38,6 +39,7 @@ const PermisoForm = ({ permisoViaje }: Props) => {
     const [observacion, setObservacion] = useState(permisoViaje?.observacion || '');
 
   return (
+    <>
     <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario del Permiso de Viaje</h2>
         <>{console.log('permisoViaje', permisoViaje)}</>
@@ -170,6 +172,10 @@ const PermisoForm = ({ permisoViaje }: Props) => {
         <h2 className="text-lg text-center text-xs font-semibold my-4">Observaciones</h2>
         <textarea className="w-full h-32 p-2 border border-gray-300 rounded-md" value={observacion} onChange={(e) => setObservacion(e.target.value)}></textarea>
     </div>
+    {permisoViaje &&             
+        <ParticipantesMain />
+    }
+    </>
   )
 }
 
