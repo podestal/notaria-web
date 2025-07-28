@@ -1,9 +1,9 @@
-import CreateParticipante from "./CreateParticipante"
+import Participantes from "./Participantes"
 
 const ParticipantesMain = () => {
   return (
         <div className="grid grid-cols-4 gap-4 my-4">
-            <CreateParticipante />
+            <Participantes />
             <div className="col-span-3 bg-slate-100 p-4 rounded-lg">
                 <h2 className="text-md font-semibold text-blue-900">Informacion de Ingreso de Participantes..!</h2>
                 <p className="text-xs">1.- Al ingresar a los participantes, primero debe ingresar AL PADRE y/o a LA MADRE.</p>

@@ -1,7 +1,7 @@
-import { UserRoundPlus } from "lucide-react"
+import { File } from "lucide-react";
 import { useState } from "react";
 import TopModal from "../../../../ui/TopModal";
-import ParticipantesTable from "./ParticipantesTable";
+import ParticipantesForm from "./ParticipantesForm";
 
 const CreateParticipante = () => {
 
@@ -11,15 +11,18 @@ const CreateParticipante = () => {
     <>
         <div 
             onClick={() => setOpen(true)}
-            className=" w-full h-fit flex items-center justify-start px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-green-600 hover:opacity-85 cursor-pointer">
-            <UserRoundPlus className="text-xl"/>
-            <p className="text-xs text-blue-600">Participantes</p>
+            className=" w-28 flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+            <File className="text-white text-xl"/>
+            <p className="text-xs font-bold">Nuevo</p>
         </div>
-        <TopModal
-            isOpen={open}
+        <TopModal 
+            isOpen={open} 
             onClose={() => setOpen(false)}
         >
-            <ParticipantesTable />
+            <div className="p-4">
+                <h2 className="text-lg font-semibold mb-4">Crear Participante</h2>
+                <ParticipantesForm />
+            </div>
         </TopModal>
     </>
   )
