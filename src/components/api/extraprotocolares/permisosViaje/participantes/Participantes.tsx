@@ -3,7 +3,11 @@ import { useState } from "react";
 import TopModal from "../../../../ui/TopModal";
 import ParticipantesTable from "./ParticipantesTable";
 
-const Participantes = () => {
+interface Props {
+    viajeId: number;
+}
+
+const Participantes = ({ viajeId }: Props) => {
 
     const [open, setOpen] = useState(false);
 
@@ -19,7 +23,9 @@ const Participantes = () => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <ParticipantesTable />
+            <ParticipantesTable 
+                viajeId={viajeId}
+            />
         </TopModal>
     </>
   )

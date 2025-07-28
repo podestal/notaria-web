@@ -2,13 +2,17 @@ import CreateParticipante from "./CreateParticipante"
 import ParticipantesTableBody from "./ParticipantesTableBody"
 import ParticipantesTableHeader from "./ParticipantesTableHeader"
 
+interface Props {
+    viajeId: number;
+}
 
-const ParticipantesTable = () => {
+
+const ParticipantesTable = ({ viajeId }: Props) => {
   return (
     <>
         <CreateParticipante />
         <ParticipantesTableHeader />
-        <ParticipantesTableBody />
+        <ParticipantesTableBody viajeId={viajeId} />
     </>
   )
 }

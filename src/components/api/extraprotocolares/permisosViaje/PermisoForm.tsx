@@ -173,7 +173,9 @@ const PermisoForm = ({ permisoViaje }: Props) => {
         <textarea className="w-full h-32 p-2 border border-gray-300 rounded-md" value={observacion} onChange={(e) => setObservacion(e.target.value)}></textarea>
     </div>
     {permisoViaje &&             
-        <ParticipantesMain />
+        <ParticipantesMain 
+            viajeId={permisoViaje.id_viaje}
+        />
     }
     </>
   )

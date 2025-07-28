@@ -34,14 +34,14 @@ export interface ViajeContratante {
 export type CreateUpdateViajeContratante = Omit<ViajeContratante, 'id_contratante'>;
 
 interface Props {
-    viajeId?: number;
+    contratanteId?: number;
     byViaje?: boolean;
 }
 
-const getViajeContratanteService = ({ viajeId, byViaje }: Props) => {
+const getViajeContratanteService = ({ contratanteId, byViaje }: Props) => {
     let url = '/viaje_contratantes/';
-    if (viajeId) {
-        url += `${viajeId}/`;
+    if (contratanteId) {
+        url += `${contratanteId}/`;
     } else if (byViaje) {
         url += `by_viaje/`;
     }
