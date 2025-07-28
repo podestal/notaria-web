@@ -40,17 +40,27 @@ export interface PermisoViaje {
     contratantes: PermisoViajeSimpleContratante[];
 }
 
-export type CreateUpdatePermisoViaje = Omit<PermisoViaje, 'id_viaje'>;
+export type CreateUpdatePermisoViaje = Omit<PermisoViaje, 'id_viaje' | 'contratantes' | 'fecha_desde' | 'fecha_hasta' | 'num_formu' | 'num_kardex'> & {
+    fecha_desde: string
+    fecha_hasta: string
+};
+
+
 
 interface Props {
     permisoViajeId?: number;
 }
 
-const getPermisoViajeService = ({ permisoViajeId }: Props) => {
+export const getPermisoViajeServiceSingle = ({ permisoViajeId }: Props) => {
     let url = '/permi_viaje/';
     if (permisoViajeId) {
         url += `${permisoViajeId}/`;
     }
+    return new APIClient<PermisoViaje, CreateUpdatePermisoViaje>(url)
+}
+
+const getPermisoViajeService = () => {
+    let url = '/permi_viaje/';
     return new APIClient<PermisoViajePage, CreateUpdatePermisoViaje>(url)
 }
 

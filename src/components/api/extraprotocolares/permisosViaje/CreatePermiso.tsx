@@ -1,9 +1,15 @@
+import useCreatePermisoViaje from "../../../../hooks/api/extraprotocolares/permisosViaje/useCreatePermisoViaje"
 import PermisoForm from "./PermisoForm"
 
 
 const CreatePermiso = () => {
+
+    const createPermisoViaje = useCreatePermisoViaje()
+
   return (
-    <PermisoForm />
+    <PermisoForm 
+        createPermisoViaje={createPermisoViaje} 
+    />
   )
 }
 

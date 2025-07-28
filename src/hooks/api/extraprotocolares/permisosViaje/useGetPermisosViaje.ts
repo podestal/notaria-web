@@ -6,8 +6,8 @@ interface Props {
     page: number
 }
 
-const useGetPermisosViaje = ({ access, page }: Props): UseQueryResult<PermisoViajePage> => {
-    const permisoViajeService = getPermisoViajeService({});
+const useGetPermisosViaje = ({ access, page }: Props): UseQueryResult<PermisoViajePage, Error> => {
+    const permisoViajeService = getPermisoViajeService();
     const params = {
         page: page.toString(),
     };

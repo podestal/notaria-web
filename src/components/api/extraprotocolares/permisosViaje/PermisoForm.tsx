@@ -8,12 +8,22 @@ import TimePicker from "../../../ui/TimePicker"
 import moment from "moment"
 import Calendar from "../../../ui/Calendar"
 import ParticipantesMain from "./participantes/ParticipantesMain"
+import { UseMutationResult } from "@tanstack/react-query"
+import { CreatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useCreatePermisoViaje"
+import useAuthStore from "../../../../store/useAuthStore"
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
+import { UpdatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje"
 
 interface Props {
     permisoViaje?: PermisoViaje
+    createPermisoViaje?: UseMutationResult<PermisoViaje, Error, CreatePermisoViajeData>
+    updatePermisoViaje?: UseMutationResult<PermisoViaje, Error, UpdatePermisoViajeData>
 }
 
-const PermisoForm = ({ permisoViaje }: Props) => {
+const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || "";
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [tipoPermiso, setTipoPermiso] = useState(permisoViaje ? permisoViaje.asunto : '');
     const [hora, setHora] = useState<string | undefined>(
@@ -38,15 +48,117 @@ const PermisoForm = ({ permisoViaje }: Props) => {
 
     const [observacion, setObservacion] = useState(permisoViaje?.observacion || '');
 
+    const [loading, setLoading] = useState(false);
+
+    const handleSave = () => {
+
+        setLoading(true);
+
+        if (!fechaDesde) {
+            setMessage('Fecha desde es requerida');
+            setShow(true);
+            setType('error');
+            return;
+        }
+
+        if (!fechaHasta) {
+            setMessage('Fecha hasta es requerida');
+            setShow(true);
+            setType('error');
+            return;
+        }
+
+
+
+        if (createPermisoViaje) {
+            createPermisoViaje.mutate({
+                permisoViaje: {
+                    asunto: tipoPermiso,
+                    hora_recep: hora || moment().format("HH:mm"),
+                    fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    referencia: motivo,
+                    nom_comu: nomComunicarse,
+                    tel_comu: telComunicarse,
+                    email_comu: emailComunicarse,
+                    via: via,
+                    lugar_formu: lugarFormu,
+                    fecha_desde: moment(fechaDesde).format('YYYY-MM-DD'),
+                    fecha_hasta: moment(fechaHasta).format('YYYY-MM-DD'),
+                    observacion: observacion,
+                    nom_recep: '', // Add the recepcionist name if needed
+                    documento: '', // Add the document if needed
+                    num_crono: '', // Add the control number if needed
+                    fecha_crono: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    swt_est: '',
+                    partida_e: '', // Add the partida if needed
+                    sede_regis: '', // Add the registration seat if needed
+                    qr: 0, // Add the QR code if needed
+                },
+                access
+            }, {
+                onSuccess: () => {
+                    setMessage('Permiso de viaje creado exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: () => {
+                    setMessage('Error al crear el permiso de viaje');
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            });
+        }
+
+        if (updatePermisoViaje && permisoViaje) {
+            updatePermisoViaje.mutate({
+                permisoViaje: {
+                    ...permisoViaje,
+                    asunto: tipoPermiso,
+                    hora_recep: hora || moment().format("HH:mm"),
+                    fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    referencia: motivo,
+                    nom_comu: nomComunicarse,
+                    tel_comu: telComunicarse,
+                    email_comu: emailComunicarse,
+                    via: via,
+                    lugar_formu: lugarFormu,
+                    fecha_desde: moment(fechaDesde).format('YYYY-MM-DD'),
+                    fecha_hasta: moment(fechaHasta).format('YYYY-MM-DD'),
+                    observacion: observacion,
+                },
+                access
+            }, {
+                onSuccess: () => {
+                    setMessage('Permiso de viaje actualizado exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: () => {
+                    setMessage('Error al actualizar el permiso de viaje');
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            });
+        }
+    }
+
   return (
     <>
     <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario del Permiso de Viaje</h2>
         <>{console.log('permisoViaje', permisoViaje)}</>
         <div className="grid grid-cols-8 gap-2">
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <Save className="text-xl"/>
-                <p className="text-xs">Guardar</p>
+            <div 
+                onClick={handleSave}
+                className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+                {!loading && <Save className="text-xl"/>}
+                <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </div>
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <FileCog className="text-xl text-green-600"/>
