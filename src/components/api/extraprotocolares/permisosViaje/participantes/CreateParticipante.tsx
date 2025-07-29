@@ -2,10 +2,17 @@ import { File } from "lucide-react";
 import { useState } from "react";
 import TopModal from "../../../../ui/TopModal";
 import ParticipantesForm from "./ParticipantesForm";
+import useCreateContratante from "../../../../../hooks/api/extraprotocolares/permisosViaje/contratantes/useCreateContratante";
 
-const CreateParticipante = () => {
+interface Props {
+    viajeId: number;
+}
+
+const CreateParticipante = ({ viajeId }: Props) => {
 
     const [open, setOpen] = useState(false);
+    const createContratante = useCreateContratante({ viaje_id: viajeId });
+    
 
   return (
     <>
@@ -21,7 +28,10 @@ const CreateParticipante = () => {
         >
             <div className="p-4">
                 <h2 className="text-2xl font-semibold mb-6 text-center">Nuevo Participante</h2>
-                <ParticipantesForm />
+                <ParticipantesForm 
+                   createContratante={createContratante}
+                   idViaje={viajeId}
+                />
             </div>
         </TopModal>
     </>

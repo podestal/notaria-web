@@ -53,6 +53,8 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
     const handleSave = () => {
 
         setLoading(true);
+        console.log('Saving permiso de viaje:');
+        
 
         if (!fechaDesde) {
             setMessage('Fecha desde es requerida');
@@ -67,8 +69,6 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
             setType('error');
             return;
         }
-
-
 
         if (createPermisoViaje) {
             createPermisoViaje.mutate({
@@ -152,14 +152,14 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
     <>
     <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario del Permiso de Viaje</h2>
-        <>{console.log('permisoViaje', permisoViaje)}</>
+        {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
         <div className="grid grid-cols-8 gap-2">
-            <div 
+            <button 
                 onClick={handleSave}
                 className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
-            </div>
+            </button>
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <FileCog className="text-xl text-green-600"/>
                 <p className="text-xs">Generar</p>

@@ -10,7 +10,9 @@ interface Props {
 const ParticipantesTable = ({ viajeId }: Props) => {
   return (
     <>
-        <CreateParticipante />
+        <CreateParticipante 
+            viajeId={viajeId}
+        />
         <ParticipantesTableHeader />
         <ParticipantesTableBody viajeId={viajeId} />
     </>
