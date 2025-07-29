@@ -3,6 +3,7 @@ import TopModal from "../../../../ui/TopModal";
 import { ViajeContratante } from "../../../../../services/api/extraprotocolares/viajeContratanteService";
 import { Pencil } from "lucide-react";
 import UpdateParticipanteForm from "./UpdateParticipanteForm";
+import useUpdateContratante from "../../../../../hooks/api/extraprotocolares/permisosViaje/contratantes/useUpdateContratante";
 
 interface Props {
     contratanteViaje: ViajeContratante;
@@ -11,6 +12,10 @@ interface Props {
 const UpdateParticipante = ({ contratanteViaje }: Props) => {
 
     const [open, setOpen] = useState(false);
+    const updateContratante = useUpdateContratante({
+        viaje_id: contratanteViaje.id_viaje,
+        contratanteId: contratanteViaje.id_contratante
+    })
 
   return (
     <>
@@ -29,6 +34,8 @@ const UpdateParticipante = ({ contratanteViaje }: Props) => {
     >
         <UpdateParticipanteForm 
             contratanteViaje={contratanteViaje}
+            setOpen={setOpen}
+            updateContratante={updateContratante}
         />
     </TopModal>
     </>
