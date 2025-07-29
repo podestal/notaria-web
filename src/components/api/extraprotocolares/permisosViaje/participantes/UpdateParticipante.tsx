@@ -1,8 +1,8 @@
 import { useState } from "react";
 import TopModal from "../../../../ui/TopModal";
-import ParticipantesForm from "./ParticipantesForm";
 import { ViajeContratante } from "../../../../../services/api/extraprotocolares/viajeContratanteService";
 import { Pencil } from "lucide-react";
+import UpdateParticipanteForm from "./UpdateParticipanteForm";
 
 interface Props {
     contratanteViaje: ViajeContratante;
@@ -27,8 +27,8 @@ const UpdateParticipante = ({ contratanteViaje }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <ParticipantesForm 
-            idViaje={contratanteViaje.id_viaje}
+        <UpdateParticipanteForm 
+            contratanteViaje={contratanteViaje}
         />
     </TopModal>
     </>
