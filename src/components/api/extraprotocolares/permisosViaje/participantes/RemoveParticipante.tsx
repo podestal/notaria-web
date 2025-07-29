@@ -2,6 +2,9 @@ import { SquareX } from "lucide-react"
 import { useState } from "react"
 import TopModal from "../../../../ui/TopModal"
 import { ViajeContratante } from "../../../../../services/api/extraprotocolares/viajeContratanteService";
+import useRemoveContratante from "../../../../../hooks/api/extraprotocolares/permisosViaje/contratantes/useRemoveContratante";
+import useAuthStore from "../../../../../store/useAuthStore";
+import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
 
 interface Props {
     contratanteViaje: ViajeContratante;
@@ -10,21 +13,33 @@ interface Props {
 
 const RemoveParticipante = ({ contratanteViaje }: Props) => {
 
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    const access = useAuthStore(s => s.access_token) || "";
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const removeContratante = useRemoveContratante({
+        viajeContratanteId: contratanteViaje.id_contratante,
+        viaje_id: contratanteViaje.id_viaje
+    })
 
     const handleRemove = () => {
         setLoading(true)
-        console.log(`Eliminando participante con ID: ${contratanteViaje.codi_podera}`);
+        removeContratante.mutate({ access }, {
+            onSuccess: () => {
+                setType('success')
+                setMessage('Participante eliminado correctamente.')
+                setShow(true)
+            },
+            onError: (error) => {
+                setType('error')
+                setMessage(`Error al eliminar el participante: ${error.message}`)
+                setShow(true)
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
         
-        // Aquí iría la lógica para eliminar el participante
-        // Por ejemplo, llamar a un hook o servicio que maneje la eliminación
-        // Simulando una llamada exitosa
-        setTimeout(() => {
-            setLoading(false)
-            setOpen(false)
-            // Mostrar notificación de éxito
-        }, 1000)
     }
 
   return (
