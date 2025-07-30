@@ -10,9 +10,10 @@ const PoderesFueraDeRegistroMain = () => {
     const access = useAuthStore(s => s.access_token) || ''
     const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
     const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
+    const [dateType, setDateType] = useState('1') // Assuming you want to manage a date type
     const [page, setPage] = useState(1)
 
-    const { data: poderes, isLoading, error, isError, isSuccess, refetch } = useGetIngresoPoderes({ access, page, dateFrom, dateTo })
+    const { data: poderes, isLoading, error, isError, isSuccess, refetch } = useGetIngresoPoderes({ access, page, dateFrom, dateTo, dateType })
 
     if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>
     if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>
@@ -20,29 +21,31 @@ const PoderesFueraDeRegistroMain = () => {
     if (isSuccess) 
 
   return (
-        <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-            <GenericHeader 
+      <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
+          <GenericHeader 
             title="Poderes Fuera de Registro"
             setOpen={() => {}}
-            />
-            <PoderesFueraDeRegistroFilters 
-              refetch={refetch}
-              dateFrom={dateFrom}
-              setDateFrom={setDateFrom}
-              dateTo={dateTo}
-              setDateTo={setDateTo}
-              page={page}
-            />
-            <PoderesFueraDeRegistroTable 
-              refetch={refetch}
-              poderes={poderes}
-            />        
-            <Paginator
-              page={page}
-              setPage={setPage}
-              itemsCount={poderes.count} 
-            />
-        </div>
+          />
+          <PoderesFueraDeRegistroFilters 
+            refetch={refetch}
+            dateFrom={dateFrom}
+            setDateFrom={setDateFrom}
+            dateTo={dateTo}
+            setDateTo={setDateTo}
+            dateType={dateType}
+            setDateType={setDateType}
+            page={page}
+          />
+          <PoderesFueraDeRegistroTable 
+            refetch={refetch}
+            poderes={poderes}
+          />        
+          <Paginator
+            page={page}
+            setPage={setPage}
+            itemsCount={poderes.count} 
+          />
+      </div>
   )
 }
 

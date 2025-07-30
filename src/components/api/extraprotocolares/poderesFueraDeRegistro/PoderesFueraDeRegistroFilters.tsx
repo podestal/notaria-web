@@ -2,6 +2,7 @@ import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import { IngresoPoderesPage } from "../../../../services/api/extraprotocolares/ingresoPoderes"
 import Calendar from "../../../ui/Calendar";
 import { useEffect } from "react";
+import SingleSelect from "../../../ui/SingleSelect";
 
 interface Props {
     refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<IngresoPoderesPage, Error>>
@@ -9,10 +10,12 @@ interface Props {
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>
     dateTo: Date | undefined;
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>;
+    dateType: string; // Optional, if you want to manage a date type
+    setDateType: React.Dispatch<React.SetStateAction<string>>;
     page: number;
 }
 
-const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo, setDateTo, page }: Props) => {
+const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo, setDateTo, dateType, setDateType, page }: Props) => {
 
 
     useEffect(() => {
@@ -26,7 +29,7 @@ const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo,
     }
 
   return (
-    <div className="w-full grid grid-cols-3 gap-4 justify-center items-center text-center my-6">
+    <div className="w-full grid grid-cols-4 gap-4 justify-center items-center text-center my-6">
         <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
             <p>Fecha Inicio</p>
             <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
@@ -34,6 +37,16 @@ const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo,
         <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
             <p>Fecha Fin</p>
             <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
+        </div>
+        <div>
+            <SingleSelect 
+                options={[
+                    { value: '1', label: 'Fecha Ingreso' },
+                    { value: '2', label: 'Fecha Crono' },
+                ]}
+                selected={dateType}
+                onChange={setDateType}
+            />
         </div>
         <div>
             <button 
