@@ -1,6 +1,12 @@
+import PoderesFueraDeRegistroTableBody from "./PoderesFueraDeRegistroTableBody"
+import PoderesFueraDeRegistroTableHeader from "./PoderesFueraDeRegistroTableHeader"
+
 const PoderesFueraDeRegistroTable = () => {
   return (
-    <div>PoderesFueraDeRegistroTable</div>
+    <>
+    <PoderesFueraDeRegistroTableHeader />
+    <PoderesFueraDeRegistroTableBody />
+    </>
   )
 }
 

@@ -1,4 +1,6 @@
 import GenericHeader from '../../../ui/GenericHeader'
+import PoderesFueraDeRegistroFilters from './PoderesFueraDeRegistroFilters'
+import PoderesFueraDeRegistroTable from './PoderesFueraDeRegistroTable'
 
 const PoderesFueraDeRegistroMain = () => {
   return (
@@ -7,7 +9,8 @@ const PoderesFueraDeRegistroMain = () => {
             title="Poderes Fuera de Registro"
             setOpen={() => {}}
             />
-            <p>dafadfasdf</p>
+            <PoderesFueraDeRegistroFilters />
+            <PoderesFueraDeRegistroTable />
         </div>
   )
 }
