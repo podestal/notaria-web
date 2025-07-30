@@ -3,6 +3,9 @@ import { useState } from "react";
 import TopModal from "../../../../ui/TopModal";
 import ParticipantesForm from "./ParticipantesForm";
 import useCreateContratante from "../../../../../hooks/api/extraprotocolares/permisosViaje/contratantes/useCreateContratante";
+import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos";
+import useGetNacionalidades from "../../../../../hooks/api/nacionalidades/useGetNacionalidades";
+import PreParticipanteForm from "./PreParticipanteForm";
 
 interface Props {
     viajeId: number;
@@ -12,7 +15,26 @@ const CreateParticipante = ({ viajeId }: Props) => {
 
     const [open, setOpen] = useState(false);
     const createContratante = useCreateContratante({ viaje_id: viajeId });
-    
+    const [contratanteInfo, setContratanteInfo] = useState({
+        apePaterno: '',
+        apeMaterno: '',
+        priNombre: '',
+        segNombre: '',
+        direccion: '',
+        ubigeo: '',
+        estadoCivil: '',
+        genero: '',
+        nacionalidad: ''
+    });
+
+    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
+    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
+
+    if (isNacionalidadesLoading || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
+
+    if (isNacionalidadesError || isErrorUbigeo) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
+
+    if (nacionalidadesSuccess && isSuccessUbigeo)
 
   return (
     <>
@@ -28,9 +50,14 @@ const CreateParticipante = ({ viajeId }: Props) => {
         >
             <div className="p-4">
                 <h2 className="text-2xl font-semibold mb-6 text-center">Nuevo Participante</h2>
+                <PreParticipanteForm setContratanteInfo={setContratanteInfo} />
                 <ParticipantesForm 
                    createContratante={createContratante}
                    idViaje={viajeId}
+                   setOpen={setOpen}
+                   ubigeos={ubigeos}
+                   nacionalidades={nacionalidades}
+                   contratanteInfo={contratanteInfo}
                 />
             </div>
         </TopModal>

@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { documentNaturalOptions } from "../../../../../data/clienteData";
 import { PERMISO_VIAJE_CONDICIONES } from "../../../../../data/permisoViajeData";
-import Selector from "../../../../ui/Selector";
-import axios from "axios";
 import SimpleSelectorStr from "../../../../ui/SimpleSelectosStr";
 import { ViajeContratante } from "../../../../../services/api/extraprotocolares/viajeContratanteService";
 import SimpleInput from "../../../../ui/SimpleInput";
@@ -10,69 +7,49 @@ import { UseMutationResult } from "@tanstack/react-query";
 import { CreateContratanteData } from "../../../../../hooks/api/extraprotocolares/permisosViaje/contratantes/useCreateContratante";
 import useAuthStore from "../../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
+import { Ubigeo } from "../../../../../services/api/ubigeoService";
+import { Nacionalidad } from "../../../../../services/api/nacionalidadesService";
 
 interface Props {
     contratanteViaje?: ViajeContratante;
     createContratante?: UseMutationResult<ViajeContratante, Error, CreateContratanteData>
     idViaje: number
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    ubigeos: Ubigeo[]
+    nacionalidades: Nacionalidad[]
+    contratanteInfo: {
+        apePaterno: string;
+        apeMaterno: string;
+        priNombre: string;
+        segNombre: string;
+        direccion: string;
+        ubigeo: string;
+        estadoCivil: string;
+        genero: string;
+        nacionalidad: string;
+    }
 }
 
-const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje }: Props) => {
+const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
 
-    // Cliente lookup 
-    const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1);
     const [document, setDocument] = useState('');
     const [loading, setLoading] = useState(false);
 
     // Contratante Viaje
     const [selectedCondicion, setSelectedCondicion] = useState(contratanteViaje ? contratanteViaje.c_condicontrat : '');
     const [firma, setFirma] = useState(contratanteViaje ? contratanteViaje.c_fircontrat : '');
-    const [appePaterno, setAppePaterno] = useState('');
-    const [appeMaterno, setAppeMaterno] = useState('');
-    const [priNombre, setPriNombre] = useState('');
-    const [segNombre, setSegNombre] = useState('');
-    const [direccion, setDireccion] = useState('');
-    const [selectedUbigeo, setSelectedUbigeo] = useState('');
-    const [estadoCivil, setEstadoCivil] = useState('');
-    const [genero, setGenero] = useState('');
-    const [nacionalidad, setNacionalidad] = useState('');
-
-    const handleClienteLookup = () => {
-        setLoading(true);
-        // Simulate an API call
-        axios.get(
-            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
-        ).then(response => {
-            if (response.data.idcliente) {
-                console.log('Cliente encontrado:', response.data);
-                setAppePaterno(response.data.apepat || '');
-                setAppeMaterno(response.data.apemat || '');
-                setPriNombre(response.data.prinom || '');
-                setSegNombre(response.data.segnom || '');
-                setDireccion(response.data.direccion || '');
-                setSelectedUbigeo(response.data.idubigeo || '');
-                setEstadoCivil(response.data.idestcivil.toString() || '');
-                setGenero(response.data.sexo || '');
-                setNacionalidad(response.data.nacionalidad || '');
-                // setCliente1(response.data)
-                // setShowContratanteForm(true)
-                // setShowClienteForm(false)
-            } else {
-                console.log('Cliente no encontrado, creando nuevo cliente')
-                // setCliente1(null)
-                // setShowContratanteForm(false)
-                // setShowClienteForm(true)
-            }
-        }).catch(error => {
-            console.log('Error al buscar el cliente:', error);
-            console.error(error);
-        }).finally(() => {
-            setLoading(false)
-        })
-    }
+    const [appePaterno, setAppePaterno] = useState(contratanteInfo.apePaterno || '');
+    const [appeMaterno, setAppeMaterno] = useState(contratanteInfo.apeMaterno || '');
+    const [priNombre, setPriNombre] = useState(contratanteInfo.priNombre || '');
+    const [segNombre, setSegNombre] = useState(contratanteInfo.segNombre || '');
+    const [direccion, setDireccion] = useState(contratanteInfo.direccion || '');
+    const [selectedUbigeo, setSelectedUbigeo] = useState(contratanteInfo.ubigeo || '');
+    const [estadoCivil, setEstadoCivil] = useState(contratanteInfo.estadoCivil || '');
+    const [genero, setGenero] = useState(contratanteInfo.genero || '');
+    const [nacionalidad, setNacionalidad] = useState(contratanteInfo.nacionalidad || '');
 
     const handleCreateContratante = () => {
 
@@ -117,6 +94,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje }: Pro
                     setMessage('Contratante creado exitosamente');
                     setShow(true);
                     setType('success');
+                    setOpen(false);
                     console.log('Contratante creado exitosamente:', res);
                 },
                 onError: (error) => {
@@ -134,38 +112,6 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje }: Pro
 
   return (
     <div>
-        <div className="grid grid-cols-5 gap-4">
-            <div className="w-full col-span-2">
-                <Selector 
-                    label="Tipo de documento"
-                    options={documentNaturalOptions}
-                    setter={setSelectedTipoDocumento}
-                    defaultValue={selectedTipoDocumento}
-                />
-            </div>
-            {selectedTipoDocumento > 0 && 
-            <div className="flex flex-col gap-2 col-span-2">
-                <p className="text-md font-bold py-2">{documentNaturalOptions.find(document => document.value === selectedTipoDocumento)?.label}</p>
-                <input 
-                    type="text"
-                    value={document}
-                    onChange={e => setDocument(e.target.value)}
-                    placeholder={documentNaturalOptions.find(document => document.value === selectedTipoDocumento)?.label || ''}
-                    className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
-                />
-            </div>}
-            {selectedTipoDocumento > 0 && 
-            <div className="flex justify-center items-center">
-                <button 
-                    onClick={handleClienteLookup}
-                    disabled={document.length === 0 || loading}
-                    className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${loading && 'animate-pulse'} ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 
-                    type="submit">
-                    {loading ? '...' : 'Buscar'}
-                </button>
-            </div>
-            }
-        </div>
         <div>
             <div className="grid grid-cols-2 gap-4 my-4">
                 <SimpleSelectorStr 
