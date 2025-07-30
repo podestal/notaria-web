@@ -19,7 +19,7 @@ const useGetIngresoPoderes = ({ access, page, dateFrom, dateTo }: Props): UseQue
     return useQuery({
         queryKey: ['ingreso_poderes', page],
         queryFn: () => ingresoPoderesService.get(access, params),
-        enabled: false
+        
     })
 }
 

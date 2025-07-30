@@ -1,6 +1,7 @@
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import { IngresoPoderesPage } from "../../../../services/api/extraprotocolares/ingresoPoderes"
 import Calendar from "../../../ui/Calendar";
+import { useEffect } from "react";
 
 interface Props {
     refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<IngresoPoderesPage, Error>>
@@ -8,9 +9,15 @@ interface Props {
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>
     dateTo: Date | undefined;
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>;
+    page: number;
 }
 
-const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo, setDateTo }: Props) => {
+const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo, setDateTo, page }: Props) => {
+
+
+    useEffect(() => {
+        refetch()
+    }, [page])
 
     const handleRefetch = () => {
         console.log('Refetching with dates:', dateFrom, dateTo);
