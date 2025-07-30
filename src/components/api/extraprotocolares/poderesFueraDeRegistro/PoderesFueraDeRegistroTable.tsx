@@ -1,11 +1,24 @@
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
+import { IngresoPoderesPage } from "../../../../services/api/extraprotocolares/ingresoPoderes"
 import PoderesFueraDeRegistroTableBody from "./PoderesFueraDeRegistroTableBody"
 import PoderesFueraDeRegistroTableHeader from "./PoderesFueraDeRegistroTableHeader"
 
-const PoderesFueraDeRegistroTable = () => {
+interface Props {
+    poderes: IngresoPoderesPage | undefined
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<IngresoPoderesPage, Error>>
+}
+
+const PoderesFueraDeRegistroTable = ({ poderes, refetch }: Props) => {
+
+
+
   return (
     <>
     <PoderesFueraDeRegistroTableHeader />
-    <PoderesFueraDeRegistroTableBody />
+    <PoderesFueraDeRegistroTableBody 
+      poderes={poderes}
+      refetch={refetch}
+    />
     </>
   )
 }

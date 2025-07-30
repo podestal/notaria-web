@@ -1,15 +1,18 @@
-import useGetIngresoPoderes from "../../../../hooks/api/extraprotocolares/ingresoPoderes/useGetIngresoPoderes"
-import useAuthStore from "../../../../store/useAuthStore"
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
+import { IngresoPoderesPage } from "../../../../services/api/extraprotocolares/ingresoPoderes"
+import { useEffect } from "react"
 
-const PoderesFueraDeRegistroTableBody = () => {
+interface Props {
+    poderes: IngresoPoderesPage | undefined
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<IngresoPoderesPage, Error>>
+}
 
-    const access = useAuthStore(s => s.access_token) || ''
-    const { data: poderes, isLoading, error, isError, isSuccess } = useGetIngresoPoderes({ access, page: 1 })
 
-    if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>
-    if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>
+const PoderesFueraDeRegistroTableBody = ({ poderes, refetch }: Props) => {
 
-    if (isSuccess)
+    useEffect(() => {
+refetch({})  // Refetching the data when the component mounts or updates
+    }, [])
 
   return (
     <div>
