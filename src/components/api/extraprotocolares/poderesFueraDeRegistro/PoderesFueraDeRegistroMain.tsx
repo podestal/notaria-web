@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import useGetIngresoPoderes from '../../../../hooks/api/extraprotocolares/ingresoPoderes/useGetIngresoPoderes'
 import useAuthStore from '../../../../store/useAuthStore'
 import GenericHeader from '../../../ui/GenericHeader'
@@ -6,7 +7,9 @@ import PoderesFueraDeRegistroTable from './PoderesFueraDeRegistroTable'
 
 const PoderesFueraDeRegistroMain = () => {
     const access = useAuthStore(s => s.access_token) || ''
-    const { data: poderes, isLoading, error, isError, refetch } = useGetIngresoPoderes({ access, page: 1 })
+    const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
+    const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
+    const { data: poderes, isLoading, error, isError, refetch } = useGetIngresoPoderes({ access, page: 1, dateFrom, dateTo })
 
     if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>
     if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>
@@ -19,7 +22,13 @@ const PoderesFueraDeRegistroMain = () => {
             title="Poderes Fuera de Registro"
             setOpen={() => {}}
             />
-            <PoderesFueraDeRegistroFilters />
+            <PoderesFueraDeRegistroFilters 
+              refetch={refetch}
+              dateFrom={dateFrom}
+              setDateFrom={setDateFrom}
+              dateTo={dateTo}
+              setDateTo={setDateTo}
+            />
             <PoderesFueraDeRegistroTable 
               refetch={refetch}
               poderes={poderes}
