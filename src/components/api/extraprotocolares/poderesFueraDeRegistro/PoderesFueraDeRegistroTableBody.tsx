@@ -3,17 +3,19 @@ import PoderesFueraDeRegistroCard from "./PoderesFueraDeRegistroCard"
 
 interface Props {
     poderes: IngresoPoderesPage | undefined
+    page: number
 }
 
 
-const PoderesFueraDeRegistroTableBody = ({ poderes }: Props) => {
+const PoderesFueraDeRegistroTableBody = ({ poderes, page }: Props) => {
 
   return (
     <>
         {poderes && poderes.results.length > 0 ?
         <>
             {poderes.results.map((poder) => (
-                <PoderesFueraDeRegistroCard key={poder.id_poder} poder={poder} />
+                <PoderesFueraDeRegistroCard 
+                  key={poder.id_poder} poder={poder} page={page} />
             ))}
         </>
         :

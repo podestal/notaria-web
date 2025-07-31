@@ -4,9 +4,10 @@ import PoderesFueraDeRegistroTableHeader from "./PoderesFueraDeRegistroTableHead
 
 interface Props {
     poderes: IngresoPoderesPage | undefined
+    page: number
 }
 
-const PoderesFueraDeRegistroTable = ({ poderes }: Props) => {
+const PoderesFueraDeRegistroTable = ({ poderes, page }: Props) => {
 
 
 
@@ -15,6 +16,7 @@ const PoderesFueraDeRegistroTable = ({ poderes }: Props) => {
     <PoderesFueraDeRegistroTableHeader />
     <PoderesFueraDeRegistroTableBody 
       poderes={poderes}
+      page={page}
     />
     </>
   )

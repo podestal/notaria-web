@@ -42,6 +42,7 @@ const PoderesFueraDeRegistroMain = () => {
           />
           <PoderesFueraDeRegistroTable 
             poderes={poderes}
+            page={page}
           />        
           <Paginator
             page={page}

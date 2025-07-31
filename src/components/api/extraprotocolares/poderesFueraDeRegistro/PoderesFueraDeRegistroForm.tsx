@@ -11,14 +11,16 @@ import { UseMutationResult } from "@tanstack/react-query";
 import { CreateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/useCreateIngresoPoderes";
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
+import { UpdateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/UpdateIngresoPoderes";
 
 interface Props {
     poder?: IngresoPoderes
     setOpen?: React.Dispatch<React.SetStateAction<boolean>>
     createIngresoPoderes?: UseMutationResult<IngresoPoderes, Error, CreateIngresoPoderesData>
+    updateIngresoPoder: UseMutationResult<IngresoPoderes, Error, UpdateIngresoPoderesData>
 }
 
-const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen }: Props) => {
+const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen, updateIngresoPoder }: Props) => {
 
     const [loading, setLoading] = useState(false);
     const access = useAuthStore(s => s.access_token) || '';
@@ -30,7 +32,9 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen }: Pr
     );
     const [tipoPoder, setTipoPoder] = useState(poder?.id_asunto || '0');
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
-        poder?.fec_ingreso ? new Date(poder.fec_ingreso) : undefined
+        poder?.fec_ingreso
+        ? moment.utc(poder.fec_ingreso, "YYYY-MM-DD").hour(12).toDate()
+        : undefined
     );
     const [referencia, setReferencia] = useState(poder?.referencia || '');
     const [nomComunicarse, setNomComunicarse] = useState(poder?.nom_comuni || '');
@@ -63,19 +67,19 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen }: Pr
                     nom_recep: poder?.nom_recep || '',
                     hora_recep: hora || '',
                     id_asunto: tipoPoder,
-                    fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    fec_ingreso: moment(fechaIngreso).format('YYYY-MM-DD'),
                     referencia,
                     nom_comuni: nomComunicarse,
                     telf_comuni: telComunicarse,
                     email_comuni: emailComunicarse,
-                    documento: poder?.documento || '',
-                    id_respon: poder?.id_respon || '',
-                    des_respon: poder?.des_respon || '',
-                    doc_presen: poder?.doc_presen || '',
-                    fec_ofre: poder?.fec_ofre ? moment(poder.fec_ofre).format('YYYY-MM-DD') : '',
-                    hora_ofre: poder?.hora_ofre || '',
-                    fec_crono: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
-                    swt_est: poder?.swt_est || ''
+                    documento: '0.00',
+                    id_respon: '',
+                    des_respon: '',
+                    doc_presen: '',
+                    fec_ofre: '',
+                    hora_ofre: '',
+                    fec_crono: moment().format('YYYY-MM-DD'),
+                    swt_est: ''
                 }
             }, {
                 onSuccess: () => {
@@ -94,6 +98,45 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen }: Pr
                 }
             });
         }
+
+        if (updateIngresoPoder && poder) {
+            updateIngresoPoder.mutate({
+                access,
+                ingresoPoderes: {
+                    nom_recep: poder.nom_recep,
+                    hora_recep: poder.hora_recep,
+                    id_asunto: tipoPoder,
+                    fec_ingreso: poder.fec_ingreso,
+                    referencia,
+                    nom_comuni: nomComunicarse,
+                    telf_comuni: telComunicarse,
+                    email_comuni: emailComunicarse,
+                    documento: poder.documento,
+                    id_respon: poder.id_respon,
+                    des_respon: poder.des_respon,
+                    doc_presen: poder.doc_presen,
+                    fec_ofre: poder.fec_ofre,
+                    hora_ofre: poder.hora_ofre,
+                    fec_crono: poder.fec_crono,
+                    swt_est: poder.swt_est
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Poder actualizado exitosamente');
+                    setShow(true);
+                    setType('success');
+                    setOpen && setOpen(false);
+                },
+                onError: (error) => {
+                    setMessage(`Error al actualizar poder: ${error.message}`);
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            });
+        }
     }
 
   return (
@@ -101,6 +144,8 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen }: Pr
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Ingreso de Poderes</h2>
         {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
         <div className="grid grid-cols-8 gap-2">
+            <>{console.log('fechaIngreso poder', poder?.fec_ingreso)}</>
+            <>{console.log('fechaIngreso state', fechaIngreso)}</>
             <button 
                 onClick={handleSave}
                 className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
