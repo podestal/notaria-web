@@ -12,6 +12,7 @@ import { CreateIngresoPoderesData } from "../../../../hooks/api/extraprotocolare
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 import { UpdateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/UpdateIngresoPoderes";
+import ContratantesMain from "./contratantes/ContratantesMain";
 
 interface Props {
     poder?: IngresoPoderes
@@ -20,11 +21,12 @@ interface Props {
     updateIngresoPoder: UseMutationResult<IngresoPoderes, Error, UpdateIngresoPoderesData>
 }
 
-const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen, updateIngresoPoder }: Props) => {
+const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngresoPoder }: Props) => {
 
     const [loading, setLoading] = useState(false);
     const access = useAuthStore(s => s.access_token) || '';
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const [idPoder, setIdPoder] = useState(poder?.id_poder || 0);
 
     // poderes values
     const [hora, setHora] = useState<string | undefined>(
@@ -82,11 +84,11 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen, upda
                     swt_est: ''
                 }
             }, {
-                onSuccess: () => {
+                onSuccess: res => {
                     setMessage('Poder creado exitosamente');
                     setShow(true);
                     setType('success');
-                    setOpen && setOpen(false);
+                    setIdPoder(res.id_poder);
                 },
                 onError: (error) => {
                     setMessage(`Error al crear poder: ${error.message}`);
@@ -125,7 +127,6 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen, upda
                     setMessage('Poder actualizado exitosamente');
                     setShow(true);
                     setType('success');
-                    setOpen && setOpen(false);
                 },
                 onError: (error) => {
                     setMessage(`Error al actualizar poder: ${error.message}`);
@@ -237,6 +238,9 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen, upda
                 disabled
             />
         </div>
+        {idPoder > 0 && (
+            <ContratantesMain idPoder={idPoder} />
+        )}
     </div>
   )
 }
