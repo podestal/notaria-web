@@ -37,7 +37,7 @@ export interface IngresoPoderes {
     contratantes: IngresoPoderesSimpleContratante[];
 }
 
-export type CreateUpdateIngresoPoderes = Omit<IngresoPoderes, 'id_poder'>
+export type CreateUpdateIngresoPoderes = Omit<IngresoPoderes, 'id_poder' | 'contratantes' | 'num_formu' | 'num_kardex'>
 
 interface Props {
     ingresoPoderesId?: number;

@@ -36,6 +36,7 @@ const PermisosMain = () => {
           setDateFrom={setDateFrom}
           dateTo={dateTo}
           setDateTo={setDateTo}
+          refetch={refetch}
         />
         <PermisosTable 
           permisosPage={permisosPage}

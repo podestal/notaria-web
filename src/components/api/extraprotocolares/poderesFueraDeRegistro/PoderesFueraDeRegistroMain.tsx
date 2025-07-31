@@ -53,7 +53,9 @@ const PoderesFueraDeRegistroMain = () => {
           isOpen={open}
           onClose={() => setOpen(false)}
       >
-          <CreatePoderesFueraDeRegistro />
+          <CreatePoderesFueraDeRegistro
+            setOpen={setOpen}
+          />
       </TopModal>
     </>
   )

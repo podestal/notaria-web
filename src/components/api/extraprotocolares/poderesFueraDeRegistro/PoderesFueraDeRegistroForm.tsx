@@ -7,14 +7,22 @@ import moment from "moment";
 import { TIPO_PODERES } from "../../../../data/poderesFueraDeRegistro";
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 import Calendar from "../../../ui/Calendar";
+import { UseMutationResult } from "@tanstack/react-query";
+import { CreateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/useCreateIngresoPoderes";
+import useAuthStore from "../../../../store/useAuthStore";
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 
 interface Props {
     poder?: IngresoPoderes
+    setOpen?: React.Dispatch<React.SetStateAction<boolean>>
+    createIngresoPoderes?: UseMutationResult<IngresoPoderes, Error, CreateIngresoPoderesData>
 }
 
-const PoderesFueraDeRegistroForm = ({ poder }: Props) => {
+const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, setOpen }: Props) => {
 
     const [loading, setLoading] = useState(false);
+    const access = useAuthStore(s => s.access_token) || '';
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     // poderes values
     const [hora, setHora] = useState<string | undefined>(
@@ -31,12 +39,61 @@ const PoderesFueraDeRegistroForm = ({ poder }: Props) => {
 
 
     const handleSave = () => {
+
+        if (tipoPoder === '0') {
+            setMessage('Debe seleccionar un tipo de poder');
+            setShow(true);
+            setType('error');
+            return;
+        }
+
+        if (!fechaIngreso) {
+            setMessage('Debe seleccionar una fecha de ingreso');
+            setShow(true);
+            setType('error');
+            return;
+        }
+
         setLoading(true);
-        // Simulate a save operation
-        setTimeout(() => {
-            setLoading(false);
-            alert("Poderes Fuera de Registro guardado exitosamente");
-        }, 2000);
+
+        if (createIngresoPoderes) {
+            createIngresoPoderes.mutate({
+                access,
+                ingresoPoderes: {
+                    nom_recep: poder?.nom_recep || '',
+                    hora_recep: hora || '',
+                    id_asunto: tipoPoder,
+                    fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    referencia,
+                    nom_comuni: nomComunicarse,
+                    telf_comuni: telComunicarse,
+                    email_comuni: emailComunicarse,
+                    documento: poder?.documento || '',
+                    id_respon: poder?.id_respon || '',
+                    des_respon: poder?.des_respon || '',
+                    doc_presen: poder?.doc_presen || '',
+                    fec_ofre: poder?.fec_ofre ? moment(poder.fec_ofre).format('YYYY-MM-DD') : '',
+                    hora_ofre: poder?.hora_ofre || '',
+                    fec_crono: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    swt_est: poder?.swt_est || ''
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Poder creado exitosamente');
+                    setShow(true);
+                    setType('success');
+                    setOpen && setOpen(false);
+                },
+                onError: (error) => {
+                    setMessage(`Error al crear poder: ${error.message}`);
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            });
+        }
     }
 
   return (
