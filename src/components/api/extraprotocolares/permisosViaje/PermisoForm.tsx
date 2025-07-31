@@ -1,4 +1,4 @@
-import { FileCog, FileText, Save } from "lucide-react"
+import { FileCog, FileText, FileWarning, QrCode, Save } from "lucide-react"
 import { PermisoViaje } from "../../../../services/api/extraprotocolares/permisoViajeService"
 import SimpleInput from "../../../ui/SimpleInput"
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr"
@@ -167,6 +167,14 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <FileText className="text-xl text-slate-50"/>
                 <p className="text-xs">Ver Doc</p>
+            </div>
+            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+                <QrCode className="text-xl text-slate-950"/>
+                <p className="text-xs">Generar QR</p>
+            </div>
+            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+                <FileWarning className="text-xl text-amber-500"/>
+                <p className="text-xs">No Corre</p>
             </div>
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">

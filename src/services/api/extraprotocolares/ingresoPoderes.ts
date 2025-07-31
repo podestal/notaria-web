@@ -7,6 +7,13 @@ export interface IngresoPoderesPage {
     results: IngresoPoderes[];
 }
 
+export interface IngresoPoderesSimpleContratante {
+    id_contrata: number;
+    c_descontrat: string;
+    c_condicontrat: string;
+}
+
+
 export interface IngresoPoderes {
     id_poder: number;
     num_kardex: string;
@@ -27,6 +34,7 @@ export interface IngresoPoderes {
     num_formu: string;
     fec_crono: string; // Date as string
     swt_est: string;
+    contratantes: IngresoPoderesSimpleContratante[];
 }
 
 export type CreateUpdateIngresoPoderes = Omit<IngresoPoderes, 'id_poder'>

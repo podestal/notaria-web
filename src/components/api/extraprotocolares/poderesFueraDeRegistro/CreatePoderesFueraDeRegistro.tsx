@@ -1,6 +1,8 @@
+import PoderesFueraDeRegistroForm from "./PoderesFueraDeRegistroForm"
+
 const CreatePoderesFueraDeRegistro = () => {
   return (
-    <div>CreatePoderesFueraDeRegistro</div>
+    <PoderesFueraDeRegistroForm />
   )
 }
 

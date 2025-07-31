@@ -14,7 +14,15 @@ const PoderesFueraDeRegistroCard = ({ poder }: Props) => {
         <p>{poder.num_kardex}</p>
         <p className="col-span-2">{TIPO_PODERES.find(p => p.id_asunto === poder.id_asunto)?.des_asunto}</p>
         <p>{poder.fec_crono}</p>
-        <p className="col-span-2">contratantes</p>
+        <div className="col-span-2 text-center">
+            {poder.contratantes.map((contratante) => (
+                <div 
+                    className="w-full gap-10 items-start justify-start text-left"
+                    key={contratante.id_contrata}>
+                    <p>{contratante.c_descontrat}</p>
+                </div>
+            ))}
+        </div>
         <p>{poder.fec_ingreso}</p>
     </div>
   )

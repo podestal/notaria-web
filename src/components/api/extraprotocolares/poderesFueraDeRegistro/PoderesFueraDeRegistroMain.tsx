@@ -5,9 +5,12 @@ import GenericHeader from '../../../ui/GenericHeader'
 import PoderesFueraDeRegistroFilters from './PoderesFueraDeRegistroFilters'
 import PoderesFueraDeRegistroTable from './PoderesFueraDeRegistroTable'
 import Paginator from '../../../ui/Paginator'
+import TopModal from '../../../ui/TopModal'
+import CreatePoderesFueraDeRegistro from './CreatePoderesFueraDeRegistro'
 
 const PoderesFueraDeRegistroMain = () => {
     const access = useAuthStore(s => s.access_token) || ''
+    const [open, setOpen] = useState(false)
     const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
     const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
     const [dateType, setDateType] = useState('1') // Assuming you want to manage a date type
@@ -21,10 +24,11 @@ const PoderesFueraDeRegistroMain = () => {
     if (isSuccess) 
 
   return (
+    <>
       <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
           <GenericHeader 
             title="Poderes Fuera de Registro"
-            setOpen={() => {}}
+            setOpen={setOpen}
           />
           <PoderesFueraDeRegistroFilters 
             refetch={refetch}
@@ -45,6 +49,13 @@ const PoderesFueraDeRegistroMain = () => {
             itemsCount={poderes.count} 
           />
       </div>
+      <TopModal
+          isOpen={open}
+          onClose={() => setOpen(false)}
+      >
+          <CreatePoderesFueraDeRegistro />
+      </TopModal>
+    </>
   )
 }
 
