@@ -2,6 +2,8 @@ import { useState } from "react";
 import SimpleInput from "../../../ui/SimpleInput";
 import SimpleSelector from "../../../ui/SimpleSelector";
 import Calendar from "../../../ui/Calendar";
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
+import { PermisoViajePage } from "../../../../services/api/extraprotocolares/permisoViajeService";
 
 const TIPO_PERMISO = [
     { value: 0, label: "Tipo Permiso" },
@@ -14,6 +16,7 @@ interface Props {
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>
     dateTo: Date | undefined;
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>;
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<PermisoViajePage, Error>>
 }
 
 const PermisosFilter = ({ dateFrom, setDateFrom, dateTo, setDateTo }: Props) => {

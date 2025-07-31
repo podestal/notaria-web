@@ -1,23 +1,25 @@
-import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import { IngresoPoderesPage } from "../../../../services/api/extraprotocolares/ingresoPoderes"
-import { useEffect } from "react"
+import PoderesFueraDeRegistroCard from "./PoderesFueraDeRegistroCard"
 
 interface Props {
     poderes: IngresoPoderesPage | undefined
-    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<IngresoPoderesPage, Error>>
 }
 
 
-const PoderesFueraDeRegistroTableBody = ({ poderes, refetch }: Props) => {
-
-    useEffect(() => {
-refetch({})  // Refetching the data when the component mounts or updates
-    }, [])
+const PoderesFueraDeRegistroTableBody = ({ poderes }: Props) => {
 
   return (
-    <div>
-        <>{console.log('poderes',poderes)}</>
-    </div>
+    <>
+        {poderes && poderes.results.length > 0 ?
+        <>
+            {poderes.results.map((poder) => (
+                <PoderesFueraDeRegistroCard key={poder.id_poder} poder={poder} />
+            ))}
+        </>
+        :
+        <p className="col-span-8 text-center my-4 text-xs">No hay registros</p>
+        }
+    </>
   )
 }
 

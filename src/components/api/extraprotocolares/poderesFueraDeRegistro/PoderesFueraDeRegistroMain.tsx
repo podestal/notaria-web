@@ -37,7 +37,6 @@ const PoderesFueraDeRegistroMain = () => {
             page={page}
           />
           <PoderesFueraDeRegistroTable 
-            refetch={refetch}
             poderes={poderes}
           />        
           <Paginator
