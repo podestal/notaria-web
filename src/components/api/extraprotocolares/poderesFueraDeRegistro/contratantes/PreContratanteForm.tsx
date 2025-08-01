@@ -183,12 +183,14 @@ const handleLookup = (e: React.FormEvent) => {
             </>
             }
         </form>
-        <>{console.log('selectedTipoPersona', selectedTipoPersona)}</>
         {showContratanteForm && cliente1 && 
         <>
             {selectedTipoPersona === 1 && <ContratantesForm cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
             {selectedTipoPersona === 2 && <ContratanteFormJuridica cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
         </>}
+        {showClienteForm &&
+            <p>Formulario de Cliente</p>
+        }
     </div>
   )
 }

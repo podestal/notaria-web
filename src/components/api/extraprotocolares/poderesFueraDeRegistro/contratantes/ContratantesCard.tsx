@@ -1,5 +1,6 @@
 import { IngresoPoderesContratante } from "../../../../../services/api/extraprotocolares/IngresoPoderesContratanteService"
 import { PODERES_CONDICIONES } from "../../../../../data/poderesFueraDeRegistro";
+import RemoveContratante from "./RemoveContratante";
 
 interface Props {
     contratante: IngresoPoderesContratante
@@ -25,6 +26,10 @@ const ContratantesCard = ({ contratante, idx }: Props) => {
             <RemoveParticipante
                 contratanteViaje={contratanteViaje}
             /> */}
+            <RemoveContratante 
+                idPoder={contratante.id_poder}
+                ingresoPoderesContratanteId={contratante.id_contrata}
+            />
         </div>
     </div>
   )
