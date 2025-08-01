@@ -1,6 +1,8 @@
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import Calendar from "../../../ui/Calendar"
 import SimpleInput from "../../../ui/SimpleInput"
 import SingleSelect from "../../../ui/SingleSelect"
+import { IngresoCartasPage } from "../../../../services/api/extraprotocolares/ingresoCartas";
 
 interface Props {
     dateFrom: Date | undefined;
@@ -16,6 +18,7 @@ interface Props {
     destinatario: string;
     setDestinatario: React.Dispatch<React.SetStateAction<string>>;
     page: number;
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<IngresoCartasPage, Error>>
 }
 
 const CartasNotarialesFilters = ({
@@ -31,12 +34,22 @@ const CartasNotarialesFilters = ({
     setRemitente,
     destinatario,
     setDestinatario,
-    page
+    refetch,
 }: Props) => {
 
     const handleRefetch = () => {
         // Logic to refetch data based on the filters
         // This could be a function passed down from a parent component
+        console.log("Refetching with filters:", {
+            dateFrom,
+            dateTo,
+            dateType,
+            numCarta,
+            remitente,
+            destinatario,
+        });
+        
+        refetch()
     }
 
   return (

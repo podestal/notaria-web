@@ -1,8 +1,10 @@
-import { use, useState } from 'react';
+import { useState } from 'react';
 import GenericHeader from '../../../ui/GenericHeader'
 import CartasNotarialesFilters from './CartasNotarialesFilters';
 import useGetIngresoCartas from '../../../../hooks/api/extraprotocolares/ingresoCartas/useGetIngresoCartas';
 import useAuthStore from '../../../../store/useAuthStore';
+import CartasNotarialesTable from './CartasNotarialesTable';
+import Paginator from '../../../ui/Paginator';
 
 const CartasNotarialesMain = () => {
 
@@ -16,7 +18,7 @@ const CartasNotarialesMain = () => {
   const [dateType, setDateType] = useState('1') // Assuming you want to manage a date type
   const [page, setPage] = useState(1);
 
-  const { data: ingresoCartas, isLoading, isError, error, isSuccess } = useGetIngresoCartas({ access, page})
+  const { data: ingresoCartas, isLoading, isError, error, isSuccess, refetch } = useGetIngresoCartas({ access, page, numCarta, remitente, destinatario, dateFrom, dateTo, dateType });
 
   if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>;
   if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>;
@@ -43,8 +45,17 @@ const CartasNotarialesMain = () => {
           setRemitente={setRemitente}
           destinatario={destinatario}
           setDestinatario={setDestinatario}
+          refetch={refetch}
         />
-        <>{console.log(ingresoCartas)}</>
+        <CartasNotarialesTable 
+          ingresoCartas={ingresoCartas.results}
+          page={page}
+        />
+        <Paginator
+          page={page}
+          setPage={setPage}
+          itemsCount={ingresoCartas.count} 
+        />
     </div>
   )
 }
