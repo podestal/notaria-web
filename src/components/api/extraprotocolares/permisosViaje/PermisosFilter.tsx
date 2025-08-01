@@ -42,13 +42,6 @@ const PermisosFilter = ({
     refetch }: Props) => {
 
     const handleFilter = () => {
-        console.log("Filtrando con los siguientes parámetros:");
-        console.log("Fecha Desde:", dateFrom);
-        console.log("Fecha Hasta:", dateTo);
-        console.log("Cronológico:", crono);
-        console.log("Tipo de Permiso:", tipoPermiso);
-        console.log("Nombre del Participante:", nombreParticipante);
-        console.log("Número de Control:", numeroControl);
         refetch();
     }
 
