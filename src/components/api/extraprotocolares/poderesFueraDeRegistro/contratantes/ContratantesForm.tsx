@@ -1,36 +1,36 @@
 import { useState } from "react";
 import { Cliente } from "../../../../../services/api/cliente1Service"
-import PreClientForm from "../../../clientes/PreClientForm"
 import { PODERES_CONDICIONES } from "../../../../../data/poderesFueraDeRegistro";
 import SimpleInput from "../../../../ui/SimpleInput";
-import SimpleSelector from "../../../../ui/SimpleSelector";
 import SimpleSelectorStr from "../../../../ui/SimpleSelectosStr";
+import useCreatePoderesContratante from "../../../../../hooks/api/extraprotocolares/ingresoPoderes/contratantes/useCreatePoderesContratante";
+import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
 
 interface Props {
     cliente1: Cliente
+    poderId: number
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+const ContratantesForm = ({ cliente1, poderId, setOpen }: Props) => {
 
-const ContratantesForm = ({ cliente1 }: Props) => {
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [appePaterno, setAppePaterno] = useState(cliente1?.apepat || '');
     const [appeMaterno, setAppeMaterno] = useState(cliente1?.apemat || '');
     const [priNombre, setPriNombre] = useState(cliente1?.prinom || '');
     const [segNombre, setSegNombre] = useState(cliente1?.segnom || '');
     const [direccion, setDireccion] = useState(cliente1?.direccion || '');
-    const [firma, setFirma] = useState('0');
+    const [firma, setFirma] = useState('SI');
     const [condicion, setCondicion] = useState('0');
     const [loading, setLoading] = useState(false);
 
-    const [firmaError, setFirmaError] = useState('');
     const [condicionError, setCondicionError] = useState('');
 
-    const handleCreate = () => {
+    // mutation to create contratante
+    const createContratanteNatural = useCreatePoderesContratante({poderId})
 
-        if (firma === '0') {
-            setFirmaError('Debe seleccionar una firma');
-            return;
-        }
+    const handleCreate = () => {
 
         if (condicion === '0') {
             setCondicionError('Debe seleccionar una condición');
@@ -39,12 +39,34 @@ const ContratantesForm = ({ cliente1 }: Props) => {
 
         setLoading(true);
 
-        // Aquí se puede agregar la lógica para crear el contratante
-
-        setTimeout(() => {
-            setLoading(false);
-
-        }, 1000);
+        if (cliente1.tipper === 'N') {
+            createContratanteNatural.mutate({
+                ingresoPoderesContratante: {
+                    id_poder: poderId,
+                    c_codcontrat: cliente1.numdoc,
+                    c_descontrat: `${appePaterno} ${appeMaterno} ${priNombre} ${segNombre}`,
+                    c_fircontrat: firma,
+                    c_condicontrat: condicion,
+                    codi_asegurado: '',
+                    codi_testigo: '',
+                    tip_incapacidad: ''
+                }, 
+                access: localStorage.getItem('access') || ''
+            }, {
+                onSuccess: () => {
+                    setMessage('Contratante creado exitosamente');
+                    setShow(true);
+                    setType('success');
+                    setOpen(false);
+                },
+                onError: (error) => {
+                    console.error(error);
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            });
+       }
     }
 
   return (
@@ -90,15 +112,11 @@ const ContratantesForm = ({ cliente1 }: Props) => {
             <SimpleSelectorStr 
                 label="Firma"
                 options={[
-                    { value: '0', label: 'Seleccionar firma' },
-                    { value: 'si', label: 'Si' },
-                    { value: 'no', label: 'No' }
+                    { value: 'SI', label: 'Si' },
+                    { value: 'NO', label: 'No' }
                 ]}
                 setter={setFirma}
                 defaultValue={firma}
-                required
-                error={firmaError}
-                setError={setFirmaError}
             />
             <SimpleSelectorStr
                 label="Condición"
@@ -120,7 +138,7 @@ const ContratantesForm = ({ cliente1 }: Props) => {
                 type="button"
                 className="bg-blue-500 text-white text-xs px-4 py-2 my-6 rounded hover:bg-blue-600 transition-colors duration-300 cursor-pointer"
                 onClick={handleCreate}
-            >Guardar
+            >{loading ? 'Cargando...' : 'Guardar'}
             </button>
         </div>
     </div>

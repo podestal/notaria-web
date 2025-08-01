@@ -8,7 +8,7 @@ interface Props {
 const Contratantes = ({ idPoder }: Props) => {
   return (
     <>
-        <CreateContratantes />
+        <CreateContratantes poderId={idPoder} />
         <ContratantesTable idPoder={idPoder} />
     </>
   )

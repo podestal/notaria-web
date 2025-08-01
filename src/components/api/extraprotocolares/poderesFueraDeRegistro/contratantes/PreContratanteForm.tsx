@@ -6,8 +6,12 @@ import { documentNaturalOptions, documentoJuridicaOptions } from "../../../../..
 import { Cliente } from "../../../../../services/api/cliente1Service";
 import ContratantesForm from "./ContratantesForm";
 
+interface Props {
+    poderId: number;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
 
-const PreContratanteForm = () => {
+const PreContratanteForm = ({ poderId, setOpen }: Props) => {
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
@@ -178,7 +182,7 @@ const handleLookup = (e: React.FormEvent) => {
             </>
             }
         </form>
-        {showContratanteForm && cliente1 && <ContratantesForm cliente1={cliente1} />}
+        {showContratanteForm && cliente1 && selectedTipoPersona === 1 && <ContratantesForm cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
     </div>
   )
 }

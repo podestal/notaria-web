@@ -3,7 +3,11 @@ import { useState } from "react"
 import TopModal from "../../../../ui/TopModal"
 import PreContratanteForm from "./PreContratanteForm"
 
-const CreateContratantes = () => {
+interface Props {
+    poderId: number;
+}
+
+const CreateContratantes = ({ poderId }: Props) => {
   const [open, setOpen] = useState(false)
     
   return (
@@ -18,7 +22,10 @@ const CreateContratantes = () => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <PreContratanteForm />
+            <PreContratanteForm 
+                poderId={poderId}
+                setOpen={setOpen}
+            />
         </TopModal>
     </>
   )
