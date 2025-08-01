@@ -23,8 +23,6 @@ const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo,
     }, [page])
 
     const handleRefetch = () => {
-        console.log('Refetching with dates:', dateFrom, dateTo);
-
         refetch()  // Refetching the data when filters are applied
     }
 

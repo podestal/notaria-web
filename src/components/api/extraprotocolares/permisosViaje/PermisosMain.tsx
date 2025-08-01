@@ -16,8 +16,12 @@ const PermisosMain = () => {
     const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
     const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
     const [page, setPage] = useState(1);
+    const [crono, setCrono] = useState('');
+    const [tipoPermiso, setTipoPermiso] = useState('');
+    const [nombreParticipante, setNombreParticipante] = useState('');
+    const [numeroControl, setNumeroControl] = useState('');
 
-    const { data: permisosPage, isLoading, isError, error, isSuccess, refetch } = useGetPermisosViaje({ access, page });
+    const { data: permisosPage, isLoading, isError, error, isSuccess, refetch } = useGetPermisosViaje({ access, page, crono, tipoPermiso, nombreParticipante, numeroControl, dateFrom, dateTo });
 
     if (isLoading) return <p className="text-center text-xs animate-pulse my-4 py-4">Cargando ...</p>;
     if (isError) return <p className="text-center text-xs text-red-500 my-4 py-4 ">Error: {error.message}</p>;
@@ -37,6 +41,15 @@ const PermisosMain = () => {
           dateTo={dateTo}
           setDateTo={setDateTo}
           refetch={refetch}
+          crono={crono}
+          setCrono={setCrono}
+          tipoPermiso={tipoPermiso}
+          setTipoPermiso={setTipoPermiso}
+          nombreParticipante={nombreParticipante}
+          setNombreParticipante={setNombreParticipante}
+          numeroControl={numeroControl}
+          setNumeroControl={setNumeroControl}
+
         />
         <PermisosTable 
           permisosPage={permisosPage}

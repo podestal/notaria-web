@@ -1,14 +1,13 @@
-import { useState } from "react";
 import SimpleInput from "../../../ui/SimpleInput";
-import SimpleSelector from "../../../ui/SimpleSelector";
 import Calendar from "../../../ui/Calendar";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { PermisoViajePage } from "../../../../services/api/extraprotocolares/permisoViajeService";
+import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 
 const TIPO_PERMISO = [
-    { value: 0, label: "Tipo Permiso" },
-    { value: 1, label: "Interior" },
-    { value: 2, label: "Exterior" },
+    { value: '0', label: "Tipo Permiso" },
+    { value: '001', label: "Interior" },
+    { value: '002', label: "Exterior" },
 ]
 
 interface Props {
@@ -16,23 +15,41 @@ interface Props {
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>
     dateTo: Date | undefined;
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>;
+    crono: string;
+    setCrono: React.Dispatch<React.SetStateAction<string>>;
+    tipoPermiso: string;
+    setTipoPermiso: React.Dispatch<React.SetStateAction<string>>;
+    nombreParticipante: string;
+    setNombreParticipante: React.Dispatch<React.SetStateAction<string>>;
+    numeroControl: string;
+    setNumeroControl: React.Dispatch<React.SetStateAction<string>>;
     refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<PermisoViajePage, Error>>
 }
 
-const PermisosFilter = ({ dateFrom, setDateFrom, dateTo, setDateTo }: Props) => {
+const PermisosFilter = ({ 
+    dateFrom, 
+    setDateFrom, 
+    dateTo, 
+    setDateTo,
+    crono, 
+    setCrono,
+    tipoPermiso, 
+    setTipoPermiso,
+    nombreParticipante, 
+    setNombreParticipante,
+    numeroControl, 
+    setNumeroControl, 
+    refetch }: Props) => {
 
-    const [crono, setCrono] = useState('');
-    const [tipoPermiso, setTipoPermiso] = useState(0);
-    const [nombreParticipante, setNombreParticipante] = useState('');
-    const [numeroControl, setNumeroControl] = useState('');
-
-    const handleCleanFilters = () => {
-        setDateFrom(undefined);
-        setDateTo(undefined);
-        setCrono('');
-        setTipoPermiso(0);
-        setNombreParticipante('');
-        setNumeroControl('');
+    const handleFilter = () => {
+        console.log("Filtrando con los siguientes parámetros:");
+        console.log("Fecha Desde:", dateFrom);
+        console.log("Fecha Hasta:", dateTo);
+        console.log("Cronológico:", crono);
+        console.log("Tipo de Permiso:", tipoPermiso);
+        console.log("Nombre del Participante:", nombreParticipante);
+        console.log("Número de Control:", numeroControl);
+        refetch();
     }
 
   return (
@@ -46,7 +63,7 @@ const PermisosFilter = ({ dateFrom, setDateFrom, dateTo, setDateTo }: Props) => 
                     setValue={setCrono}
                     horizontal
                 />
-                <SimpleSelector 
+                <SimpleSelectorStr
                     label="Tipo de Permiso"
                     options={TIPO_PERMISO}
                     defaultValue={tipoPermiso}
@@ -80,8 +97,8 @@ const PermisosFilter = ({ dateFrom, setDateFrom, dateTo, setDateTo }: Props) => 
                 </div>
                 <div>
                     <button 
-                        onClick={handleCleanFilters}
-                        className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Limpiar</button>
+                        onClick={handleFilter}
+                        className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
                 </div>
             </div>
         </div>
