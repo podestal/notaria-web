@@ -6,6 +6,7 @@ import { documentNaturalOptions, documentoJuridicaOptions } from "../../../../..
 import { Cliente } from "../../../../../services/api/cliente1Service";
 import ContratantesForm from "./ContratantesForm";
 import ContratanteFormJuridica from "./ContratanteFormJuridica";
+import CreateCliente from "../../../clientes/CreateCliente";
 
 interface Props {
     poderId: number;
@@ -188,8 +189,16 @@ const handleLookup = (e: React.FormEvent) => {
             {selectedTipoPersona === 1 && <ContratantesForm cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
             {selectedTipoPersona === 2 && <ContratanteFormJuridica cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
         </>}
+        <div className="my-6"></div>
         {showClienteForm &&
-            <p>Formulario de Cliente</p>
+            <CreateCliente 
+                dni={document}
+                setShowContratanteForm={setShowContratanteForm}
+                setShowClienteForm={setShowClienteForm}
+                setCliente1={setCliente1}
+                cliente1={cliente1}
+                selectedTipoPersona={selectedTipoPersona}
+            />
         }
     </div>
   )
