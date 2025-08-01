@@ -1,6 +1,6 @@
-import { use } from "react";
 import useAuthStore from "../../../../../store/useAuthStore"
 import useGetIngresoPoderesContratantesByPoder from "../../../../../hooks/api/extraprotocolares/ingresoPoderes/contratantes/useGetIngresoPoderesContratantesByPoder";
+import ContratantesCard from "./ContratantesCard";
 
 interface Props {
     idPoder: number;
@@ -21,9 +21,18 @@ const ContratantesTableBody = ({ idPoder }: Props) => {
     if (isSuccess)
 
   return (
-    <div>
-        <>{console.log('contratantes', contratantes)}</>
-    </div>
+    <>
+        {contratantes.length > 0 ?
+            contratantes.map((contratante, idx) => (
+                <ContratantesCard 
+                    key={contratante.id_contrata}
+                    contratante={contratante}
+                    idx={idx}
+                />
+            )) :
+            <p className="text-center text-xs my-4">No hay contratantes disponibles</p>
+        }
+    </>
   )
 }
 
