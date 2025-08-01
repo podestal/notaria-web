@@ -5,6 +5,7 @@ import Selector from "../../../../ui/Selector";
 import { documentNaturalOptions, documentoJuridicaOptions } from "../../../../../data/clienteData";
 import { Cliente } from "../../../../../services/api/cliente1Service";
 import ContratantesForm from "./ContratantesForm";
+import ContratanteFormJuridica from "./ContratanteFormJuridica";
 
 interface Props {
     poderId: number;
@@ -92,20 +93,20 @@ const handleLookup = (e: React.FormEvent) => {
             ).then(response => {
                 if (response.data.idcliente) {
                     console.log('Cliente encontrado:', response.data);
-                    // setCliente1(response.data)
-                    // setShowContratanteForm(true)
-                    // setShowClienteForm(false)
+                    setCliente1(response.data)
+                    setShowContratanteForm(true)
+                    setShowClienteForm(false)
                 } else {
                     console.log('Cliente no encontrado, creando nuevo cliente')
-                    // setCliente1(null)
-                    // setShowContratanteForm(false)
-                    // setShowClienteForm(true)
+                    setCliente1(null)
+                    setShowContratanteForm(false)
+                    setShowClienteForm(true)
                 }
             }).catch(error => {
                 console.log('Error al buscar el cliente:', error);
                 console.error(error);
             }).finally(() => {
-                // setLoading(false)
+                setLoading(false)
             })
         }
     }
@@ -182,7 +183,12 @@ const handleLookup = (e: React.FormEvent) => {
             </>
             }
         </form>
-        {showContratanteForm && cliente1 && selectedTipoPersona === 1 && <ContratantesForm cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
+        <>{console.log('selectedTipoPersona', selectedTipoPersona)}</>
+        {showContratanteForm && cliente1 && 
+        <>
+            {selectedTipoPersona === 1 && <ContratantesForm cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
+            {selectedTipoPersona === 2 && <ContratanteFormJuridica cliente1={cliente1} poderId={poderId} setOpen={setOpen} />}
+        </>}
     </div>
   )
 }
