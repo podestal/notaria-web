@@ -13,16 +13,23 @@ import TimePicker from "../../../ui/TimePicker";
 import { Usuario } from "../../../../services/api/usuariosService";
 import getTitleCase from "../../../../utils/getTitleCase";
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
+import { CreateIngresoCartaData } from "../../../../hooks/api/extraprotocolares/ingresoCartas/useCreateIngresoCarta";
+import { UseMutationResult } from "@tanstack/react-query";
+import useAuthStore from "../../../../store/useAuthStore";
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 
 interface Props {
     carta?: IngresoCartas;
     ubigeos: Ubigeo[]
     usuarios: Usuario[]
+    createIngresoCarta?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
 }
 
-const CartasNotarialesForm = ({ carta, ubigeos, usuarios }: Props) => {
+const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta }: Props) => {
 
     const [loading, setLoading] = useState(false);
+    const access = useAuthStore(s => s.access_token) || '';
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
 
     const [numCarta, setNumCarta] = useState(carta?.num_carta || '');
@@ -68,12 +75,52 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios }: Props) => {
 
     const handleSave = () => {
         setLoading(true);
-        // Logic to save the carta
-        // This could be an API call to save the carta data
-        setTimeout(() => {
-            setLoading(false);
-            console.log("Carta saved successfully");
-        }, 2000);
+
+        if (createIngresoCarta) {
+            createIngresoCarta.mutate({
+                access,
+                ingresoCarta: {
+                    fec_ingreso: moment(fechaIngreso).format('YYYY-MM-DD'),
+                    id_remitente: documento,
+                    telf_remitente: telefono,
+                    nom_remitente: remitente,
+                    dir_remitente: direccion,
+                    dni_destinatario: documentoDest,
+                    nom_destinatario: destinatario,
+                    dir_destinatario: direccionDest,
+                    zona_destinatario: ubigeo?.id || '',
+                    fec_entrega: moment(fechaDiligencia).format('YYYY-MM-DD'),
+                    hora_entrega: horaDiligencia || '',
+                    emple_entrega: responsible,
+                    firmo: firma,
+                    recepcion,
+                    conte_carta: contenido,
+                    costo: '0.00', // Assuming costo is not provided in the form
+                    id_encargado: responsible,
+                    des_encargado: 'Encargado de la carta',
+                    nom_regogio: '',
+                    doc_recogio: '',
+                    fec_recogio: moment(fechaIngreso).format('YYYY-MM-DD'), // Assuming this is the same as fec_ingreso
+                    fact_recogio: '0.00',
+                }
+            }, {
+                onSuccess: () => {
+                    // Optionally reset the form or show a success message
+                    setMessage('Carta guardada exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: (error) => {
+                    console.error("Error creating carta:", error);
+                    setMessage('Error al guardar la carta');
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            });
+        }
     }
 
   return (

@@ -1,14 +1,17 @@
+import { UseMutationResult } from '@tanstack/react-query';
 import useGetUbigeos from '../../../../hooks/api/ubigeo/useGetUbigeos';
 import useGetUsuarios from '../../../../hooks/api/usuarios/useGetUsuarios';
 import { IngresoCartas } from '../../../../services/api/extraprotocolares/ingresoCartas';
 import useAuthStore from '../../../../store/useAuthStore';
 import CartasNotarialesForm from './CartasNotarialesForm';
+import { CreateIngresoCartaData } from '../../../../hooks/api/extraprotocolares/ingresoCartas/useCreateIngresoCarta';
 
 interface Props {
     carta?: IngresoCartas;
+    createIngresoCarta?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
 }
 
-const PreCartasNotarialesForm = ({ carta }: Props) => {
+const PreCartasNotarialesForm = ({ carta, createIngresoCarta }: Props) => {
 
     const access =useAuthStore(s => s.access_token) || '';
 
@@ -25,6 +28,7 @@ const PreCartasNotarialesForm = ({ carta }: Props) => {
                 carta={carta}
                 ubigeos={ubigeos}
                 usuarios={usuarios}
+                createIngresoCarta={createIngresoCarta}
             />
         );
 }
