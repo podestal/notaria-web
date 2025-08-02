@@ -23,9 +23,10 @@ interface Props {
     ubigeos: Ubigeo[]
     usuarios: Usuario[]
     createIngresoCarta?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
+    updateCartaNotarial?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
 }
 
-const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta }: Props) => {
+const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, updateCartaNotarial }: Props) => {
 
     const [loading, setLoading] = useState(false);
     const access = useAuthStore(s => s.access_token) || '';
@@ -113,6 +114,51 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta }: 
                 onError: (error) => {
                     console.error("Error creating carta:", error);
                     setMessage('Error al guardar la carta');
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            });
+        }
+
+        if (updateCartaNotarial) {
+            updateCartaNotarial.mutate({
+                access,
+                ingresoCarta: {
+                    fec_ingreso: moment(fechaIngreso).format('DD/MM/YYYY'),
+                    id_remitente: documento,
+                    telf_remitente: telefono,
+                    nom_remitente: remitente,
+                    dir_remitente: direccion,
+                    dni_destinatario: documentoDest,
+                    nom_destinatario: destinatario,
+                    dir_destinatario: direccionDest,
+                    zona_destinatario: ubigeo?.id || '',
+                    fec_entrega: moment(fechaDiligencia).format('DD/MM/YYYY'),
+                    hora_entrega: horaDiligencia || '',
+                    emple_entrega: responsible,
+                    firmo: firma,
+                    recepcion,
+                    conte_carta: contenido,
+                    costo: '0.00', // Assuming costo is not provided in the form
+                    id_encargado: responsible,
+                    des_encargado: 'Encargado de la carta',
+                    nom_regogio: '',
+                    doc_recogio: '',
+                    fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
+                    fact_recogio: '0.00',
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Carta actualizada exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: (error) => {
+                    console.error("Error updating carta:", error);
+                    setMessage('Error al actualizar la carta');
                     setShow(true);
                     setType('error');
                 },

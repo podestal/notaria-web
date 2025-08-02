@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas"
 import TopModal from "../../../ui/TopModal";
-import PreCartasNotarialesForm from "./PreCartasNotarialesForm";
+import UpdateCartasNotariales from "./UpdateCartasNotariales";
 
 interface Props {
     carta: IngresoCartas
@@ -28,7 +28,7 @@ const CartasNotarialesCard = ({ carta }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
       >
-        <PreCartasNotarialesForm carta={carta} />
+        <UpdateCartasNotariales carta={carta} />
       </TopModal>
       </>
   )

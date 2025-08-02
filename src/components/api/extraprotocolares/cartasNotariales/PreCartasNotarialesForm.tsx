@@ -9,9 +9,10 @@ import { CreateIngresoCartaData } from '../../../../hooks/api/extraprotocolares/
 interface Props {
     carta?: IngresoCartas;
     createIngresoCarta?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
+    updateCartaNotarial?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
 }
 
-const PreCartasNotarialesForm = ({ carta, createIngresoCarta }: Props) => {
+const PreCartasNotarialesForm = ({ carta, createIngresoCarta, updateCartaNotarial }: Props) => {
 
     const access =useAuthStore(s => s.access_token) || '';
 
@@ -29,6 +30,7 @@ const PreCartasNotarialesForm = ({ carta, createIngresoCarta }: Props) => {
                 ubigeos={ubigeos}
                 usuarios={usuarios}
                 createIngresoCarta={createIngresoCarta}
+                updateCartaNotarial={updateCartaNotarial}
             />
         );
 }
