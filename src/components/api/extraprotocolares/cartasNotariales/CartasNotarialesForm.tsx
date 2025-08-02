@@ -80,7 +80,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta }: 
             createIngresoCarta.mutate({
                 access,
                 ingresoCarta: {
-                    fec_ingreso: moment(fechaIngreso).format('YYYY-MM-DD'),
+                    fec_ingreso: moment(fechaIngreso).format('DD/MM/YYYY'),
                     id_remitente: documento,
                     telf_remitente: telefono,
                     nom_remitente: remitente,
@@ -89,7 +89,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta }: 
                     nom_destinatario: destinatario,
                     dir_destinatario: direccionDest,
                     zona_destinatario: ubigeo?.id || '',
-                    fec_entrega: moment(fechaDiligencia).format('YYYY-MM-DD'),
+                    fec_entrega: moment(fechaDiligencia).format('DD/MM/YYYY'),
                     hora_entrega: horaDiligencia || '',
                     emple_entrega: responsible,
                     firmo: firma,
@@ -100,7 +100,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta }: 
                     des_encargado: 'Encargado de la carta',
                     nom_regogio: '',
                     doc_recogio: '',
-                    fec_recogio: moment(fechaIngreso).format('YYYY-MM-DD'), // Assuming this is the same as fec_ingreso
+                    fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
                     fact_recogio: '0.00',
                 }
             }, {
