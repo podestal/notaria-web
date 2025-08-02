@@ -16,3 +16,8 @@ export const documentNaturalOptions = [
     { value: 8, label: 'Partida de Nacimiento' },
     { value: 9, label: 'Otro' }
 ]
+
+export const ALL_DOCUMENTS_OPTIONS = [
+    ...documentNaturalOptions,
+    { value: 10, label: 'R.U.C.' },
+]

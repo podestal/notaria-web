@@ -5,10 +5,13 @@ import useGetIngresoCartas from '../../../../hooks/api/extraprotocolares/ingreso
 import useAuthStore from '../../../../store/useAuthStore';
 import CartasNotarialesTable from './CartasNotarialesTable';
 import Paginator from '../../../ui/Paginator';
+import TopModal from '../../../ui/TopModal';
+import CreateCartasNotariales from './CreateCartasNotariales';
 
 const CartasNotarialesMain = () => {
 
   const access = useAuthStore(s => s.access_token) || '';
+  const [open, setOpen] = useState(false);
 
   const [numCarta, setNumCarta] = useState('');
   const [remitente, setRemitente] = useState('');
@@ -26,10 +29,11 @@ const CartasNotarialesMain = () => {
   if (isSuccess)
 
   return (
+    <>
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
         <GenericHeader 
           title="Cartas Notariales"
-          setOpen={() => {}}
+          setOpen={setOpen}
         />
         <CartasNotarialesFilters 
           dateFrom={dateFrom}
@@ -57,6 +61,13 @@ const CartasNotarialesMain = () => {
           itemsCount={ingresoCartas.count} 
         />
     </div>
+    <TopModal
+      isOpen={open}
+      onClose={() => setOpen(false)}
+    >
+      <CreateCartasNotariales />
+    </TopModal>
+    </>
   )
 }
 
