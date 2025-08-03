@@ -11,12 +11,12 @@ import SearchableDropdownInput from "../../../ui/SearchableDropdownInput";
 import { Ubigeo } from "../../../../services/api/ubigeoService";
 import TimePicker from "../../../ui/TimePicker";
 import { Usuario } from "../../../../services/api/usuariosService";
-import getTitleCase from "../../../../utils/getTitleCase";
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 import { CreateIngresoCartaData } from "../../../../hooks/api/extraprotocolares/ingresoCartas/useCreateIngresoCarta";
 import { UseMutationResult } from "@tanstack/react-query";
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
+import useGetUserInfo from "../../../../hooks/store/useGetUserInfo";
 
 interface Props {
     carta?: IngresoCartas;
@@ -31,6 +31,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const [loading, setLoading] = useState(false);
     const access = useAuthStore(s => s.access_token) || '';
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const user = useGetUserInfo(s => s.user);
 
 
     const [numCarta, setNumCarta] = useState(carta?.num_carta || '');
@@ -69,7 +70,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     // State for Diligencia
     const [fechaDiligencia, setFechaDiligencia] = useState<Date | undefined>(carta?.fec_entrega ? moment.utc(carta.fec_entrega, "YYYY-MM-DD").hour(12).toDate() : new Date());
     const [horaDiligencia, setHoraDiligencia] = useState<string | undefined>(carta?.hora_entrega || undefined);
-    const [responsible, setResponsible] = useState<string>(carta?.emple_entrega || 'ADMINISTRADOR');
+    const [responsible, setResponsible] = useState<string>(carta?.emple_entrega || '');
     const [firma, setFirma] = useState<string>(carta?.firmo || 'si');
     const [recepcion, setRecepcion] = useState<string>(carta?.recepcion || '');
     const [contenido, setContenido] = useState<string>(carta?.conte_carta || '');
@@ -97,7 +98,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     recepcion,
                     conte_carta: contenido,
                     costo: '0.00', // Assuming costo is not provided in the form
-                    id_encargado: responsible,
+                    id_encargado: `${user?.first_name} ${user?.last_name}`,
                     des_encargado: 'Encargado de la carta',
                     nom_regogio: '',
                     doc_recogio: '',
@@ -203,7 +204,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
             />
             <SimpleInput 
                 label="Responsable"
-                value={'ADMINISTRADOR'}
+                value={carta?.id_encargado || `${user?.first_name} ${user?.last_name}`.trim()}
                 setValue={() => {}}
                 horizontal
                 disabled
@@ -323,7 +324,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleSelectorStr
                 label="Responsable"
-                options={usuarios.map(user => ({ value: user.loginusuario, label: getTitleCase(user.loginusuario) }))}
+                options={usuarios.map(user => ({ value: user.loginusuario, label: `${user.prinom} ${user.apepat}` }))}
                 defaultValue={responsible}
                 setter={setResponsible}
             />

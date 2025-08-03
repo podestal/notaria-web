@@ -13,6 +13,7 @@ import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 import { UpdateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/UpdateIngresoPoderes";
 import ContratantesMain from "./contratantes/ContratantesMain";
+import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
 
 interface Props {
     poder?: IngresoPoderes
@@ -27,6 +28,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
     const access = useAuthStore(s => s.access_token) || '';
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [idPoder, setIdPoder] = useState(poder?.id_poder || 0);
+    const user = useUserInfoStore(s => s.user);
 
     // poderes values
     const [hora, setHora] = useState<string | undefined>(
@@ -75,8 +77,8 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     telf_comuni: telComunicarse,
                     email_comuni: emailComunicarse,
                     documento: '0.00',
-                    id_respon: '',
-                    des_respon: '',
+                    id_respon: `${user?.first_name} ${user?.last_name}`.trim(),
+                    des_respon: `${user?.first_name} ${user?.last_name}`.trim(),
                     doc_presen: '',
                     fec_ofre: '',
                     hora_ofre: '',
@@ -232,7 +234,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                 <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput 
                 label="Responsable"
-                value={'ADMINISTRADOR CNL'}
+                value={poder?.id_respon || `${user?.first_name} ${user?.last_name}`.trim()}
                 setValue={() => {}}
                 horizontal
                 disabled
