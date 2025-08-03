@@ -4,8 +4,10 @@
 //   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
 //   const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
 
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import Calendar from "../../../ui/Calendar";
 import SimpleInput from "../../../ui/SimpleInput";
+import { LibrosPage } from "../../../../services/api/extraprotocolares/librosService";
 
 interface Props {
     cliente: string;
@@ -18,6 +20,7 @@ interface Props {
     setCronologico: React.Dispatch<React.SetStateAction<string>>;
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>;
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>;
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<LibrosPage, Error>>
 }
 
 const LibrosFilters = ({ 
@@ -30,7 +33,8 @@ const LibrosFilters = ({
     setNumDoc, 
     setCronologico, 
     setDateFrom, 
-    setDateTo 
+    setDateTo,
+    refetch
 }: Props) => {
 
     const handleFilter = () => {
@@ -42,6 +46,7 @@ const LibrosFilters = ({
             dateFrom,
             dateTo,
         });
+        refetch();
     }
 
   return (

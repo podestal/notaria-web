@@ -1,8 +1,14 @@
+import { Libro } from "../../../../services/api/extraprotocolares/librosService"
 
+interface Libros {
+    libros: Libro[]
+}
 
-const LibrosTableBody = () => {
+const LibrosTableBody = ({ libros }: Libros) => {
   return (
-    <div>LibrosTableBody</div>
+    <div>
+        <>{console.log(libros)}</>
+    </div>
   )
 }
 

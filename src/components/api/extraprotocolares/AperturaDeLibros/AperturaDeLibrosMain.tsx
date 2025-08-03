@@ -3,8 +3,14 @@ import GenericHeader from '../../../ui/GenericHeader'
 import TopModal from '../../../ui/TopModal';
 import LibrosFilters from './LibrosFilters';
 import LibrosTable from './LibrosTable';
+import useGetLibros from '../../../../hooks/api/extraprotocolares/aperturaLibros/useGetLibros';
+import useAuthStore from '../../../../store/useAuthStore';
+import Paginator from '../../../ui/Paginator';
+
 
 const AperturaDeLibrosMain = () => {
+
+  const access = useAuthStore(s => s.access_token) || '';
 
   const [open, setOpen] = useState(false);
   const [cliente, setCliente] = useState('');
@@ -13,6 +19,13 @@ const AperturaDeLibrosMain = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
   const [page, setPage] = useState(1);
+
+  const { data: librosData, isLoading, isError, error, isSuccess, refetch } = useGetLibros({access, page});
+
+  if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>;
+  if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>;
+
+  if (isSuccess)
 
   return (
     <>
@@ -32,8 +45,16 @@ const AperturaDeLibrosMain = () => {
           setCronologico={setCronologico}
           setDateFrom={setDateFrom}
           setDateTo={setDateTo} 
+          refetch={refetch}
         />
-        <LibrosTable />
+        <LibrosTable 
+          libros={librosData.results}
+        />
+        <Paginator
+          page={page}
+          setPage={setPage}
+          itemsCount={librosData.count}
+        />
         
     </div>
     <TopModal
