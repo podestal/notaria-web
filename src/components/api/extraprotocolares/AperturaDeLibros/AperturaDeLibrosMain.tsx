@@ -20,7 +20,7 @@ const AperturaDeLibrosMain = () => {
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
   const [page, setPage] = useState(1);
 
-  const { data: librosData, isLoading, isError, error, isSuccess, refetch } = useGetLibros({access, page});
+  const { data: librosData, isLoading, isError, error, isSuccess, refetch } = useGetLibros({access, page, cliente, numDoc, cronologico, dateFrom, dateTo });
 
   if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>;
   if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>;
