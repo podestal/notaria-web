@@ -6,6 +6,7 @@ import LibrosTable from './LibrosTable';
 import useGetLibros from '../../../../hooks/api/extraprotocolares/aperturaLibros/useGetLibros';
 import useAuthStore from '../../../../store/useAuthStore';
 import Paginator from '../../../ui/Paginator';
+import CreateLibro from './CreateLibro';
 
 
 const AperturaDeLibrosMain = () => {
@@ -61,7 +62,7 @@ const AperturaDeLibrosMain = () => {
       isOpen={open}
       onClose={() => setOpen(false)}
     >
-      <p>Contenido del modal de Apertura de Libros</p>  
+      <CreateLibro />
     </TopModal>
     </>
   )

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Libro } from "../../../../services/api/extraprotocolares/librosService"
 import TopModal from "../../../ui/TopModal";
+import { NUMERO_LIBROS, TIPOS_FOLIOS } from "../../../../data/librosData";
 
 interface Props {
     libro: Libro
@@ -20,9 +21,9 @@ const LibrosCard = ({ libro }: Props) => {
             <p>{libro.fecing}</p>
             <p className="col-span-2">{libro.empresa}</p>
             <p>{libro.idtiplib}</p>
-            <p>{libro.numlibro}</p>
+            <p>{NUMERO_LIBROS.find(libro => libro.idnlibro === libro.idnlibro)?.desnlibro}</p>
             <p>{libro.folio}</p>
-            <p>{libro.idtipfol}</p>
+            <p>{TIPOS_FOLIOS.find(folio => folio.idtipfol === libro.idtipfol)?.destipfol}</p>
             <p>{libro.ruc}</p>
             <p>l</p>
         </div>

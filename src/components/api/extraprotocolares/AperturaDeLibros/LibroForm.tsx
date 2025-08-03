@@ -1,6 +1,13 @@
+import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
+
 const LibroForm = () => {
+
+    const user = useUserInfoStore(state => state.user);
+
   return (
-    <div>LibroForm</div>
+    <div>
+        <>{console.log('user', user)}</>
+    </div>
   )
 }
 
