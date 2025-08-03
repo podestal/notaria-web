@@ -1,4 +1,5 @@
 import { Libro } from "../../../../services/api/extraprotocolares/librosService"
+import LibrosCard from "./LibrosCard"
 
 interface Libros {
     libros: Libro[]
@@ -6,9 +7,15 @@ interface Libros {
 
 const LibrosTableBody = ({ libros }: Libros) => {
   return (
-    <div>
-        <>{console.log(libros)}</>
-    </div>
+    <>
+        {libros.length > 0 ? (
+            libros.map(libro => (
+                <LibrosCard key={libro.id} libro={libro} />
+            ))
+        ) : (
+            <p>No hay libros disponibles</p>
+        )}
+    </>
   )
 }
 
