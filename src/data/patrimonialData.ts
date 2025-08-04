@@ -13,7 +13,7 @@ export const OPPORTUNIDADES_PAGO = [
     { idoppago: 6, codoppago: '06', desoppago: 'CON LA ENTREGA FISICA DEL BIEN' },
     { idoppago: 7, codoppago: '07', desoppago: 'CON ANTERIORIDAD A LA FIRMA DE LA MINUTA' },
     { idoppago: 8, codoppago: '99', desoppago: 'OTRO' },
-    { idoppago: 10, codoppago: '', desoppago: 'VACIO' }
+    { idoppago: 10, codoppago: '10', desoppago: 'VACIO' }
 ]
 
 export const FORMAS_PAGO = [
