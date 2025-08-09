@@ -1,31 +1,48 @@
 import axios from "axios";
 import useAuthStore from "../../../../store/useAuthStore";
-import { FileCog } from "lucide-react";
-import { PermisoViaje } from "../../../../services/api/extraprotocolares/permisoViajeService";
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
+import { FileCog, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 interface Props {
-    permiso: PermisoViaje
+    name: string
+    url: string
+    params: Record<string, string>
 }
 
-const GenerarDocumento = ({ permiso }: Props) => {
+const GenerarDocumento = ({ name, url, params }: Props) => {
+    const [isLoading, setIsLoading] = useState(false);
     const access = useAuthStore((s) => s.access_token) || ''
+    const { setType, setMessage, setShow } = useNotificationsStore();
     const docsURL = import.meta.env.VITE_DOC_URL
-    const typePermisoUrl = permiso.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior'
+
+    const showNotification = (type: 'success' | 'error', message: string) => {
+        setType(type);
+        setMessage(message);
+        setShow(true);
+    };
 
     const handleOpenDocument = async () => {
-  
+        if (isLoading) return; // Prevent multiple clicks during loading
+        
+        setIsLoading(true);
+        
         try {
           const isWindows = /Windows/.test(navigator.userAgent);
           const mode = isWindows ? 'open' : 'download';
   
           console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
-  // generate-document
+          
           const response = await axios.get(
-            `${docsURL}extraprotocolares/${typePermisoUrl}/?id_viaje=${permiso.id_viaje}`,
+            `${docsURL}extraprotocolares/${url}/`,
             {
               responseType: mode === 'download' ? 'blob' : 'json',
               headers: {
                 'Authorization': `JWT ${access}`,
+              },
+              params: {
+                mode,
+                ...params
               }
             }
           );
@@ -34,7 +51,7 @@ const GenerarDocumento = ({ permiso }: Props) => {
             // Windows: Open in Word using the secure backend URL
             const wordUrl = `ms-word:ofe|u|${response.data.url}`;
             window.open(wordUrl, '_blank');
-            // Optionally, you can show a message or return here
+            showNotification('success', 'Documento abierto en Word exitosamente');
             return;
           } else {
             // Download mode (iOS, Mac, Linux, or fallback)
@@ -44,27 +61,38 @@ const GenerarDocumento = ({ permiso }: Props) => {
             const blobUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = blobUrl;
-            link.download = `__PROY__${permiso.num_kardex}.docx`;
+            link.download = `__PROY__${name}.docx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+            showNotification('success', 'Documento descargado exitosamente');
           }
   
         } catch (error) {
           console.error('Error opening Word document:', error);
+          showNotification('error', 'Error al generar el documento. Por favor intenta nuevamente.');
         } finally {
-        //   queryClient.invalidateQueries({ queryKey: ["documents by kardex", `${kardex.kardex}`] })
+          setIsLoading(false);
         }
       };
 
   return (
     <div 
         onClick={handleOpenDocument}
-        className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-        <FileCog className="text-xl text-green-600"/>
-        <p className="text-xs">Generar</p>
-        
+        className={`w-full flex items-center justify-between px-4 py-2 gap-1 rounded-lg mb-4 text-blue-600 transition-all duration-200 ${
+            isLoading 
+                ? 'bg-blue-100 cursor-not-allowed opacity-70' 
+                : 'bg-blue-200 hover:opacity-85 cursor-pointer hover:bg-blue-300'
+        }`}>
+        {isLoading ? (
+            <Loader2 className="text-xl text-blue-600 animate-spin" />
+        ) : (
+            <FileCog className="text-xl text-green-600"/>
+        )}
+        <p className="text-xs font-medium">
+            {isLoading ? 'Generando...' : 'Generar'}
+        </p>
     </div>
   )
 }

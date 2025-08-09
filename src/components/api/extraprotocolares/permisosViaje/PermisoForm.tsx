@@ -1,4 +1,4 @@
-import { FileCog, FileText, FileWarning, QrCode, Save } from "lucide-react"
+import { FileText, FileWarning, QrCode, Save } from "lucide-react"
 import { PermisoViaje } from "../../../../services/api/extraprotocolares/permisoViajeService"
 import SimpleInput from "../../../ui/SimpleInput"
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr"
@@ -13,7 +13,7 @@ import { CreatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/
 import useAuthStore from "../../../../store/useAuthStore"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 import { UpdatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje"
-import GenerarDocumento from "./GenerarDocumento"
+import GenerarDocumento from "../documentos/GenerarDocumento"
 
 interface Props {
     permisoViaje?: PermisoViaje
@@ -161,8 +161,13 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            {permisoViaje && <GenerarDocumento 
-                permiso={permisoViaje}
+            {permisoViaje && 
+            <GenerarDocumento 
+                name={permisoViaje.num_kardex}
+                url={permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior'}
+                params={{
+                    id_viaje: permisoViaje.id_viaje.toString()
+                }}
             />}
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <FileText className="text-xl text-slate-50"/>
