@@ -14,6 +14,7 @@ import useCorrelativeStore from '../hooks/store/useCorrelativeStore'
 import getTitleCase from '../utils/getTitleCase'
 import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
 import { useNavigate } from 'react-router-dom'
+import useUserInfoStore from '../hooks/store/useGetUserInfo'
 
 interface MenuOptions {
     name: string;
@@ -40,6 +41,7 @@ const Header = ({ kardexTypes }: Props) => {
 
     const [openDropdown, setOpenDropdown] = useState<number | null>(null);
     const [openSubDropdown, setOpenSubDropdown] = useState<number | null>(null);
+    const user = useUserInfoStore( s => s.user)
 
     const navigate = useNavigate()
 
@@ -136,6 +138,8 @@ const Header = ({ kardexTypes }: Props) => {
 
   return (
     <div>
+      <>{console.log('user', user)
+      }</>
     <div className='grid grid-cols-9 h-[138px] bg-black'>
         <div className='w-full h-full flex items-center justify-center col-span-2'>
             <img src={notariaLogo} alt="" className='col-span-2 w-[280px]' />

@@ -1,7 +1,5 @@
 import AuthClient from "./authClient";
 
-// ['idusuario', 'username', 'email', 'notary', 'first_name', 'last_name']
-
 export interface User {
     idusuario: number;
     username: string;
