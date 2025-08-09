@@ -13,6 +13,7 @@ import { CreatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/
 import useAuthStore from "../../../../store/useAuthStore"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 import { UpdatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje"
+import GenerarDocumento from "./GenerarDocumento"
 
 interface Props {
     permisoViaje?: PermisoViaje
@@ -160,10 +161,9 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileCog className="text-xl text-green-600"/>
-                <p className="text-xs">Generar</p>
-            </div>
+            {permisoViaje && <GenerarDocumento 
+                permiso={permisoViaje}
+            />}
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <FileText className="text-xl text-slate-50"/>
                 <p className="text-xs">Ver Doc</p>
