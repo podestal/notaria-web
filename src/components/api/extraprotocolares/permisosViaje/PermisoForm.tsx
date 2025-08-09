@@ -14,6 +14,7 @@ import useAuthStore from "../../../../store/useAuthStore"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 import { UpdatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje"
 import GenerarDocumento from "../documentos/GenerarDocumento"
+import AbrirDocumento from "../documentos/AbrirDocumento"
 
 interface Props {
     permisoViaje?: PermisoViaje
@@ -169,10 +170,14 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
                     id_viaje: permisoViaje.id_viaje.toString()
                 }}
             />}
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileText className="text-xl text-slate-50"/>
-                <p className="text-xs">Ver Doc</p>
-            </div>
+            {permisoViaje && <AbrirDocumento 
+                name={permisoViaje.num_kardex}
+                url={permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior'}
+                params={{
+                    id_viaje: permisoViaje.id_viaje.toString(),
+                    action: 'retrieve'
+                }}
+            />}
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <QrCode className="text-xl text-slate-950"/>
                 <p className="text-xs">Generar QR</p>
