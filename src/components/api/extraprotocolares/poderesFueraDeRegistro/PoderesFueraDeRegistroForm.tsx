@@ -1,4 +1,4 @@
-import { FileCog, FileText, FileWarning, QrCode, Save } from "lucide-react";
+import { FileWarning, QrCode, Save } from "lucide-react";
 import { useState } from "react";
 import SimpleInput from "../../../ui/SimpleInput";
 import { IngresoPoderes } from "../../../../services/api/extraprotocolares/ingresoPoderes";
@@ -14,6 +14,11 @@ import useNotificationsStore from "../../../../hooks/store/useNotificationsStore
 import { UpdateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/UpdateIngresoPoderes";
 import ContratantesMain from "./contratantes/ContratantesMain";
 import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
+import GenerarDocumento from "../documentos/GenerarDocumento";
+import AbrirDocumento from "../documentos/AbrirDocumento";
+import FueraDeRegistroForm from "./poderTypeForms/FueraDeRegistroForm";
+import EssaludForm from "./poderTypeForms/EssaludForm";
+import PensionForm from "./poderTypeForms/PensionForm";
 
 interface Props {
     poder?: IngresoPoderes
@@ -147,22 +152,27 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Ingreso de Poderes</h2>
         {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
         <div className="grid grid-cols-8 gap-2">
-            <>{console.log('fechaIngreso poder', poder?.fec_ingreso)}</>
-            <>{console.log('fechaIngreso state', fechaIngreso)}</>
             <button 
                 onClick={handleSave}
                 className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileCog className="text-xl text-green-600"/>
-                <p className="text-xs">Generar</p>
-            </div>
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileText className="text-xl text-slate-50"/>
-                <p className="text-xs">Ver Doc</p>
-            </div>
+            {poder && <GenerarDocumento 
+                name={poder.num_kardex}
+                url={'poder-fuera-registro'}
+                params={{
+                    id_poder: poder.id_poder.toString()
+                }}
+            />}
+            {poder && <AbrirDocumento 
+                name={poder.num_kardex}
+                url={'poder-fuera-registro'}
+                params={{
+                    id_poder: poder.id_poder.toString(),
+                    action: 'retrieve'
+                }}
+            />}
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <QrCode className="text-xl text-slate-950"/>
                 <p className="text-xs">Generar QR</p>
@@ -241,7 +251,12 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
             />
         </div>
         {idPoder > 0 && (
-            <ContratantesMain idPoder={idPoder} />
+            <div className="w-full flex justify-center items-center gap-4 my-8">
+                <ContratantesMain idPoder={idPoder} />
+                {(tipoPoder === '002' && poder?.id_asunto === tipoPoder) && <FueraDeRegistroForm poderId={idPoder} />}
+                {(tipoPoder === '003' && poder?.id_asunto === tipoPoder) && <PensionForm poderId={idPoder} />}
+                {(tipoPoder === '004' && poder?.id_asunto === tipoPoder) && <EssaludForm poderId={idPoder} />}
+            </div>
         )}
     </div>
   )
