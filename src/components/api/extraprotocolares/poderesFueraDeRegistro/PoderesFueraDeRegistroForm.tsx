@@ -16,15 +16,15 @@ import ContratantesMain from "./contratantes/ContratantesMain";
 import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
 import GenerarDocumento from "../documentos/GenerarDocumento";
 import AbrirDocumento from "../documentos/AbrirDocumento";
-import FueraDeRegistroForm from "./poderTypeForms/FueraDeRegistroForm";
 import EssaludForm from "./poderTypeForms/EssaludForm";
 import PensionForm from "./poderTypeForms/PensionForm";
+import CreatePoderRegistro from "./CreatePoderRegistro";
 
 interface Props {
     poder?: IngresoPoderes
     setOpen?: React.Dispatch<React.SetStateAction<boolean>>
     createIngresoPoderes?: UseMutationResult<IngresoPoderes, Error, CreateIngresoPoderesData>
-    updateIngresoPoder: UseMutationResult<IngresoPoderes, Error, UpdateIngresoPoderesData>
+    updateIngresoPoder?: UseMutationResult<IngresoPoderes, Error, UpdateIngresoPoderesData>
 }
 
 const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngresoPoder }: Props) => {
@@ -253,7 +253,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
         {idPoder > 0 && (
             <div className="w-full flex justify-center items-center gap-4 my-8">
                 <ContratantesMain idPoder={idPoder} />
-                {(tipoPoder === '002' && poder?.id_asunto === tipoPoder) && <FueraDeRegistroForm poderId={idPoder} />}
+                {(tipoPoder === '002' && poder?.id_asunto === tipoPoder) && <CreatePoderRegistro poderId={idPoder} />}
                 {(tipoPoder === '003' && poder?.id_asunto === tipoPoder) && <PensionForm poderId={idPoder} />}
                 {(tipoPoder === '004' && poder?.id_asunto === tipoPoder) && <EssaludForm poderId={idPoder} />}
             </div>
