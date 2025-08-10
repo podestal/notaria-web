@@ -4,6 +4,10 @@ import SimpleInput from "../../../../ui/SimpleInput";
 import DateInput from "../../../../ui/DateInput";
 import { PoderRegistro } from "../../../../../services/api/extraprotocolares/poderRegistroService";
 import SimpleSelectorStr from "../../../../ui/SimpleSelectosStr";
+import useCreateUpdateRegistro from "../../../../../hooks/api/extraprotocolares/ingresoPoderes/poderes/useCreateUpdateRegistro";
+import useAuthStore from "../../../../../store/useAuthStore";
+import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
+import moment from "moment";
 
 interface Props {
     poderId: number;
@@ -13,11 +17,20 @@ interface Props {
 
 
 const FueraDeRegistroForm = ({ poderId, setOpen, poderRegistro }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
+    const [isLoading, setIsLoading] = useState(false)
+    const {setMessage, setShow, setType} = useNotificationsStore()
+
     const [tipoRegistro, setTipoRegistro] = useState(poderRegistro?.id_tipo || '0')
     const [plazo, setPlazo] = useState(poderRegistro?.f_plazopoder || '')
-    const [fechaOtorgamiento, setFechaOtorgamiento] = useState(poderRegistro?.f_fecotor || '')
-    const [fechaVencimiento, setFechaVencimiento] = useState(poderRegistro?.f_fecvcto || '')
+    const [fechaOtorgamiento, setFechaOtorgamiento] = useState(poderRegistro?.f_fecotor || moment().format('DD/MM/YYYY'))
+    const [fechaVencimiento, setFechaVencimiento] = useState(poderRegistro?.f_fecvcto || moment().format('DD/MM/YYYY'))
     const [solicita, setSolicita] = useState(poderRegistro?.f_solicita || '')
+
+    const createUpdateRegistro = useCreateUpdateRegistro({ idPoderRegistro: poderRegistro?.id_fuerareg, poderId })
+
+
     
     useEffect(() => {
         if (tipoRegistro === '1') {
@@ -33,6 +46,37 @@ SEGUNDO.- REALIZAR LOS TRAMITES ADMINISTRATIVOS SOBRE LA DOCUMENTACION QUE ESTE 
 
     const handleSave = () => {
 
+        setIsLoading(true)
+        createUpdateRegistro.mutate({
+            registro: {
+                id_tipo: tipoRegistro,
+                f_plazopoder: plazo,
+                f_fecotor: fechaOtorgamiento,
+                f_fecvcto: fechaVencimiento,
+                f_solicita: solicita,
+                f_observ: '',
+                f_fecha: '',
+                id_poder: poderId,
+            },
+            access
+        },
+        {
+            onSuccess: () => {
+                setMessage('Poder actualizado correctamente')
+                setShow(true)
+                setType('success')
+                setOpen(false)
+            },
+            onError: (error) => {
+                setMessage('Error al actualizar el registro')
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setIsLoading(false)
+            }
+        }
+    )
     }
     
   return (
@@ -79,7 +123,8 @@ SEGUNDO.- REALIZAR LOS TRAMITES ADMINISTRATIVOS SOBRE LA DOCUMENTACION QUE ESTE 
         <button 
             className=" bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 cursor-pointer transition-all duration-300"
             onClick={handleSave}
-        >Guardar</button>
+            disabled={isLoading}
+        >{isLoading ? 'Guardando...' : 'Guardar'}</button>
         <button 
             className=" bg-red-500 text-white p-2 rounded-md hover:bg-red-600 cursor-pointer transition-all duration-300"
             onClick={() => setOpen(false)}
