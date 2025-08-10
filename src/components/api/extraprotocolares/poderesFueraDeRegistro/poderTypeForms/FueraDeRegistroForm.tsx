@@ -68,7 +68,7 @@ SEGUNDO.- REALIZAR LOS TRAMITES ADMINISTRATIVOS SOBRE LA DOCUMENTACION QUE ESTE 
                 setOpen(false)
             },
             onError: (error) => {
-                setMessage('Error al actualizar el registro')
+                setMessage(`Error al actualizar el poder: ${error.message}`)
                 setShow(true)
                 setType('error')
             },
@@ -82,7 +82,6 @@ SEGUNDO.- REALIZAR LOS TRAMITES ADMINISTRATIVOS SOBRE LA DOCUMENTACION QUE ESTE 
   return (
     <div>
     <h2 className="text-lg font-bold mb-4 text-center">Formato Libre</h2>
-    {console.log(poderRegistro)}
     <div className="grid grid-cols-2 gap-4 my-4">
         <SimpleSelectorStr
             label="Tipo"

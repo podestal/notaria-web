@@ -19,6 +19,7 @@ import AbrirDocumento from "../documentos/AbrirDocumento";
 import EssaludForm from "./poderTypeForms/EssaludForm";
 import PensionForm from "./poderTypeForms/PensionForm";
 import CreatePoderRegistro from "./CreatePoderRegistro";
+import CreatePension from "./CreatePension";
 
 interface Props {
     poder?: IngresoPoderes
@@ -254,7 +255,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
             <div className="w-full flex justify-center items-center gap-4 my-8">
                 <ContratantesMain idPoder={idPoder} />
                 {(tipoPoder === '002' && poder?.id_asunto === tipoPoder) && <CreatePoderRegistro poderId={idPoder} />}
-                {(tipoPoder === '003' && poder?.id_asunto === tipoPoder) && <PensionForm poderId={idPoder} />}
+                {(tipoPoder === '003' && poder?.id_asunto === tipoPoder) && <CreatePension poderId={idPoder} />}
                 {(tipoPoder === '004' && poder?.id_asunto === tipoPoder) && <EssaludForm poderId={idPoder} />}
             </div>
         )}
