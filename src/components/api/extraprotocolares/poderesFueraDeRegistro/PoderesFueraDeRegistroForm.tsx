@@ -51,7 +51,8 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
     const [emailComunicarse, setEmailComunicarse] = useState(poder?.email_comuni || '');
 
     const urlDocumento = poder?.id_asunto === '002' ? 'poder-fuera-registro' : poder?.id_asunto === '003' ? 'poder-onp' : poder?.id_asunto === '004' ? 'poder-essalud' : '';
-
+    // const kardexYear = (poder?.num_kardex || '').slice(0, 4);
+    // const documentName = `__PODER__${poder?.id_poder}-${(poder?.num_kardex || '').slice(0, 4)}.docx`;
 
     const handleSave = () => {
 
@@ -162,14 +163,14 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
             {poder && <GenerarDocumento 
-                name={poder.num_kardex}
+                name={`__PODER__${poder?.id_poder}-${(poder?.num_kardex || '').slice(0, 4)}.docx`}
                 url={urlDocumento}
                 params={{
                     id_poder: poder.id_poder.toString()
                 }}
             />}
             {poder && <AbrirDocumento 
-                name={poder.num_kardex}
+                name={`__PODER__${poder?.id_poder}-${(poder?.num_kardex || '').slice(0, 4)}.docx`}
                 url={urlDocumento}
                 params={{
                     id_poder: poder.id_poder.toString(),

@@ -17,6 +17,8 @@ import { UseMutationResult } from "@tanstack/react-query";
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 import useGetUserInfo from "../../../../hooks/store/useGetUserInfo";
+import GenerarDocumento from "../documentos/GenerarDocumento";
+import AbrirDocumento from "../documentos/AbrirDocumento";
 
 interface Props {
     carta?: IngresoCartas;
@@ -181,14 +183,22 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileCog className="text-xl text-green-600"/>
-                <p className="text-xs">Generar</p>
-            </div>
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileText className="text-xl text-slate-50"/>
-                <p className="text-xs">Ver Doc</p>
-            </div>
+            {carta && 
+            <GenerarDocumento 
+                name={`__CARTA__${carta.num_carta.slice(-6)}-${carta.num_carta.slice(0, 4)}.docx`}
+                url='carta-notarial'
+                params={{
+                    id_carta: carta.id_carta.toString()
+                }}
+            />}
+            {carta && <AbrirDocumento 
+                name={`__CARTA__${carta.num_carta.slice(-6)}-${carta.num_carta.slice(0, 4)}.docx`}
+                url='carta-notarial'
+                params={{
+                    id_carta: carta.id_carta.toString(),
+                    action: 'retrieve'
+                }}
+            />}
             <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <QrCode className="text-xl text-slate-950"/>
                 <p className="text-xs">Generar QR</p>

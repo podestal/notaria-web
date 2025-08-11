@@ -66,7 +66,8 @@ const GenerarDocumento = ({ name, url, params }: Props) => {
             const blobUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = blobUrl;
-            link.download = `__PROY__${name}.docx`;
+            
+            link.download = name;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

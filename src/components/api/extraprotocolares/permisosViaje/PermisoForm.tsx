@@ -164,14 +164,14 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
             </button>
             {permisoViaje && 
             <GenerarDocumento 
-                name={permisoViaje.num_kardex}
+                name={`__PERMIVIAJE__${permisoViaje.id_viaje}-${(permisoViaje.num_kardex || '').slice(0, 4)}.docx`}
                 url={permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior'}
                 params={{
                     id_viaje: permisoViaje.id_viaje.toString()
                 }}
             />}
             {permisoViaje && <AbrirDocumento 
-                name={permisoViaje.num_kardex}
+                name={`__PERMIVIAJE__${permisoViaje.id_viaje}-${(permisoViaje.num_kardex || '').slice(0, 4)}.docx`}
                 url={permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior'}
                 params={{
                     id_viaje: permisoViaje.id_viaje.toString(),

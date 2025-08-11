@@ -59,7 +59,7 @@ const AbrirDocumento = ({ name, url, params }: Props) => {
           const blobUrl = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = blobUrl;
-          link.download = `__PROY__${name}.docx`;
+          link.download = name;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -91,7 +91,7 @@ const AbrirDocumento = ({ name, url, params }: Props) => {
             <FileText className="text-xl text-slate-50"/>
         )}
         <p className="text-xs">
-            {isLoading ? 'Generando...' : 'Generar'}
+            {isLoading ? 'Abriendo...' : 'Ver Doc'}
         </p>
     </div>
     <TopModal
