@@ -2,6 +2,8 @@ import { Landmark } from "lucide-react"
 import { useState } from "react"
 import TopModal from "../../../ui/TopModal"
 import PensionForm from "./poderTypeForms/PensionForm";
+import useGetPoderPensionByPoder from "../../../../hooks/api/extraprotocolares/ingresoPoderes/poderes/useGetPoderPensionByPoder";
+import useAuthStore from "../../../../store/useAuthStore";
 
 interface Props {
     poderId: number;
@@ -11,6 +13,7 @@ interface Props {
 const CreatePension = ({ poderId }: Props) => {
 
   const [open, setOpen] = useState(false)
+  const access = useAuthStore(s => s.access_token) || ''
 
   return (
     <>
@@ -24,7 +27,19 @@ const CreatePension = ({ poderId }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <PensionForm poderId={poderId} />
+        
+        <div>
+            {(() => {
+                const { data: poderPension, isLoading, isError, error, isSuccess } = useGetPoderPensionByPoder({ access, poderId });
+                if (isLoading) return <div>Cargando...</div>;
+                if (isError) return <div>Error: {error.message}</div>;
+                if (isSuccess) 
+                return (<PensionForm 
+                  poderPension={poderPension}
+                  setOpen={setOpen}
+                  poderId={poderId} />)
+            })()}
+        </div>
     </TopModal>
     </>
   )

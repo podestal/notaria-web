@@ -51,6 +51,8 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
     const [telComunicarse, setTelComunicarse] = useState(poder?.telf_comuni || '');
     const [emailComunicarse, setEmailComunicarse] = useState(poder?.email_comuni || '');
 
+    const urlDocumento = poder?.id_asunto === '002' ? 'poder-fuera-registro' : poder?.id_asunto === '003' ? 'poder-onp' : poder?.id_asunto === '004' ? 'poder-essalud' : '';
+
 
     const handleSave = () => {
 
@@ -151,7 +153,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
   return (
     <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Ingreso de Poderes</h2>
-        {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
+        <>{console.log('urlDocumento', urlDocumento)}</>
         <div className="grid grid-cols-8 gap-2">
             <button 
                 onClick={handleSave}
@@ -161,14 +163,14 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
             </button>
             {poder && <GenerarDocumento 
                 name={poder.num_kardex}
-                url={'poder-fuera-registro'}
+                url={urlDocumento}
                 params={{
                     id_poder: poder.id_poder.toString()
                 }}
             />}
             {poder && <AbrirDocumento 
                 name={poder.num_kardex}
-                url={'poder-fuera-registro'}
+                url={urlDocumento}
                 params={{
                     id_poder: poder.id_poder.toString(),
                     action: 'retrieve'
