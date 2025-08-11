@@ -4,6 +4,9 @@ import SimpleInput from "../../../../ui/SimpleInput";
 import moment from "moment";
 import DateInput from "../../../../ui/DateInput";
 import { PoderPension } from "../../../../../services/api/extraprotocolares/poderPension";
+import useCreateUpdatePension from "../../../../../hooks/api/extraprotocolares/ingresoPoderes/poderes/useCreateUpdatePension";
+import useAuthStore from "../../../../../store/useAuthStore";
+import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
 
 interface Props {
     poderId: number;
@@ -13,6 +16,9 @@ interface Props {
 
 const PensionForm = ({ poderId, setOpen, poderPension }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
+    const {setMessage, setShow, setType} = useNotificationsStore()
+
     const [isLoading, setIsLoading] = useState(false)
     const [monto, setMonto] = useState(poderPension?.p_pension || '')
     const [plazo, setPlazo] = useState(poderPension?.p_plazopoder || '')
@@ -20,8 +26,45 @@ const PensionForm = ({ poderId, setOpen, poderPension }: Props) => {
     const [fechaVencimiento, setFechaVencimiento] = useState(poderPension?.p_fecvcto || moment().format('DD/MM/YYYY'))
     const [presentacion, setPresentacion] = useState(poderPension?.p_presauto || '')
 
+    const createUpdatePension = useCreateUpdatePension({ idPoderPension: poderPension?.id_pension, poderId })
+
     const handleSave = () => {
         setIsLoading(true)
+        createUpdatePension.mutate({
+            poderPension: {
+                p_pension: monto,
+                p_plazopoder: plazo,
+                p_fecotor: fechaEmision,
+                p_fecvcto: fechaVencimiento,
+                p_presauto: presentacion,
+                id_poder: poderId,
+                p_crono: poderPension?.p_crono || '',
+                p_fecha: poderPension?.p_fecha || '',
+                p_numformu: poderPension?.p_numformu || '',
+                p_domicilio: poderPension?.p_domicilio || '',
+                p_mespension: poderPension?.p_mespension || '',
+                p_anopension: poderPension?.p_anopension || '',
+                p_observ: poderPension?.p_observ || '',
+            },
+            access
+        }, {
+            onSuccess: () => {
+                setMessage('Pension actualizada correctamente')
+                setShow(true)
+                setType('success')
+                setOpen(false)
+            },
+            onError: () => {
+                setMessage('Error al actualizar la pension')
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setIsLoading(false)
+            }
+        })
+
+
     }
     
   return (
