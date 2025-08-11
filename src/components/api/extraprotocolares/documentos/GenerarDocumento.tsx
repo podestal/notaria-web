@@ -3,6 +3,8 @@ import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 import { FileCog, Loader2 } from "lucide-react";
 import { useState } from "react";
+import ExplanationMessage from "../../../ui/ExplanationMessage";
+import TopModal from "../../../ui/TopModal";
 
 interface Props {
     name: string
@@ -15,6 +17,9 @@ const GenerarDocumento = ({ name, url, params }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ''
     const { setType, setMessage, setShow } = useNotificationsStore();
     const docsURL = import.meta.env.VITE_DOC_URL
+
+    const [openExplanation, setOpenExplanation] = useState(false)
+    const [explanationMessage, setExplanationMessage] = useState('')
 
     const showNotification = (type: 'success' | 'error', message: string) => {
         setType(type);
@@ -70,14 +75,22 @@ const GenerarDocumento = ({ name, url, params }: Props) => {
           }
   
         } catch (error) {
-          console.error('Error opening Word document:', error);
-          showNotification('error', 'Error al generar el documento. Por favor intenta nuevamente.');
+          const status = (error as any)?.status ?? (error as any)?.response?.status;
+        
+          if (status === 404) {
+              setOpenExplanation(true);
+              setExplanationMessage('El documento no ha sido creado, por favor, genere el documento y vuelva a intentarlo.')
+          } else if (status === 409) {
+              setOpenExplanation(true);
+              setExplanationMessage('El documento ya ha sido creado, por favor, pruebe con ver el documento.')
+          }
         } finally {
           setIsLoading(false);
         }
       };
 
   return (
+    <>
     <div 
         onClick={handleOpenDocument}
         className={`w-full flex items-center justify-between px-4 py-2 gap-1 rounded-lg mb-4 text-blue-600 transition-all duration-200 ${
@@ -94,6 +107,16 @@ const GenerarDocumento = ({ name, url, params }: Props) => {
             {isLoading ? 'Generando...' : 'Generar'}
         </p>
     </div>
+      <TopModal
+        isOpen={openExplanation}
+        onClose={() => setOpenExplanation(false)}
+    >
+        <ExplanationMessage
+            onClick={() => setOpenExplanation(false)}
+            message={explanationMessage}
+        />
+    </TopModal>
+    </>
   )
 }
 

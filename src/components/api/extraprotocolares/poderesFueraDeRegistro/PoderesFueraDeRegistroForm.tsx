@@ -17,7 +17,6 @@ import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
 import GenerarDocumento from "../documentos/GenerarDocumento";
 import AbrirDocumento from "../documentos/AbrirDocumento";
 import EssaludForm from "./poderTypeForms/EssaludForm";
-import PensionForm from "./poderTypeForms/PensionForm";
 import CreatePoderRegistro from "./CreatePoderRegistro";
 import CreatePension from "./CreatePension";
 
@@ -151,6 +150,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
     }
 
   return (
+    <>
     <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Ingreso de Poderes</h2>
         <>{console.log('urlDocumento', urlDocumento)}</>
@@ -262,6 +262,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
             </div>
         )}
     </div>
+    </>
   )
 }
 
