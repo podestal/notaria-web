@@ -3,6 +3,8 @@ import GenericHeader from '../../../ui/GenericHeader'
 import DomiciliarioFilters from './DomiciliarioFilters';
 import useGetDomiciliarios from '../../../../hooks/api/extraprotocolares/domiciliario/useGetDomiciliarios';
 import useAuthStore from '../../../../store/useAuthStore';
+import Paginator from '../../../ui/Paginator';
+import DomiciliarioTable from './DomiciliarioTable';
 
 const CertDomiciliarioMain = () => {
 
@@ -22,7 +24,6 @@ const CertDomiciliarioMain = () => {
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-      <>{console.log(domiciliarioPage)}</>
         <GenericHeader 
           title="Certificado Domiciliario"
           setOpen={() => {}}
@@ -36,6 +37,17 @@ const CertDomiciliarioMain = () => {
             setCrono={setCrono}
             solicitante={solicitante}
             setSolicitante={setSolicitante}
+            refetch={refetch}
+        />
+        <DomiciliarioTable 
+            domiciliarios={domiciliarioPage.results}
+            page={page}
+        />
+
+        <Paginator
+          page={page}
+          setPage={setPage}
+          itemsCount={domiciliarioPage.count} 
         />
     </div>
   )

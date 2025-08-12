@@ -1,6 +1,9 @@
-import { RefetchOptions } from "@tanstack/react-query"
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
+import { DomiciliarioPage } from "../../../../services/api/extraprotocolares/domiciliarioService";
+import { useState } from "react";
+import { Loader } from "lucide-react";
 
 interface Props {
     dateFrom: Date | undefined;
@@ -11,7 +14,7 @@ interface Props {
     setCrono: React.Dispatch<React.SetStateAction<string>>;
     solicitante: string;
     setSolicitante: React.Dispatch<React.SetStateAction<string>>;
-    // refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<PermisoViajePage, Error>>
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<DomiciliarioPage, Error>>
 }
 
 const DomiciliarioFilters = ({ 
@@ -23,10 +26,16 @@ const DomiciliarioFilters = ({
     setCrono,
     solicitante,
     setSolicitante,
+    refetch,
  }: Props) => {
 
+    const [loading, setLoading] = useState(false);
+
     const handleFilter = () => {
-        // refetch();
+        setLoading(true);
+        refetch().finally(() => {
+            setLoading(false);
+        });
     }
 
   return (
@@ -61,7 +70,11 @@ const DomiciliarioFilters = ({
                 <div>
                     <button 
                         onClick={handleFilter}
-                        className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
+                        className="bg-blue-500 w-[100px] text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer"
+                        disabled={loading}
+                    >
+                        {loading ? <Loader className="animate-spin text-center mx-auto" /> : 'Buscar'}
+                    </button>
                 </div>
             </div>
         </div>
