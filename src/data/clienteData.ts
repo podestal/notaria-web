@@ -21,3 +21,11 @@ export const ALL_DOCUMENTS_OPTIONS = [
     ...documentNaturalOptions,
     { value: 10, label: 'R.U.C.' },
 ]
+
+export const ESTADO_CIVIL = [
+    { value: 1, codestcivil: 'S', desestcivil: 'SOLTERO' },
+    { value: 2, codestcivil: 'C', desestcivil: 'CASADO' },
+    { value: 3, codestcivil: 'V', desestcivil: 'VIUDO' },
+    { value: 4, codestcivil: 'D', desestcivil: 'DIVORCIADO' },
+    { value: 5, codestcivil: 'O', desestcivil: 'CONVIVIENTE' }
+]

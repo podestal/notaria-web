@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PERMISO_VIAJE_CONDICIONES } from "../../../../../data/permisoViajeData";
 import SimpleSelectorStr from "../../../../ui/SimpleSelectosStr";
 import { ViajeContratante } from "../../../../../services/api/extraprotocolares/viajeContratanteService";
@@ -9,6 +9,7 @@ import useAuthStore from "../../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
 import { Ubigeo } from "../../../../../services/api/ubigeoService";
 import { Nacionalidad } from "../../../../../services/api/nacionalidadesService";
+import { ESTADO_CIVIL } from "../../../../../data/clienteData";
 
 interface Props {
     contratanteViaje?: ViajeContratante;
@@ -24,13 +25,16 @@ interface Props {
         segNombre: string;
         direccion: string;
         ubigeo: string;
-        estadoCivil: string;
+        estadoCivil: number;
         genero: string;
         nacionalidad: string;
     }
 }
 
 const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo }: Props) => {
+
+    console.log('contratanteInfo ->',contratanteInfo);
+    
 
     const access = useAuthStore(s => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -49,7 +53,19 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
     const [selectedUbigeo, setSelectedUbigeo] = useState(contratanteInfo.ubigeo || '');
     const [estadoCivil, setEstadoCivil] = useState(contratanteInfo.estadoCivil || '');
     const [genero, setGenero] = useState(contratanteInfo.genero || '');
-    const [nacionalidad, setNacionalidad] = useState(contratanteInfo.nacionalidad || '');
+    const [nacionalidad, setNacionalidad] = useState(contratanteInfo ? nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad)?.descripcion || '' : '');
+
+    useEffect(() => {
+        setAppePaterno(contratanteInfo.apePaterno || '');
+        setAppeMaterno(contratanteInfo.apeMaterno || '');
+        setPriNombre(contratanteInfo.priNombre || '');
+        setSegNombre(contratanteInfo.segNombre || '');
+        setDireccion(contratanteInfo.direccion || '');
+        setSelectedUbigeo(contratanteInfo ? ubigeos.find(ubigeo => (ubigeo.coddis).toString() === contratanteInfo.ubigeo)?.nomdis + ' - ' + ubigeos.find(ubigeo => (ubigeo.coddis).toString() === contratanteInfo.ubigeo)?.nomprov + ' - ' + ubigeos.find(ubigeo => (ubigeo.coddis).toString() === contratanteInfo.ubigeo)?.nomdpto || '' : '');
+        setEstadoCivil(contratanteInfo ? ESTADO_CIVIL.find(estado => (estado.value) === contratanteInfo.estadoCivil)?.desestcivil || '' : '');
+        setGenero(contratanteInfo ? contratanteInfo.genero === 'M' ? 'Masculino' : 'Femenino' : '');
+        setNacionalidad(contratanteInfo ? nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad)?.descripcion || '' : '');
+    }, [contratanteInfo]);
 
     const handleCreateContratante = () => {
 

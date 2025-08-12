@@ -6,6 +6,8 @@ import GenerarDocumento from "../documentos/GenerarDocumento";
 import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
 import moment from "moment";
+import PreClientForm from "../../clientes/PreClientForm";
+import PreParticipanteForm from "../permisosViaje/participantes/PreParticipanteForm";
 
 interface Props {
     domiciliario?: Domiciliario;
@@ -81,6 +83,10 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
                 />
             </div>
         </div>
+        <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Solicitante</p>
+        <PreParticipanteForm 
+            setContratanteInfo={() => {}}
+        />
     </div>
   )
 }

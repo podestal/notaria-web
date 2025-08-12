@@ -11,7 +11,7 @@ interface Props {
         segNombre: string;
         direccion: string;
         ubigeo: string;
-        estadoCivil: string;
+        estadoCivil: number;
         genero: string;
         nacionalidad: string;
     }>>
@@ -32,14 +32,14 @@ const PreParticipanteForm = ({ setContratanteInfo }: Props) => {
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);
                 setContratanteInfo({
-                    apePaterno: response.data.ape_paterno,
-                    apeMaterno: response.data.ape_materno,
-                    priNombre: response.data.pri_nombre,
-                    segNombre: response.data.seg_nombre,
+                    apePaterno: response.data.apepat,
+                    apeMaterno: response.data.apemat,
+                    priNombre: response.data.prinom,
+                    segNombre: response.data.segnom,
                     direccion: response.data.direccion,
-                    ubigeo: response.data.ubigeo,
-                    estadoCivil: response.data.estado_civil,
-                    genero: response.data.genero,
+                    ubigeo: response.data.idubigeo,
+                    estadoCivil: response.data.idestcivil,
+                    genero: response.data.sexo,
                     nacionalidad: response.data.nacionalidad
                 });
             } else {
