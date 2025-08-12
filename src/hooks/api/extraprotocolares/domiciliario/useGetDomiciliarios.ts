@@ -20,8 +20,8 @@ const useGetDomiciliarios = ({ dateFrom, dateTo, crono, solicitante, access, pag
 
     if (dateFrom) params = { ...params, dateFrom: moment(dateFrom).format('YYYY-MM-DD') }
     if (dateTo) params = { ...params, dateTo: moment(dateTo).format('YYYY-MM-DD') }
-    if (crono) params = { ...params, crono };
-    if (solicitante) params = { ...params, solicitante };
+    if (crono) params = { ...params, num_certificado: crono };
+    if (solicitante) params = { ...params, nombre_solic: solicitante };
     
     return useQuery<DomiciliarioPage, Error>({
         queryKey: ['domiciliarios', page],
