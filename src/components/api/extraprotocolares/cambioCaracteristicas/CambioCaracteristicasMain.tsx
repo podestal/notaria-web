@@ -1,3 +1,4 @@
+import ComingSoon from '../../../ui/ComingSoon'
 import GenericHeader from '../../../ui/GenericHeader'
 
 const CambioCaracteristicasMain = () => {
@@ -7,7 +8,7 @@ const CambioCaracteristicasMain = () => {
           title="Cambio de Características"
           setOpen={() => {}}
         />
-        <p>dafadfasdf</p>
+        <ComingSoon />
     </div>
   )
 }

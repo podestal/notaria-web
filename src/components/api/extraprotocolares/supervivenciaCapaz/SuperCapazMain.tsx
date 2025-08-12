@@ -1,4 +1,5 @@
 import GenericHeader from "../../../ui/GenericHeader"
+import ComingSoon from "../../../ui/ComingSoon"
 
 const SuperCapazMain = () => {
   return (
@@ -7,7 +8,7 @@ const SuperCapazMain = () => {
           title="Supervivencia Persona Capaz"
           setOpen={() => {}}
         />
-        <p>dafadfasdf</p>
+        <ComingSoon />
     </div>
   )
 }

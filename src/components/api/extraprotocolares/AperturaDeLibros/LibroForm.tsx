@@ -6,12 +6,17 @@ import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
 import SimpleSelector from "../../../ui/SimpleSelector";
 import { NUMERO_LIBROS } from "../../../../data/librosData";
+import { QrCode, Save } from "lucide-react";
+import GenerarDocumento from "../documentos/GenerarDocumento";
+import AbrirDocumento from "../documentos/AbrirDocumento";
 
 interface Props {
     libro?: Libro
 }
 
 const LibroForm = ({ libro }: Props) => {
+
+    const [loading, setLoading] = useState(false);
 
     const user = useUserInfoStore(state => state.user);
     const [cronologico, setCronologico] = useState<string>(libro?.numlibro ? `${libro.numlibro}-${libro.ano}` : '');
@@ -22,8 +27,42 @@ const LibroForm = ({ libro }: Props) => {
     );
     const [numeroLibro, setNumeroLibro] = useState(libro?.idnlibro || 0);
 
+    const handleSave = () => {
+        console.log('handleSave');
+    }
+
   return (
     <div>
+        <h2 className="text-lg font-semibold text-center mb-8">Formulario Apertura de Libros</h2>
+        <div className="grid grid-cols-8 gap-2">
+            <button 
+                onClick={handleSave}
+                className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+                {!loading && <Save className="text-xl"/>}
+                <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
+            </button>
+            {libro && 
+            <GenerarDocumento 
+                name={`__LIBRO__${libro.numlibro}-${libro.ano}.docx`}
+                url='libro'
+                params={{
+                    id_libro: libro.id.toString()
+                }}
+            />}
+            {libro && 
+            <AbrirDocumento 
+                name={`__LIBRO__${libro.numlibro}-${libro.ano}.docx`}
+                url='libro'
+                params={{
+                    id_libro: libro.id.toString(),
+                    action: 'retrieve'
+                }}
+            />}
+            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+                <QrCode className="text-xl text-slate-950"/>
+                <p className="text-xs">Generar QR</p>
+            </div>
+        </div>
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput 
                 label="N Cronológico"

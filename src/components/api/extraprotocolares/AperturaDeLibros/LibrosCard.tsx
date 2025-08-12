@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Libro } from "../../../../services/api/extraprotocolares/librosService"
 import TopModal from "../../../ui/TopModal";
 import { NUMERO_LIBROS, TIPOS_FOLIOS } from "../../../../data/librosData";
+import UpdateLibro from "./UpdateLibro";
 
 interface Props {
     libro: Libro
@@ -31,9 +32,7 @@ const LibrosCard = ({ libro }: Props) => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            {/* Aquí podrías agregar un componente para editar el libro */}
-            <p>Detalles del Libro: {libro.numlibro}</p>
-            {/* Agrega más detalles o un formulario de edición aquí */}
+            <UpdateLibro libro={libro} />
         </TopModal>
     </>
   )
