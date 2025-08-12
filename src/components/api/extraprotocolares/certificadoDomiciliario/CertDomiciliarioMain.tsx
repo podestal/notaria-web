@@ -5,9 +5,12 @@ import useGetDomiciliarios from '../../../../hooks/api/extraprotocolares/domicil
 import useAuthStore from '../../../../store/useAuthStore';
 import Paginator from '../../../ui/Paginator';
 import DomiciliarioTable from './DomiciliarioTable';
+import TopModal from '../../../ui/TopModal';
+import CreateDomiciliario from './CreateDomiciliario';
 
 const CertDomiciliarioMain = () => {
 
+  const [open, setOpen] = useState(false);
   const access = useAuthStore(s => s.access_token) || '';
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
@@ -23,33 +26,41 @@ const CertDomiciliarioMain = () => {
   if (isSuccess)
 
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-        <GenericHeader 
-          title="Certificado Domiciliario"
-          setOpen={() => {}}
-        />
-        <DomiciliarioFilters
-            dateFrom={dateFrom}
-            setDateFrom={setDateFrom}
-            dateTo={dateTo}
-            setDateTo={setDateTo}
-            crono={crono}
-            setCrono={setCrono}
-            solicitante={solicitante}
-            setSolicitante={setSolicitante}
-            refetch={refetch}
-        />
-        <DomiciliarioTable 
-            domiciliarios={domiciliarioPage.results}
-            page={page}
-        />
+    <>
+      <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
+          <GenericHeader 
+            title="Certificado Domiciliario"
+            setOpen={setOpen}
+          />
+          <DomiciliarioFilters
+              dateFrom={dateFrom}
+              setDateFrom={setDateFrom}
+              dateTo={dateTo}
+              setDateTo={setDateTo}
+              crono={crono}
+              setCrono={setCrono}
+              solicitante={solicitante}
+              setSolicitante={setSolicitante}
+              refetch={refetch}
+          />
+          <DomiciliarioTable 
+              domiciliarios={domiciliarioPage.results}
+              page={page}
+          />
 
-        <Paginator
-          page={page}
-          setPage={setPage}
-          itemsCount={domiciliarioPage.count} 
-        />
-    </div>
+          <Paginator
+            page={page}
+            setPage={setPage}
+            itemsCount={domiciliarioPage.count} 
+          />
+      </div>
+      <TopModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+      >
+        <CreateDomiciliario />
+      </TopModal>
+    </>
   )
 }
 

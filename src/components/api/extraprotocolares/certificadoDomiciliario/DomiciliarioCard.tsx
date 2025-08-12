@@ -26,7 +26,7 @@ const DomiciliarioCard = ({ domiciliario }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <UpdateDomiciliario />
+        <UpdateDomiciliario domiciliario={domiciliario} />
     </TopModal>
     </>
   )

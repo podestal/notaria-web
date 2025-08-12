@@ -1,8 +1,15 @@
+import { Domiciliario } from "../../../../services/api/extraprotocolares/domiciliarioService"
+import DomiciliarioForm from "./DomiciliarioForm";
 
+interface Props {
+    domiciliario: Domiciliario;
+}
 
-const UpdateDomiciliario = () => {
+const UpdateDomiciliario = ({ domiciliario }: Props) => {
   return (
-    <div>UpdateDomiciliario</div>
+    <DomiciliarioForm 
+        domiciliario={domiciliario}
+    />
   )
 }
 
