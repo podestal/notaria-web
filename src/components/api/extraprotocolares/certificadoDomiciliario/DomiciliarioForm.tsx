@@ -11,6 +11,10 @@ import PreParticipanteForm from "../permisosViaje/participantes/PreParticipanteF
 import PreSolicitanteForm from "./solicitante/PreSolicitanteForm";
 import SolicitanteForm from "./solicitante/SolicitanteForm";
 import SolicitanteMain from "./solicitante/SolicitanteMain";
+import DateInput from "../../../ui/DateInput";
+import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
+import { documentNaturalOptions } from "../../../../data/clienteData";
+import SimpleSelector from "../../../ui/SimpleSelector";
 
 interface Props {
     domiciliario?: Domiciliario;
@@ -37,6 +41,19 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
     const [profesion, setProfesion] = useState(domiciliario?.detprofesionc || '');
     const [estadoCivil, setEstadoCivil] = useState(domiciliario?.idestcivil || 0);
     const [genero, setGenero] = useState(domiciliario?.sexo || '');
+
+    const [motivo, setMotivo] = useState(domiciliario?.motivo_solic || '');
+    const [fechaOcupacion, setFechaOcupacion] = useState(domiciliario?.fecha_ocupa || '');
+    const [condicion, setCondicion] = useState(domiciliario?.declara_ser || '');
+    const [propietario, setPropietario] = useState(domiciliario?.propietario || '');
+    const [recibido, setRecibido] = useState(domiciliario?.recibido || '');
+    const [reciboEmpresa, setReciboEmpresa] = useState(domiciliario?.recibo_empresa || '');
+    const [numRecibo, setNumRecibo] = useState(domiciliario?.numero_recibo || '');
+    const [mesFacturado, setMesFacturado] = useState(domiciliario?.mes_facturado || '');
+    const [textoCuerpo, setTextoCuerpo] = useState(domiciliario?.texto_cuerpo || '');
+    const [testigoTipoDocumento, setTestigoTipoDocumento] = useState(domiciliario?.tdoc_testigo ? parseInt(domiciliario.tdoc_testigo) : 1);
+    const [testigoDocument, setTestigoDocument] = useState(domiciliario?.ndocu_testigo || '');
+    const [nomTestigo, setNomTestigo] = useState(domiciliario?.nom_testigo || '');
 
     const handleSave = () => {
         console.log('handleSave');
@@ -115,6 +132,103 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
             document={document}
             setDocument={setDocument}
         />
+        <div className="w-[80%] flex justify-center items-start flex-col gap-4 my-4">
+            <>{console.log('fechaOcupacion', fechaOcupacion)}</>
+            <>{console.log('fecha ocupa domiciliario', domiciliario?.fecha_ocupa)}</>
+            <SimpleInput
+                label="Motivo"
+                value={motivo}
+                setValue={setMotivo}
+                horizontal
+                fullWidth
+            />
+            <DateInput 
+                label="Fecha de ocupación"
+                value={fechaOcupacion}
+                setValue={setFechaOcupacion}
+                horizontal
+            />
+            <SimpleSelectorStr 
+                label="Declara ser"
+                options={[
+                    {label: 'Seleccione una opción', value: ''},
+                    {label: 'INQUILINO', value: 'INQUILINO'}, 
+                    {label: 'PROPIETARIO', value: 'PROPIETARIO'}
+                ]}
+                setter={setCondicion}
+                defaultValue={condicion}
+            />
+            <SimpleInput
+                label="Propietario"
+                value={propietario}
+                setValue={setPropietario}
+                horizontal
+                fullWidth
+            />
+            <SimpleInput
+                label="Recibido por"
+                value={recibido}
+                setValue={setRecibido}
+                horizontal
+                fullWidth
+            />
+            <SimpleSelectorStr 
+                label="Recibo empresa"
+                options={[
+                    {label: 'Seleccione una opción', value: ''},
+                    {label: 'SEDA JULIACA S.A.', value: 'SEDA JULIACA S.A.'}, 
+                    {label: 'ELECTRO PUNO S.A.A', value: 'ELECTRO PUNO S.A.A'}
+                ]}
+                setter={setReciboEmpresa}
+                defaultValue={reciboEmpresa}
+            />
+            <SimpleInput
+                label="Número de recibo"
+                value={numRecibo}
+                setValue={setNumRecibo}
+                horizontal
+                fullWidth
+            />
+            <SimpleSelectorStr 
+                label="Mes facturado"
+                options={[{label: 'Seleccione una opción', value: ''}, {label: 'ENERO', value: 'ENERO'}, {label: 'FEBRERO', value: 'FEBRERO'}, {label: 'MARZO', value: 'MARZO'}, {label: 'ABRIL', value: 'ABRIL'}, {label: 'MAYO', value: 'MAYO'}, {label: 'JUNIO', value: 'JUNIO'}, {label: 'JULIO', value: 'JULIO'}, {label: 'AGOSTO', value: 'AGOSTO'}, {label: 'SEPTIEMBRE', value: 'SEPTIEMBRE'}, {label: 'OCTUBRE', value: 'OCTUBRE'}, {label: 'NOVIEMBRE', value: 'NOVIEMBRE'}, {label: 'DICIEMBRE', value: 'DICIEMBRE'}]}
+                setter={setMesFacturado}
+                defaultValue={mesFacturado}
+            />
+        </div>
+        <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Cuerpo</p>
+        <div className="flex gap-4 justify-center items-center my-4">
+            <p className="pl-2 text-xs font-semibold text-slate-700">Cuerpo</p>
+            <textarea
+                value={textoCuerpo}
+                onChange={(e) => setTextoCuerpo(e.target.value)}
+                placeholder="Contenido de la carta"
+                className="w-full h-32 p-2 border border-slate-300 rounded"
+            />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+            <SimpleSelector 
+                label="Tipo de documento"
+                options={documentNaturalOptions}
+                setter={setTestigoTipoDocumento}
+                defaultValue={testigoTipoDocumento}
+            />
+            <SimpleInput
+                label="Número de documento"
+                value={testigoDocument}
+                setValue={setTestigoDocument}
+                horizontal
+            />
+        </div>
+        <div className="w-[80%] flex justify-center items-start flex-col gap-4 my-4">
+            <SimpleInput
+                label="Testigo a ruego"
+                value={nomTestigo}
+                setValue={setNomTestigo}
+                horizontal
+                fullWidth
+            />
+        </div>
     </div>
   )
 }
