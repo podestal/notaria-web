@@ -6,23 +6,28 @@ import GenerarDocumento from "../documentos/GenerarDocumento";
 import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
 import moment from "moment";
-import PreClientForm from "../../clientes/PreClientForm";
-import PreParticipanteForm from "../permisosViaje/participantes/PreParticipanteForm";
-import PreSolicitanteForm from "./solicitante/PreSolicitanteForm";
-import SolicitanteForm from "./solicitante/SolicitanteForm";
 import SolicitanteMain from "./solicitante/SolicitanteMain";
 import DateInput from "../../../ui/DateInput";
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 import { documentNaturalOptions } from "../../../../data/clienteData";
 import SimpleSelector from "../../../ui/SimpleSelector";
+import { UseMutationResult } from "@tanstack/react-query";
+import { CreateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useCreateDomiciliario";
+import useAuthStore from "../../../../store/useAuthStore";
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
+import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
 
 interface Props {
     domiciliario?: Domiciliario;
+    createDomiciliario?: UseMutationResult<Domiciliario, Error, CreateDomiciliarioData>
 }
 
-const DomiciliarioForm = ({ domiciliario }: Props) => {
+const DomiciliarioForm = ({ domiciliario, createDomiciliario }: Props) => {
 
     const [loading, setLoading] = useState(false);
+    const user = useUserInfoStore(s => s.user)
+    const access = useAuthStore(s => s.access_token) || '';
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [numCertificado, setNumCertificado] = useState(domiciliario?.num_certificado || '');
     const [numFormulario, setNumFormulario] = useState(domiciliario?.num_formu || '');
@@ -43,7 +48,7 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
     const [genero, setGenero] = useState(domiciliario?.sexo || '');
 
     const [motivo, setMotivo] = useState(domiciliario?.motivo_solic || '');
-    const [fechaOcupacion, setFechaOcupacion] = useState(domiciliario?.fecha_ocupa || '');
+    const [fechaOcupacion, setFechaOcupacion] = useState(domiciliario?.fecha_ocupa ? moment(domiciliario.fecha_ocupa).format('DD/MM/YYYY') : moment().format('DD/MM/YYYY'));
     const [condicion, setCondicion] = useState(domiciliario?.declara_ser || '');
     const [propietario, setPropietario] = useState(domiciliario?.propietario || '');
     const [recibido, setRecibido] = useState(domiciliario?.recibido || '');
@@ -56,7 +61,52 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
     const [nomTestigo, setNomTestigo] = useState(domiciliario?.nom_testigo || '');
 
     const handleSave = () => {
-        console.log('handleSave');
+        setLoading(true);
+        createDomiciliario && createDomiciliario.mutate({
+            access,
+            domiciliario: {
+                num_formu: numFormulario,
+                fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                numdoc_solic: document,
+                nombre_solic: solicitante,
+                domic_solic: domicilio,
+                distrito_solic: distrito,
+                motivo_solic: motivo,
+                fecha_ocupa: fechaOcupacion ? moment(fechaOcupacion, 'DD/MM/YYYY').format('YYYY-MM-DD') : '',
+                declara_ser: condicion,
+                propietario,
+                recibido,
+                tdoc_testigo: testigoTipoDocumento.toString(),
+                tipdoc_solic: selectedTipoDocumento.toString(),
+                texto_cuerpo: textoCuerpo,
+                justifi_cuerpo: '',
+                nom_testigo: nomTestigo,
+                ndocu_testigo: testigoDocument,
+                idestcivil: estadoCivil,
+                sexo: genero,
+                detprofesionc: profesion,
+                profesionc: profesion,
+                especificacion: '',
+                recibo_empresa: reciboEmpresa,
+                numero_recibo: numRecibo,
+                mes_facturado: mesFacturado,
+                idusuario: user?.idusuario || 0,
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Domiciliario creado exitosamente');
+                setShow(true);
+                setType('success');
+            },
+            onError: () => {
+                setMessage('Error al crear el domiciliario');
+                setShow(true);
+                setType('error');
+            },
+            onSettled: () => {
+                setLoading(false);
+            }
+        })
     }
 
   return (
@@ -133,8 +183,6 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
             setDocument={setDocument}
         />
         <div className="w-[80%] flex justify-center items-start flex-col gap-4 my-4">
-            <>{console.log('fechaOcupacion', fechaOcupacion)}</>
-            <>{console.log('fecha ocupa domiciliario', domiciliario?.fecha_ocupa)}</>
             <SimpleInput
                 label="Motivo"
                 value={motivo}

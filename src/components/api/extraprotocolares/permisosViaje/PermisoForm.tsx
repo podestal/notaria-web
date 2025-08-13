@@ -299,7 +299,7 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
                 />
             </div>
         </div>
-        <h2 className="text-lg text-center text-xs font-semibold my-4">Observaciones</h2>
+        <h2 className="text-center text-xs font-semibold my-4">Observaciones</h2>
         <textarea className="w-full h-32 p-2 border border-gray-300 rounded-md" value={observacion} onChange={(e) => setObservacion(e.target.value)}></textarea>
     </div>
     {permisoViaje &&             

@@ -67,7 +67,7 @@ export interface Domiciliario {
     idusuario: number;
 }
 
-export type CreateUpdateDomiciliario = Omit<Domiciliario, 'id_domiciliario'>
+export type CreateUpdateDomiciliario = Omit<Domiciliario, 'id_domiciliario' | 'num_certificado'>
 
 interface Props {
     domiciliarioId?: number;
