@@ -9,17 +9,18 @@ interface Props {
     setDomicilio: React.Dispatch<React.SetStateAction<string>>;
     setDistrito: React.Dispatch<React.SetStateAction<string>>;
     setProfesion: React.Dispatch<React.SetStateAction<string>>;
-    setEstadoCivil: React.Dispatch<React.SetStateAction<string>>;
+    setEstadoCivil: React.Dispatch<React.SetStateAction<number>>;
     setGenero: React.Dispatch<React.SetStateAction<string>>;
-    setShowSolicitanteForm: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedTipoDocumento: number;
+    setSelectedTipoDocumento: React.Dispatch<React.SetStateAction<number>>;
+    document: string;
+    setDocument: React.Dispatch<React.SetStateAction<string>>;
 }
 
 
-const PreSolicitanteForm = ({setSolicitante, setDomicilio, setDistrito, setProfesion, setEstadoCivil, setGenero, setShowSolicitanteForm}: Props) => {
+const PreSolicitanteForm = ({setSolicitante, setDomicilio, setDistrito, setProfesion, setEstadoCivil, setGenero, selectedTipoDocumento, setSelectedTipoDocumento, document, setDocument}: Props) => {
 
 
-    const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1);
-    const [document, setDocument] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleClienteLookup = (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,12 +36,10 @@ const PreSolicitanteForm = ({setSolicitante, setDomicilio, setDistrito, setProfe
                 setDomicilio(response.data.direccion);
                 setDistrito(response.data.idubigeo);
                 setProfesion(response.data.idprofesion);
-                setEstadoCivil(response.data.idestcivil.toString());
+                setEstadoCivil(response.data.idestcivil);
                 setGenero(response.data.sexo);
-                setShowSolicitanteForm(true);
             } else {
                 console.log('Cliente no encontrado, creando nuevo cliente')
-                setShowSolicitanteForm(false);
             }
         }).catch(error => {
             console.log('Error al buscar el cliente:', error);

@@ -28,12 +28,15 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
         : (new Date())
     );
 
-    const [solicitante, setSolicitante] = useState('');
-    const [domicilio, setDomicilio] = useState('');
-    const [distrito, setDistrito] = useState('');
-    const [profesion, setProfesion] = useState('');
-    const [estadoCivil, setEstadoCivil] = useState('');
-    const [genero, setGenero] = useState('');
+    const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1);
+    const [document, setDocument] = useState(domiciliario?.numdoc_solic || '');
+
+    const [solicitante, setSolicitante] = useState(domiciliario?.nombre_solic || '');
+    const [domicilio, setDomicilio] = useState(domiciliario?.domic_solic || '');
+    const [distrito, setDistrito] = useState(domiciliario?.distrito_solic || '');
+    const [profesion, setProfesion] = useState(domiciliario?.detprofesionc || '');
+    const [estadoCivil, setEstadoCivil] = useState(domiciliario?.idestcivil || 0);
+    const [genero, setGenero] = useState(domiciliario?.sexo || '');
 
     const handleSave = () => {
         console.log('handleSave');
@@ -107,6 +110,10 @@ const DomiciliarioForm = ({ domiciliario }: Props) => {
             setProfesion={setProfesion}
             setEstadoCivil={setEstadoCivil}
             setGenero={setGenero}
+            selectedTipoDocumento={selectedTipoDocumento}
+            setSelectedTipoDocumento={setSelectedTipoDocumento}
+            document={document}
+            setDocument={setDocument}
         />
     </div>
   )

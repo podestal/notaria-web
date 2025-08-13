@@ -1,4 +1,3 @@
-import { useState } from "react";
 import useGetNacionalidades from "../../../../../hooks/api/nacionalidades/useGetNacionalidades";
 import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos";
 import PreSolicitanteForm from "./PreSolicitanteForm"
@@ -9,14 +8,18 @@ interface Props {
     domicilio: string;
     distrito: string;
     profesion: string;
-    estadoCivil: string;
+    estadoCivil: number;
     genero: string;
     setSolicitante: React.Dispatch<React.SetStateAction<string>>;
     setDomicilio: React.Dispatch<React.SetStateAction<string>>;
     setDistrito: React.Dispatch<React.SetStateAction<string>>;
     setProfesion: React.Dispatch<React.SetStateAction<string>>;
-    setEstadoCivil: React.Dispatch<React.SetStateAction<string>>;
+    setEstadoCivil: React.Dispatch<React.SetStateAction<number>>;
     setGenero: React.Dispatch<React.SetStateAction<string>>;
+    selectedTipoDocumento: number;
+    setSelectedTipoDocumento: React.Dispatch<React.SetStateAction<number>>;
+    document: string;
+    setDocument: React.Dispatch<React.SetStateAction<string>>;
 }
 const SolicitanteMain = ({
     solicitante,
@@ -30,10 +33,12 @@ const SolicitanteMain = ({
     setDistrito, 
     setProfesion, 
     setEstadoCivil, 
-    setGenero
+    setGenero,
+    selectedTipoDocumento,
+    setSelectedTipoDocumento,
+    document,
+    setDocument
 }: Props) => {
-
-    const [showSolicitanteForm, setShowSolicitanteForm] = useState(false);
 
     const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
@@ -53,9 +58,11 @@ const SolicitanteMain = ({
             setProfesion={setProfesion}
             setEstadoCivil={setEstadoCivil}
             setGenero={setGenero}
-            setShowSolicitanteForm={setShowSolicitanteForm}
+            selectedTipoDocumento={selectedTipoDocumento}
+            setSelectedTipoDocumento={setSelectedTipoDocumento}
+            document={document}
+            setDocument={setDocument}
         />
-        {showSolicitanteForm && 
         <SolicitanteForm 
             solicitante={solicitante}
             setSolicitante={setSolicitante}
@@ -63,15 +70,13 @@ const SolicitanteMain = ({
             setDomicilio={setDomicilio}
             distrito={distrito}
             setDistrito={setDistrito}
-            profesion={profesion}
-            setProfesion={setProfesion}
             estadoCivil={estadoCivil}
             setEstadoCivil={setEstadoCivil}
             genero={genero}
             setGenero={setGenero}
             ubigeos={ubigeos}
             nacionalidades={nacionalidades}
-        />}
+        />
     </>
   )
 }

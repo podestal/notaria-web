@@ -13,8 +13,8 @@ interface Props {
     setDomicilio: React.Dispatch<React.SetStateAction<string>>;
     distrito: string;
     setDistrito: React.Dispatch<React.SetStateAction<string>>;
-    estadoCivil: string;
-    setEstadoCivil: React.Dispatch<React.SetStateAction<string>>;
+    estadoCivil: number;
+    setEstadoCivil: React.Dispatch<React.SetStateAction<number>>;
     genero: string;
     setGenero: React.Dispatch<React.SetStateAction<string>>;
     ubigeos: Ubigeo[];
@@ -37,8 +37,17 @@ const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, 
         return null;
       });
 
-    // Local numeric state for Estado Civil, mapped to the string prop
-    const [estadoCivilValue, setEstadoCivilValue] = useState<number>(estadoCivil ? parseInt(estadoCivil) : 0);
+    // Local numeric state for Estado Civil, mapped to the prop (coerce to number)
+    const [estadoCivilValue, setEstadoCivilValue] = useState<number>(() => {
+        const coerced = Number(estadoCivil);
+        return Number.isFinite(coerced) ? coerced : 0;
+    });
+
+    // Reflect prop changes (e.g., after DNI lookup) into local selector value (coerce to number)
+    useEffect(() => {
+        const coerced = Number(estadoCivil);
+        setEstadoCivilValue(Number.isFinite(coerced) ? coerced : 0);
+    }, [estadoCivil]);
 
     // When distrito or ubigeos change (e.g., after fetch), sync the local selected Ubigeo option
     useEffect(() => {
@@ -90,8 +99,7 @@ const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, 
             }))]}
             setter={(value: number) => {
                 setEstadoCivilValue(value);
-                const label = ESTADO_CIVIL.find(estado => estado.value === value)?.desestcivil || '';
-                setEstadoCivil(label);
+                setEstadoCivil(Number(value));
             }}
             defaultValue={estadoCivilValue}
         />
