@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Domiciliario } from '../../../../services/api/extraprotocolares/domiciliarioService'
 import TopModal from '../../../ui/TopModal';
 import UpdateDomiciliario from './UpdateDomiciliario';
+import useUpdateDomiciliario from '../../../../hooks/api/extraprotocolares/domiciliario/useUpdateDomiciliario';
 
 interface Props {
     domiciliario: Domiciliario;
@@ -10,6 +11,7 @@ interface Props {
 const DomiciliarioCard = ({ domiciliario }: Props) => {
 
     const [open, setOpen] = useState(false);
+    const updateDomiciliario = useUpdateDomiciliario({ domiciliarioId: domiciliario.id_domiciliario, page: 1 });
   return (
     <>
     <div className='grid grid-cols-8 gap-4 justify-center items-center text-center text-black text-xs p-2 my-4 mx-6'>
@@ -26,7 +28,10 @@ const DomiciliarioCard = ({ domiciliario }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <UpdateDomiciliario domiciliario={domiciliario} />
+        <UpdateDomiciliario 
+            updateDomiciliario={updateDomiciliario}
+            domiciliario={domiciliario}
+        />
     </TopModal>
     </>
   )

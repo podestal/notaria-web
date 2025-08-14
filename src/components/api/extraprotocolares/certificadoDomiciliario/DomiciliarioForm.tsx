@@ -12,17 +12,19 @@ import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 import { documentNaturalOptions } from "../../../../data/clienteData";
 import SimpleSelector from "../../../ui/SimpleSelector";
 import { UseMutationResult } from "@tanstack/react-query";
-import { CreateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useCreateDomiciliario";
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
+import { CreateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useCreateDomiciliario";
+import { UpdateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useUpdateDomiciliario";
 
 interface Props {
     domiciliario?: Domiciliario;
     createDomiciliario?: UseMutationResult<Domiciliario, Error, CreateDomiciliarioData>
+    updateDomiciliario?: UseMutationResult<Domiciliario, Error, UpdateDomiciliarioData>
 }
 
-const DomiciliarioForm = ({ domiciliario, createDomiciliario }: Props) => {
+const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario }: Props) => {
 
     const [loading, setLoading] = useState(false);
     const user = useUserInfoStore(s => s.user)
@@ -100,6 +102,52 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario }: Props) => {
             },
             onError: () => {
                 setMessage('Error al crear el domiciliario');
+                setShow(true);
+                setType('error');
+            },
+            onSettled: () => {
+                setLoading(false);
+            }
+        })
+
+        updateDomiciliario && updateDomiciliario.mutate({
+            access,
+            domiciliario: {
+                num_formu: numFormulario,
+                fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                numdoc_solic: document,
+                nombre_solic: solicitante,
+                domic_solic: domicilio,
+                distrito_solic: distrito,
+                motivo_solic: motivo,
+                fecha_ocupa: fechaOcupacion ? moment(fechaOcupacion, 'DD/MM/YYYY').format('YYYY-MM-DD') : '',
+                declara_ser: condicion,
+                propietario,
+                recibido,
+                tdoc_testigo: testigoTipoDocumento.toString(),
+                tipdoc_solic: selectedTipoDocumento.toString(),
+                texto_cuerpo: textoCuerpo,
+                justifi_cuerpo: '',
+                nom_testigo: nomTestigo,
+                ndocu_testigo: testigoDocument,
+                idestcivil: estadoCivil,
+                sexo: genero,
+                detprofesionc: profesion,
+                profesionc: profesion,
+                especificacion: '',
+                recibo_empresa: reciboEmpresa,
+                numero_recibo: numRecibo,
+                mes_facturado: mesFacturado,
+                idusuario: user?.idusuario || 0,
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Domiciliario actualizado exitosamente');
+                setShow(true);
+                setType('success');
+            },
+            onError: () => {
+                setMessage('Error al actualizar el domiciliario');
                 setShow(true);
                 setType('error');
             },
