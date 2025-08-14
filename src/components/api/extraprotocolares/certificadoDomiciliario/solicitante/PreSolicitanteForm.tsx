@@ -15,10 +15,23 @@ interface Props {
     setSelectedTipoDocumento: React.Dispatch<React.SetStateAction<number>>;
     document: string;
     setDocument: React.Dispatch<React.SetStateAction<string>>;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
-const PreSolicitanteForm = ({setSolicitante, setDomicilio, setDistrito, setProfesion, setEstadoCivil, setGenero, selectedTipoDocumento, setSelectedTipoDocumento, document, setDocument}: Props) => {
+const PreSolicitanteForm = ({
+    setSolicitante, 
+    setDomicilio, 
+    setDistrito, 
+    setProfesion, 
+    setEstadoCivil, 
+    setGenero, 
+    selectedTipoDocumento, 
+    setSelectedTipoDocumento, 
+    document, 
+    setDocument,
+    setIsOpen
+}: Props) => {
 
 
     const [loading, setLoading] = useState(false);
@@ -40,6 +53,7 @@ const PreSolicitanteForm = ({setSolicitante, setDomicilio, setDistrito, setProfe
                 setGenero(response.data.sexo);
             } else {
                 console.log('Cliente no encontrado, creando nuevo cliente')
+                setIsOpen(true);
             }
         }).catch(error => {
             console.log('Error al buscar el cliente:', error);

@@ -1,8 +1,12 @@
+import { useState } from "react";
 import useGetNacionalidades from "../../../../../hooks/api/nacionalidades/useGetNacionalidades";
 import useGetProfesiones from "../../../../../hooks/api/profesiones/useGetProfesiones";
 import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos";
+import TopModal from "../../../../ui/TopModal";
 import PreSolicitanteForm from "./PreSolicitanteForm"
 import SolicitanteForm from "./SolicitanteForm"
+import useGetCargos from "../../../../../hooks/api/cargos/useGetCargos";
+import NuevoClienteForm from "./NuevoClienteForm";
 
 interface Props {
     solicitante: string;
@@ -41,15 +45,18 @@ const SolicitanteMain = ({
     setDocument
 }: Props) => {
 
+    const [isOpen, setIsOpen] = useState(false);
+
     const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
     const { data: profesiones, isLoading: isProfesionesLoading, isError: isProfesionesError, isSuccess: isProfesionesSuccess } = useGetProfesiones()
+    const { data: cargos, isLoading: isCargosLoading, isError: isCargosError, isSuccess: isCargosSuccess } = useGetCargos()
 
-    if (isNacionalidadesLoading || isLoadingUbigeos || isProfesionesLoading) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
+    if (isNacionalidadesLoading || isLoadingUbigeos || isProfesionesLoading || isCargosLoading) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 
-    if (isNacionalidadesError || isErrorUbigeo || isProfesionesError) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
+    if (isNacionalidadesError || isErrorUbigeo || isProfesionesError || isCargosError) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
 
-    if (nacionalidadesSuccess && isSuccessUbigeo && isProfesionesSuccess)
+    if (nacionalidadesSuccess && isSuccessUbigeo && isProfesionesSuccess && isCargosSuccess)
 
   return (
     <>
@@ -64,6 +71,7 @@ const SolicitanteMain = ({
             setSelectedTipoDocumento={setSelectedTipoDocumento}
             document={document}
             setDocument={setDocument}
+            setIsOpen={setIsOpen}
         />
         <SolicitanteForm 
             solicitante={solicitante}
@@ -82,6 +90,17 @@ const SolicitanteMain = ({
             profesion={profesion}
             setProfesion={setProfesion}
         />
+        <TopModal 
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+        >
+            <NuevoClienteForm 
+                ubigeos={ubigeos}
+                nacionalidades={nacionalidades}
+                profesiones={profesiones}
+                cargos={cargos}
+            />
+        </TopModal>
     </>
   )
 }
