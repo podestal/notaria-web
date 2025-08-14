@@ -51,6 +51,12 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
     const [observacion, setObservacion] = useState(permisoViaje?.observacion || '');
 
     const [loading, setLoading] = useState(false);
+    const [showDocs, setShowDocs] = useState(permisoViaje ? true : false);
+    const [permisoViajeId, setPermisoViajeId] = useState(permisoViaje?.id_viaje || 0);
+    const [numFormu, setNumFormu] = useState(permisoViaje?.num_kardex || '');
+    const permisoViajeUrl = permisoViaje ? 
+    permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior' :
+    tipoPermiso === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior';
 
     const handleSave = () => {
 
@@ -98,10 +104,13 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
                 },
                 access
             }, {
-                onSuccess: () => {
+                onSuccess: res => {
                     setMessage('Permiso de viaje creado exitosamente');
                     setShow(true);
                     setType('success');
+                    setPermisoViajeId(res.id_viaje);
+                    setNumFormu(res.num_kardex);
+                    setShowDocs(true);
                 },
                 onError: () => {
                     setMessage('Error al crear el permiso de viaje');
@@ -162,19 +171,20 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            {permisoViaje && 
+            {showDocs && 
             <GenerarDocumento 
-                name={`__PERMIVIAJE__${permisoViaje.id_viaje}-${(permisoViaje.num_kardex || '').slice(0, 4)}.docx`}
-                url={permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior'}
+                name={`__PERMIVIAJE__${permisoViajeId}-${numFormu.slice(0, 4)}.docx`}
+                url={permisoViajeUrl}
                 params={{
-                    id_viaje: permisoViaje.id_viaje.toString()
+                    id_viaje: permisoViajeId.toString(),
+                    action: 'generate'
                 }}
             />}
-            {permisoViaje && <AbrirDocumento 
-                name={`__PERMIVIAJE__${permisoViaje.id_viaje}-${(permisoViaje.num_kardex || '').slice(0, 4)}.docx`}
-                url={permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior'}
+            {showDocs && <AbrirDocumento 
+                name={`__PERMIVIAJE__${permisoViajeId}-${numFormu.slice(0, 4)}.docx`}
+                url={permisoViajeUrl}
                 params={{
-                    id_viaje: permisoViaje.id_viaje.toString(),
+                    id_viaje: permisoViajeId.toString(),
                     action: 'retrieve'
                 }}
             />}
