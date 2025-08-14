@@ -5,6 +5,7 @@ import SimpleInput from "../../../../ui/SimpleInput";
 import { ESTADO_CIVIL } from "../../../../../data/clienteData";
 import SimpleSelector from "../../../../ui/SimpleSelector";
 import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput";
+import { Profesion } from "../../../../../services/api/profesionesService";
 
 interface Props {
     solicitante: string;
@@ -19,9 +20,11 @@ interface Props {
     setGenero: React.Dispatch<React.SetStateAction<string>>;
     ubigeos: Ubigeo[];
     nacionalidades: Nacionalidad[];
-
+    profesiones: Profesion[];
+    profesion: string;
+    setProfesion: React.Dispatch<React.SetStateAction<string>>;
 }
-const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, distrito, setDistrito, estadoCivil, setEstadoCivil, genero, setGenero, ubigeos, nacionalidades}: Props) => {
+const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, distrito, setDistrito, estadoCivil, setEstadoCivil, genero, setGenero, ubigeos, profesiones, profesion, setProfesion}: Props) => {
 
     // Keep a local selected option for the Ubigeo dropdown
     const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(() => {
@@ -36,6 +39,16 @@ const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, 
         }
         return null;
       });
+
+    const [selectedProfesion, setSelectedProfesion] = useState<{id: string, label: string} | null>(() => {
+        if (profesion) {
+            const match = profesiones.find(prof => prof.idprofesion === parseInt(profesion));
+            if (match) {
+                return { id: match.idprofesion.toString(), label: match.desprofesion };
+            }
+        }
+        return null;
+    });
 
     // Local numeric state for Estado Civil, mapped to the prop (coerce to number)
     const [estadoCivilValue, setEstadoCivilValue] = useState<number>(() => {
@@ -60,6 +73,12 @@ const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, 
         }
         setUbigeo(null);
     }, [distrito, ubigeos]);
+
+    useEffect(() => {
+        if (selectedProfesion) {
+            setProfesion(selectedProfesion.label);
+        }
+    }, [selectedProfesion, profesion]);
 
     // Whenever user selects an Ubigeo option, propagate coddis to parent distrito
     useEffect(() => {
@@ -89,6 +108,15 @@ const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, 
                 selected={ubigeo}
                 setSelected={setUbigeo}
                 placeholder="Buscar Ubigeo"
+            />
+        </div>
+        <div className="w-full flex justify-center items-center gap-4 col-span-2">
+            <p className="pl-2 block text-xs font-semibold text-slate-700">Profesión</p>
+            <SearchableDropdownInput
+                options={[...profesiones.map(prof => ({ id: prof.idprofesion.toString(), label: prof.desprofesion }))]}
+                selected={selectedProfesion}
+                setSelected={setSelectedProfesion}
+                placeholder="Buscar Profesión"
             />
         </div>
         <SimpleSelector

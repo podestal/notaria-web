@@ -1,4 +1,5 @@
 import useGetNacionalidades from "../../../../../hooks/api/nacionalidades/useGetNacionalidades";
+import useGetProfesiones from "../../../../../hooks/api/profesiones/useGetProfesiones";
 import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos";
 import PreSolicitanteForm from "./PreSolicitanteForm"
 import SolicitanteForm from "./SolicitanteForm"
@@ -42,12 +43,13 @@ const SolicitanteMain = ({
 
     const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
+    const { data: profesiones, isLoading: isProfesionesLoading, isError: isProfesionesError, isSuccess: isProfesionesSuccess } = useGetProfesiones()
 
-    if (isNacionalidadesLoading || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
+    if (isNacionalidadesLoading || isLoadingUbigeos || isProfesionesLoading) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 
-    if (isNacionalidadesError || isErrorUbigeo) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
+    if (isNacionalidadesError || isErrorUbigeo || isProfesionesError) return <p className="text-red-500 text-center text-xs my-6">Error al cargar info</p>
 
-    if (nacionalidadesSuccess && isSuccessUbigeo)
+    if (nacionalidadesSuccess && isSuccessUbigeo && isProfesionesSuccess)
 
   return (
     <>
@@ -76,6 +78,9 @@ const SolicitanteMain = ({
             setGenero={setGenero}
             ubigeos={ubigeos}
             nacionalidades={nacionalidades}
+            profesiones={profesiones}
+            profesion={profesion}
+            setProfesion={setProfesion}
         />
     </>
   )
