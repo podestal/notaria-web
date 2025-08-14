@@ -77,6 +77,10 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const [recepcion, setRecepcion] = useState<string>(carta?.recepcion || '');
     const [contenido, setContenido] = useState<string>(carta?.conte_carta || '');
 
+    const [showDocs, setShowDocs] = useState(carta ? true : false);
+    const [cartaId, setCartaId] = useState(carta?.id_carta || 0);
+
+
     const handleSave = () => {
         setLoading(true);
 
@@ -108,11 +112,14 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     fact_recogio: '0.00',
                 }
             }, {
-                onSuccess: () => {
+                onSuccess: res => {
                     // Optionally reset the form or show a success message
                     setMessage('Carta guardada exitosamente');
                     setShow(true);
                     setType('success');
+                    setShowDocs(true);
+                    setCartaId(res.id_carta);
+                    setNumCarta(res.num_carta);
                 },
                 onError: (error) => {
                     console.error("Error creating carta:", error);
@@ -183,19 +190,20 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            {carta && 
+            {showDocs && 
             <GenerarDocumento 
-                name={`__CARTA__${carta.num_carta.slice(-6)}-${carta.num_carta.slice(0, 4)}.docx`}
+                name={`__CARTA__${numCarta.slice(-6)}-${numCarta.slice(0, 4)}.docx`}
                 url='carta-notarial'
                 params={{
-                    id_carta: carta.id_carta.toString()
+                    id_carta: cartaId.toString()
                 }}
             />}
-            {carta && <AbrirDocumento 
-                name={`__CARTA__${carta.num_carta.slice(-6)}-${carta.num_carta.slice(0, 4)}.docx`}
+            {showDocs && 
+            <AbrirDocumento 
+                name={`__CARTA__${numCarta.slice(-6)}-${numCarta.slice(0, 4)}.docx`}
                 url='carta-notarial'
                 params={{
-                    id_carta: carta.id_carta.toString(),
+                    id_carta: cartaId.toString(),
                     action: 'retrieve'
                 }}
             />}

@@ -51,8 +51,8 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
     const [emailComunicarse, setEmailComunicarse] = useState(poder?.email_comuni || '');
 
     const urlDocumento = poder?.id_asunto === '002' ? 'poder-fuera-registro' : poder?.id_asunto === '003' ? 'poder-onp' : poder?.id_asunto === '004' ? 'poder-essalud' : '';
-    // const kardexYear = (poder?.num_kardex || '').slice(0, 4);
-    // const documentName = `__PODER__${poder?.id_poder}-${(poder?.num_kardex || '').slice(0, 4)}.docx`;
+    const [showDocs, setShowDocs] = useState(poder ? true : false);
+    const [numPoder, setNumPoder] = useState(poder?.num_kardex || '');
 
     const handleSave = () => {
 
@@ -99,6 +99,8 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     setShow(true);
                     setType('success');
                     setIdPoder(res.id_poder);
+                    setNumPoder(res.num_kardex);
+                    setShowDocs(true);
                 },
                 onError: (error) => {
                     setMessage(`Error al crear poder: ${error.message}`);
@@ -162,18 +164,19 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            {poder && <GenerarDocumento 
-                name={`__PODER__${poder?.id_poder}-${(poder?.num_kardex || '').slice(0, 4)}.docx`}
+            {showDocs && 
+            <GenerarDocumento 
+                name={`__PODER__${idPoder}-${(numPoder || '').slice(0, 4)}.docx`}
                 url={urlDocumento}
                 params={{
-                    id_poder: poder.id_poder.toString()
+                    id_poder: idPoder.toString()
                 }}
             />}
-            {poder && <AbrirDocumento 
-                name={`__PODER__${poder?.id_poder}-${(poder?.num_kardex || '').slice(0, 4)}.docx`}
+            {showDocs && <AbrirDocumento 
+                name={`__PODER__${idPoder}-${(numPoder || '').slice(0, 4)}.docx`}
                 url={urlDocumento}
                 params={{
-                    id_poder: poder.id_poder.toString(),
+                    id_poder: idPoder.toString(),
                     action: 'retrieve'
                 }}
             />}
