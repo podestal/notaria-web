@@ -62,6 +62,9 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
     const [testigoDocument, setTestigoDocument] = useState(domiciliario?.ndocu_testigo || '');
     const [nomTestigo, setNomTestigo] = useState(domiciliario?.nom_testigo || '');
 
+    const [showDocs, setShowDocs] = useState(domiciliario ? true : false);
+    const [domiciliarioId, setDomiciliarioId] = useState(domiciliario?.id_domiciliario || 0);
+
     const handleSave = () => {
         setLoading(true);
         createDomiciliario && createDomiciliario.mutate({
@@ -78,8 +81,8 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 declara_ser: condicion,
                 propietario,
                 recibido,
-                tdoc_testigo: testigoTipoDocumento.toString(),
-                tipdoc_solic: selectedTipoDocumento.toString(),
+                tdoc_testigo: testigoTipoDocumento !== 0 ? `0${testigoTipoDocumento}` : '0',
+                tipdoc_solic: selectedTipoDocumento !== 0 ? `0${selectedTipoDocumento}` : '0',
                 texto_cuerpo: textoCuerpo,
                 justifi_cuerpo: '',
                 nom_testigo: nomTestigo,
@@ -95,10 +98,13 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 idusuario: user?.idusuario || 0,
             }
         }, {
-            onSuccess: () => {
+            onSuccess: res => {
                 setMessage('Domiciliario creado exitosamente');
                 setShow(true);
                 setType('success');
+                setShowDocs(true);
+                setDomiciliarioId(res.id_domiciliario);
+                setNumCertificado(res.num_certificado);
             },
             onError: () => {
                 setMessage('Error al crear el domiciliario');
@@ -124,8 +130,8 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 declara_ser: condicion,
                 propietario,
                 recibido,
-                tdoc_testigo: testigoTipoDocumento.toString(),
-                tipdoc_solic: selectedTipoDocumento.toString(),
+                tdoc_testigo: testigoTipoDocumento !== 0 ? `0${testigoTipoDocumento}` : '0',
+                tipdoc_solic: selectedTipoDocumento !== 0 ? `0${selectedTipoDocumento}` : '0',
                 texto_cuerpo: textoCuerpo,
                 justifi_cuerpo: '',
                 nom_testigo: nomTestigo,
@@ -168,20 +174,21 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            {domiciliario && 
+            {showDocs && 
             <GenerarDocumento 
-                name={`__CDOM__${domiciliario.num_certificado.slice(-6)}-${domiciliario.num_certificado.slice(0, 4)}.docx`}
+                name={`__CDOM__${numCertificado.slice(-6)}-${numCertificado.slice(0, 4)}.docx`}
                 url='cert-domiciliario'
                 params={{
-                    id_domiciliario: domiciliario.id_domiciliario.toString()
+                    id_domiciliario: domiciliarioId.toString() || '',
+                    action: 'generate'
                 }}
             />}
-            {domiciliario && 
+            {showDocs && 
             <AbrirDocumento 
-                name={`__CDOM__${domiciliario.num_certificado.slice(-6)}-${domiciliario.num_certificado.slice(0, 4)}.docx`}
+                name={`__CDOM__${numCertificado.slice(-6)}-${numCertificado.slice(0, 4)}.docx`}
                 url='cert-domiciliario'
                 params={{
-                    id_domiciliario: domiciliario.id_domiciliario.toString(),
+                    id_domiciliario: domiciliarioId.toString(),
                     action: 'retrieve'
                 }}
             />}
