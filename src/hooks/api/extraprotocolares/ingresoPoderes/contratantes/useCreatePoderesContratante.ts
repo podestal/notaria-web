@@ -19,6 +19,7 @@ const useCreatePoderesContratante = ({ poderId }: Props): UseMutationResult<Ingr
         onSuccess: (res) => {
             console.log('Ingreso Poder Contratante creado exitosamente:', res);
             queryClient.invalidateQueries({ queryKey: ['ingreso_poderes_contratantes', poderId] });
+            queryClient.invalidateQueries({ queryKey: ['ingreso_poderes', 1] })
         },
         onError: (error) => {
             console.error('Error al crear Ingreso Poder Contratante:', error);

@@ -43,14 +43,16 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
         poder?.fec_ingreso
         ? moment.utc(poder.fec_ingreso, "YYYY-MM-DD").hour(12).toDate()
-        : undefined
+        : moment().toDate()
     );
     const [referencia, setReferencia] = useState(poder?.referencia || '');
     const [nomComunicarse, setNomComunicarse] = useState(poder?.nom_comuni || '');
     const [telComunicarse, setTelComunicarse] = useState(poder?.telf_comuni || '');
     const [emailComunicarse, setEmailComunicarse] = useState(poder?.email_comuni || '');
 
-    const urlDocumento = poder?.id_asunto === '002' ? 'poder-fuera-registro' : poder?.id_asunto === '003' ? 'poder-onp' : poder?.id_asunto === '004' ? 'poder-essalud' : '';
+    const urlDocumento = poder ? 
+    poder?.id_asunto === '002' ? 'poder-fuera-registro' : poder?.id_asunto === '003' ? 'poder-onp' : poder?.id_asunto === '004' ? 'poder-essalud' : 'cert-domiciliario' :
+    tipoPoder === '002' ? 'poder-fuera-registro' : tipoPoder === '003' ? 'poder-onp' : tipoPoder === '004' ? 'poder-essalud' : 'cert-domiciliario';
     const [showDocs, setShowDocs] = useState(poder ? true : false);
     const [numPoder, setNumPoder] = useState(poder?.num_kardex || '');
 
@@ -169,7 +171,8 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                 name={`__PODER__${idPoder}-${(numPoder || '').slice(0, 4)}.docx`}
                 url={urlDocumento}
                 params={{
-                    id_poder: idPoder.toString()
+                    id_poder: idPoder.toString(),
+                    action: 'generate'
                 }}
             />}
             {showDocs && <AbrirDocumento 
@@ -257,12 +260,14 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                 disabled
             />
         </div>
+        <>{console.log('idPoder', idPoder)}</>
+        <>{console.log('tipoPoder', tipoPoder)}</>
         {idPoder > 0 && (
             <div className="w-full flex justify-center items-center gap-4 my-8">
                 <ContratantesMain idPoder={idPoder} />
-                {(tipoPoder === '002' && poder?.id_asunto === tipoPoder) && <CreatePoderRegistro poderId={idPoder} />}
-                {(tipoPoder === '003' && poder?.id_asunto === tipoPoder) && <CreatePension poderId={idPoder} />}
-                {(tipoPoder === '004' && poder?.id_asunto === tipoPoder) && <EssaludForm poderId={idPoder} />}
+                {(tipoPoder === '002') && <CreatePoderRegistro poderId={idPoder} />}
+                {(tipoPoder === '003') && <CreatePension poderId={idPoder} />}
+                {(tipoPoder === '004') && <EssaludForm poderId={idPoder} />}
             </div>
         )}
     </div>
