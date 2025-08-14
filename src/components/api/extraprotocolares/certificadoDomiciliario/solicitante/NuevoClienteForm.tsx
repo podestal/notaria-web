@@ -8,12 +8,14 @@ import SimpleInput from "../../../../ui/SimpleInput"
 import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput"
 import DateInput from "../../../../ui/DateInput"
 import SimpleSelector from "../../../../ui/SimpleSelector"
+import axios from "axios"
 
 interface Props {
     ubigeos: Ubigeo[]
     nacionalidades: Nacionalidad[]
     profesiones: Profesion[]
     cargos: Cargo[]
+    dni: string
 }
 
 
@@ -37,7 +39,8 @@ const NuevoClienteForm = ({
     ubigeos,
     nacionalidades,
     profesiones,
-    cargos
+    cargos,
+    dni
 }: Props) => {
     const { setMessage, setShow, setType } = useNotificationsStore()
 
@@ -81,7 +84,27 @@ const NuevoClienteForm = ({
     const [cargoError, setCargoError] = useState('')
 
 
-    const handleReniec = () => {}
+    const handleReniec = () => {
+        console.log('Consulta RENIEC')
+        axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${dni}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
+        ).then(response => {
+            console.log('response', response.data)
+            setApepat(response.data.resultado.apellido_paterno || '')
+            setApemat(response.data.resultado.apellido_materno || '')
+            setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
+            setBirthdate(response.data.resultado.fecha_nacimiento || '')
+            // setDireccion('Avis Luz y Fuerza D-8')
+            if (response.data.resultado.genero === 'M') {
+                setGender(1) // Masculino
+            }
+            else if (response.data.resultado.genero === 'F') {
+                setGender(2) // Femenino
+            }
+
+        }).catch(error => {
+            console.error('Error al consultar RENIEC:', error)
+        });
+    }
   return (
     <>
     <div className="grid grid-cols-3 items-center gap-6 mb-10">

@@ -99,6 +99,7 @@ const SolicitanteMain = ({
                 nacionalidades={nacionalidades}
                 profesiones={profesiones}
                 cargos={cargos}
+                dni={document}
             />
         </TopModal>
     </>
