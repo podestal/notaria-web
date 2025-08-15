@@ -17,6 +17,10 @@ interface Props {
     primerNombre: string
     segundoNombre: string
     direccion: string
+    razonSocial: string
+    domicilioFiscal: string
+    setRazonSocial: React.Dispatch<React.SetStateAction<string>>
+    setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
 }
 
 const ClienteMain = ({ 
@@ -33,7 +37,12 @@ const ClienteMain = ({
     apellidoMaterno, 
     primerNombre, 
     segundoNombre, 
-    direccion }: Props) => {
+    direccion,
+    razonSocial,
+    domicilioFiscal,
+    setRazonSocial,
+    setDomicilioFiscal
+ }: Props) => {
 
   return (
     <>
@@ -47,6 +56,8 @@ const ClienteMain = ({
             setPrimerNombre={setPrimerNombre}
             setSegundoNombre={setSegundoNombre}
             setDireccion={setDireccion}
+            setRazonSocial={setRazonSocial}
+            setDomicilioFiscal={setDomicilioFiscal}
         />
         <ClienteForm 
             tipoPersona={selectedTipoPersona}
@@ -60,6 +71,10 @@ const ClienteMain = ({
             setPrimerNombre={setPrimerNombre}
             setSegundoNombre={setSegundoNombre}
             setDireccion={setDireccion}
+            razonSocial={razonSocial}
+            domicilioFiscal={domicilioFiscal}
+            setRazonSocial={setRazonSocial}
+            setDomicilioFiscal={setDomicilioFiscal}
         />
     </>
   )

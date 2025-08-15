@@ -33,6 +33,8 @@ const LibroForm = ({ libro }: Props) => {
     const [primerNombre, setPrimerNombre] = useState('');
     const [segundoNombre, setSegundoNombre] = useState('');
     const [direccion, setDireccion] = useState('');
+    const [razonSocial, setRazonSocial] = useState('');
+    const [domicilioFiscal, setDomicilioFiscal] = useState('');
 
     const handleSave = () => {
         console.log('handleSave');
@@ -113,6 +115,10 @@ const LibroForm = ({ libro }: Props) => {
             primerNombre={primerNombre}
             segundoNombre={segundoNombre}
             direccion={direccion}
+            razonSocial={razonSocial}
+            domicilioFiscal={domicilioFiscal}
+            setRazonSocial={setRazonSocial}
+            setDomicilioFiscal={setDomicilioFiscal}
         />
     </div>
   )

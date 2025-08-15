@@ -12,9 +12,13 @@ interface Props {
     setPrimerNombre: React.Dispatch<React.SetStateAction<string>>
     setSegundoNombre: React.Dispatch<React.SetStateAction<string>>
     setDireccion: React.Dispatch<React.SetStateAction<string>>
+    razonSocial: string
+    domicilioFiscal: string
+    setRazonSocial: React.Dispatch<React.SetStateAction<string>>
+    setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
 }
 
-const ClienteForm = ({ tipoPersona, apellidoPaterno, apellidoMaterno, primerNombre, segundoNombre, direccion, setApellidoPaterno, setApellidoMaterno, setPrimerNombre, setSegundoNombre, setDireccion }: Props) => {
+const ClienteForm = ({ tipoPersona, apellidoPaterno, apellidoMaterno, primerNombre, segundoNombre, direccion, setApellidoPaterno, setApellidoMaterno, setPrimerNombre, setSegundoNombre, setDireccion, razonSocial, domicilioFiscal, setRazonSocial, setDomicilioFiscal }: Props) => {
   return (
     <>
     {tipoPersona === 1 && (
@@ -57,8 +61,22 @@ const ClienteForm = ({ tipoPersona, apellidoPaterno, apellidoMaterno, primerNomb
         </div>
     )}
     {tipoPersona === 2 && (
-        <>
-        </>
+        <div className="flex flex-col gap-4 my-4">
+            <SimpleInput 
+                label="Razón Social"
+                value={razonSocial}
+                setValue={setRazonSocial}
+                horizontal
+                fullWidth
+            />
+            <SimpleInput 
+                label="Domicilio Fiscal"
+                value={domicilioFiscal}
+                setValue={setDomicilioFiscal}
+                horizontal
+                fullWidth
+            />
+        </div>
     )}
     </>
   )

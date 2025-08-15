@@ -13,13 +13,18 @@ interface Props {
     setPrimerNombre: React.Dispatch<React.SetStateAction<string>>
     setSegundoNombre: React.Dispatch<React.SetStateAction<string>>
     setDireccion: React.Dispatch<React.SetStateAction<string>>
+    setRazonSocial: React.Dispatch<React.SetStateAction<string>>
+    setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
 }
 
-const PreClienteForm = ({ selectedTipoPersona, setSelectedTipoPersona, document, setDocument, setApellidoPaterno, setApellidoMaterno, setPrimerNombre, setSegundoNombre, setDireccion }: Props) => {
+const PreClienteForm = ({ selectedTipoPersona, setSelectedTipoPersona, document, setDocument, setApellidoPaterno, setApellidoMaterno, setPrimerNombre, setSegundoNombre, setDireccion, setRazonSocial, setDomicilioFiscal }: Props) => {
     const { setMessage, setType, setShow } = useNotificationsStore()
     const [loading, setLoading] = useState(false)
 
     const handleSearch = () => {
+
+        console.log(document);
+        
         
         if (selectedTipoPersona === 0) {
             setMessage('Seleccione un tipo de persona')
@@ -44,27 +49,41 @@ const PreClienteForm = ({ selectedTipoPersona, setSelectedTipoPersona, document,
 
         setLoading(true);
 
-        axios.get(
-            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
-        ).then(response => {
-            if (response.data.idcliente) {
-                console.log('Cliente encontrado:', response.data);
-                if (selectedTipoPersona === 1) {
+        if (selectedTipoPersona === 1) {
+            axios.get(
+                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
+            ).then(response => {
+                if (response.data.idcliente) {
                     setApellidoPaterno(response.data.apepat);
                     setApellidoMaterno(response.data.apemat);
                     setPrimerNombre(response.data.prinom);
                     setSegundoNombre(response.data.segnom);
                     setDireccion(response.data.direccion);
-                } 
-            } else {
-                console.log('Cliente no encontrado, creando nuevo cliente')
-            }
-        }).catch(error => {
-            console.log('Error al buscar el cliente:', error);
-            console.error(error);
-        }).finally(() => {
-            setLoading(false)
-        })
+                } else {
+                    console.log('Cliente no encontrado, creando nuevo cliente')
+                }
+            }).catch(error => {
+                console.log('Error al buscar el cliente:', error);
+                console.error(error);
+            }).finally(() => {
+                setLoading(false)
+            })
+        } else if (selectedTipoPersona === 2) {
+            axios.get(
+                `${import.meta.env.VITE_API_URL}cliente/by_ruc/?ruc=${document}`
+            ).then(response => {
+                console.log(response.data);
+                if (response.data.idcliente) {
+                    setRazonSocial(response.data.razonsocial);
+                    setDomicilioFiscal(response.data.domfiscal);
+                }
+            }).catch(error => {
+                console.log('Error al buscar el cliente:', error);
+                console.error(error);
+            }).finally(() => {
+                setLoading(false)
+            })
+        }
 
 
         setLoading(true)
