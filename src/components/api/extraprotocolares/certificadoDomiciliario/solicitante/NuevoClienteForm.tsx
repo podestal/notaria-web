@@ -9,6 +9,8 @@ import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput"
 import DateInput from "../../../../ui/DateInput"
 import SimpleSelector from "../../../../ui/SimpleSelector"
 import axios from "axios"
+import useCreateCliente from "../../../../../hooks/api/cliente/useCreateCliente"
+
 
 interface Props {
     ubigeos: Ubigeo[]
@@ -16,6 +18,16 @@ interface Props {
     profesiones: Profesion[]
     cargos: Cargo[]
     dni: string
+    setSolicitante: React.Dispatch<React.SetStateAction<string>>
+    setDomicilio: React.Dispatch<React.SetStateAction<string>>
+    setDistrito: React.Dispatch<React.SetStateAction<string>>
+    setProfesion: React.Dispatch<React.SetStateAction<string>>
+    setEstadoCivil: React.Dispatch<React.SetStateAction<number>>
+    setGenero: React.Dispatch<React.SetStateAction<string>>
+    selectedTipoDocumento: number
+    setSelectedTipoDocumento: React.Dispatch<React.SetStateAction<number>>
+    setDocument: React.Dispatch<React.SetStateAction<string>>
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
@@ -40,9 +52,17 @@ const NuevoClienteForm = ({
     nacionalidades,
     profesiones,
     cargos,
-    dni
+    dni,
+    setSolicitante,
+    setDomicilio,
+    setDistrito,
+    setEstadoCivil,
+    setGenero,
+    setProfesion,
+    setOpen
 }: Props) => {
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const [loading, setLoading] = useState(false)
 
     // NATURAL PERSON
 
@@ -51,7 +71,6 @@ const NuevoClienteForm = ({
     const [prinom, setPrinom] = useState( '')
     const [segnom, setSegnom] = useState( '')
     const [direccion, setDireccion] = useState( '')
-    const [nombre, setNombre] = useState( '')
     const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(null);
       
     const [naturalFrom, setNaturalFrom] = useState('')
@@ -62,7 +81,7 @@ const NuevoClienteForm = ({
     const [birthdate, setBirthdate] = useState('')
     const [resident, setResident] = useState(1)
 
-    const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(null);
+    const [selectedProfesion, setSelectedProfesion] = useState<{ id: string; label: string } | null>(null);
     const [cargo, setCargo] = useState<{ id: string; label: string } | null>(null);
 
     const [celphone, setCellphone] = useState('')
@@ -82,6 +101,195 @@ const NuevoClienteForm = ({
     const [birthdateError, setBirthdateError] = useState('')
     const [profesionError, setProfesionError] = useState('')
     const [cargoError, setCargoError] = useState('')
+
+    const createCliente = useCreateCliente()
+
+    const handleSubmit = (e: React.FormEvent) => {
+
+        e.preventDefault()
+
+        if (!apepat) {
+            setApepatError('Apellido Paterno es requerido')
+            setType('error')
+            setMessage('Apellido Paterno es requerido')
+            setShow(true)
+            return
+        }
+
+        if (!prinom) {
+            setPrinomError('Primer Nombre es requerido')
+            setType('error')
+            setMessage('Primer Nombre es requerido')
+            setShow(true)
+            return
+        }
+
+        if (!apemat) {
+            setApematError('Apellido Materno es requerido')
+            setType('error')
+            setMessage('Apellido Materno es requerido')
+            setShow(true)
+            return
+        }
+
+        if (!direccion) {
+            setDireccionError('Dirección es requerida')
+            setType('error')
+            setMessage('Dirección es requerida')
+            setShow(true)
+            return
+        }
+    
+        if (!ubigeo) {
+            setUbigeoError('Ubigeo es requerido')
+            setType('error')
+            setMessage('Ubigeo es requerido')
+            setShow(true)
+            return
+        }
+
+        if (civilStatus === 0) {
+            setCivilStatusError('Estado Civil es requerido')
+            setType('error')
+            setMessage('Estado Civil es requerido')
+            setShow(true)
+            return
+        }
+
+        if (gender === 0) {
+            setGenderError('Sexo es requerido')
+            setType('error')
+            setMessage('Sexo es requerido')
+            setShow(true)
+            return  
+        }
+
+        if (nationality === null) {
+            setNationalityError('Nacionalidad es requerida')
+            setType('error')
+            setMessage('Nacionalidad es requerida')
+            setShow(true)
+            return
+        }
+
+        if (!birthdate) {
+            setBirthdateError('Fecha de Nacimiento es requerida')
+            setType('error')
+            setMessage('Fecha de Nacimiento es requerida')
+            setShow(true)
+            return
+        }
+
+        const rawBirthdate = birthdate.split('/')
+
+        if (rawBirthdate.length !== 3 || rawBirthdate[0].length !== 2 || rawBirthdate[1].length !== 2 || rawBirthdate[2].length !== 4) {
+            setBirthdateError('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
+            setType('error')
+            setMessage('Fecha de Nacimiento debe ser en formato DD/MM/AAAA')
+            setShow(true)
+            return
+        }
+
+        if (parseInt(rawBirthdate[0]) < 1 || parseInt(rawBirthdate[0]) > 31) {
+            setBirthdateError('Día de Nacimiento debe ser entre 01 y 31')
+            setType('error')
+            setMessage('Día de Nacimiento debe ser entre 01 y 31')
+            setShow(true)
+            return  
+        }
+
+        if (parseInt(rawBirthdate[1]) < 1 || parseInt(rawBirthdate[1]) > 12) {
+            setBirthdateError('Mes de Nacimiento debe ser entre 01 y 12')
+            setType('error')
+            setMessage('Mes de Nacimiento debe ser entre 01 y 12')
+            setShow(true)
+            return  
+        }
+
+        if (parseInt(rawBirthdate[2]) < 1900 || parseInt(rawBirthdate[2]) > new Date().getFullYear()) {
+            setBirthdateError('Año de Nacimiento debe ser válido')
+            setType('error')
+            setMessage('Año de Nacimiento debe ser válido')
+            setShow(true)
+            return  
+        }
+    
+        if (selectedProfesion === null) {
+            setProfesionError('Profesión es requerida')
+            setType('error')
+            setMessage('Profesión es requerida')
+            setShow(true)
+            return
+        }
+
+        if (cargo === null) {
+            setCargoError('Cargo es requerido')
+            setType('error')
+            setMessage('Cargo es requerido')
+            setShow(true)
+            return
+        }
+
+        setLoading(true)
+
+        createCliente.mutate({
+            cliente: {
+                tipper: 'N',
+                apepat,
+                apemat,
+                prinom,
+                segnom,
+                nombre: `${apepat} ${apemat}, ${prinom} ${segnom}`,
+                direccion,
+                idubigeo: ubigeo.id,
+                resedente: resident === 1 ? '1' : '0',
+                idtipdoc: 1,
+                numdoc: dni,
+                email,
+                nacionalidad: nationality.id,
+                idestcivil: civilStatus,
+                sexo: gender === 1 ? 'M' : 'F',
+                telfijo: fixedPhone,
+                telcel: celphone,
+                telofi: officePhone,
+                idcargoprofe: parseInt(cargo.id),
+                idprofesion: parseInt(selectedProfesion?.id),
+                detaprofesion: selectedProfesion?.label,
+                cumpclie: birthdate,
+                razonsocial: '',
+                domfiscal: '',
+                idsedereg: 0,
+                numpartida: '',
+                telempresa: '',
+                actmunicipal: '',
+                contacempresa: '',
+                fechaconstitu: '',
+            }
+        }, {
+            onSuccess: (data) => {
+                console.log('Cliente creado:', data)
+                setType('success')
+                setMessage('Cliente creado exitosamente')
+                setShow(true)
+                setSolicitante(data.nombre)
+                setDomicilio(data.direccion)
+                setDistrito(data.idubigeo)
+                setEstadoCivil(data.idestcivil ?? 0)
+                setGenero(data.sexo ?? '')
+                setProfesion(data.detaprofesion || selectedProfesion?.label || '')
+                setOpen(false)
+            },
+            onError: (error) => {
+                console.error('Error al crear cliente:', error)
+                setType('error')
+                setMessage('Error al crear cliente')
+                setShow(true)
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
+    }
 
 
     const handleReniec = () => {
@@ -246,8 +454,8 @@ const NuevoClienteForm = ({
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Profesión</p>
                 <SearchableDropdownInput
                     options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
-                    selected={profesion}
-                    setSelected={setProfesion}
+                    selected={selectedProfesion}
+                    setSelected={setSelectedProfesion}
                     placeholder="Buscar Profesión"
                     required
                     error={profesionError}
@@ -300,8 +508,11 @@ const NuevoClienteForm = ({
         <div className="flex justify-center items-center gap-6 mb-4">
             <button 
                 type="submit"
-                className="mt-8 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
-                Crear Cliente
+                className="mt-8 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 cursor-pointer"
+                onClick={handleSubmit}
+                disabled={loading}
+            >
+                {loading ? 'Creando...' : 'Crear Cliente'}
             </button>
         </div>
     </>

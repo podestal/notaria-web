@@ -100,6 +100,16 @@ const SolicitanteMain = ({
                 profesiones={profesiones}
                 cargos={cargos}
                 dni={document}
+                setSolicitante={setSolicitante}
+                setDomicilio={setDomicilio}
+                setDistrito={setDistrito}
+                setProfesion={setProfesion}
+                setEstadoCivil={setEstadoCivil}
+                setGenero={setGenero}
+                selectedTipoDocumento={selectedTipoDocumento}
+                setSelectedTipoDocumento={setSelectedTipoDocumento}
+                setDocument={setDocument}
+                setOpen={setIsOpen}
             />
         </TopModal>
     </>
