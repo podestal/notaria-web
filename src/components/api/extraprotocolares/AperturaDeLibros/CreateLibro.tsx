@@ -1,9 +1,9 @@
-import LibroForm from "./LibroForm"
+import PreLibroForm from "./PreLibroForm"
 
 
 const CreateLibro = () => {
   return (
-    <LibroForm />
+    <PreLibroForm />
   )
 }
 

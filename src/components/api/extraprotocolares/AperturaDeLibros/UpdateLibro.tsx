@@ -1,6 +1,6 @@
 
 import { Libro } from "../../../../services/api/extraprotocolares/librosService"
-import LibroForm from "./LibroForm"
+import PreLibroForm from "./PreLibroForm"
 
 interface Props {
     libro: Libro
@@ -8,7 +8,7 @@ interface Props {
 
 const UpdateLibro = ({ libro }: Props) => {
   return (
-    <LibroForm 
+    <PreLibroForm
         libro={libro}
     />
   )
