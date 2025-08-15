@@ -9,6 +9,7 @@ import { NUMERO_LIBROS } from "../../../../data/librosData";
 import { QrCode, Save } from "lucide-react";
 import GenerarDocumento from "../documentos/GenerarDocumento";
 import AbrirDocumento from "../documentos/AbrirDocumento";
+import ClienteMain from "./cliente/ClienteMain";
 
 interface Props {
     libro?: Libro
@@ -17,7 +18,8 @@ interface Props {
 const LibroForm = ({ libro }: Props) => {
 
     const [loading, setLoading] = useState(false);
-
+    const [selectedTipoPersona, setSelectedTipoPersona] = useState(0);
+    const [document, setDocument] = useState('');
     const user = useUserInfoStore(state => state.user);
     const [cronologico, setCronologico] = useState<string>(libro?.numlibro ? `${libro.numlibro}-${libro.ano}` : '');
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
@@ -26,6 +28,11 @@ const LibroForm = ({ libro }: Props) => {
         : (new Date())
     );
     const [numeroLibro, setNumeroLibro] = useState(libro?.idnlibro || 0);
+    const [apellidoPaterno, setApellidoPaterno] = useState('');
+    const [apellidoMaterno, setApellidoMaterno] = useState('');
+    const [primerNombre, setPrimerNombre] = useState('');
+    const [segundoNombre, setSegundoNombre] = useState('');
+    const [direccion, setDireccion] = useState('');
 
     const handleSave = () => {
         console.log('handleSave');
@@ -89,8 +96,24 @@ const LibroForm = ({ libro }: Props) => {
                     ...NUMERO_LIBROS.map(libro => ({ value: libro.idnlibro, label: libro.desnlibro }))
                 ]}
             />
-
         </div>
+        <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Busqueda de Cliente</p>
+        <ClienteMain 
+            selectedTipoPersona={selectedTipoPersona}
+            setSelectedTipoPersona={setSelectedTipoPersona}
+            document={document}
+            setDocument={setDocument}
+            setApellidoPaterno={setApellidoPaterno}
+            setApellidoMaterno={setApellidoMaterno}
+            setPrimerNombre={setPrimerNombre}
+            setSegundoNombre={setSegundoNombre}
+            setDireccion={setDireccion}
+            apellidoPaterno={apellidoPaterno}
+            apellidoMaterno={apellidoMaterno}
+            primerNombre={primerNombre}
+            segundoNombre={segundoNombre}
+            direccion={direccion}
+        />
     </div>
   )
 }
