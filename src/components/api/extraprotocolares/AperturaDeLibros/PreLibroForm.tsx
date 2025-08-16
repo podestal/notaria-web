@@ -20,9 +20,9 @@ const PreLibroForm = ({ libro }: Props) => {
 
   return (
     <>
-        <>{console.log(tipoLibros)}</>
         <LibroForm 
             libro={libro}
+            tipoLibros={tipoLibros}
         />
     </>
   )

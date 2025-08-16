@@ -27,3 +27,16 @@ export const TIPOS_FOLIOS = [
   { idtipfol: 7, destipfol: 'SIMPLE CON 3 COPIAS' },
   { idtipfol: 8, destipfol: 'HOJAS SUELTAS' },
 ];
+// +---------+-----------------+
+// | idlegal | deslegal        |
+// +---------+-----------------+
+// |       1 | LIBROS          |
+// |       2 | HOJAS SUELTAS   |
+// |       3 | HOJAS CONTINUAS |
+// +---------+-----------------+
+
+export const TIPOS_LEGAL = [
+  { idlegal: 1, deslegal: 'LIBROS' },
+  { idlegal: 2, deslegal: 'HOJAS SUELTAS' },
+  { idlegal: 3, deslegal: 'HOJAS CONTINUAS' },
+]

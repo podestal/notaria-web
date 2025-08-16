@@ -5,17 +5,21 @@ import moment from "moment";
 import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
 import SimpleSelector from "../../../ui/SimpleSelector";
-import { NUMERO_LIBROS } from "../../../../data/librosData";
+import { NUMERO_LIBROS, TIPOS_LEGAL, TIPOS_FOLIOS } from "../../../../data/librosData";
 import { QrCode, Save } from "lucide-react";
 import GenerarDocumento from "../documentos/GenerarDocumento";
 import AbrirDocumento from "../documentos/AbrirDocumento";
 import ClienteMain from "./cliente/ClienteMain";
+import SearchableDropdownInput from "../../../ui/SearchableDropdownInput";
+import { TipoLibro } from "../../../../services/api/extraprotocolares/tipoLibroService";
+import SolicitanteLookup from "./cliente/SolicitanteLookup";
 
 interface Props {
     libro?: Libro
+    tipoLibros: TipoLibro[]
 }
 
-const LibroForm = ({ libro }: Props) => {
+const LibroForm = ({ libro, tipoLibros }: Props) => {
 
     const [loading, setLoading] = useState(false);
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0);
@@ -36,6 +40,17 @@ const LibroForm = ({ libro }: Props) => {
     const [razonSocial, setRazonSocial] = useState('');
     const [domicilioFiscal, setDomicilioFiscal] = useState('');
 
+    // Datos del Libro
+    const [selectedTipoLibro, setSelectedTipoLibro] = useState<{id: string, label: string} | null>(libro?.idtiplib ? {id: libro.idtiplib.toString(), label: tipoLibros.find(tl => tl.idtiplib === libro.idtiplib)?.destiplib || ''} : null);
+    const [selectedTipoLegal, setSelectedTipoLegal] = useState(libro?.idlegal || 0);
+    const [numFojas, setNumFojas] = useState(libro?.folio || '');
+    const [tipoFolio, setTipoFolio] = useState(libro?.idtipfol || 0);
+    const [detalle, setDetalle] = useState(libro?.detalle || '');
+
+    // Datos del Solicitante
+    const [solicitanteName, setSolicitanteName] = useState('');
+    const [solicitanteDocument, setSolicitanteDocument] = useState('');
+    
     const handleSave = () => {
         console.log('handleSave');
     }
@@ -119,6 +134,44 @@ const LibroForm = ({ libro }: Props) => {
             domicilioFiscal={domicilioFiscal}
             setRazonSocial={setRazonSocial}
             setDomicilioFiscal={setDomicilioFiscal}
+        />
+        <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Datos del Libro</p>
+        <div className="w-full flex justify-center items-center gap-4 col-span-2">
+            <p className="pl-2 block text-xs font-semibold text-slate-700">Tipo de Libro</p>
+            <SearchableDropdownInput
+                options={tipoLibros.map(tl => ({ id: tl.idtiplib.toString(), label: tl.destiplib }))}
+                selected={selectedTipoLibro}
+                setSelected={setSelectedTipoLibro}
+                placeholder="Tipo de Libro"
+            />
+        </div>
+        <div className="grid grid-cols-2 gap-4 my-4">
+            <SimpleSelector
+                label="Tipo de Legalización"
+                defaultValue={selectedTipoLegal}
+                setter={setSelectedTipoLegal}
+                options={TIPOS_LEGAL.map(tl => ({ value: tl.idlegal, label: tl.deslegal }))}
+            />
+        </div>
+        <div className="grid grid-cols-2 gap-4 my-4">
+            <SimpleInput
+                label="N° de Fojas"
+                value={numFojas}
+                setValue={setNumFojas}
+                horizontal
+            />
+            <SimpleSelector
+                label="Tipo de Folio"
+                defaultValue={tipoFolio}
+                setter={setTipoFolio}
+                options={TIPOS_FOLIOS.map(tf => ({ value: tf.idtipfol, label: tf.destipfol }))}
+            />
+        </div>
+        <SolicitanteLookup 
+            solicitanteName={solicitanteName}
+            setSolicitanteName={setSolicitanteName}
+            solicitanteDocument={solicitanteDocument}
+            setSolicitanteDocument={setSolicitanteDocument}
         />
     </div>
   )
