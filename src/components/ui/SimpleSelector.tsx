@@ -43,31 +43,42 @@ const SimpleSelector = ({
     }, [defaultValue]);
 
   return (
-    <div className="grid grid-cols-3 items-center gap-2 w-full">
-        <p className="pl-2 block text-xs font-semibold text-slate-700">{label}</p>
-        <div className="flex items-center gap-1 w-full col-span-2">
-            <motion.select 
-                {...(error ? shakeAnimation : {})}
-                defaultValue={defaultValue ? defaultValue.toString() : '0'}
-                value={defaultValue !== undefined ? defaultValue?.toString() : '0'}
-                onChange={(e) => {
-                    setError?.('');
-                    setter(parseInt(e.target.value));
-                }}
-                // className="flex-1 bg-white w-2xl col-span-2 text-slate-700 border border-slate-300 rounded-md py-2  px-2"
-                className={`flex-1 bg-white text-slate-700 border rounded-md py-2 px-2 w-full ${
-                    error ? 'border-red-500 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-300'
-                } focus:outline-none focus:ring-2`}
-            >
-                    {options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-            </motion.select>
-            {required && <span className="text-red-500">*</span>}
+    <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-3 items-center gap-2 w-full">
+            <p className="pl-2 block text-xs font-semibold text-slate-700">{label}</p>
+            <div className="flex items-center gap-1 w-full col-span-2">
+                <motion.select 
+                    {...(error ? shakeAnimation : {})}
+                    defaultValue={defaultValue ? defaultValue.toString() : '0'}
+                    value={defaultValue !== undefined ? defaultValue?.toString() : '0'}
+                    onChange={(e) => {
+                        setError?.('');
+                        setter(parseInt(e.target.value));
+                    }}
+                    // className="flex-1 bg-white w-2xl col-span-2 text-slate-700 border border-slate-300 rounded-md py-2  px-2"
+                    className={`flex-1 bg-white text-slate-700 border rounded-md py-2 px-2 w-full ${
+                        error ? 'border-red-500 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-300'
+                    } focus:outline-none focus:ring-2`}
+                >
+                        {options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                </motion.select>
+                {required && <span className="text-red-500">*</span>}
+            </div>
         </div>
-    </div>
+        {error && (
+            <motion.div
+                className="text-xs text-center text-red-500 mt-1 px-2"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                >
+                {error}
+            </motion.div>
+        )}
+        </div>
   )
 }
 

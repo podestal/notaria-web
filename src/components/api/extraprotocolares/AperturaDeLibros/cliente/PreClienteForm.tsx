@@ -15,9 +15,22 @@ interface Props {
     setDireccion: React.Dispatch<React.SetStateAction<string>>
     setRazonSocial: React.Dispatch<React.SetStateAction<string>>
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
+    setCodeCliente: React.Dispatch<React.SetStateAction<string>>
 }
 
-const PreClienteForm = ({ selectedTipoPersona, setSelectedTipoPersona, document, setDocument, setApellidoPaterno, setApellidoMaterno, setPrimerNombre, setSegundoNombre, setDireccion, setRazonSocial, setDomicilioFiscal }: Props) => {
+const PreClienteForm = ({ 
+    selectedTipoPersona, 
+    setSelectedTipoPersona, 
+    document, 
+    setDocument, 
+    setApellidoPaterno, 
+    setApellidoMaterno, 
+    setPrimerNombre, 
+    setSegundoNombre, 
+    setDireccion, 
+    setRazonSocial, 
+    setDomicilioFiscal, 
+    setCodeCliente }: Props) => {
     const { setMessage, setType, setShow } = useNotificationsStore()
     const [loading, setLoading] = useState(false)
 
@@ -59,6 +72,7 @@ const PreClienteForm = ({ selectedTipoPersona, setSelectedTipoPersona, document,
                     setPrimerNombre(response.data.prinom);
                     setSegundoNombre(response.data.segnom);
                     setDireccion(response.data.direccion);
+                    setCodeCliente(response.data.idcliente);
                 } else {
                     console.log('Cliente no encontrado, creando nuevo cliente')
                 }
@@ -76,6 +90,7 @@ const PreClienteForm = ({ selectedTipoPersona, setSelectedTipoPersona, document,
                 if (response.data.idcliente) {
                     setRazonSocial(response.data.razonsocial);
                     setDomicilioFiscal(response.data.domfiscal);
+                    setCodeCliente(response.data.idcliente);
                 }
             }).catch(error => {
                 console.log('Error al buscar el cliente:', error);

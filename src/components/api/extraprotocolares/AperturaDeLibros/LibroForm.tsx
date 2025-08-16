@@ -13,6 +13,7 @@ import ClienteMain from "./cliente/ClienteMain";
 import SearchableDropdownInput from "../../../ui/SearchableDropdownInput";
 import { TipoLibro } from "../../../../services/api/extraprotocolares/tipoLibroService";
 import SolicitanteLookup from "./cliente/SolicitanteLookup";
+import SingleSelect from "../../../ui/SingleSelect";
 
 interface Props {
     libro?: Libro
@@ -39,6 +40,7 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
     const [direccion, setDireccion] = useState('');
     const [razonSocial, setRazonSocial] = useState('');
     const [domicilioFiscal, setDomicilioFiscal] = useState('');
+    const [codeCliente, setCodeCliente] = useState('');
 
     // Datos del Libro
     const [selectedTipoLibro, setSelectedTipoLibro] = useState<{id: string, label: string} | null>(libro?.idtiplib ? {id: libro.idtiplib.toString(), label: tipoLibros.find(tl => tl.idtiplib === libro.idtiplib)?.destiplib || ''} : null);
@@ -50,9 +52,74 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
     // Datos del Solicitante
     const [solicitanteName, setSolicitanteName] = useState('');
     const [solicitanteDocument, setSolicitanteDocument] = useState('');
+    const [comentario, setComentario] = useState('');
+    const [orientation, setOrientation] = useState('V');
+
+    // Error handling
+    const [numLibroError, setNumLibroError] = useState('');
+    const [documentError, setDocumentError] = useState('');
+    const [tipoLibroError, setTipoLibroError] = useState('');
+    const [numFojasError, setNumFojasError] = useState('');
+    const [solictanteDocumentError, setSolictanteDocumentError] = useState('');
+    const [solicitanteNameError, setSolicitanteNameError] = useState('');
     
     const handleSave = () => {
+
+        if (!numeroLibro) {
+            setNumLibroError('Seleccione un tipo de libro')
+            return
+        }
+
+        if (!selectedTipoLibro) {
+            setTipoLibroError('Seleccione un tipo de libro')
+            return
+        }
+
+        if (!numFojas) {
+            setNumFojasError('Ingrese el número de fojas')
+            return
+        }
+
+        if (!solicitanteName) {
+            setSolicitanteNameError('Ingrese el nombre del solicitante')
+            return
+        }
+
+        setLoading(true);
         console.log('handleSave');
+        // id: number;
+        // numlibro: string;
+        // ano: string;
+        // fecing: string; // Date as string
+        // tipper: string | null;
+        // apepat: string | null;
+        // apemat: string | null;
+        // prinom: string | null;
+        // segnom: string | null;
+        // ruc: string | null;
+        // domicilio: string | null;
+        // coddis: string | null;
+        // empresa: string | null;
+        // domfiscal: string | null;
+        // idtiplib: number | null;
+        // descritiplib: string | null;
+        // idlegal: number | null;
+        // folio: string | null;
+        // idtipfol: number | null;
+        // detalle: string | null;
+        // idnotario: number | null;
+        // solicitante: string | null;
+        // comentario: string | null;
+        // feclegal: string | null; // Date as string
+        // comentario2: string | null;
+        // dni: string | null;
+        // idusuario: number | null;
+        // idnlibro: number | null;
+        // codclie: string | null;
+        // flag: number | null;
+        // numdoc_plantilla: string | null; // Assuming this is a document template ID
+
+        
     }
 
   return (
@@ -70,7 +137,9 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
                 name={`__LIBRO__${libro.numlibro}-${libro.ano}.docx`}
                 url='libro'
                 params={{
-                    id_libro: libro.id.toString()
+                    id_libro: libro.id.toString(),
+                    action: 'generate',
+                    orientation: orientation,
                 }}
             />}
             {libro && 
@@ -112,6 +181,8 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
                     { value: 0, label: 'Seleccione un libro' },
                     ...NUMERO_LIBROS.map(libro => ({ value: libro.idnlibro, label: libro.desnlibro }))
                 ]}
+                error={numLibroError}
+                setError={setNumLibroError}
             />
         </div>
         <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Busqueda de Cliente</p>
@@ -134,6 +205,8 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
             domicilioFiscal={domicilioFiscal}
             setRazonSocial={setRazonSocial}
             setDomicilioFiscal={setDomicilioFiscal}
+            setCodeCliente={setCodeCliente}
+            setDocumentError={setDocumentError}
         />
         <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Datos del Libro</p>
         <div className="w-full flex justify-center items-center gap-4 col-span-2">
@@ -143,6 +216,8 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
                 selected={selectedTipoLibro}
                 setSelected={setSelectedTipoLibro}
                 placeholder="Tipo de Libro"
+                error={tipoLibroError}
+                setError={setTipoLibroError}
             />
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
@@ -159,6 +234,8 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
                 value={numFojas}
                 setValue={setNumFojas}
                 horizontal
+                error={numFojasError}
+                setError={setNumFojasError}
             />
             <SimpleSelector
                 label="Tipo de Folio"
@@ -172,7 +249,30 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
             setSolicitanteName={setSolicitanteName}
             solicitanteDocument={solicitanteDocument}
             setSolicitanteDocument={setSolicitanteDocument}
+            comentario={comentario}
+            setComentario={setComentario}
+            solicitanteNameError={solicitanteNameError}
+            setSolicitanteNameError={setSolicitanteNameError}
         />
+        <div className="grid grid-cols-2 gap-4 my-4">
+            <SimpleInput
+                label="Responsable"
+                value={user ? `${user.first_name} ${user.last_name}` : ''}
+                setValue={() => {}}
+                horizontal
+                disabled
+            />
+            <div>
+                <SingleSelect 
+                    options={[
+                        { value: 'V', label: 'Vertical' },
+                        { value: 'H', label: 'Horizontal' },
+                    ]}
+                    selected={orientation}
+                    onChange={setOrientation}
+                />
+            </div>
+        </div>
     </div>
   )
 }
