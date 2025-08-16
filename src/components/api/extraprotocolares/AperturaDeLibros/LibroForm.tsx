@@ -56,7 +56,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
     const [selectedTipoLibro, setSelectedTipoLibro] = useState<{id: string, label: string} | null>(libro?.idtiplib ? {id: libro.idtiplib.toString(), label: tipoLibros.find(tl => tl.idtiplib === libro.idtiplib)?.destiplib || ''} : null);
     const [selectedTipoLegal, setSelectedTipoLegal] = useState(libro?.idlegal || 0);
     const [numFojas, setNumFojas] = useState(libro?.folio || '');
-    const [tipoFolio, setTipoFolio] = useState(libro?.idtipfol || 0);
+    const [tipoFolio, setTipoFolio] = useState(libro?.idtipfol || 1);
     const [detalle, setDetalle] = useState(libro?.detalle || '');
 
     // Datos del Solicitante
@@ -71,6 +71,14 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
     const [tipoLibroError, setTipoLibroError] = useState('');
     const [numFojasError, setNumFojasError] = useState('');
     const [solicitanteNameError, setSolicitanteNameError] = useState('');
+
+    // docs
+    const [showDocs, setShowDocs] = useState(libro ? true : false);
+    const [numLibro, setNumLibro] = useState(libro?.numlibro || '');
+    const [anoLibro, setAnoLibro] = useState(libro?.ano || '');
+    const [idLibro, setIdLibro] = useState(libro?.id || 0);
+
+
     
     const handleSave = () => {
 
@@ -99,8 +107,8 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
         createLibro && createLibro.mutate({
             access: access,
             libro: {
-                numlibro: '1',
-                ano: '1',
+                numlibro: '0',
+                ano: moment().format('YYYY'),
                 fecing: moment(fechaIngreso).format('YYYY-MM-DD'),
                 tipper: selectedTipoPersona === 1 ? 'N' : 'J',
                 apepat: apellidoPaterno,
@@ -132,10 +140,14 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
                 estadosisgen: 0,
             }
         }, {
-            onSuccess: () => {
+            onSuccess: res  => {
                 setMessage('Libro creado correctamente')
                 setShow(true)
                 setType('success')
+                setShowDocs(true)
+                setNumLibro(res.numlibro)
+                setAnoLibro(res.ano)
+                setIdLibro(res.id)
             },
             onError: () => {
                 setMessage('Error al crear el libro')
@@ -162,22 +174,22 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
             </button>
-            {libro && 
+            {showDocs && 
             <GenerarDocumento 
-                name={`__LIBRO__${libro.numlibro}-${libro.ano}.docx`}
+                name={`__LIBRO__${numLibro}-${anoLibro}.docx`}
                 url='libro'
                 params={{
-                    id_libro: libro.id.toString(),
+                    id_libro: idLibro.toString(),
                     action: 'generate',
                     orientation: orientation,
                 }}
             />}
-            {libro && 
+            {showDocs && 
             <AbrirDocumento 
-                name={`__LIBRO__${libro.numlibro}-${libro.ano}.docx`}
+                name={`__LIBRO__${numLibro}-${anoLibro}.docx`}
                 url='libro'
                 params={{
-                    id_libro: libro.id.toString(),
+                    id_libro: idLibro.toString(),
                     action: 'retrieve'
                 }}
             />}
