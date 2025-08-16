@@ -1,13 +1,16 @@
+import { UseMutationResult } from "@tanstack/react-query"
 import useGetTipoLibros from "../../../../hooks/api/extraprotocolares/aperturaLibros/useGetTipoLibros"
 import { Libro } from "../../../../services/api/extraprotocolares/librosService"
 import useAuthStore from "../../../../store/useAuthStore"
 import LibroForm from "./LibroForm"
+import { CreateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useCreateLibro"
 
 interface Props {
     libro?: Libro
+    createLibro?: UseMutationResult<Libro, Error, CreateLibroData>
 }
 
-const PreLibroForm = ({ libro }: Props) => {
+const PreLibroForm = ({ libro, createLibro }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { data: tipoLibros, isLoading, isError, error, isSuccess } = useGetTipoLibros({ access })
@@ -23,6 +26,7 @@ const PreLibroForm = ({ libro }: Props) => {
         <LibroForm 
             libro={libro}
             tipoLibros={tipoLibros}
+            createLibro={createLibro}
         />
     </>
   )

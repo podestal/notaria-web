@@ -39,9 +39,10 @@ export interface Libro {
     codclie: string | null;
     flag: number | null;
     numdoc_plantilla: string | null; // Assuming this is a document template ID
+    estadosisgen: number | null;
 }
 
-export type CreateUpdateLibro = Omit<Libro, 'id' | 'numlibro' | 'ano'>;
+export type CreateUpdateLibro = Omit<Libro, 'id'>;
 
 interface Props {
     libroId?: number;

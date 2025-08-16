@@ -14,13 +14,22 @@ import SearchableDropdownInput from "../../../ui/SearchableDropdownInput";
 import { TipoLibro } from "../../../../services/api/extraprotocolares/tipoLibroService";
 import SolicitanteLookup from "./cliente/SolicitanteLookup";
 import SingleSelect from "../../../ui/SingleSelect";
+import { UseMutationResult } from "@tanstack/react-query";
+import { CreateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useCreateLibro";
+import useAuthStore from "../../../../store/useAuthStore";
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
+
 
 interface Props {
     libro?: Libro
     tipoLibros: TipoLibro[]
+    createLibro?: UseMutationResult<Libro, Error, CreateLibroData>
 }
 
-const LibroForm = ({ libro, tipoLibros }: Props) => {
+const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setShow, setType} = useNotificationsStore()
 
     const [loading, setLoading] = useState(false);
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0);
@@ -38,6 +47,7 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
     const [primerNombre, setPrimerNombre] = useState('');
     const [segundoNombre, setSegundoNombre] = useState('');
     const [direccion, setDireccion] = useState('');
+    const [ubigeo, setUbigeo] = useState('');
     const [razonSocial, setRazonSocial] = useState('');
     const [domicilioFiscal, setDomicilioFiscal] = useState('');
     const [codeCliente, setCodeCliente] = useState('');
@@ -60,7 +70,6 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
     const [documentError, setDocumentError] = useState('');
     const [tipoLibroError, setTipoLibroError] = useState('');
     const [numFojasError, setNumFojasError] = useState('');
-    const [solictanteDocumentError, setSolictanteDocumentError] = useState('');
     const [solicitanteNameError, setSolicitanteNameError] = useState('');
     
     const handleSave = () => {
@@ -86,38 +95,59 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
         }
 
         setLoading(true);
+
+        createLibro && createLibro.mutate({
+            access: access,
+            libro: {
+                numlibro: '1',
+                ano: '1',
+                fecing: moment(fechaIngreso).format('YYYY-MM-DD'),
+                tipper: selectedTipoPersona === 1 ? 'N' : 'J',
+                apepat: apellidoPaterno,
+                apemat: apellidoMaterno,
+                prinom: primerNombre,
+                segnom: segundoNombre,
+                ruc: selectedTipoPersona === 1 ? '' : document,
+                domicilio: direccion,
+                coddis: ubigeo || '',
+                empresa: razonSocial,
+                domfiscal: domicilioFiscal,
+                idtiplib: parseInt(selectedTipoLibro?.id || '0'),
+                descritiplib: selectedTipoLibro?.label || '',
+                idlegal: selectedTipoLegal,
+                folio: numFojas,
+                idtipfol: tipoFolio,
+                detalle: detalle,
+                idnotario: 1,
+                solicitante: solicitanteName,
+                comentario: comentario,
+                feclegal: '',
+                comentario2: '',
+                dni: solicitanteDocument,
+                idusuario: user?.idusuario || 0,
+                idnlibro: numeroLibro,
+                codclie: codeCliente,
+                flag: 1,
+                numdoc_plantilla: '',
+                estadosisgen: 0,
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Libro creado correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: () => {
+                setMessage('Error al crear el libro')
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        } )
+
         console.log('handleSave');
-        // id: number;
-        // numlibro: string;
-        // ano: string;
-        // fecing: string; // Date as string
-        // tipper: string | null;
-        // apepat: string | null;
-        // apemat: string | null;
-        // prinom: string | null;
-        // segnom: string | null;
-        // ruc: string | null;
-        // domicilio: string | null;
-        // coddis: string | null;
-        // empresa: string | null;
-        // domfiscal: string | null;
-        // idtiplib: number | null;
-        // descritiplib: string | null;
-        // idlegal: number | null;
-        // folio: string | null;
-        // idtipfol: number | null;
-        // detalle: string | null;
-        // idnotario: number | null;
-        // solicitante: string | null;
-        // comentario: string | null;
-        // feclegal: string | null; // Date as string
-        // comentario2: string | null;
-        // dni: string | null;
-        // idusuario: number | null;
-        // idnlibro: number | null;
-        // codclie: string | null;
-        // flag: number | null;
-        // numdoc_plantilla: string | null; // Assuming this is a document template ID
 
         
     }
@@ -207,6 +237,7 @@ const LibroForm = ({ libro, tipoLibros }: Props) => {
             setDomicilioFiscal={setDomicilioFiscal}
             setCodeCliente={setCodeCliente}
             setDocumentError={setDocumentError}
+            setUbigeo={setUbigeo}
         />
         <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Datos del Libro</p>
         <div className="w-full flex justify-center items-center gap-4 col-span-2">

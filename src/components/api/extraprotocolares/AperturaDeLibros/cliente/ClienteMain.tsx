@@ -23,6 +23,7 @@ interface Props {
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
     setCodeCliente: React.Dispatch<React.SetStateAction<string>>
     setDocumentError: React.Dispatch<React.SetStateAction<string>>
+    setUbigeo: React.Dispatch<React.SetStateAction<string>>
 }
 
 const ClienteMain = ({ 
@@ -45,7 +46,7 @@ const ClienteMain = ({
     setRazonSocial,
     setDomicilioFiscal,
     setCodeCliente,
-    setDocumentError,
+    setUbigeo,
  }: Props) => {
 
   return (
@@ -63,7 +64,7 @@ const ClienteMain = ({
             setRazonSocial={setRazonSocial}
             setDomicilioFiscal={setDomicilioFiscal}
             setCodeCliente={setCodeCliente}
-            setDocumentError={setDocumentError}
+            setUbigeo={setUbigeo}
         />
         <ClienteForm 
             tipoPersona={selectedTipoPersona}

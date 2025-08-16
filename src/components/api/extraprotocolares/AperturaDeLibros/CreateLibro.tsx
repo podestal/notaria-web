@@ -1,9 +1,15 @@
+import useCreateLibro from "../../../../hooks/api/extraprotocolares/aperturaLibros/useCreateLibro";
 import PreLibroForm from "./PreLibroForm"
 
 
 const CreateLibro = () => {
+
+  const createLibro = useCreateLibro();
+
   return (
-    <PreLibroForm />
+    <PreLibroForm 
+      createLibro={createLibro}
+    />
   )
 }
 

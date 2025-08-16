@@ -13,8 +13,6 @@ interface Props {
     setComentario: (comentario: string) => void
     solicitanteNameError: string
     setSolicitanteNameError: (solicitanteNameError: string) => void
-    solicitanteDocumentError: string
-    setSolicitanteDocumentError: (solicitanteDocumentError: string) => void
 }
 
 const SolicitanteLookup = ({ 

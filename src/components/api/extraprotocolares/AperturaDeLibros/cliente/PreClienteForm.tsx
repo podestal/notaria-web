@@ -16,6 +16,7 @@ interface Props {
     setRazonSocial: React.Dispatch<React.SetStateAction<string>>
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
     setCodeCliente: React.Dispatch<React.SetStateAction<string>>
+    setUbigeo: React.Dispatch<React.SetStateAction<string>>
 }
 
 const PreClienteForm = ({ 
@@ -30,7 +31,9 @@ const PreClienteForm = ({
     setDireccion, 
     setRazonSocial, 
     setDomicilioFiscal, 
-    setCodeCliente }: Props) => {
+    setCodeCliente,
+    setUbigeo
+ }: Props) => {
     const { setMessage, setType, setShow } = useNotificationsStore()
     const [loading, setLoading] = useState(false)
 
@@ -73,6 +76,7 @@ const PreClienteForm = ({
                     setSegundoNombre(response.data.segnom);
                     setDireccion(response.data.direccion);
                     setCodeCliente(response.data.idcliente);
+                    setUbigeo(response.data.idubigeo);
                 } else {
                     console.log('Cliente no encontrado, creando nuevo cliente')
                 }
