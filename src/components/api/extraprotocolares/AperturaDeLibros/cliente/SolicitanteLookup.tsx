@@ -23,7 +23,13 @@ const SolicitanteLookup = ({ solicitanteName, setSolicitanteName, solicitanteDoc
             if (response.data.idcliente) {
                 setSolicitanteName(response.data.nombre || `${response.data.apepat} ${response.data.apemat} ${response.data.prinom} ${response.data.segnom}`);
             } else {
-                console.log('Cliente no encontrado, creando nuevo cliente')
+                axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${solicitanteDocument}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
+                ).then(response => {
+                    console.log('response', response.data)
+                    setSolicitanteName(`${response.data.resultado.nombres.split(' ')[0]} ${response.data.resultado.apellido_paterno} ${response.data.resultado.apellido_materno}`)
+                }).catch(error => {
+                    console.error('Error al consultar RENIEC:', error)
+                });
             }
         }).catch(error => {
             console.log('Error al buscar el cliente:', error);
