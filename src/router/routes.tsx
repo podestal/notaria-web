@@ -28,7 +28,7 @@ import Testamentos from "../components/api/reportes/cronologicos/reportes/Testam
 import Protestos from "../components/api/reportes/cronologicos/reportes/Protestos";
 import ActasProtestos from "../components/api/reportes/cronologicos/reportes/ActasProtestos";
 import CamaraDeComercio from "../components/api/reportes/cronologicos/reportes/CamaraDeComercio";
-import CartasNotariales from "../components/api/reportes/cronologicos/reportes/CartasNotariales";
+import CartasNotariales from "../components/api/reportes/cronologicos/reportes/cartasNotariales/CartasNotariales";
 import AperturaLibros from "../components/api/reportes/cronologicos/reportes/AperturaLibros";
 import PermisoViajes from "../components/api/reportes/cronologicos/reportes/PermisoViajes";
 import Poderes from "../components/api/reportes/cronologicos/reportes/Poderes";

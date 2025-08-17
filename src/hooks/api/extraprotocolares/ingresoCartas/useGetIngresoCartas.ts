@@ -11,9 +11,10 @@ interface Props {
     dateFrom?: Date
     dateTo?: Date
     dateType?: string // '1' for fecha_ingreso, '2' for fecha
+    dissabled?: boolean
 }
 
-const useGetIngresoCartas = ({ access, page, numCarta, remitente, destinatario, dateFrom, dateTo, dateType }: Props): UseQueryResult<IngresoCartasPage, Error> => {
+const useGetIngresoCartas = ({ access, page, numCarta, remitente, destinatario, dateFrom, dateTo, dateType, dissabled }: Props): UseQueryResult<IngresoCartasPage, Error> => {
     const ingresoCartasService = getIngresoCartasService();
 
     let params: { page: string; numCarta?: string; remitente?: string; destinatario?: string; dateFrom?: string; dateTo?: string; dateType?: string } = { page: page.toString() };
@@ -31,6 +32,7 @@ const useGetIngresoCartas = ({ access, page, numCarta, remitente, destinatario, 
     return useQuery({
         queryKey: ['ingreso_cartas', page],
         queryFn: () => ingresoCartasService.get(access, params),
+        enabled: !dissabled
     });
 }
 

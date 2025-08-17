@@ -1,9 +1,3 @@
-//   const [cliente, setCliente] = useState('');
-//   const [numDoc, setNumDoc] = useState('');
-//   const [cronologico, setCronologico] = useState('');
-//   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
-//   const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
-
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import Calendar from "../../../ui/Calendar";
 import SimpleInput from "../../../ui/SimpleInput";

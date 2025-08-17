@@ -29,6 +29,7 @@ const useGetPermisosViaje = ({ access, page, crono, tipoPermiso, nombreParticipa
     return useQuery({
         queryKey: ['permisosViaje', page],
         queryFn: () => permisoViajeService.get(access, params),
+        
     });
 }
     
