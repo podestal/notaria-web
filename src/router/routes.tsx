@@ -35,6 +35,14 @@ import Poderes from "../components/api/reportes/cronologicos/reportes/Poderes";
 import SupervivenciaCapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaCapaz";
 import SupervivenciaIncapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaIncapaz";
 import Domiciliario from "../components/api/reportes/cronologicos/reportes/Domiciliario";
+import AlfabeticosMain from "../components/api/reportes/alfabeticos/AlfabeticosMain";
+import ArchivosPdtMain from "../components/api/reportes/archivosPdt/ArchivosPdtMain";
+import RegistrosUifMain from "../components/api/reportes/registrosUif/RegistrosUifMain";
+import ReoporteUifMian from "../components/api/reportes/reporteUif/ReoporteUifMian";
+import BusquedaMain from "../components/api/reportes/busqueda/BusquedaMain";
+import CorrelativoMain from "../components/api/reportes/correlativo/CorrelativoMain";
+import CronologicosPasadoMain from "../components/api/reportes/cronologicosPasado/CronologicosPasadoMain";
+import ReporteFirmaMain from "../components/api/reportes/reportePendFirma.tsx/ReporteFirmaMain";
 
 const routes = createBrowserRouter([
     {
@@ -95,7 +103,7 @@ const routes = createBrowserRouter([
                     {
                         path: "cambioCaracteristicas",
                         element: <PrivateRoutes><CambioCaracteristicasMain /></PrivateRoutes>
-                    }
+                    },
                 ]
             },
             {
@@ -176,13 +184,36 @@ const routes = createBrowserRouter([
                     },
                     {
                         path: "alfabeticos",
-                        element: <p>Alfabeticos</p>
+                        element: <PrivateRoutes><AlfabeticosMain /></PrivateRoutes>
                     },
                     {
                         path: "archivos-pdt",
-                        element: <p>Archivos PDT</p>
+                        element: <PrivateRoutes><ArchivosPdtMain /></PrivateRoutes>
                     },
-                    
+                    {
+                        path: "registros-uif",
+                        element: <PrivateRoutes><RegistrosUifMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "reporte-uif-iaoc",
+                        element: <PrivateRoutes><ReoporteUifMian /></PrivateRoutes>
+                    },
+                    {
+                        path: "busqueda-avanzada",
+                        element: <PrivateRoutes><BusquedaMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "correlativo",
+                        element: <PrivateRoutes><CorrelativoMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "cronologicos-pasado",
+                        element: <PrivateRoutes><CronologicosPasadoMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "reporte-pendiente-conclusion-firma",
+                        element: <PrivateRoutes><ReporteFirmaMain /></PrivateRoutes>
+                    },
                 ]
             },
                         {
