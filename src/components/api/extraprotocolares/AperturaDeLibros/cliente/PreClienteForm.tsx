@@ -113,6 +113,7 @@ const PreClienteForm = ({
 
   return (
     <div className="grid grid-cols-5 items-center gap-6 text-black">
+        <>{console.log(selectedTipoPersona)}</>
         <Selector 
             label="Tipo de Persona"
             options={[
@@ -121,7 +122,10 @@ const PreClienteForm = ({
                 { value: 2, label: 'Persona Jurídica' }
             ]}
             setter={setSelectedTipoPersona}
+            defaultValue={selectedTipoPersona}
+            
         />
+        
         <div className="flex flex-col gap-2 col-span-2">
             <p className="text-md font-bold py-2">Documento</p>
             <input 

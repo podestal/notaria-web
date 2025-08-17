@@ -32,8 +32,8 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
     const { setMessage, setShow, setType} = useNotificationsStore()
 
     const [loading, setLoading] = useState(false);
-    const [selectedTipoPersona, setSelectedTipoPersona] = useState(0);
-    const [document, setDocument] = useState('');
+    const [selectedTipoPersona, setSelectedTipoPersona] = useState(libro ? libro.tipper === 'N' ? 1 : 2 : 0);
+    const [document, setDocument] = useState(libro ? libro.ruc : '');
     const user = useUserInfoStore(state => state.user);
     const [cronologico, setCronologico] = useState<string>(libro?.numlibro ? `${libro.numlibro}-${libro.ano}` : '');
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
@@ -42,15 +42,15 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
         : (new Date())
     );
     const [numeroLibro, setNumeroLibro] = useState(libro?.idnlibro || 0);
-    const [apellidoPaterno, setApellidoPaterno] = useState('');
-    const [apellidoMaterno, setApellidoMaterno] = useState('');
-    const [primerNombre, setPrimerNombre] = useState('');
-    const [segundoNombre, setSegundoNombre] = useState('');
-    const [direccion, setDireccion] = useState('');
-    const [ubigeo, setUbigeo] = useState('');
-    const [razonSocial, setRazonSocial] = useState('');
-    const [domicilioFiscal, setDomicilioFiscal] = useState('');
-    const [codeCliente, setCodeCliente] = useState('');
+    const [apellidoPaterno, setApellidoPaterno] = useState(libro ? libro.apepat : '');
+    const [apellidoMaterno, setApellidoMaterno] = useState(libro ? libro.apemat : '');
+    const [primerNombre, setPrimerNombre] = useState(libro ? libro.prinom : '');
+    const [segundoNombre, setSegundoNombre] = useState(libro ? libro.segnom : '');
+    const [direccion, setDireccion] = useState(libro ? libro.domicilio : '');
+    const [ubigeo, setUbigeo] = useState(libro ? libro.coddis : '');
+    const [razonSocial, setRazonSocial] = useState(libro ? libro.empresa : '');
+    const [domicilioFiscal, setDomicilioFiscal] = useState(libro ? libro.domfiscal : '');
+    const [codeCliente, setCodeCliente] = useState(libro ? libro.codclie : '');
 
     // Datos del Libro
     const [selectedTipoLibro, setSelectedTipoLibro] = useState<{id: string, label: string} | null>(libro?.idtiplib ? {id: libro.idtiplib.toString(), label: tipoLibros.find(tl => tl.idtiplib === libro.idtiplib)?.destiplib || ''} : null);
@@ -60,9 +60,9 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
     const [detalle, setDetalle] = useState(libro?.detalle || '');
 
     // Datos del Solicitante
-    const [solicitanteName, setSolicitanteName] = useState('');
-    const [solicitanteDocument, setSolicitanteDocument] = useState('');
-    const [comentario, setComentario] = useState('');
+    const [solicitanteName, setSolicitanteName] = useState(libro ? libro.solicitante : '');
+    const [solicitanteDocument, setSolicitanteDocument] = useState(libro ? libro.dni : '');
+    const [comentario, setComentario] = useState(libro ? libro.comentario : '');
     const [orientation, setOrientation] = useState('V');
 
     // Error handling
