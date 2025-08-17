@@ -1,6 +1,10 @@
+import { Outlet } from "react-router-dom"
+
 const CronologicosMain = () => {
   return (
-    <div>CronologicosMain</div>
+    <>
+        <Outlet />
+    </>
   )
 }
 
