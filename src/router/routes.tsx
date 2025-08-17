@@ -43,6 +43,7 @@ import BusquedaMain from "../components/api/reportes/busqueda/BusquedaMain";
 import CorrelativoMain from "../components/api/reportes/correlativo/CorrelativoMain";
 import CronologicosPasadoMain from "../components/api/reportes/cronologicosPasado/CronologicosPasadoMain";
 import ReporteFirmaMain from "../components/api/reportes/reportePendFirma.tsx/ReporteFirmaMain";
+import BusquedaAvanzadaMain from "../components/api/extraprotocolares/busqueda/BusquedaAvanzadaMain";
 
 const routes = createBrowserRouter([
     {
@@ -104,6 +105,10 @@ const routes = createBrowserRouter([
                         path: "cambioCaracteristicas",
                         element: <PrivateRoutes><CambioCaracteristicasMain /></PrivateRoutes>
                     },
+                    {
+                        path: "busquedaAvanzada",
+                        element: <PrivateRoutes><BusquedaAvanzadaMain /></PrivateRoutes>
+                    }
                 ]
             },
             {

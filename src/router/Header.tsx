@@ -74,7 +74,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Cert. Supervivencia Persona Incapaz", path: "/app/extraprotocolares/supervivenciaIncapaz"},
                 {name: "Certificado Domiciliario", path: "/app/extraprotocolares/certificadoDomiciliario"},
                 {name: "Cambio de Características", path: "/app/extraprotocolares/cambioCaracteristicas"},
-                {name: "Busqueda Avanzada"}
+                {name: "Busqueda Avanzada", path: "/app/extraprotocolares/busquedaAvanzada"}
             ]},
         { label: "REPORTES", options: 
             [   {name: "Indices Cronologicos", 
