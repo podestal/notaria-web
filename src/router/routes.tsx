@@ -19,6 +19,7 @@ import SuperCapazMain from "../components/api/extraprotocolares/supervivenciaCap
 import SuperIncapazMain from "../components/api/extraprotocolares/supervivenciaIncapaz/SuperIncapazMain";
 import CertDomiciliarioMain from "../components/api/extraprotocolares/certificadoDomiciliario/CertDomiciliarioMain";
 import CambioCaracteristicasMain from "../components/api/extraprotocolares/cambioCaracteristicas/CambioCaracteristicasMain";
+import CronologicosMain from "../components/api/reportes/cronologicos/CronologicosMain";
 
 const routes = createBrowserRouter([
     {
@@ -87,7 +88,81 @@ const routes = createBrowserRouter([
                 element: 
                 <PrivateRoutes>
                     <ReportesMain />
-                </PrivateRoutes>
+                </PrivateRoutes>,
+                children: [
+                    {
+                        path: "cronologicos",
+                        element: 
+                        <PrivateRoutes>
+                            <CronologicosMain />
+                        </PrivateRoutes>,
+                        // úblicas", path: "/app/reportes/cronologicos/escrituras"}, 
+                        // {name: "Asunotos No Contenciosos", path: "/app/reportes/cronologicos/no-contenciosos"}, 
+                        // {name: "Transferencias Vehiculares", path: "/app/reportes/cronologicos/transferencias-vehiculares"}, 
+                        // {name: "Garantías Mobiliarias", path: "/app/reportes/cronologicos/garantias-mobiliarias"}, 
+                        // {name: "Testamentos", path: "/app/reportes/cronologicos/testamentos"}, 
+                        // {name: "Protestos", path: "/app/reportes/cronologicos/protestos"}, 
+                        // {name: "Generar Actas Protesto", path: "/app/reportes/cronologicos/generar-actas-protesto"}, 
+                        // {name: "Informe a la Cámara de Comercio", path: "/app/reportes/cronologicos/informe-camara-comercio"}, 
+                        // {name: "Cartas Notariales", path: "/app/reportes/cronologicos/cartas-notariales"}
+                        children: [
+                            {
+                                path: "escrituras",
+                                element: <p>Escrituras</p>
+                            },
+                            
+                            {
+                                path: "no-contenciosos",
+                                element: <p>No Contenciosos</p>
+                            },
+                            {
+                                path: "transferencias-vehiculares",
+                                element: <p>Transferencias Vehiculares</p>
+                            },
+                            {
+                                path: "garantias-mobiliarias",
+                                element: <p>Garantías Mobiliarias</p>
+                            },
+                            
+                            {
+                                path: "testamentos",
+                                element: <p>Testamentos</p>
+                            },
+                            
+                            {
+                                path: "protestos",
+                                element: <p>Protestos</p>
+                            },
+                            {
+                                path: "generar-actas-protesto",
+                                element: <p>Generar Actas Protesto</p>
+                            },
+                            {
+                                path: "informe-camara-comercio",
+                                element: <p>Informe a la Cámara de Comercio</p>
+                            },
+                            {
+                                path: "cartas-notariales",
+                                element: <p>Cartas Notariales</p>
+                            },
+                            
+                            
+                            
+                            
+
+                            
+                        ]
+                    },
+                    {
+                        path: "alfabeticos",
+                        element: <p>Alfabeticos</p>
+                    },
+                    {
+                        path: "archivos-pdt",
+                        element: <p>Archivos PDT</p>
+                    },
+                    
+                ]
             },
                         {
                 path: "caja",

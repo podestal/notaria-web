@@ -16,10 +16,15 @@ import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
 import { useNavigate } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
 
+interface SubOption {
+  name: string
+  path?: string
+}
+
 interface MenuOptions {
     name: string;
     path?: string
-    subOptions?: string[]
+    subOptions?: SubOption[]
     docType?: number
 }
 
@@ -72,9 +77,35 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Busqueda Avanzada"}
             ]},
         { label: "REPORTES", options: 
-            [   {name: "Indices Cronologicos", subOptions: ["Escrituras Públicas", "Asunotos No Contenciosos", "Transferencias Vehiculares", "Garantías Mobiliarias", "Testamentos", "Protestos", "Generar Actas Protesto", "Informe a la Cámara de Comercio", "Cartas Notariales", "Certificación de Apertura de Libros", " Permisos de Viaje al Interior/Exterior", "Poderes Fuera de Registro", "Cart. Supervivencia Persona Capaz", "Cart. Supervivencia Persona Incapaz", "Certificado Domiciliario"]},
-                {name: "Indices Alfabeticos", subOptions: ["Escrituras Públicas", "Garantías Mobiliarias", "Asuntos no Contenciosos", "Transferencias Vehiculares", "Testamentos"]},
-                {name: "Archivos PDT Notaría", subOptions: ["Archivos PDT Escrituras", "Archivos PDT Garantías", "Archivos PDT Vehiculares", "Archivos PDT Libros"]},
+            [   {name: "Indices Cronologicos", 
+                  path: "/app/reportes/cronologicos",
+                  subOptions: [
+                    {name: "Escrituras Públicas", path: "/app/reportes/cronologicos/escrituras"}, 
+                    {name: "Asunotos No Contenciosos", path: "/app/reportes/cronologicos/no-contenciosos"}, 
+                    {name: "Transferencias Vehiculares", path: "/app/reportes/cronologicos/transferencias-vehiculares"}, 
+                    {name: "Garantías Mobiliarias", path: "/app/reportes/cronologicos/garantias-mobiliarias"}, 
+                    {name: "Testamentos", path: "/app/reportes/cronologicos/testamentos"}, 
+                    {name: "Protestos", path: "/app/reportes/cronologicos/protestos"}, 
+                    {name: "Generar Actas Protesto", path: "/app/reportes/cronologicos/generar-actas-protesto"}, 
+                    {name: "Informe a la Cámara de Comercio", path: "/app/reportes/cronologicos/informe-camara-comercio"}, 
+                    {name: "Cartas Notariales", path: "/app/reportes/cronologicos/cartas-notariales"}
+                  ]},
+                {name: "Indices Alfabeticos", 
+                  path: "/app/reportes/alfabeticos",
+                  subOptions: [
+                    {name: "Escrituras Públicas", path: "/app/reportes/alfabeticos/escrituras"}, 
+                    {name: "Garantías Mobiliarias", path: "/app/reportes/alfabeticos/garantias-mobiliarias"}, 
+                    {name: "Asuntos no Contenciosos", path: "/app/reportes/alfabeticos/no-contenciosos"}, 
+                    {name: "Transferencias Vehiculares", path: "/app/reportes/alfabeticos/transferencias-vehiculares"}, 
+                    {name: "Testamentos", path: "/app/reportes/alfabeticos/testamentos"}
+                  ]},
+                {name: "Archivos PDT Notaría", 
+                  subOptions: [
+                    {name: "Archivos PDT Escrituras", path: "/app/reportes/archivos-pdt/escrituras"}, 
+                    {name: "Archivos PDT Garantías", path: "/app/reportes/archivos-pdt/garantias"}, 
+                    {name: "Archivos PDT Vehiculares", path: "/app/reportes/archivos-pdt/vehiculares"}, 
+                    {name: "Archivos PDT Libros", path: "/app/reportes/archivos-pdt/libros"}
+                  ]},
                 {name: "Registro de Operaciones UIF"},
                 {name: "Reporte UIF-IAOC"},
                 {name: "Report.Pend.Conclusión Firma"},
@@ -83,12 +114,20 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Indices Cronológicos 2013 - 2020"}
             ]},
         { label: "CAJA", options:
-            [   {name: "Egresos", subOptions: ["Generar Egresos", "Edición de Egresos", "Reporte de Egresos"]},
+            [   {name: "Egresos", 
+                  subOptions: [
+                    {name: "Generar Egresos", path: "/app/caja/generar-egresos"}, 
+                    {name: "Edición de Egresos", path: "/app/caja/edicion-egresos"}, 
+                    {name: "Reporte de Egresos", path: "/app/caja/reporte-egresos"}
+                  ]},
                 {name: "Emisión de Comprobantes"},
                 {name: "Edición de Comprobantes"},
                 {name: "Cancelación de Comprobantes"},
                 {name: "Reporte de Comprobantes Emitidos"},
-                {name: "Reporte de Comprobantes" ,subOptions: ["Pendiente de Pago", "Cancelados"]}
+                {name: "Reporte de Comprobantes" ,subOptions: [
+                    {name: "Pendiente de Pago", path: "/app/caja/pendiente-pago"}, 
+                    {name: "Cancelados", path: "/app/caja/cancelados"}
+                  ]}
             ]},
         { label: "USUARIOS", options:
             [   {name: "Mantenimiento"},
@@ -227,8 +266,19 @@ const Header = ({ kardexTypes }: Props) => {
                                 <li
                                   key={subIdx}
                                   className="px-4 py-2 hover:bg-sky-500 hover:text-slate-50 cursor-pointer w-full border-b border-neutral-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    console.log('subOption', subOption)
+                                    navigate(`${subOption.path}`)
+                                    setCorrelative('')
+                                    option.docType && setBodyRender(option.docType)
+                                    setKardexFilter({
+                                      type: '',
+                                      value: ''
+                                    })
+                                  }}
                                 >
-                                  {subOption}
+                                  {subOption.name}
                                 </li>
                               ))}
                             </ul>
