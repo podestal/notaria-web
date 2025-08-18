@@ -12,34 +12,34 @@ export interface Libro {
     numlibro: string;
     ano: string;
     fecing: string; // Date as string
-    tipper: string | null;
-    apepat: string | null;
-    apemat: string | null;
-    prinom: string | null;
-    segnom: string | null;
-    ruc: string | null;
-    domicilio: string | null;
-    coddis: string | null;
-    empresa: string | null;
-    domfiscal: string | null;
-    idtiplib: number | null;
-    descritiplib: string | null;
-    idlegal: number | null;
-    folio: string | null;
-    idtipfol: number | null;
-    detalle: string | null;
-    idnotario: number | null;
-    solicitante: string | null;
-    comentario: string | null;
-    feclegal: string | null; // Date as string
-    comentario2: string | null;
-    dni: string | null;
-    idusuario: number | null;
-    idnlibro: number | null;
-    codclie: string | null;
-    flag: number | null;
-    numdoc_plantilla: string | null; // Assuming this is a document template ID
-    estadosisgen: number | null;
+    tipper: string
+    apepat: string
+    apemat: string
+    prinom: string
+    segnom: string
+    ruc: string
+    domicilio: string
+    coddis: string
+    empresa: string
+    domfiscal: string
+    idtiplib: number
+    descritiplib: string
+    idlegal: number
+    folio: string
+    idtipfol: number
+    detalle: string
+    idnotario: number
+    solicitante: string
+    comentario: string
+    feclegal: string // Date as string
+    comentario2: string
+    dni: string
+    idusuario: number
+    idnlibro: number
+    codclie: string
+    flag: number
+    numdoc_plantilla: string // Assuming this is a document template ID
+    estadosisgen: number;
 }
 
 export type CreateUpdateLibro = Omit<Libro, 'id'>;
