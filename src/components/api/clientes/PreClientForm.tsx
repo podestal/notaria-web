@@ -28,7 +28,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
 
     useEffect(() => {
-        if (selectedTipoPersona === 2 && selectedTipoDocumento === 2) {
+        if (selectedTipoPersona === 2 && selectedTipoDocumento === 10) {
             setShowClienteForm(true)
         }
     }, [selectedTipoPersona, selectedTipoDocumento])
@@ -223,7 +223,8 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 setCliente1={setCliente1}
                 dni={document}
                 cliente1={cliente1}
-                // selectedTipoPersona={selectedTipoPersona}
+                selectedTipoDocumento={selectedTipoDocumento}
+                selectedTipoPersona={selectedTipoPersona}
             />
             : 
             <CreateCliente 
@@ -233,6 +234,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 dni={document}
                 cliente1={null}
                 selectedTipoPersona={selectedTipoPersona}
+                selectedTipoDocumento={selectedTipoDocumento}
             />}
         </div>
     }

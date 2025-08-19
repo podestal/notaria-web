@@ -12,6 +12,8 @@ interface Props {
     setShowClienteForm: React.Dispatch<React.SetStateAction<boolean>>
     setCliente1: React.Dispatch<React.SetStateAction<Cliente | null>>
     cliente1: Cliente | null
+    selectedTipoDocumento: number
+    selectedTipoPersona: number
 }
 
 const UpdateCliente = ({ 
@@ -19,7 +21,9 @@ const UpdateCliente = ({
     setShowContratanteForm, 
     setShowClienteForm, 
     setCliente1, 
-    cliente1
+    cliente1,
+    selectedTipoDocumento,
+    selectedTipoPersona
  }: Props) => {
 
     const updateCliente = useUpdateCliente({ clienteId: cliente1?.idcliente || '', dni })
@@ -47,6 +51,8 @@ const UpdateCliente = ({
         ubigeos={ubigeos}
         cliente1={cliente1} 
         updateCliente={updateCliente} 
+        selectedTipoPersona={selectedTipoPersona}
+        selectedTipoDocumento={selectedTipoDocumento}
     />
   )
 }

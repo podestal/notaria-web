@@ -29,6 +29,7 @@ interface Props {
     updateCliente?: UseMutationResult<Cliente, Error, UpdateClienteData>
     createCliente?: UseMutationResult<Cliente, Error, CreateClienteData>
     selectedTipoPersona: number
+    selectedTipoDocumento: number
 }
 
 const civilStatusOptions = [
@@ -58,8 +59,11 @@ const ClientesForm = ({
     ubigeos, 
     updateCliente,
     createCliente,
-    selectedTipoPersona
+    selectedTipoPersona,
+    selectedTipoDocumento
     }: Props) => {
+
+    console.log('selectedTipoDocumento', selectedTipoDocumento)
 
     const { setMessage, setShow, setType } = useNotificationsStore()
 
@@ -310,7 +314,7 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
-                    idtipdoc: 1,
+                    idtipdoc: selectedTipoDocumento,
                     numdoc: dni,
                     email,
                     nacionalidad: nationality.id,
@@ -362,7 +366,7 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
-                    idtipdoc: 1,
+                    idtipdoc: cliente1?.idtipdoc || 1,
                     numdoc: dni,
                     email,
                     nacionalidad: nationality.id,
@@ -451,7 +455,7 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
-                    idtipdoc: 1,
+                    idtipdoc: selectedTipoDocumento,
                     numdoc: dni,
                     email,
                     nacionalidad: '',
@@ -503,7 +507,7 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
-                    idtipdoc: 1,
+                    idtipdoc: cliente1?.idtipdoc || 1,
                     numdoc: dni,
                     email,
                     nacionalidad: '',
