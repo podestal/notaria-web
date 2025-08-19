@@ -17,6 +17,7 @@ interface Props {
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
     setCodeCliente: React.Dispatch<React.SetStateAction<string>>
     setUbigeo: React.Dispatch<React.SetStateAction<string>>
+    setOpenCreateCliente: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const PreClienteForm = ({ 
@@ -32,14 +33,13 @@ const PreClienteForm = ({
     setRazonSocial, 
     setDomicilioFiscal, 
     setCodeCliente,
-    setUbigeo
+    setUbigeo,
+    setOpenCreateCliente
  }: Props) => {
     const { setMessage, setType, setShow } = useNotificationsStore()
     const [loading, setLoading] = useState(false)
 
     const handleSearch = () => {
-
-        console.log(document);
         
         
         if (selectedTipoPersona === 0) {
@@ -79,6 +79,7 @@ const PreClienteForm = ({
                     setUbigeo(response.data.idubigeo);
                 } else {
                     console.log('Cliente no encontrado, creando nuevo cliente')
+                    setOpenCreateCliente(true)
                 }
             }).catch(error => {
                 console.log('Error al buscar el cliente:', error);
@@ -95,6 +96,9 @@ const PreClienteForm = ({
                     setRazonSocial(response.data.razonsocial);
                     setDomicilioFiscal(response.data.domfiscal);
                     setCodeCliente(response.data.idcliente);
+                } else {
+                    console.log('Cliente no encontrado, creando nuevo cliente')
+                    setOpenCreateCliente(true)
                 }
             }).catch(error => {
                 console.log('Error al buscar el cliente:', error);
