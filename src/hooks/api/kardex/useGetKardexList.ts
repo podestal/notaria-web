@@ -16,7 +16,7 @@ const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescr
 
     let params: Record<string, string> = { page, idtipkar: idtipkar.toString() }
 
-    if (correlative) {
+    if (correlative && correlative.length > 3) {
         params.correlative = correlative
     }
     if (name) {

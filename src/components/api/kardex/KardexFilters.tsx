@@ -1,15 +1,6 @@
-import { useEffect, useState } from "react"
-import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
-import useCorrelativeStore from "../../../hooks/store/useCorrelativeStore"
-import useKardexFiltersStore from "../../../hooks/store/useKardexFiltersStore"
-
-const kardexTypes: Record<number, string> = {
-    1: 'KAR',
-    2: 'NCT',
-    3: 'ACT',
-    4: 'GAM',
-    5: 'TES',
-}
+import { useState } from "react"
+import { KardexPage } from "../../../services/api/kardexService"
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 
 interface Props {
     setCorrelative: React.Dispatch<React.SetStateAction<string>>
@@ -20,7 +11,7 @@ interface Props {
     name: string
     document: string
     numescritura: string
-    refetch: () => void
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<KardexPage, Error>>
 }
 
 const KardexFilters = ({ 
@@ -34,10 +25,16 @@ const KardexFilters = ({
     numescritura, 
     refetch }: Props) => {
 
+
+    const [loading, setLoading] = useState(false)
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-
-        refetch()
+        setLoading(true)
+        
+        refetch().finally(() => {
+            setLoading(false)
+        })
     }
         
 
@@ -46,8 +43,8 @@ const KardexFilters = ({
         onSubmit={handleSubmit}
         className="w-full flex-col justify-between items-center py-4 px-2 mb-6 border-b-2 border-dashed border-slate-950">
         <p className="mb-4">Busqueda por:</p>
-        <div className="flex justify-between items-center gap-8 text-xs">
-            <div className="flex items-center justify-center gap-2">
+        <div className="grid grid-cols-9 gap-8 text-xs">
+            <div className="flex items-center justify-center gap-2 col-span-2">
                 <p>Nº Kardex:</p>
                 <input 
                     value={correlative}
@@ -57,7 +54,7 @@ const KardexFilters = ({
                     type="text" 
                     className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
             </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 col-span-2">
                 <p>Nro Doc:</p>
                 <input 
                     value={document}
@@ -67,7 +64,7 @@ const KardexFilters = ({
                     type="text" 
                     className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
             </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 col-span-2">
                 <p>Nombre:</p>
                 <input 
                     value={name}
@@ -77,7 +74,7 @@ const KardexFilters = ({
                     type="text" 
                     className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
             </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 col-span-2">
                 <p>Nº Escr/Act:</p>
                 <input 
                     value={numescritura}
@@ -86,7 +83,11 @@ const KardexFilters = ({
                     }}
                     type="text" className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
             </div>
-            <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Buscar</button>
+            <button 
+                disabled={loading} 
+                className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">
+                {loading ? 'Buscando...' : 'Buscar'}
+            </button>
         </div>
     </form>
   )
