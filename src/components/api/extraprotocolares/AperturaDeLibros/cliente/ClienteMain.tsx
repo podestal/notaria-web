@@ -114,6 +114,15 @@ const ClienteMain = ({
                 nacionalidades={nacionalidades}
                 profesiones={profesiones}
                 cargos={cargos}
+                document={document}
+                setDocument={setDocument}
+                setApellidoPaterno={setApellidoPaterno}
+                setApellidoMaterno={setApellidoMaterno}
+                setPrimerNombre={setPrimerNombre}
+                setSegundoNombre={setSegundoNombre}
+                setDireccion={setDireccion}
+                setRazonSocial={setRazonSocial}
+                setDomicilioFiscal={setDomicilioFiscal}
             />
         </TopModal>
     </>

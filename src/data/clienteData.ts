@@ -1,19 +1,3 @@
-// +----------+-----------+-----------------------------------------------+-----------+-------+
-// | idtipdoc | codtipdoc | destipdoc                                     | td_abrev  | sunat |
-// +----------+-----------+-----------------------------------------------+-----------+-------+
-// |        1 | 01        | DOCUMENTO NACIONAL DE IDENTIDAD               | DNI       |     1 |
-// |        2 | 02        | CARNET DE EXTRANJERIA                         | CE        |     4 |
-// |        3 | 03        | CARNET DE IDENTIDAD DE LAS FUERZAS POLICIALES | CEFP      |     0 |
-// |        4 | 04        | CARNET DE IDENTIDAD DE LAS FUERZAS ARMADAS    | CEFA      |     0 |
-// |        5 | 05        | PASAPORTE                                     | PASAPORTE |     7 |
-// |        6 | 06        | CEDULA DE CIUDADANIA                          | CDC       |     0 |
-// |        7 | 07        | CEDULA DIPLOMATICA DE IDENTIDAD               | CDI       |     0 |
-// |        8 | 08        | R.U.C.                                        | R.U.C.    |     6 |
-// |        9 | 09        | OTRO                                          | OTRO      |     0 |
-// |       10 | 10        | SIN DOCUMENTO                                 | SD        |     0 |
-// |       11 | 11        | PARTIDA DE NACIMIENTO                         | PN        |     1 |
-// +----------+-----------+-----------------------------------------------+-----------+-------+
-
 export const documentoJuridicaOptions = [
     { value: 0, label: 'Seleccione una opción' },
     { value: 8, label: 'R.U.C.' },

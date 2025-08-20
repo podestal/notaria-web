@@ -32,8 +32,8 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
     const { setMessage, setShow, setType} = useNotificationsStore()
 
     const [loading, setLoading] = useState(false);
-    const [selectedTipoPersona, setSelectedTipoPersona] = useState(libro ? libro.tipper === 'N' ? 1 : 2 : 0);
-    const [document, setDocument] = useState(libro ? libro.ruc : '');
+    const [selectedTipoPersona, setSelectedTipoPersona] = useState(libro ? libro.tipper === 'N' ? 1 : 2 : 2);
+    const [document, setDocument] = useState(libro ? libro.ruc : 'CODJU000000');
     const user = useUserInfoStore(state => state.user);
     const [cronologico, setCronologico] = useState<string>(libro?.numlibro ? `${libro.numlibro}-${libro.ano}` : '');
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
@@ -115,7 +115,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
                 apemat: apellidoMaterno,
                 prinom: primerNombre,
                 segnom: segundoNombre,
-                ruc: selectedTipoPersona === 1 ? '' : document,
+                ruc: selectedTipoPersona === 1 ? '' : document.startsWith('CODJU') ? '' : document,
                 domicilio: direccion,
                 coddis: ubigeo || '',
                 empresa: razonSocial,
@@ -136,7 +136,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
                 idnlibro: numeroLibro,
                 codclie: codeCliente,
                 flag: 1,
-                numdoc_plantilla: '',
+                numdoc_plantilla: document.startsWith('CODJU') ? document : '',
                 estadosisgen: 0,
             }
         }, {

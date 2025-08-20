@@ -27,6 +27,7 @@ interface Props {
     setRazonSocial: React.Dispatch<React.SetStateAction<string>>
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
     document: string
+    setDocument: React.Dispatch<React.SetStateAction<string>>
 }
 
 const civilStatusOptions = [
@@ -57,7 +58,8 @@ const NuevoClienteForm = ({
     setDireccion: setDireccionNatural,
     setRazonSocial: setRazonSocialJuridica,
     setDomicilioFiscal,
-    document
+    document,
+    setDocument,
 }: Props) => {
 
         const { setMessage, setType, setShow } = useNotificationsStore()
@@ -174,6 +176,11 @@ const NuevoClienteForm = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
+
+
+        console.log('document', document);
+        console.log('selectedTipoPersona', selectedTipoPersona);
+
         if (selectedTipoPersona === 1) {
             if (!apepat) {
                 setApepatError('Apellido Paterno es requerido')
@@ -399,8 +406,8 @@ const NuevoClienteForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
-                    idtipdoc: 1,
-                    numdoc: document,
+                    idtipdoc: document.startsWith('CODJU') ? 10 : 8,
+                    numdoc: document.startsWith('CODJU') ? '' : document,
                     email,
                     nacionalidad: '',
                     idestcivil: civilStatus,
@@ -429,6 +436,7 @@ const NuevoClienteForm = ({
                     setShow(true)
                     setRazonSocialJuridica(razonSocial)
                     setDomicilioFiscal(domFiscal)
+                    setDocument(data.numdoc_plantilla)
     
                 },
                 onError: (error) => {

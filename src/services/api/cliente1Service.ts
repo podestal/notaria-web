@@ -32,9 +32,10 @@ export interface Cliente {
     actmunicipal: string; // CIIU code
     contacempresa: string; // Contact person in the company
     fechaconstitu: string; // Date in 'DD/MM/YYYY' format
+    numdoc_plantilla: string;
 }
 
-export type CreateUpdateCliente1 = Omit<Cliente, 'idcliente'> 
+export type CreateUpdateCliente1 = Omit<Cliente, 'idcliente' | 'numdoc_plantilla'> 
 
 interface Props {
     clienteId: string
