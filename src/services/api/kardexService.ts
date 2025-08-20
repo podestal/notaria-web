@@ -66,28 +66,9 @@ export const getSingleKardexService = ({ id }: SingleKardexProps) => {
     return new APIClient<Kardex, CreateUpdateKardex>(url)
 }
 
-interface Props {
-    id?: number
-    byCorrelative?: boolean
-    byDocument?: boolean
-    byName?: boolean
-    byNumescritura?: boolean
-}
-
-const getKardexService =({ id, byCorrelative, byDocument, byName, byNumescritura }: Props) => {
+const getKardexService =() => {
 
     let url = '/kardex/'
-    if (id) {
-        url += `${id}/`
-    } else if (byCorrelative) {
-        url += 'kardex_by_correlative/'
-    } else if (byDocument) {
-        url += 'by_document/'
-    } else if (byName) {
-        url += 'by_name/'
-    } else if (byNumescritura) {
-        url += 'by_numescritura/'
-    }
 
 
     return new APIClient<KardexPage, CreateUpdateKardex>(url)

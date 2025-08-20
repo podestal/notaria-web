@@ -11,51 +11,33 @@ const kardexTypes: Record<number, string> = {
     5: 'TES',
 }
 
-const KardexFilters = () => {
-    const bodyRender = useBodyRenderStore(s => s.bodyRender)
-    const [numberValue, setNumberValue] = useState(kardexTypes[bodyRender])
-    const [filterDocument, setFilterDocument] = useState('')
-    const [filterName, setFilterName] = useState('')
-    const [filterNumescritura, setFilterNumescritura] = useState('')
-    const [filterType, setFilterType] = useState<'K' | 'N' | 'D' | 'E' | ''>('')
-    const setCorrelative = useCorrelativeStore(s => s.setCorrelative)
-    const {setKardexFilter, kardexFilter} = useKardexFiltersStore()
-    
+interface Props {
+    setCorrelative: React.Dispatch<React.SetStateAction<string>>
+    setName: React.Dispatch<React.SetStateAction<string>>
+    setDocument: React.Dispatch<React.SetStateAction<string>>
+    setNumescritura: React.Dispatch<React.SetStateAction<string>>
+    correlative: string
+    name: string
+    document: string
+    numescritura: string
+    refetch: () => void
+}
 
-    useEffect(() => {
-        setNumberValue(kardexTypes[bodyRender] || '')
-    }, [bodyRender])
-
-    useEffect(() => {
-        if (kardexFilter.type === '' && kardexFilter.value === '') {
-            setNumberValue(kardexTypes[bodyRender])
-            setFilterDocument('')
-            setFilterName('')
-            setFilterType('')
-        }
-    }, [kardexFilter])
+const KardexFilters = ({ 
+    setCorrelative, 
+    setName, 
+    setDocument, 
+    setNumescritura, 
+    correlative, 
+    name, 
+    document, 
+    numescritura, 
+    refetch }: Props) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        setCorrelative(numberValue)
 
-        let filterValue = ''
-        if (numberValue.length > 3) {
-            filterValue = numberValue
-        } else if (filterDocument) {
-            filterValue = filterDocument
-        } else if (filterName) {
-            filterValue = filterName
-        } else if (filterNumescritura) {
-            filterValue = filterNumescritura
-        } else {
-            return
-        }
-        setKardexFilter({
-            type: filterType,
-            value: filterValue
-        })
-        
+        refetch()
     }
         
 
@@ -68,13 +50,9 @@ const KardexFilters = () => {
             <div className="flex items-center justify-center gap-2">
                 <p>Nº Kardex:</p>
                 <input 
-                    value={numberValue}
+                    value={correlative}
                     onChange={(e) => {
-                        setNumberValue(e.target.value)
-                        setFilterDocument('')
-                        setFilterName('')
-                        setFilterNumescritura('')
-                        setFilterType('K')
+                        setCorrelative(e.target.value)
                     }}
                     type="text" 
                     className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
@@ -82,13 +60,9 @@ const KardexFilters = () => {
             <div className="flex items-center justify-center gap-2">
                 <p>Nro Doc:</p>
                 <input 
-                    value={filterDocument}
+                    value={document}
                     onChange={(e) => {
-                        setFilterDocument(e.target.value)
-                        setFilterName('')
-                        setNumberValue(kardexTypes[bodyRender])
-                        setFilterNumescritura('')
-                        setFilterType('D')
+                        setDocument(e.target.value)
                     }}
                     type="text" 
                     className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
@@ -96,13 +70,9 @@ const KardexFilters = () => {
             <div className="flex items-center justify-center gap-2">
                 <p>Nombre:</p>
                 <input 
-                    value={filterName}
+                    value={name}
                     onChange={(e) => {
-                        setFilterName(e.target.value)
-                        setFilterDocument('')
-                        setNumberValue(kardexTypes[bodyRender])
-                        setFilterNumescritura('')
-                        setFilterType('N')
+                        setName(e.target.value)
                     }}
                     type="text" 
                     className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
@@ -110,13 +80,9 @@ const KardexFilters = () => {
             <div className="flex items-center justify-center gap-2">
                 <p>Nº Escr/Act:</p>
                 <input 
-                    value={filterNumescritura}
+                    value={numescritura}
                     onChange={(e) => {
-                        setFilterNumescritura(e.target.value)
-                        setFilterDocument('')
-                        setFilterName('')
-                        setNumberValue(kardexTypes[bodyRender])
-                        setFilterType('E')
+                        setNumescritura(e.target.value)
                     }}
                     type="text" className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
             </div>

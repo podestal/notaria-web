@@ -1,62 +1,38 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import getKardexService, { KardexPage } from "../../../services/api/kardexService"
-import { FilterInterface } from "../../store/useKardexFiltersStore"
 
 interface Props {
     page: string
     idtipkar: number
     correlative?: string
-    kardexFilter?: FilterInterface
+    name?: string
+    document?: string
+    numescritura?: string
+    access: string
 }
 
-const useGetKardexList = ({ page, idtipkar, kardexFilter }: Props): UseQueryResult<KardexPage, Error> => {
-    let kardexService = getKardexService({ })
+const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescritura, access }: Props): UseQueryResult<KardexPage, Error> => {
+    let kardexService = getKardexService()
 
-    if (kardexFilter && kardexFilter.type) {
-        if (kardexFilter.type === 'K') {
-            kardexService = getKardexService({ byCorrelative: true })
-        }
-        else if (kardexFilter.type === 'N') {
-            kardexService = getKardexService({ byName: true })
-        }
-        else if (kardexFilter.type === 'D') {
-            kardexService = getKardexService({ byDocument: true })
-        } 
-        else if (kardexFilter.type === 'E') {
-            kardexService = getKardexService({ byNumescritura: true })
-        }
+    let params: Record<string, string> = { page, idtipkar: idtipkar.toString() }
+
+    if (correlative) {
+        params.correlative = correlative
     }
-
-    let params = {}
-
-    if (kardexFilter && kardexFilter.type) {
-        if (kardexFilter.type === 'K' && (kardexFilter.value ?? '').length > 3) {
-            params = { correlative: kardexFilter.value, idtipkar: idtipkar.toString(), page }
-        }
-        else if (kardexFilter.type === 'N') {
-            params = { name: kardexFilter.value.toLocaleUpperCase(), idtipkar: idtipkar.toString() }
-        }
-        else if (kardexFilter.type === 'D') {
-            params = { document: kardexFilter.value, idtipkar: idtipkar.toString(), page }
-        } 
-        else if (kardexFilter.type === 'E') {
-            params = { numescritura: kardexFilter.value, idtipkar: idtipkar.toString(), page }
-        }
-    
-    } else if (page && idtipkar) {
-        params = { page, idtipkar: idtipkar.toString() }
+    if (name) {
+        params.name = name
     }
-
-
-    let queryKey = ['kardex list', page, idtipkar]
-    if (kardexFilter && kardexFilter.type) {
-        queryKey = ['kardex list', kardexFilter.type, kardexFilter.value, idtipkar, page]
-    } 
+    if (document) {
+        params.document = document
+    }
     
+    if (numescritura) {
+        params.numescritura = numescritura
+    }
 
     return useQuery({
-        queryKey,
-        queryFn: () => kardexService.get('', params),
+        queryKey: ['kardex list', page, idtipkar],
+        queryFn: () => kardexService.get(access, params),
         refetchOnWindowFocus: false,
         retry: false,
     })
