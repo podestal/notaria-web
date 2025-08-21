@@ -31,6 +31,45 @@ export interface KardexPage {
     results: Kardex[];
 }
 
+export interface KardexROError {
+    idkardex: number
+    kardex: string
+    idtipkar: number
+    tipo_instrumento: string
+    codacto: string
+    numescritura: string
+    fechaescritura: string
+    fechaconclusion: string
+    tipo: string
+    act: string
+    uif_code: string
+    status: string
+    error_type: string
+    error_description: string
+}
+
+export interface KardexRO {
+    errors: KardexROError[]
+    summary: {
+        total_kardex: number
+        total_errors: number
+        error_breakdown: {
+            [key: string]: number
+        }
+    }
+    metadata: {
+        processed_at: string
+        list_type: string
+    }
+}
+
+export interface KardexROPage {
+    count: number
+    next: string | null
+    previous: string | null
+    results: KardexRO
+}
+
 export type CreateUpdateKardex = Omit<Kardex, 
     'kardex' |
     'idkardex' | 
@@ -64,6 +103,11 @@ export const getSingleKardexService = ({ id }: SingleKardexProps) => {
         url += `${id}/`;
     }
     return new APIClient<Kardex, CreateUpdateKardex>(url)
+}
+
+export const getKardexROService = () => {
+    let url = '/kardex/uif-errors/'
+    return new APIClient<KardexROPage, KardexROPage>(url)
 }
 
 const getKardexService =() => {

@@ -1,15 +1,32 @@
 import { useState } from "react"
 import RegistroUifFilters from "./RegistroUifFilters"
+import useAuthStore from "../../../../store/useAuthStore"
+import useGetUifErrors from "../../../../hooks/api/kardex/useGetUifErrors"
 
 
 const RegistrosUifMain = () => {
 
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
-  const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
+  const access = useAuthStore(s => s.access_token) || ''
+
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date())
+  const [dateTo, setDateTo] = useState<Date | undefined>(new Date())
   const [cronologico, setCronologico] = useState<string>('')
+  const [listType, setListType] = useState<string>('errors')
+  const [page, setPage] = useState<number>(1)
+
+  const { data: uifErrors, isLoading, isError, error, isSuccess, refetch } = useGetUifErrors({ access, page, listType, dateFrom, dateTo, cronologico })
+
+
+  if (isLoading) return <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">Cargando...</div>
+
+  if (isError) return <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">Error al cargar los datos</div>
+
+  if (isSuccess)
+   
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
+      <>{console.log(uifErrors)}</>
       <RegistroUifFilters 
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
@@ -17,6 +34,7 @@ const RegistrosUifMain = () => {
         setDateTo={setDateTo}
         cronologico={cronologico}
         setCronologico={setCronologico}
+        refetch={refetch}
       />
     </div>
   )
