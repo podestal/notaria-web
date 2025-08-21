@@ -11,7 +11,7 @@ interface Props {
     dateTo?: Date
 }
 
-const useGetLibros = ({ access, page, cliente, numDoc, cronologico, dateFrom, dateTo }: Props): UseQueryResult<LibrosPage, Error> => {
+const   useGetLibros = ({ access, page, cliente, numDoc, cronologico, dateFrom, dateTo }: Props): UseQueryResult<LibrosPage, Error> => {
     const librosService = getLibrosService();
     let params: { page: string; empresa?: string; document?: string; year?: string; num_libro?: string; dateFrom?: string; dateTo?: string } = { page: page.toString() };
     if (cliente) params = { ...params, empresa: cliente };
