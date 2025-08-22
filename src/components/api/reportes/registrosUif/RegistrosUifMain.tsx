@@ -9,8 +9,8 @@ const RegistrosUifMain = () => {
 
   const access = useAuthStore(s => s.access_token) || ''
 
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date())
-  const [dateTo, setDateTo] = useState<Date | undefined>(new Date())
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
   const [cronologico, setCronologico] = useState<string>('')
   const [listType, setListType] = useState<string>('errors')
   const [page, setPage] = useState<number>(1)
@@ -22,7 +22,7 @@ const RegistrosUifMain = () => {
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-      <>{console.log(listType)}</>
+      <>{console.log(uifErrors)}</>
       <RegistroUifFilters 
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
@@ -37,11 +37,11 @@ const RegistrosUifMain = () => {
         {isError && <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg my-10 text-black text-center">Error al cargar los datos</div>}
 
         {isSuccess &&
-      <RegistroUifBody 
-        listType={listType}
-        setListType={setListType}
-        kardexRO={uifErrors.results}
-      />}
+        <RegistroUifBody 
+          listType={listType}
+          setListType={setListType}
+          kardexRO={uifErrors.results}
+        />}
     </div>
   )
 }

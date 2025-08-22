@@ -34,7 +34,7 @@ const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescr
         queryKey: ['kardex list', page, idtipkar],
         queryFn: () => kardexService.get(access, params),
         refetchOnWindowFocus: false,
-        retry: false,
+        
     })
 }
 

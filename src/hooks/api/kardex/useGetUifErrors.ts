@@ -36,6 +36,7 @@ const useGetUifErrors = ({ dateFrom, dateTo, cronologico, access, page, listType
     return useQuery({
         queryKey: ['kardex-ro', page, listType],
         queryFn: () => kardexROService.get(access, params),
+        enabled: !!dateFrom && !!dateTo 
     })
 }
 
