@@ -2,6 +2,7 @@ import { useState } from "react"
 import RegistroUifFilters from "./RegistroUifFilters"
 import useAuthStore from "../../../../store/useAuthStore"
 import useGetUifErrors from "../../../../hooks/api/kardex/useGetUifErrors"
+import RegistroUifBody from "./RegistroUifBody"
 
 
 const RegistrosUifMain = () => {
@@ -36,6 +37,7 @@ const RegistrosUifMain = () => {
         setCronologico={setCronologico}
         refetch={refetch}
       />
+      <RegistroUifBody />
     </div>
   )
 }
