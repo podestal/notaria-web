@@ -30,6 +30,29 @@ export interface KardexPage {
     previous: string | null;
     results: Kardex[];
 }
+export interface KardexError {
+    idkardex: number
+    kardex: string
+    act: string
+    status: string
+    error_type: string
+    error_description: string
+}
+
+export interface KardexROValid {
+    idkardex: number
+    kardex: string
+    act: string
+    tipo_moneda: string
+    tipo_cambio: number
+    patrimonial: number
+    en_dolares: number
+    // Additional fields that might be useful
+    codacto: string
+    uif_code: string
+    fecha_conclusion: string
+    tipo_instrumento: string
+}
 
 export interface KardexROError {
     idkardex: number
@@ -49,7 +72,9 @@ export interface KardexROError {
 }
 
 export interface KardexRO {
-    errors: KardexROError[]
+    lista_errores: KardexError[]
+    lista_kardex_ro: KardexROValid[]
+    lista_kardex_no_envian: KardexROError[]
     summary: {
         total_kardex: number
         total_errors: number

@@ -12,10 +12,10 @@ const RegistrosUifMain = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
   const [cronologico, setCronologico] = useState<string>('')
-  const [listType, setListType] = useState<string>('errors')
+  // const [listType, setListType] = useState<string>('errors')
   const [page, setPage] = useState<number>(1)
 
-  const { data: uifErrors, isLoading, isError, error, isSuccess, refetch } = useGetUifErrors({ access, page, listType, dateFrom, dateTo, cronologico })
+  const { data: uifErrors, isLoading, isError, error, isSuccess, refetch } = useGetUifErrors({ access, page, dateFrom, dateTo, cronologico })
 
 
    
@@ -34,12 +34,10 @@ const RegistrosUifMain = () => {
       />
         {isLoading && <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg my-10 text-black text-center">Cargando...</div>}
 
-        {isError && <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg my-10 text-black text-center">Error al cargar los datos</div>}
+        {isError && <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg my-10 text-black text-center">Error al cargar los datos {error?.message}</div>}
 
         {isSuccess &&
         <RegistroUifBody 
-          listType={listType}
-          setListType={setListType}
           kardexRO={uifErrors.results}
         />}
     </div>

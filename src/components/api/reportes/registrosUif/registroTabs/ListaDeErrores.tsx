@@ -1,11 +1,10 @@
 import { useState } from "react"
-import { KardexROError } from "../../../../../services/api/kardexService"
+import { KardexError } from "../../../../../services/api/kardexService"
 import TopModal from "../../../../ui/TopModal"
-import KardexForm from "../../../kardex/KardexForm"
 import PreKardexForm from "../PreKardexForm"
 
 interface Props {
-    kardexErrors: KardexROError[]
+    kardexErrors: KardexError[]
 }
 
 const ListaDeErrores = ({
@@ -31,18 +30,9 @@ const ListaDeErrores = ({
                             setKardexId(error.idkardex)
                         }}
                         className="text-blue-700 hover:text-blue-400 cursor-pointer transition-all duration-300">{error.kardex}</p>
-                    <p className="col-span-2">{error.act}</p>
-                    <p className="col-span-5">{error.error_description}</p>
+                    <p className="col-span-2 text-left">{error.act}</p>
+                    <p className="col-span-5 text-left">{error.error_description}</p>
                 </div>
-                {/* <TopModal
-                    isOpen={isOpen}
-                    onClose={() => setIsOpen(false)}
-                >
-                    <PreKardexForm
-                        isOpen={isOpen}
-                        kardexId={error.idkardex}
-                    />
-                </TopModal> */}
             </div>
 
             
