@@ -10,6 +10,7 @@ const ListaDeKardex = ({
 
   return (
     <div>
+        <>{console.log('kardexErrors', kardexErrors)}</>
         <div className="grid grid-cols-7 gap-4 justify-center items-center text-center text-xs font-semibold p-2 my-4 mx-6">
             <p>Kardex</p>
             <p className="col-span-2">Acto</p>
@@ -20,8 +21,13 @@ const ListaDeKardex = ({
         </div>
         {kardexErrors?.map((kardex) => (
             <div key={kardex.idkardex}>
-                <div className="grid grid-cols-7 gap-4 justify-center items-center text-center text-xs font-semibold p-2 my-4 mx-6">
+                <div className="grid grid-cols-7 gap-4 justify-center items-center text-center text-xs p-2 my-4 mx-6">
                     <p>{kardex.kardex}</p>
+                    <p className="col-span-2">{kardex.act}</p>
+                    <p>{kardex.tipo_moneda}</p>
+                    <p>0</p>
+                    <p>S/.{kardex.patrimonial}</p>
+                    <p>$0.00</p>
                 </div>
             </div>
         ))}
