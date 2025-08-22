@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 interface Tab {
     id: string;
@@ -10,11 +10,23 @@ interface Tab {
 
 interface Props {
     tabs: Tab[];
+    setFilter?: React.Dispatch<React.SetStateAction<string>>
+    initialActiveTab?: string
 }
 
-const KardexFormTabs = ({ tabs }: Props) => {
+const KardexFormTabs = ({ 
+    tabs, 
+    setFilter,
+    initialActiveTab
+}: Props) => {
 
-    const [activeTab, setActiveTab] = useState(tabs[0]?.id ?? '')
+    const [activeTab, setActiveTab] = useState(initialActiveTab || (tabs[0]?.id ?? ''))
+
+    useEffect(() => {
+        if (!initialActiveTab && setFilter) {
+            setFilter(tabs[0]?.id ?? '')
+        }
+    }, [tabs, initialActiveTab, setFilter])
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -22,7 +34,11 @@ const KardexFormTabs = ({ tabs }: Props) => {
             {tabs.map((tab) => (
                 <motion.button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => {
+                        setFilter &&setFilter(tab.id)
+                        setActiveTab(tab.id)
+                        
+                    }}
                     disabled={tab.notAllowed}
                     className={`px-4 py-2 rounded-full font-medium text-sm transition-all cursor-pointer
                     ${tab.notAllowed && 'opacity-50 cursor-not-allowed'}

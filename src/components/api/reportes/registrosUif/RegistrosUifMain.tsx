@@ -18,16 +18,11 @@ const RegistrosUifMain = () => {
   const { data: uifErrors, isLoading, isError, error, isSuccess, refetch } = useGetUifErrors({ access, page, listType, dateFrom, dateTo, cronologico })
 
 
-  if (isLoading) return <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">Cargando...</div>
-
-  if (isError) return <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">Error al cargar los datos</div>
-
-  if (isSuccess)
    
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-      <>{console.log(uifErrors)}</>
+      <>{console.log(listType)}</>
       <RegistroUifFilters 
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
@@ -37,7 +32,16 @@ const RegistrosUifMain = () => {
         setCronologico={setCronologico}
         refetch={refetch}
       />
-      <RegistroUifBody />
+        {isLoading && <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg my-10 text-black text-center">Cargando...</div>}
+
+        {isError && <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg my-10 text-black text-center">Error al cargar los datos</div>}
+
+        {isSuccess &&
+      <RegistroUifBody 
+        listType={listType}
+        setListType={setListType}
+        kardexRO={uifErrors.results}
+      />}
     </div>
   )
 }

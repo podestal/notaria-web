@@ -8,14 +8,14 @@ interface Props {
     cronologico?: string
     access: string
     page: number
-    listType: string
+    listType?: string
 }
 
 const useGetUifErrors = ({ dateFrom, dateTo, cronologico, access, page, listType }: Props): UseQueryResult<KardexROPage, Error> => {
     
     const kardexROService = getKardexROService()
 
-    let params: Record<string, string> = { page: page.toString(), listType }
+    let params: Record<string, string> = { page: page.toString() }
 
     if (dateFrom) {
         params.initialDate = moment(dateFrom).format('YYYY-MM-DD')
@@ -26,6 +26,10 @@ const useGetUifErrors = ({ dateFrom, dateTo, cronologico, access, page, listType
 
     if (cronologico) {
         params.cronologico = cronologico
+    }
+
+    if (listType) {
+        params.listType = listType
     }
     
 
