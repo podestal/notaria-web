@@ -4,6 +4,7 @@ import SingleSelect from "../../../ui/SingleSelect";
 import { Loader } from "lucide-react";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { KardexROPage } from "../../../../services/api/kardexService";
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 
 interface Props {
     dateFrom: Date | undefined;
@@ -26,9 +27,18 @@ const RegistroUifFilters = ({
 }: Props) => {
 
     const [loading, setLoading] = useState(false)
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
 
     const handleGenerateRO = () => {
+
+        if (!dateFrom || !dateTo) {
+            setMessage('Por favor, selecciona una fecha de inicio y fin')
+            setShow(true)
+            setType('error')
+            return
+        }
+
         setLoading(true)
         refetch().finally(() => {
             setLoading(false)
