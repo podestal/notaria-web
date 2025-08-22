@@ -19,7 +19,6 @@ const RegistroUifBody = ({
        <RegistroUifSummary />
        <KardexFormTabs 
             tabs={[
-                // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                 { id: 'errors', label: 'Lista de Errores', content: <ListaDeErrores kardexErrors={kardexRO.errors} /> },
                 { id: 'ro', label: 'Lista de Kardex (RO)', content: <p>Lista de Kardex (RO)</p> },
                 { id: 'not_ro', label: 'Lista de Kardex que no envían', content: <p>Lista de Kardex que no envían</p> },

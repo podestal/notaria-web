@@ -44,8 +44,6 @@ const KardexMain = () => {
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-      <>{console.log('correlative', correlative)}</>
-      <>{console.log('bodyRender', bodyRender)}</>
         {bodyRender !== 0 
         ?
         <>

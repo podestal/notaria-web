@@ -37,7 +37,7 @@ interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
     kardex?: Kardex | null
     setKardex?: React.Dispatch<React.SetStateAction<Kardex | null>>
-    createKardex: UseMutationResult<Kardex, Error, CreateKardexData>
+    createKardex?: UseMutationResult<Kardex, Error, CreateKardexData>
     updateKardex?: UseMutationResult<Kardex, Error, UpdateKardexData>
 }
 
