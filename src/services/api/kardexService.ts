@@ -54,27 +54,20 @@ export interface KardexROValid {
     tipo_instrumento: string
 }
 
-export interface KardexROError {
+export interface KardexNoEnvian {
     idkardex: number
     kardex: string
-    idtipkar: number
-    tipo_instrumento: string
-    codacto: string
-    numescritura: string
-    fechaescritura: string
-    fechaconclusion: string
-    tipo: string
     act: string
-    uif_code: string
+    tipo_moneda: string
+    patrimonial: number
     status: string
-    error_type: string
-    error_description: string
+    reason: string
 }
 
 export interface KardexRO {
     lista_errores: KardexError[]
     lista_kardex_ro: KardexROValid[]
-    lista_kardex_no_envian: KardexROError[]
+    lista_kardex_no_envian: KardexNoEnvian[]
     summary: {
         total_kardex: number
         total_errors: number
