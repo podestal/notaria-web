@@ -3,14 +3,15 @@ import LibrosCard from "./LibrosCard"
 
 interface Libros {
     libros: Libro[]
+    readyOnly?: boolean
 }
 
-const LibrosTableBody = ({ libros }: Libros) => {
+const LibrosTableBody = ({ libros, readyOnly }: Libros) => {
   return (
     <>
         {libros.length > 0 ? (
             libros.map(libro => (
-                <LibrosCard key={libro.id} libro={libro} />
+                <LibrosCard key={libro.id} libro={libro} readyOnly={readyOnly} />
             ))
         ) : (
             <p>No hay libros disponibles</p>

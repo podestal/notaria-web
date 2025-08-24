@@ -29,7 +29,7 @@ import Protestos from "../components/api/reportes/cronologicos/reportes/Protesto
 import ActasProtestos from "../components/api/reportes/cronologicos/reportes/ActasProtestos";
 import CamaraDeComercio from "../components/api/reportes/cronologicos/reportes/CamaraDeComercio";
 import CartasNotariales from "../components/api/reportes/cronologicos/reportes/cartasNotariales/CartasNotariales";
-import AperturaLibros from "../components/api/reportes/cronologicos/reportes/AperturaLibros";
+import AperturaLibros from "../components/api/reportes/cronologicos/reportes/aperturaLibro/AperturaLibros";
 import PermisoViajes from "../components/api/reportes/cronologicos/reportes/PermisoViajes";
 import Poderes from "../components/api/reportes/cronologicos/reportes/Poderes";
 import SupervivenciaCapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaCapaz";

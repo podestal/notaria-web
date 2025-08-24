@@ -1,7 +1,9 @@
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import Calendar from "../../../ui/Calendar"
-import { IngresoCartasPage } from "../../../../services/api/extraprotocolares/ingresoCartas"
-import { Sheet, FileText } from "lucide-react"
+import { Sheet, FileText, Loader2 } from "lucide-react"
+import { useState } from "react"
+import axios from "axios"
+import useAuthStore from "../../../../store/useAuthStore"
 
 
 
@@ -10,9 +12,12 @@ interface Props {
     dateTo: Date | undefined
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>
-    refetch:(options?: RefetchOptions) => Promise<QueryObserverResult<IngresoCartasPage, Error>>
+    refetch:(options?: RefetchOptions) => Promise<QueryObserverResult<any, Error>>
     generatesWord: boolean
     generatesExcel: boolean
+    url: string
+    params: Record<string, string>
+    name: string
 }
 
 const ExtraProtocolaresHeader = ({ 
@@ -22,13 +27,92 @@ const ExtraProtocolaresHeader = ({
     setDateTo, 
     refetch,
     generatesWord,
-    generatesExcel
+    generatesExcel,
+    url,
+    params,
+    name
 }: Props) => {
+    const access = useAuthStore(s => s.access_token) || ''
+    const apiURL = import.meta.env.VITE_API_URL
+    const [loadingWord, setLoadingWord] = useState(false)
+    const [loadingExcel, setLoadingExcel] = useState(false)
+    const [loading, setLoading] = useState(false)
 
 
     const handleFilter = () => {
-        console.log('refetching')
-        refetch()
+        if (loading) return;
+        setLoading(true)
+        refetch().finally(() => {
+            setLoading(false)
+        })
+    }
+
+    const handleGenerateWord = async () => {
+        if (loadingWord) return; // Prevent multiple clicks during loading
+        
+        setLoadingWord(true);
+        
+        try {
+          const isWindows = /Windows/.test(navigator.userAgent);
+          const mode = isWindows ? 'open' : 'download';
+  
+          console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
+          
+          const response = await axios.get(
+            `${apiURL}${url}/`,
+            {
+              responseType: mode === 'download' ? 'blob' : 'json',
+              headers: {
+                'Authorization': `JWT ${access}`,
+              },
+              params: {
+                ...params
+              }
+            }
+          );
+  
+          if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
+            // Windows: Open in Word using the secure backend URL
+            const wordUrl = `ms-word:ofe|u|${response.data.url}`;
+            window.open(wordUrl, '_blank');
+            return;
+          } else {
+            // Download mode (iOS, Mac, Linux, or fallback)
+            const blob = new Blob([response.data], {
+              type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            });
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            
+            link.download = name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+          }
+  
+        } catch (error) {
+          const status = (error as any)?.status ?? (error as any)?.response?.status;
+        
+        //   if (status === 404) {
+        //       setOpenExplanation(true);
+        //       setExplanationMessage('El documento no ha sido creado, por favor, genere el documento y vuelva a intentarlo.')
+        //   } else if (status === 409) {
+        //       setOpenExplanation(true);
+        //       setExplanationMessage('El documento ya ha sido creado, por favor, pruebe con ver el documento.')
+        //   }
+        } finally {
+          setLoadingWord(false);
+        }
+    }
+
+    const handleGenerateExcel = () => {
+        console.log('generating excel')
+        setLoadingExcel(true)
+        setTimeout(() => {
+            setLoadingExcel(false)
+        }, 1000)
     }
 
   return (
@@ -44,18 +128,28 @@ const ExtraProtocolaresHeader = ({
         <div>
             <button 
                 onClick={handleFilter}
-                className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
+                className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer"
+                disabled={loading}
+            >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Buscar'}
+            </button>
         </div>
         <div className="flex justify-center items-center gap-8">
             <div 
-                className="flex flex-col items-center justify-center w-20 h-20 bg-white shadow-md rounded-lg mt-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                className="flex flex-col items-center justify-center w-20 h-20 bg-white shadow-md rounded-lg mt-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={handleGenerateWord}
+            >
                 <FileText className="w-6 h-6 text-blue-500 hover:text-blue-700 cursor-pointer mb-2" />
-                <p className="text-[10px] text-center text-gray-700">Word</p>
-            </div>
+                {!loadingWord && <p className="text-[10px] text-center text-gray-700">Word</p>}
+                {loadingWord && <p className="text-[10px] text-center text-gray-700 animate-pulse">Cargando...</p>}
+            </div>  
             <div 
-                className="flex flex-col items-center justify-center w-20 h-20 bg-white shadow-md rounded-lg mt-4 cursor-pointer hover:bg-gray-100 transition-colors">
+                className="flex flex-col items-center justify-center w-20 h-20 bg-white shadow-md rounded-lg mt-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={handleGenerateExcel}
+            >
                 <Sheet className="w-6 h-6 text-green-500 hover:text-green-700 cursor-pointer mb-2" />
-                <p className="text-[10px] text-center text-gray-700">Excel</p>
+                {!loadingExcel && <p className="text-[10px] text-center text-gray-700">Excel</p>}
+                {loadingExcel && <p className="text-[10px] text-center text-gray-700 animate-pulse">Cargando...</p>}
             </div>
         </div>
     </div>
