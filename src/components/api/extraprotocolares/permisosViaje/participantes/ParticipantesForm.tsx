@@ -29,17 +29,16 @@ interface Props {
         genero: string;
         nacionalidad: string;
     }
+    document: string
 }
 
-const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo }: Props) => {
+const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo, document }: Props) => {
 
     console.log('contratanteInfo ->',contratanteInfo);
     
 
     const access = useAuthStore(s => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
-
-    const [document, setDocument] = useState('');
     const [loading, setLoading] = useState(false);
 
     // Contratante Viaje
@@ -87,6 +86,9 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         }
 
         setLoading(true);
+
+        console.log('document ->', document);
+        
 
         if (createContratante) {
             createContratante.mutate({

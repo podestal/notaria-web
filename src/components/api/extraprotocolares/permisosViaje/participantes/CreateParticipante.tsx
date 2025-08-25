@@ -14,6 +14,7 @@ interface Props {
 const CreateParticipante = ({ viajeId }: Props) => {
 
     const [open, setOpen] = useState(false);
+    const [document, setDocument] = useState('');
     const createContratante = useCreateContratante({ viaje_id: viajeId });
     const [contratanteInfo, setContratanteInfo] = useState({
         apePaterno: '',
@@ -50,13 +51,18 @@ const CreateParticipante = ({ viajeId }: Props) => {
         >
             <div className="p-4">
                 <h2 className="text-2xl font-semibold mb-6 text-center">Nuevo Participante</h2>
-                <PreParticipanteForm setContratanteInfo={setContratanteInfo as React.Dispatch<React.SetStateAction<any>>} />
+                <PreParticipanteForm 
+                    setContratanteInfo={setContratanteInfo as React.Dispatch<React.SetStateAction<any>>} 
+                    setDocument={setDocument}
+                    document={document}
+                />
                 <ParticipantesForm 
                    createContratante={createContratante}
                    idViaje={viajeId}
                    setOpen={setOpen}
                    ubigeos={ubigeos}
                    nacionalidades={nacionalidades}
+                   document={document}
                    contratanteInfo={{
                      ...contratanteInfo,
                      estadoCivil: contratanteInfo.estadoCivil === '' ? 0 : Number(contratanteInfo.estadoCivil)

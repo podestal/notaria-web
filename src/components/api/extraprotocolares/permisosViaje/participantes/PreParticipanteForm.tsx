@@ -15,12 +15,13 @@ interface Props {
         genero: string;
         nacionalidad: string;
     }>>
+    setDocument: React.Dispatch<React.SetStateAction<string>>
+    document: string
 }
 
-const PreParticipanteForm = ({ setContratanteInfo }: Props) => {
+const PreParticipanteForm = ({ setContratanteInfo, setDocument, document }: Props) => {
 
     const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1);
-    const [document, setDocument] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleClienteLookup = () => {
@@ -44,9 +45,6 @@ const PreParticipanteForm = ({ setContratanteInfo }: Props) => {
                 });
             } else {
                 console.log('Cliente no encontrado, creando nuevo cliente')
-                // setCliente1(null)
-                // setShowContratanteForm(false)
-                // setShowClienteForm(true)
             }
         }).catch(error => {
             console.log('Error al buscar el cliente:', error);
