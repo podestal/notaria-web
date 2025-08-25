@@ -8,9 +8,14 @@ import { CreateLibroData } from "../../../../hooks/api/extraprotocolares/apertur
 interface Props {
     libro?: Libro
     createLibro?: UseMutationResult<Libro, Error, CreateLibroData>
+    updateLibro?: UseMutationResult<Libro, Error, UpdateLibroData>
 }
 
-const PreLibroForm = ({ libro, createLibro }: Props) => {
+const PreLibroForm = ({ 
+  libro, 
+  createLibro, 
+  updateLibro 
+}: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { data: tipoLibros, isLoading, isError, error, isSuccess } = useGetTipoLibros({ access })
@@ -27,6 +32,7 @@ const PreLibroForm = ({ libro, createLibro }: Props) => {
             libro={libro}
             tipoLibros={tipoLibros}
             createLibro={createLibro}
+            updateLibro={updateLibro}
         />
     </>
   )

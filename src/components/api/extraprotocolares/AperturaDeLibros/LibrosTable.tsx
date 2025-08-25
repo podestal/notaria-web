@@ -5,13 +5,14 @@ import LibrosTableHeader from "./LibrosTableHeader"
 interface Libros {
     libros: Libro[]
     readyOnly?: boolean
+    page: number
 }
 
-const LibrosTable = ({ libros, readyOnly }: Libros) => {
+const LibrosTable = ({ libros, readyOnly, page }: Libros) => {
   return (
     <>
         <LibrosTableHeader />
-        <LibrosTableBody libros={libros} readyOnly={readyOnly} />
+        <LibrosTableBody libros={libros} readyOnly={readyOnly} page={page} />
     </>
   )
 }

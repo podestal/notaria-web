@@ -18,15 +18,17 @@ import { UseMutationResult } from "@tanstack/react-query";
 import { CreateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useCreateLibro";
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
+import { UpdateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useUpdateLibro";
 
 
 interface Props {
     libro?: Libro
     tipoLibros: TipoLibro[]
     createLibro?: UseMutationResult<Libro, Error, CreateLibroData>
+    updateLibro?: UseMutationResult<Libro, Error, UpdateLibroData>
 }
 
-const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
+const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType} = useNotificationsStore()
@@ -159,7 +161,56 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
             }
         } )
 
-        console.log('handleSave');
+        updateLibro && libro && updateLibro.mutate({
+            access: access,
+            libro: {
+                numlibro: libro.numlibro,
+                ano: libro.ano,
+                fecing: moment(fechaIngreso).format('YYYY-MM-DD'),
+                tipper: selectedTipoPersona === 1 ? 'N' : 'J',
+                apepat: apellidoPaterno,
+                apemat: apellidoMaterno,
+                prinom: primerNombre,
+                segnom: segundoNombre,
+                ruc: selectedTipoPersona === 1 ? '' : document.startsWith('CODJU') ? '' : document,
+                domicilio: direccion,
+                coddis: ubigeo || '',
+                empresa: razonSocial,
+                domfiscal: domicilioFiscal,
+                idtiplib: parseInt(selectedTipoLibro?.id || '0'),
+                descritiplib: selectedTipoLibro?.label || '',
+                idlegal: selectedTipoLegal,
+                folio: numFojas,
+                idtipfol: tipoFolio,
+                detalle: detalle,
+                idnotario: 1,
+                solicitante: solicitanteName,
+                comentario: comentario,
+                feclegal: '',
+                comentario2: '',
+                dni: solicitanteDocument,
+                idusuario: user?.idusuario || 0,
+                idnlibro: numeroLibro,
+                codclie: codeCliente,
+                flag: 1,
+                numdoc_plantilla: document.startsWith('CODJU') ? document : '',
+                estadosisgen: 0,
+            }
+        }, {
+            onSuccess: res => {
+                setMessage('Libro actualizado correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: () => {
+                setMessage('Error al actualizar el libro')
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
 
         
     }

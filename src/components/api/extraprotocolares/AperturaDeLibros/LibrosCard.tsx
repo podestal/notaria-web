@@ -7,9 +7,10 @@ import UpdateLibro from "./UpdateLibro";
 interface Props {
     libro: Libro
     readyOnly?: boolean
+    page: number
 }
 
-const LibrosCard = ({ libro, readyOnly }: Props) => {
+const LibrosCard = ({ libro, readyOnly, page }: Props) => {
 
     const [open, setOpen] = useState(false);
 
@@ -36,7 +37,7 @@ const LibrosCard = ({ libro, readyOnly }: Props) => {
             isOpen={open}
             onClose={() => setOpen(false)}
         >
-            <UpdateLibro libro={libro} />
+            <UpdateLibro libro={libro} page={page} />
         </TopModal>
     </>
   )
