@@ -50,14 +50,17 @@ const CreateParticipante = ({ viajeId }: Props) => {
         >
             <div className="p-4">
                 <h2 className="text-2xl font-semibold mb-6 text-center">Nuevo Participante</h2>
-                <PreParticipanteForm setContratanteInfo={setContratanteInfo} />
+                <PreParticipanteForm setContratanteInfo={setContratanteInfo as React.Dispatch<React.SetStateAction<any>>} />
                 <ParticipantesForm 
                    createContratante={createContratante}
                    idViaje={viajeId}
                    setOpen={setOpen}
                    ubigeos={ubigeos}
                    nacionalidades={nacionalidades}
-                   contratanteInfo={contratanteInfo}
+                   contratanteInfo={{
+                     ...contratanteInfo,
+                     estadoCivil: contratanteInfo.estadoCivil === '' ? 0 : Number(contratanteInfo.estadoCivil)
+                   }}
                 />
             </div>
         </TopModal>

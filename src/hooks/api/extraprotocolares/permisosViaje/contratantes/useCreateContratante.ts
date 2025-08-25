@@ -19,6 +19,7 @@ const useCreateContratante = ({ viaje_id }: Props): UseMutationResult<ViajeContr
         onSuccess: (res) => {
             console.log('Contratante creado exitosamente:', res);
             queryClient.invalidateQueries({ queryKey: ['viaje_contratantes', viaje_id] });
+            queryClient.invalidateQueries({ queryKey:  ['permisosViaje', 1]})
         },
         onError: (error) => {
             console.error('Error al crear el contratante:', error);

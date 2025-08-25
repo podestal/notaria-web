@@ -167,6 +167,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro }: Props) => {
   return (
     <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Apertura de Libros</h2>
+        <>{console.log('libro', libro)}</>
         <div className="grid grid-cols-8 gap-2">
             <button 
                 onClick={handleSave}
