@@ -56,7 +56,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
 
     // Datos del Libro
     const [selectedTipoLibro, setSelectedTipoLibro] = useState<{id: string, label: string} | null>(libro?.idtiplib ? {id: libro.idtiplib.toString(), label: tipoLibros.find(tl => tl.idtiplib === libro.idtiplib)?.destiplib || ''} : null);
-    const [selectedTipoLegal, setSelectedTipoLegal] = useState(libro?.idlegal || 0);
+    const [selectedTipoLegal, setSelectedTipoLegal] = useState(libro?.idlegal || 1);
     const [numFojas, setNumFojas] = useState(libro?.folio || '');
     const [tipoFolio, setTipoFolio] = useState(libro?.idtipfol || 1);
     const [detalle, setDetalle] = useState(libro?.detalle || '');
@@ -86,21 +86,33 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
 
         if (!numeroLibro) {
             setNumLibroError('Seleccione un tipo de libro')
+            setMessage('Seleccione un tipo de libro')
+            setShow(true)
+            setType('error')
             return
         }
 
         if (!selectedTipoLibro) {
             setTipoLibroError('Seleccione un tipo de libro')
+            setMessage('Seleccione un tipo de libro')
+            setShow(true)
+            setType('error')
             return
         }
 
         if (!numFojas) {
             setNumFojasError('Ingrese el número de fojas')
+            setMessage('Ingrese el número de fojas')
+            setShow(true)
+            setType('error')
             return
         }
 
         if (!solicitanteName) {
             setSolicitanteNameError('Ingrese el nombre del solicitante')
+            setMessage('Ingrese el nombre del solicitante')
+            setShow(true)
+            setType('error')
             return
         }
 
