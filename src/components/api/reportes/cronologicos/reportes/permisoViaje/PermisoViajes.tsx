@@ -37,12 +37,12 @@ const PermisoViajes = () => {
           refetch={refetch}
           generatesWord={false}
           generatesExcel={false}
-          url='ingreso_cartas/reporte'
+          url='permi_viaje/reporte'
           params={{
             fechade: moment(dateFrom).format('DD/MM/YYYY') || '',
             fechaa: moment(dateTo).format('DD/MM/YYYY') || '',
           }}
-          name='reporte_cartas'
+          name='reporte_permisos_viaje'
         />
         <PermisosTable
           permisosPage={permisoViajesPage}
@@ -54,6 +54,8 @@ const PermisoViajes = () => {
           setPage={setPage}
           itemsCount={permisoViajesPage.count}
         />
+
+        <>{console.log('permisoViajesPage', permisoViajesPage)}</>
         {/* 
         <CartasNotarialesTable 
           ingresoCartas={cartasPage.results}

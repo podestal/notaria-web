@@ -93,26 +93,66 @@ const ExtraProtocolaresHeader = ({
           }
   
         } catch (error) {
-          const status = (error as any)?.status ?? (error as any)?.response?.status;
+          console.log('error', error)
         
-        //   if (status === 404) {
-        //       setOpenExplanation(true);
-        //       setExplanationMessage('El documento no ha sido creado, por favor, genere el documento y vuelva a intentarlo.')
-        //   } else if (status === 409) {
-        //       setOpenExplanation(true);
-        //       setExplanationMessage('El documento ya ha sido creado, por favor, pruebe con ver el documento.')
-        //   }
         } finally {
           setLoadingWord(false);
         }
     }
 
-    const handleGenerateExcel = () => {
-        console.log('generating excel')
-        setLoadingExcel(true)
-        setTimeout(() => {
-            setLoadingExcel(false)
-        }, 1000)
+    const handleGenerateExcel = async () => {
+      if (loadingExcel) return; // Prevent multiple clicks during loading
+        
+      setLoadingExcel(true);
+      
+      try {
+        const isWindows = /Windows/.test(navigator.userAgent);
+        const mode = isWindows ? 'open' : 'download';
+
+        console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
+        
+        const response = await axios.get(
+          `${apiURL}${url}/`,
+          {
+            responseType: mode === 'download' ? 'blob' : 'json',
+            headers: {
+              'Authorization': `JWT ${access}`,
+            },
+            params: {
+              ...params,
+              tipo_documento: 'EXCEL'
+            }
+          }
+        );
+
+        if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
+          // Windows: Open in Excel using the secure backend URL
+          const excelUrl = `ms-excel:ofe|u|${response.data.url}`;
+          window.open(excelUrl, '_blank');
+          return;
+        } else {
+          // Download mode (iOS, Mac, Linux, or fallback)
+          const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          });
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          
+          link.download = `${name}.xlsx`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+        }
+
+      } catch (error) {
+        console.log('error', error)
+      
+      } finally {
+        setLoadingExcel(false);
+      }
+        
     }
 
   return (
