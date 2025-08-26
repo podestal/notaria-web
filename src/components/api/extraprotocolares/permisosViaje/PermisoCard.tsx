@@ -6,9 +6,10 @@ import UpdatePermiso from "./UpdatePermiso";
 
 interface Props {
     permisoViaje: PermisoViaje
+    readyOnly?: boolean
 }
 
-const PermisoCard = ({ permisoViaje }: Props) => {
+const PermisoCard = ({ permisoViaje, readyOnly }: Props) => {
 
     const [open, setOpen] = useState(false);
     
@@ -19,7 +20,10 @@ const PermisoCard = ({ permisoViaje }: Props) => {
         className="grid grid-cols-9 gap-4 p-2 my-4 mx-6 text-xs"
       >
         <p 
-            onClick={() => setOpen(true)}
+            onClick={() => {
+                if (readyOnly) return;
+                setOpen(true)
+            }}
             className="text-center text-blue-600 cursor-pointer hover:text-blue-500">{permisoViaje.num_formu}</p>
         <p className="text-center">{permisoViaje.num_kardex}</p>
         <div className="col-span-2 text-center">

@@ -3,9 +3,10 @@ import { PermisoViajePage } from "../../../../services/api/extraprotocolares/per
 
 interface Props {
    permisosPage: PermisoViajePage
+   readyOnly?: boolean
 }
 
-const PermisosTableBody = ({ permisosPage }: Props) => {
+const PermisosTableBody = ({ permisosPage, readyOnly }: Props) => {
 
   return (
     <>
@@ -17,6 +18,7 @@ const PermisosTableBody = ({ permisosPage }: Props) => {
           <PermisoCard 
             key={permiso.num_formu} 
             permisoViaje={permiso} 
+            readyOnly={readyOnly}
           />
         ))}
         </>

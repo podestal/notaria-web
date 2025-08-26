@@ -4,13 +4,14 @@ import PermisosTableHeader from "./PermisosTableHeader"
 
 interface Props {
    permisosPage: PermisoViajePage
+   readyOnly?: boolean
 }
 
-const PermisosTable = ({ permisosPage }: Props) => {
+const PermisosTable = ({ permisosPage, readyOnly }: Props) => {
   return (
     <>
         <PermisosTableHeader />
-        <PermisosTableBody permisosPage={permisosPage} />
+        <PermisosTableBody permisosPage={permisosPage} readyOnly={readyOnly} />
     </>
   )
 }
