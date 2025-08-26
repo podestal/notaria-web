@@ -4,9 +4,10 @@ import CartasNotarialesCard from "./CartasNotarialesCard"
 interface Props {
     ingresoCartas: IngresoCartas[]
     page: number
+    readyOnly?: boolean
 }
 
-const CartasNotarialesTableBody = ({ ingresoCartas, page }: Props) => {
+const CartasNotarialesTableBody = ({ ingresoCartas, page, readyOnly }: Props) => {
   return (
     <>
     {ingresoCartas.length > 0 ? (
@@ -16,6 +17,7 @@ const CartasNotarialesTableBody = ({ ingresoCartas, page }: Props) => {
                     key={carta.id_carta}
                     carta={carta}
                     page={page}
+                    readyOnly={readyOnly}
                 />
             ))}
         </>

@@ -29,7 +29,7 @@ const AperturaLibros = () => {
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black py-6">
-        <ReportHeader title="Indice Cronológico de Cartas" />
+        <ReportHeader title="Indice Cronológico de Libros" />
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
           dateTo={dateTo} 
@@ -48,6 +48,7 @@ const AperturaLibros = () => {
         <LibrosTable 
           libros={librosPage.results}
           readyOnly={true}
+          page={page}
         />
         <Paginator
           page={page}

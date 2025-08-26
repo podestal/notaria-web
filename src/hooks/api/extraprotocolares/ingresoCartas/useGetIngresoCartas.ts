@@ -16,18 +16,23 @@ interface Props {
 
 const useGetIngresoCartas = ({ access, page, numCarta, remitente, destinatario, dateFrom, dateTo, dateType, dissabled }: Props): UseQueryResult<IngresoCartasPage, Error> => {
     const ingresoCartasService = getIngresoCartasService();
-
+    console.log('dateFrom', dateFrom);
+    console.log('dateTo', dateTo);
+    console.log('page', page);
+    
     let params: { page: string; numCarta?: string; remitente?: string; destinatario?: string; dateFrom?: string; dateTo?: string; dateType?: string } = { page: page.toString() };
     if (numCarta) params = { ...params, numCarta };
     if (remitente) params = { ...params, remitente };
     if (destinatario) params = { ...params, destinatario };
-    if (dateFrom) params = { ...params, dateFrom: moment(dateFrom).format('YYYY-MM-DD') };
-    if (dateTo) params = { ...params, dateTo: moment(dateTo).format('YYYY-MM-DD') };
+    if (dateFrom) params = { ...params, dateFrom: moment(dateFrom).format('DD/MM/YYYY') };
+    if (dateTo) params = { ...params, dateTo: moment(dateTo).format('DD/MM/YYYY') };
     if (dateType === '2') {
         params = { ...params, dateType: 'fecha_diligencia' }
     } else {
         params = { ...params, dateType: 'fecha_ingreso' }
     }
+
+    console.log('params', params);
 
     return useQuery({
         queryKey: ['ingreso_cartas', page],
