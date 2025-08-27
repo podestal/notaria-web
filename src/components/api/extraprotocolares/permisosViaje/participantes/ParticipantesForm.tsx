@@ -19,6 +19,7 @@ interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
     ubigeos: Ubigeo[]
     nacionalidades: Nacionalidad[]
+    setDocument: React.Dispatch<React.SetStateAction<string>>
     contratanteInfo: {
         apePaterno: string;
         apeMaterno: string;
@@ -30,10 +31,11 @@ interface Props {
         genero: string;
         nacionalidad: string;
     }
+    setContratanteInfo: React.Dispatch<React.SetStateAction<any>>
     document: string
 }
 
-const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo, document }: Props) => {
+const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo, document, setContratanteInfo, setDocument }: Props) => {
 
     console.log('contratanteInfo ->',contratanteInfo);
     
@@ -74,7 +76,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         setDireccion(contratanteInfo.direccion || '');
         setSelectedUbigeo(contratanteInfo.ubigeo ? { id: contratanteInfo.ubigeo, label: `${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomdpto} - ${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomprov} - ${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomdis}` } : null);
         setEstadoCivil(contratanteInfo ? ESTADO_CIVIL.find(estado => (estado.value) === contratanteInfo.estadoCivil)?.desestcivil || '' : '');
-        setGenero(contratanteInfo ? contratanteInfo.genero === 'M' ? 'Masculino' : 'Femenino' : '');
+        setGenero(contratanteInfo ? contratanteInfo.genero === 'M' ? 'Masculino' : contratanteInfo.genero === 'F' ? 'Femenino' : '' : '');
         setNacionalidad(contratanteInfo ? nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad)?.descripcion || '' : '');
     }, [contratanteInfo]);
 
@@ -126,6 +128,19 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                     setType('success');
                     setOpen(false);
                     console.log('Contratante creado exitosamente:', res);
+                    // reset contratante info
+                    setContratanteInfo({
+                        apePaterno: '',
+                        apeMaterno: '',
+                        priNombre: '',
+                        segNombre: '',
+                        direccion: '',
+                        ubigeo: null,
+                        estadoCivil: 0,
+                        genero: '',
+                        nacionalidad: ''
+                    })
+                    setDocument('')
                 },
                 onError: (error) => {
                     setMessage('Error al crear el contratante');

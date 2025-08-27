@@ -58,11 +58,13 @@ const CreateParticipante = ({ viajeId }: Props) => {
                 />
                 <ParticipantesForm 
                    createContratante={createContratante}
+                   setDocument={setDocument}
                    idViaje={viajeId}
                    setOpen={setOpen}
                    ubigeos={ubigeos}
                    nacionalidades={nacionalidades}
                    document={document}
+                   setContratanteInfo={setContratanteInfo}
                    contratanteInfo={{
                      ...contratanteInfo,
                      estadoCivil: contratanteInfo.estadoCivil === '' ? 0 : Number(contratanteInfo.estadoCivil)
