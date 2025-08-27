@@ -31,8 +31,8 @@ const PermisoCard = ({ permisoViaje, readyOnly }: Props) => {
                 <div 
                     className="grid grid-cols-6 gap-10 items-start justify-start text-left"
                     key={contratante.id_contratante}>
-                    <p className="font-semibold">{PERMISO_VIAJE_CONDICIONES.find(condicion => condicion.id_condicion === contratante.c_condicontrat)?.des_condicion}:</p>
-                    <p className="col-span-5">{contratante.c_descontrat}</p>
+                    <p className="font-semibold col-span-2">{PERMISO_VIAJE_CONDICIONES.find(condicion => condicion.id_condicion === contratante.c_condicontrat)?.des_condicion}:</p>
+                    <p className="col-span-4">{contratante.c_descontrat}</p>
                 </div>
             ))}
         </div>
