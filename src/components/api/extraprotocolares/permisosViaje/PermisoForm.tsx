@@ -15,6 +15,7 @@ import useNotificationsStore from "../../../../hooks/store/useNotificationsStore
 import { UpdatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje"
 import GenerarDocumento from "../documentos/GenerarDocumento"
 import AbrirDocumento from "../documentos/AbrirDocumento"
+import useGetUserInfo from "../../../../hooks/store/useGetUserInfo"
 
 interface Props {
     permisoViaje?: PermisoViaje
@@ -25,6 +26,7 @@ interface Props {
 const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || "";
+    const user = useGetUserInfo(u => u.user)
     const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [tipoPermiso, setTipoPermiso] = useState(permisoViaje ? permisoViaje.asunto : '');
@@ -48,7 +50,8 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
         permisoViaje?.fecha_hasta ? new Date(permisoViaje.fecha_hasta) : undefined
     );
 
-    const [observacion, setObservacion] = useState(permisoViaje?.observacion || '');
+    const [observacion, setObservacion] = useState(permisoViaje?.observacion || `El menor realizará el viaje en compañia...
+con quien permanecerá hasta su retorno.`);
 
     const [loading, setLoading] = useState(false);
     const [showDocs, setShowDocs] = useState(permisoViaje ? true : false);
@@ -105,6 +108,8 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
                 access
             }, {
                 onSuccess: res => {
+                    console.log('res', res)
+                    setPermisoViajeId(res.id_viaje);
                     setMessage('Permiso de viaje creado exitosamente');
                     setShow(true);
                     setType('success');
@@ -207,7 +212,7 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
             />
             <SimpleInput 
                 label="Encargado"
-                value={permisoViaje?.num_kardex || ''}
+                value={permisoViaje?.nom_recep || `${user?.first_name} ${user?.last_name}`}
                 setValue={() => {}}
                 horizontal
                 disabled
@@ -312,9 +317,9 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
         <h2 className="text-center text-xs font-semibold my-4">Observaciones</h2>
         <textarea className="w-full h-32 p-2 border border-gray-300 rounded-md" value={observacion} onChange={(e) => setObservacion(e.target.value)}></textarea>
     </div>
-    {permisoViaje &&             
+    {permisoViajeId !== 0 &&             
         <ParticipantesMain 
-            viajeId={permisoViaje.id_viaje}
+            viajeId={permisoViajeId}
         />
     }
     </>
