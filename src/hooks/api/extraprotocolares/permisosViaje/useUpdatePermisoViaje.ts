@@ -14,7 +14,7 @@ interface Props {
 const useUpdatePermisoViaje = ({ page, permisoViajeId }: Props): UseMutationResult<PermisoViaje, Error, UpdatePermisoViajeData> => {
     const permisoViajeService = getPermisoViajeServiceSingle({ permisoViajeId });
     const queryClient = useQueryClient();
-
+    console.log('permisoViajeId ->', permisoViajeId);
     return useMutation({
         mutationFn: (data) => permisoViajeService.update(data.permisoViaje, data.access),
         onSuccess: (res) => {

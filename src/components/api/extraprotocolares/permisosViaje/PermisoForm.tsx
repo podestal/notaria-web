@@ -12,7 +12,7 @@ import { UseMutationResult } from "@tanstack/react-query"
 import { CreatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useCreatePermisoViaje"
 import useAuthStore from "../../../../store/useAuthStore"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
-import { UpdatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje"
+import useUpdatePermisoViaje, { UpdatePermisoViajeData } from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje"
 import GenerarDocumento from "../documentos/GenerarDocumento"
 import AbrirDocumento from "../documentos/AbrirDocumento"
 import useGetUserInfo from "../../../../hooks/store/useGetUserInfo"
@@ -63,6 +63,8 @@ con quien permanecerá hasta su retorno.`);
     permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior' :
     tipoPermiso === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior';
 
+    const updatePermisoViajeInternal = useUpdatePermisoViaje({ page: 1, permisoViajeId })
+
     const handleSave = () => {
 
         setLoading(true);
@@ -98,7 +100,7 @@ con quien permanecerá hasta su retorno.`);
                     fecha_desde: moment(fechaDesde).format('YYYY-MM-DD'),
                     fecha_hasta: moment(fechaHasta).format('YYYY-MM-DD'),
                     observacion: observacion,
-                    nom_recep: '', // Add the recepcionist name if needed
+                    nom_recep: `${user?.first_name} ${user?.last_name}`,
                     documento: '', // Add the document if needed
                     num_crono: '', // Add the control number if needed
                     fecha_crono: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
@@ -164,6 +166,49 @@ con quien permanecerá hasta su retorno.`);
                     setLoading(false);
                 }
             });
+        }
+
+        if (!permisoViaje && doneCreate) {
+            
+            updatePermisoViajeInternal.mutate({
+                permisoViaje: {
+                    asunto: tipoPermiso,
+                    hora_recep: hora || moment().format("HH:mm"),
+                    fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    referencia: motivo,
+                    nom_comu: nomComunicarse,
+                    tel_comu: telComunicarse,
+                    email_comu: emailComunicarse,
+                    via: via,
+                    lugar_formu: lugarFormu,
+                    fecha_desde: moment(fechaDesde).format('YYYY-MM-DD'),
+                    fecha_hasta: moment(fechaHasta).format('YYYY-MM-DD'),
+                    observacion: observacion,
+                    nom_recep: `${user?.first_name} ${user?.last_name}`, 
+                    documento: '', // Add the document if needed
+                    num_crono: '', // Add the control number if needed
+                    fecha_crono: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    swt_est: '',
+                    partida_e: '', // Add the partida if needed
+                    sede_regis: '', // Add the registration seat if needed
+                    qr: 0, // Add the QR code if needed
+                },
+                access
+            }, {
+                onSuccess: () => {
+                    setMessage('Permiso de viaje actualizado exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: () => {
+                    setMessage('Error al actualizar el permiso de viaje');
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            })
         }
     }
 
