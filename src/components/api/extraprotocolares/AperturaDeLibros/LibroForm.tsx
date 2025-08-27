@@ -18,7 +18,7 @@ import { UseMutationResult } from "@tanstack/react-query";
 import { CreateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useCreateLibro";
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
-import { UpdateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useUpdateLibro";
+import useUpdateLibro, { UpdateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useUpdateLibro";
 
 
 interface Props {
@@ -79,6 +79,9 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
     const [numLibro, setNumLibro] = useState(libro?.numlibro || '');
     const [anoLibro, setAnoLibro] = useState(libro?.ano || '');
     const [idLibro, setIdLibro] = useState(libro?.id || 0);
+
+    const [doneCreate, setDoneCreate] = useState(false);
+    const updateLibroInternal = useUpdateLibro({ page: 1, libroId: idLibro })
 
 
     
@@ -162,6 +165,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
                 setNumLibro(res.numlibro)
                 setAnoLibro(res.ano)
                 setIdLibro(res.id)
+                setDoneCreate(true)
             },
             onError: () => {
                 setMessage('Error al crear el libro')
@@ -223,6 +227,59 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
                 setLoading(false)
             }
         })
+
+        if (!libro && doneCreate) {
+            updateLibroInternal.mutate({
+                access: access,
+                libro: {
+                    numlibro: numLibro,
+                    ano: anoLibro,
+                    fecing: moment(fechaIngreso).format('YYYY-MM-DD'),
+                    tipper: selectedTipoPersona === 1 ? 'N' : 'J',
+                    apepat: apellidoPaterno,
+                    apemat: apellidoMaterno,
+                    prinom: primerNombre,
+                    segnom: segundoNombre,
+                    ruc: selectedTipoPersona === 1 ? '' : document.startsWith('CODJU') ? '' : document,
+                    domicilio: direccion,
+                    coddis: ubigeo || '',
+                    empresa: razonSocial,
+                    domfiscal: domicilioFiscal,
+                    idtiplib: parseInt(selectedTipoLibro?.id || '0'),
+                    descritiplib: selectedTipoLibro?.label || '',
+                    idlegal: selectedTipoLegal,
+                    folio: numFojas,
+                    idtipfol: tipoFolio,
+                    detalle: detalle,
+                    idnotario: 1,
+                    solicitante: solicitanteName,
+                    comentario: comentario,
+                    feclegal: '',
+                    comentario2: '',
+                    dni: solicitanteDocument,
+                    idusuario: user?.idusuario || 0,
+                    idnlibro: numeroLibro,
+                    codclie: codeCliente,
+                    flag: 1,
+                    numdoc_plantilla: document.startsWith('CODJU') ? document : '',
+                    estadosisgen: 0,
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Libro actualizado correctamente')
+                    setShow(true)
+                    setType('success')
+                },
+                onError: () => {
+                    setMessage('Error al actualizar el libro')
+                    setShow(true)
+                    setType('error')
+                },
+                onSettled: () => {
+                    setLoading(false)
+                }
+            })
+        }
 
         
     }

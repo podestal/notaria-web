@@ -16,7 +16,7 @@ import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
 import { CreateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useCreateDomiciliario";
-import { UpdateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useUpdateDomiciliario";
+import useUpdateDomiciliario, { UpdateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useUpdateDomiciliario";
 
 interface Props {
     domiciliario?: Domiciliario;
@@ -65,9 +65,13 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
     const [showDocs, setShowDocs] = useState(domiciliario ? true : false);
     const [domiciliarioId, setDomiciliarioId] = useState(domiciliario?.id_domiciliario || 0);
 
+    const [doneCreate, setDoneCreate] = useState(false);
+    const updateDomiciliarioInternal = useUpdateDomiciliario({ page: 1, domiciliarioId: domiciliarioId })
+
     const handleSave = () => {
         setLoading(true);
-        createDomiciliario && createDomiciliario.mutate({
+        if (createDomiciliario && !doneCreate) {
+        createDomiciliario.mutate({
             access,
             domiciliario: {
                 num_formu: numFormulario,
@@ -105,6 +109,7 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 setShowDocs(true);
                 setDomiciliarioId(res.id_domiciliario);
                 setNumCertificado(res.num_certificado);
+                setDoneCreate(true);
             },
             onError: () => {
                 setMessage('Error al crear el domiciliario');
@@ -115,6 +120,7 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 setLoading(false);
             }
         })
+    }
 
         updateDomiciliario && updateDomiciliario.mutate({
             access,
@@ -161,6 +167,54 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 setLoading(false);
             }
         })
+
+        if (!domiciliario && doneCreate) {
+            updateDomiciliarioInternal.mutate({
+                access,
+                domiciliario: {
+                    num_formu: numFormulario,
+                    fec_ingreso: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
+                    numdoc_solic: document,
+                    nombre_solic: solicitante,
+                    domic_solic: domicilio,
+                    distrito_solic: distrito,
+                    motivo_solic: motivo,
+                    fecha_ocupa: fechaOcupacion ? moment(fechaOcupacion, 'DD/MM/YYYY').format('YYYY-MM-DD') : '',
+                    declara_ser: condicion,
+                    propietario,
+                    recibido,
+                    tdoc_testigo: testigoTipoDocumento !== 0 ? `0${testigoTipoDocumento}` : '0',
+                    tipdoc_solic: selectedTipoDocumento !== 0 ? `0${selectedTipoDocumento}` : '0',
+                    texto_cuerpo: textoCuerpo,
+                    justifi_cuerpo: '',
+                    nom_testigo: nomTestigo,
+                    ndocu_testigo: testigoDocument,
+                    idestcivil: estadoCivil,
+                    sexo: genero,
+                    detprofesionc: profesion,
+                    profesionc: profesion,
+                    especificacion: '',
+                    recibo_empresa: reciboEmpresa,
+                    numero_recibo: numRecibo,
+                    mes_facturado: mesFacturado,
+                    idusuario: user?.idusuario || 0,
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Domiciliario actualizado exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: () => {
+                    setMessage('Error al actualizar el domiciliario');
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            })
+        }
     }
 
   return (

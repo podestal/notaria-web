@@ -19,6 +19,7 @@ import useNotificationsStore from "../../../../hooks/store/useNotificationsStore
 import useGetUserInfo from "../../../../hooks/store/useGetUserInfo";
 import GenerarDocumento from "../documentos/GenerarDocumento";
 import AbrirDocumento from "../documentos/AbrirDocumento";
+import useUpdateIngresoCarta from "../../../../hooks/api/extraprotocolares/ingresoCartas/useUpdateIngresoCarta";
 
 interface Props {
     carta?: IngresoCartas;
@@ -80,11 +81,14 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const [showDocs, setShowDocs] = useState(carta ? true : false);
     const [cartaId, setCartaId] = useState(carta?.id_carta || 0);
 
+    const [doneCreate, setDoneCreate] = useState(false);
+    const updateCartaNotarialInternal = useUpdateIngresoCarta({ ingresoCartasId: cartaId })
+
 
     const handleSave = () => {
         setLoading(true);
 
-        if (createIngresoCarta) {
+        if (createIngresoCarta && !doneCreate) {
             createIngresoCarta.mutate({
                 access,
                 ingresoCarta: {
@@ -120,6 +124,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     setShowDocs(true);
                     setCartaId(res.id_carta);
                     setNumCarta(res.num_carta);
+                    setDoneCreate(true);
                 },
                 onError: (error) => {
                     console.error("Error creating carta:", error);
@@ -176,6 +181,50 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     setLoading(false);
                 }
             });
+        }
+
+        if (!carta && doneCreate) {
+            updateCartaNotarialInternal.mutate({
+                access,
+                ingresoCarta: {
+                    fec_ingreso: moment(fechaIngreso).format('DD/MM/YYYY'),
+                    id_remitente: documento,
+                    telf_remitente: telefono,
+                    nom_remitente: remitente,
+                    dir_remitente: direccion,
+                    dni_destinatario: documentoDest,
+                    nom_destinatario: destinatario,
+                    dir_destinatario: direccionDest,
+                    zona_destinatario: ubigeo?.id || '',
+                    fec_entrega: moment(fechaDiligencia).format('DD/MM/YYYY'),
+                    hora_entrega: horaDiligencia || '',
+                    emple_entrega: responsible,
+                    firmo: firma,
+                    recepcion,
+                    conte_carta: contenido,
+                    costo: '0.00', // Assuming costo is not provided in the form
+                    id_encargado: responsible,
+                    des_encargado: 'Encargado de la carta',
+                    nom_regogio: '',
+                    doc_recogio: '',
+                    fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
+                    fact_recogio: '0.00',
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Carta actualizada exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: () => {
+                    setMessage('Error al actualizar la carta');
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            })
         }
     }
 

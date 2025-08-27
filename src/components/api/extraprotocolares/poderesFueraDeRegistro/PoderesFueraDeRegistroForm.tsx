@@ -11,7 +11,7 @@ import { UseMutationResult } from "@tanstack/react-query";
 import { CreateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/useCreateIngresoPoderes";
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
-import { UpdateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/UpdateIngresoPoderes";
+import useUpdateIngresoPoderes, { UpdateIngresoPoderesData } from "../../../../hooks/api/extraprotocolares/ingresoPoderes/UpdateIngresoPoderes";
 import ContratantesMain from "./contratantes/ContratantesMain";
 import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
 import GenerarDocumento from "../documentos/GenerarDocumento";
@@ -56,6 +56,9 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
     const [showDocs, setShowDocs] = useState(poder ? true : false);
     const [numPoder, setNumPoder] = useState(poder?.num_kardex || '');
 
+    const [doneCreate, setDoneCreate] = useState(false);
+    const updatePoderInternal = useUpdateIngresoPoderes({ page: 1, ingresoPoderesId: idPoder })
+
     const handleSave = () => {
 
         if (tipoPoder === '0') {
@@ -74,7 +77,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
 
         setLoading(true);
 
-        if (createIngresoPoderes) {
+        if (createIngresoPoderes && !doneCreate) {
             createIngresoPoderes.mutate({
                 access,
                 ingresoPoderes: {
@@ -87,11 +90,11 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     telf_comuni: telComunicarse,
                     email_comuni: emailComunicarse,
                     documento: '0.00',
-                    id_respon: `${user?.first_name} ${user?.last_name}`.trim(),
-                    des_respon: `${user?.first_name} ${user?.last_name}`.trim(),
+                    id_respon: `${user?.last_name} ${user?.first_name}`.trim(),
+                    des_respon: `${user?.last_name} ${user?.first_name}`.trim(),
                     doc_presen: '',
-                    fec_ofre: '',
-                    hora_ofre: '',
+                    fec_ofre: moment(fechaIngreso).format('DD/MM/YYYY'),
+                    hora_ofre: hora || '',
                     fec_crono: moment().format('YYYY-MM-DD'),
                     swt_est: ''
                 }
@@ -103,6 +106,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     setIdPoder(res.id_poder);
                     setNumPoder(res.num_kardex);
                     setShowDocs(true);
+                    setDoneCreate(true);
                 },
                 onError: (error) => {
                     setMessage(`Error al crear poder: ${error.message}`);
@@ -119,22 +123,22 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
             updateIngresoPoder.mutate({
                 access,
                 ingresoPoderes: {
-                    nom_recep: poder.nom_recep,
-                    hora_recep: poder.hora_recep,
+                    nom_recep: poder?.nom_recep || '',
+                    hora_recep: hora || '',
                     id_asunto: tipoPoder,
-                    fec_ingreso: poder.fec_ingreso,
+                    fec_ingreso: moment(fechaIngreso).format('YYYY-MM-DD'),
                     referencia,
                     nom_comuni: nomComunicarse,
                     telf_comuni: telComunicarse,
                     email_comuni: emailComunicarse,
-                    documento: poder.documento,
+                    documento: '0.00',
                     id_respon: poder.id_respon,
                     des_respon: poder.des_respon,
-                    doc_presen: poder.doc_presen,
+                    doc_presen: '',
                     fec_ofre: poder.fec_ofre,
                     hora_ofre: poder.hora_ofre,
-                    fec_crono: poder.fec_crono,
-                    swt_est: poder.swt_est
+                    fec_crono: moment().format('YYYY-MM-DD'),
+                    swt_est: ''
                 }
             }, {
                 onSuccess: () => {
@@ -151,6 +155,44 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     setLoading(false);
                 }
             });
+        }
+
+        if (!poder && doneCreate) {
+            updatePoderInternal.mutate({
+                access,
+                ingresoPoderes: {
+                    nom_recep: '',
+                    hora_recep: hora || '',
+                    id_asunto: tipoPoder,
+                    fec_ingreso: moment(fechaIngreso).format('YYYY-MM-DD'),
+                    referencia,
+                    nom_comuni: nomComunicarse,
+                    telf_comuni: telComunicarse,
+                    email_comuni: emailComunicarse,
+                    documento: '0.00',
+                    id_respon: `${user?.last_name} ${user?.first_name}`.trim(),
+                    des_respon: `${user?.last_name} ${user?.first_name}`.trim(),
+                    doc_presen: '',
+                    fec_ofre: moment(fechaIngreso).format('DD/MM/YYYY'),
+                    hora_ofre: hora || '',
+                    fec_crono: moment().format('YYYY-MM-DD'),
+                    swt_est: ''
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Poder actualizado exitosamente');
+                    setShow(true);
+                    setType('success');
+                },
+                onError: (error) => {
+                    setMessage(`Error al actualizar poder: ${error.message}`);
+                    setShow(true);
+                    setType('error');
+                },
+                onSettled: () => {
+                    setLoading(false);
+                }
+            })
         }
     }
 
