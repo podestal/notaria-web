@@ -10,7 +10,7 @@ interface Props {
         priNombre: string;
         segNombre: string;
         direccion: string;
-        ubigeo: string;
+        ubigeo: string | null;
         estadoCivil: number;
         genero: string;
         nacionalidad: string;
@@ -26,7 +26,19 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document }: Prop
 
     const handleClienteLookup = () => {
         setLoading(true);
-        // Simulate an API call
+        // initialize contratanteInfo
+        setContratanteInfo({
+            apePaterno: '',
+            apeMaterno: '',
+            priNombre: '',
+            segNombre: '',
+            direccion: '',
+            ubigeo: null,
+            estadoCivil: 0,
+            genero: '',
+            nacionalidad: ''
+        })
+    
         axios.get(
             `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
         ).then(response => {
@@ -44,7 +56,8 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document }: Prop
                     nacionalidad: response.data.nacionalidad
                 });
             } else {
-                console.log('Cliente no encontrado, creando nuevo cliente')
+                console.log('Cliente no encontrado, buscando en RENIEC')
+                handleReniec(document)
             }
         }).catch(error => {
             console.log('Error al buscar el cliente:', error);
@@ -52,6 +65,30 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document }: Prop
         }).finally(() => {
             setLoading(false)
         })
+    }
+
+    const handleReniec = (dni: string) => {
+        console.log('Consulta RENIEC')
+        axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${dni}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
+        ).then(response => {
+            console.log('response', response.data)
+            setContratanteInfo({
+                apePaterno: response.data.resultado.apellido_paterno || '',
+                apeMaterno: response.data.resultado.apellido_materno || '',
+                priNombre: response.data.resultado.nombres.split(' ')[0] || '',
+                segNombre: response.data.resultado.nombres.split(' ')[1] || '',
+                genero: response.data.resultado.genero,
+                nacionalidad: '',
+                direccion: '',
+                ubigeo: null,
+                estadoCivil: 0
+            })
+
+        }).catch(error => {
+            console.error('Error al consultar RENIEC:', error)
+        });
+
+        
     }
 
   return (

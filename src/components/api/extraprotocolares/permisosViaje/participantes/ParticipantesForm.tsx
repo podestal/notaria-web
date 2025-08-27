@@ -10,6 +10,7 @@ import useNotificationsStore from "../../../../../hooks/store/useNotificationsSt
 import { Ubigeo } from "../../../../../services/api/ubigeoService";
 import { Nacionalidad } from "../../../../../services/api/nacionalidadesService";
 import { ESTADO_CIVIL } from "../../../../../data/clienteData";
+import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput";
 
 interface Props {
     contratanteViaje?: ViajeContratante;
@@ -24,7 +25,7 @@ interface Props {
         priNombre: string;
         segNombre: string;
         direccion: string;
-        ubigeo: string;
+        ubigeo: string | null;
         estadoCivil: number;
         genero: string;
         nacionalidad: string;
@@ -49,7 +50,18 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
     const [priNombre, setPriNombre] = useState(contratanteInfo.priNombre || '');
     const [segNombre, setSegNombre] = useState(contratanteInfo.segNombre || '');
     const [direccion, setDireccion] = useState(contratanteInfo.direccion || '');
-    const [selectedUbigeo, setSelectedUbigeo] = useState(contratanteInfo.ubigeo || '');
+    const [selectedUbigeo, setSelectedUbigeo] = useState<{ id: string; label: string } | null>(() => {
+        if (contratanteInfo.ubigeo) {
+          const match = ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo);
+          if (match) {
+            return {
+              id: match.coddis,
+              label: `${match.nomdpto} - ${match.nomprov} - ${match.nomdis}`,
+            };
+          }
+        }
+        return null;
+      })
     const [estadoCivil, setEstadoCivil] = useState(contratanteInfo.estadoCivil || '');
     const [genero, setGenero] = useState(contratanteInfo.genero || '');
     const [nacionalidad, setNacionalidad] = useState(contratanteInfo ? nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad)?.descripcion || '' : '');
@@ -60,7 +72,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         setPriNombre(contratanteInfo.priNombre || '');
         setSegNombre(contratanteInfo.segNombre || '');
         setDireccion(contratanteInfo.direccion || '');
-        setSelectedUbigeo(contratanteInfo ? ubigeos.find(ubigeo => (ubigeo.coddis).toString() === contratanteInfo.ubigeo)?.nomdis + ' - ' + ubigeos.find(ubigeo => (ubigeo.coddis).toString() === contratanteInfo.ubigeo)?.nomprov + ' - ' + ubigeos.find(ubigeo => (ubigeo.coddis).toString() === contratanteInfo.ubigeo)?.nomdpto || '' : '');
+        setSelectedUbigeo(contratanteInfo.ubigeo ? { id: contratanteInfo.ubigeo, label: `${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomdpto} - ${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomprov} - ${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomdis}` } : null);
         setEstadoCivil(contratanteInfo ? ESTADO_CIVIL.find(estado => (estado.value) === contratanteInfo.estadoCivil)?.desestcivil || '' : '');
         setGenero(contratanteInfo ? contratanteInfo.genero === 'M' ? 'Masculino' : 'Femenino' : '');
         setNacionalidad(contratanteInfo ? nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad)?.descripcion || '' : '');
@@ -131,6 +143,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
   return (
     <div>
         <div>
+            <>{console.log('selectedUbigeo ->', selectedUbigeo)}</>
             <div className="grid grid-cols-2 gap-4 my-4">
                 <SimpleSelectorStr 
                     label="Condiciones"
@@ -190,13 +203,16 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                 fullWidth
             />
             <div className="my-4"></div>
-            <SimpleInput 
-                label="Ubigeo"
-                value={selectedUbigeo}
-                setValue={setSelectedUbigeo}
-                horizontal
-                fullWidth
-            />
+            <div className="w-full flex justify-center items-center gap-4 col-span-2">
+                <p className="pl-2 block text-xs font-semibold text-slate-700">Ubigeo</p>
+                <SearchableDropdownInput
+                    options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
+                    selected={selectedUbigeo}
+                    setSelected={setSelectedUbigeo}
+                    placeholder="Buscar Ubigeo"
+                />
+            </div>
+               
             <div className="grid grid-cols-2 gap-4 my-4">
                 <SimpleInput 
                     label="Estado Civil"
