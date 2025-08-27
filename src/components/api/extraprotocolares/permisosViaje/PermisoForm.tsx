@@ -25,6 +25,8 @@ interface Props {
 
 const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: Props) => {
 
+    const [doneCreate, setDoneCreate] = useState(false); 
+
     const access = useAuthStore(s => s.access_token) || "";
     const user = useGetUserInfo(u => u.user)
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -81,7 +83,7 @@ con quien permanecerá hasta su retorno.`);
             return;
         }
 
-        if (createPermisoViaje) {
+        if (createPermisoViaje && !doneCreate) {
             createPermisoViaje.mutate({
                 permisoViaje: {
                     asunto: tipoPermiso,
@@ -116,6 +118,7 @@ con quien permanecerá hasta su retorno.`);
                     setPermisoViajeId(res.id_viaje);
                     setNumFormu(res.num_kardex);
                     setShowDocs(true);
+                    setDoneCreate(true);
                 },
                 onError: () => {
                     setMessage('Error al crear el permiso de viaje');

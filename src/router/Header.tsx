@@ -65,7 +65,8 @@ const Header = ({ kardexTypes }: Props) => {
           ],
       },
         { label: "EXTRAPROTOCOLARES", options: 
-            [   {name: "Certificación de Firmas", path: "/app/extraprotocolares/certificacionFirmas"},
+            [   
+              // {name: "Certificación de Firmas", path: "/app/extraprotocolares/certificacionFirmas"},
                 {name: "Cert. Autorización de viaje", path: "/app/extraprotocolares/permisosViaje"},
                 {name: "Poderes Fuera de Registro", path: "/app/extraprotocolares/poderesFueraDeRegistro"},
                 {name: "Cartas Notariales", path: "/app/extraprotocolares/cartaNotarial"},
