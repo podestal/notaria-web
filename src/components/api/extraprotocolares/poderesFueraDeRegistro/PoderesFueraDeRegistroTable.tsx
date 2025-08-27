@@ -5,9 +5,10 @@ import PoderesFueraDeRegistroTableHeader from "./PoderesFueraDeRegistroTableHead
 interface Props {
     poderes: IngresoPoderesPage | undefined
     page: number
+    readyOnly?: boolean
 }
 
-const PoderesFueraDeRegistroTable = ({ poderes, page }: Props) => {
+const PoderesFueraDeRegistroTable = ({ poderes, page, readyOnly }: Props) => {
 
 
 
@@ -17,6 +18,7 @@ const PoderesFueraDeRegistroTable = ({ poderes, page }: Props) => {
     <PoderesFueraDeRegistroTableBody 
       poderes={poderes}
       page={page}
+      readyOnly={readyOnly}
     />
     </>
   )

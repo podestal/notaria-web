@@ -7,9 +7,10 @@ import UpdatePoderesFueraDeRegistro from "./UpdatePoderesFueraDeRegistro"
 interface Props {
     poder: IngresoPoderes
     page: number
+    readyOnly?: boolean
 }
 
-const PoderesFueraDeRegistroCard = ({ poder, page }: Props) => {
+const PoderesFueraDeRegistroCard = ({ poder, page, readyOnly }: Props) => {
 
     const [open, setOpen] = useState(false);
 
@@ -17,7 +18,10 @@ const PoderesFueraDeRegistroCard = ({ poder, page }: Props) => {
     <>
         <div className="grid grid-cols-8 gap-4 justify-center items-center text-center text-black text-xs p-2 my-4 mx-6">
             <p
-                onClick={() => setOpen(true)}
+                onClick={() => {
+                    if (readyOnly) return;
+                    setOpen(true)
+                }}
                 className="text-center text-blue-600 cursor-pointer hover:text-blue-500"
             >{poder.id_poder}</p>
             <p>{poder.num_kardex}</p>

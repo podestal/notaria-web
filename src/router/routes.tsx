@@ -31,7 +31,7 @@ import CamaraDeComercio from "../components/api/reportes/cronologicos/reportes/C
 import CartasNotariales from "../components/api/reportes/cronologicos/reportes/cartasNotariales/CartasNotariales";
 import AperturaLibros from "../components/api/reportes/cronologicos/reportes/aperturaLibro/AperturaLibros";
 import PermisoViajes from "../components/api/reportes/cronologicos/reportes/permisoViaje/PermisoViajes";
-import Poderes from "../components/api/reportes/cronologicos/reportes/Poderes";
+import Poderes from "../components/api/reportes/cronologicos/reportes/poderes/Poderes";
 import SupervivenciaCapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaCapaz";
 import SupervivenciaIncapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaIncapaz";
 import Domiciliario from "../components/api/reportes/cronologicos/reportes/Domiciliario";

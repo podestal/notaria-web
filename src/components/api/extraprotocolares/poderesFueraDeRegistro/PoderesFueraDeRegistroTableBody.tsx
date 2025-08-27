@@ -4,10 +4,11 @@ import PoderesFueraDeRegistroCard from "./PoderesFueraDeRegistroCard"
 interface Props {
     poderes: IngresoPoderesPage | undefined
     page: number
+    readyOnly?: boolean
 }
 
 
-const PoderesFueraDeRegistroTableBody = ({ poderes, page }: Props) => {
+const PoderesFueraDeRegistroTableBody = ({ poderes, page, readyOnly }: Props) => {
 
   return (
     <>
@@ -15,7 +16,7 @@ const PoderesFueraDeRegistroTableBody = ({ poderes, page }: Props) => {
         <>
             {poderes.results.map((poder) => (
                 <PoderesFueraDeRegistroCard 
-                  key={poder.id_poder} poder={poder} page={page} />
+                  key={poder.id_poder} poder={poder} page={page} readyOnly={readyOnly} />
             ))}
         </>
         :
