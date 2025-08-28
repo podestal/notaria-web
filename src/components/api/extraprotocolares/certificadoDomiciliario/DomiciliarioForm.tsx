@@ -219,7 +219,7 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
 
   return (
     <div>
-        <h2 className="text-lg font-semibold text-center mb-8">Formulario Cartas Notariales</h2>
+        <h2 className="text-lg font-semibold text-center mb-8">Formulario Certificado Domiciliario</h2>
         {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
         <div className="grid grid-cols-8 gap-2">
             <button 

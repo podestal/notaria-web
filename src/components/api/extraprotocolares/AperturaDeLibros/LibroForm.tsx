@@ -314,10 +314,10 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
                     action: 'retrieve'
                 }}
             />}
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+            {/* <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <QrCode className="text-xl text-slate-950"/>
                 <p className="text-xs">Generar QR</p>
-            </div>
+            </div> */}
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput 
