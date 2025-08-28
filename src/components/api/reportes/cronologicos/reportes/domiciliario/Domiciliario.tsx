@@ -38,10 +38,10 @@ const Domiciliario = () => {
       generatesExcel={false}
       url='cert_domiciliario/reporte'
       params={{
-        fechade: moment(dateFrom).format('YYYY-MM-DD') || '',
-        fechaa: moment(dateTo).format('YYYY-MM-DD') || '',
+        fechade: moment(dateFrom).format('DD/MM/YYYY') || '',
+        fechaa: moment(dateTo).format('DD/MM/YYYY') || '',
       }}
-      name='reporte_cartas'
+      name='reporte_domiciliario'
     />
     <DomiciliarioTable 
       domiciliarios={domiciliariosPage.results}
