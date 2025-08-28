@@ -17,7 +17,7 @@ const PermisoCard = ({ permisoViaje, readyOnly }: Props) => {
   return (
     <>
     <div
-        className="grid grid-cols-9 gap-4 p-2 my-4 mx-6 text-xs"
+        className={`grid grid-cols-9 gap-4 p-2 my-4 mx-6 text-xs ${permisoViaje.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}
       >
         <p 
             onClick={() => {

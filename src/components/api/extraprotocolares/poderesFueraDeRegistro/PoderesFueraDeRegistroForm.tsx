@@ -19,6 +19,7 @@ import AbrirDocumento from "../documentos/AbrirDocumento";
 import EssaludForm from "./poderTypeForms/EssaludForm";
 import CreatePoderRegistro from "./CreatePoderRegistro";
 import CreatePension from "./CreatePension";
+import PoderFueraDeRegistroNoCorre from "./PoderFueraDeRegistroNoCorre";
 
 interface Props {
     poder?: IngresoPoderes
@@ -58,6 +59,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
 
     const [doneCreate, setDoneCreate] = useState(false);
     const updatePoderInternal = useUpdateIngresoPoderes({ page: 1, ingresoPoderesId: idPoder })
+    const [noCorre, setNoCorre] = useState(poder?.swt_est === 'NC' ? true : false);
 
     const handleSave = () => {
 
@@ -96,7 +98,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     fec_ofre: moment(fechaIngreso).format('DD/MM/YYYY'),
                     hora_ofre: hora || '',
                     fec_crono: moment().format('YYYY-MM-DD'),
-                    swt_est: ''
+                    swt_est: null
                 }
             }, {
                 onSuccess: res => {
@@ -138,7 +140,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     fec_ofre: poder.fec_ofre,
                     hora_ofre: poder.hora_ofre,
                     fec_crono: moment().format('YYYY-MM-DD'),
-                    swt_est: ''
+                    swt_est: poder.swt_est
                 }
             }, {
                 onSuccess: () => {
@@ -176,7 +178,7 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     fec_ofre: moment(fechaIngreso).format('DD/MM/YYYY'),
                     hora_ofre: hora || '',
                     fec_crono: moment().format('YYYY-MM-DD'),
-                    swt_est: ''
+                    swt_est: null
                 }
             }, {
                 onSuccess: () => {
@@ -199,15 +201,24 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
   return (
     <>
     <div>
+        {noCorre && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center mt-12 backdrop-blur-xs rounded-lg">
+                <div className="text-center">
+                    <div className="bg-amber-600 text-white px-8 py-4 rounded-lg shadow-2xl transform -rotate-12 scale-110">
+                        <h3 className="text-2xl font-bold tracking-wider">NO CORRESPONDE</h3>
+                        <p className="text-amber-100 text-sm mt-1">Documento no aplicable</p>
+                    </div>
+                </div>
+            </div>
+        )}
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Ingreso de Poderes</h2>
-        <>{console.log('urlDocumento', urlDocumento)}</>
         <div className="grid grid-cols-8 gap-2">
-            <button 
+            {!noCorre && <button 
                 onClick={handleSave}
                 className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
-            </button>
+            </button>}
             {showDocs && 
             <GenerarDocumento 
                 name={`__PODER__${idPoder}-${(numPoder || '').slice(0, 4)}.docx`}
@@ -225,14 +236,15 @@ const PoderesFueraDeRegistroForm = ({ poder, createIngresoPoderes, updateIngreso
                     action: 'retrieve'
                 }}
             />}
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+            {/* <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 <QrCode className="text-xl text-slate-950"/>
                 <p className="text-xs">Generar QR</p>
-            </div>
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileWarning className="text-xl text-amber-500"/>
-                <p className="text-xs">No Corre</p>
-            </div>
+            </div> */}
+            {poder && <PoderFueraDeRegistroNoCorre
+                page={1}
+                poderFueraDeRegistro={poder}
+                setNoCorre={setNoCorre}
+            />}
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput 

@@ -33,7 +33,7 @@ export interface IngresoPoderes {
     hora_ofre: string;
     num_formu: string;
     fec_crono: string; // Date as string
-    swt_est: string;
+    swt_est: string | null;
     contratantes: IngresoPoderesSimpleContratante[];
 }
 

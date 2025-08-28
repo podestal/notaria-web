@@ -16,7 +16,7 @@ const PoderesFueraDeRegistroCard = ({ poder, page, readyOnly }: Props) => {
 
   return (
     <>
-        <div className="grid grid-cols-8 gap-4 justify-center items-center text-center text-black text-xs p-2 my-4 mx-6">
+        <div className={`grid grid-cols-8 gap-4 justify-center items-center text-center text-black text-xs p-2 my-4 mx-6 ${poder.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}>
             <p
                 onClick={() => {
                     if (readyOnly) return;
