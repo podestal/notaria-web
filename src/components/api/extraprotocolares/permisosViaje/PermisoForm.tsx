@@ -16,6 +16,7 @@ import useUpdatePermisoViaje, { UpdatePermisoViajeData } from "../../../../hooks
 import GenerarDocumento from "../documentos/GenerarDocumento"
 import AbrirDocumento from "../documentos/AbrirDocumento"
 import useGetUserInfo from "../../../../hooks/store/useGetUserInfo"
+import PermisoNoCorre from "./PermisoNoCorre"
 
 interface Props {
     permisoViaje?: PermisoViaje
@@ -62,6 +63,7 @@ con quien permanecerá hasta su retorno.`);
     const permisoViajeUrl = permisoViaje ? 
     permisoViaje.asunto === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior' :
     tipoPermiso === '001' ? 'permiso-viaje-interior' : 'permiso-viaje-exterior';
+    const [noCorre, setNoCorre] = useState(permisoViaje?.swt_est === 'NC' ? true : false);
 
     const updatePermisoViajeInternal = useUpdatePermisoViaje({ page: 1, permisoViajeId })
 
@@ -104,7 +106,7 @@ con quien permanecerá hasta su retorno.`);
                     documento: '', // Add the document if needed
                     num_crono: '', // Add the control number if needed
                     fecha_crono: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
-                    swt_est: '',
+                    swt_est: null,
                     partida_e: '', // Add the partida if needed
                     sede_regis: '', // Add the registration seat if needed
                     qr: 0, // Add the QR code if needed
@@ -188,7 +190,7 @@ con quien permanecerá hasta su retorno.`);
                     documento: '', // Add the document if needed
                     num_crono: '', // Add the control number if needed
                     fecha_crono: fechaIngreso ? moment(fechaIngreso).format('YYYY-MM-DD') : '',
-                    swt_est: '',
+                    swt_est: null,
                     partida_e: '', // Add the partida if needed
                     sede_regis: '', // Add the registration seat if needed
                     qr: 0, // Add the QR code if needed
@@ -215,15 +217,25 @@ con quien permanecerá hasta su retorno.`);
   return (
     <>
     <div>
+        {noCorre && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center mt-12 backdrop-blur-xs rounded-lg">
+                <div className="text-center">
+                    <div className="bg-amber-600 text-white px-8 py-4 rounded-lg shadow-2xl transform -rotate-12 scale-110">
+                        <h3 className="text-2xl font-bold tracking-wider">NO CORRESPONDE</h3>
+                        <p className="text-amber-100 text-sm mt-1">Documento no aplicable</p>
+                    </div>
+                </div>
+            </div>
+        )}
         <h2 className="text-lg font-semibold text-center mb-8">Formulario del Permiso de Viaje</h2>
         {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
         <div className="grid grid-cols-8 gap-2">
-            <button 
+            {!noCorre && <button 
                 onClick={handleSave}
                 className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 {!loading && <Save className="text-xl"/>}
                 <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
-            </button>
+            </button>}
             {showDocs && 
             <GenerarDocumento 
                 name={`__PERMIVIAJE__${permisoViajeId}-${numFormu.slice(0, 4)}.docx`}
@@ -245,10 +257,11 @@ con quien permanecerá hasta su retorno.`);
                 <QrCode className="text-xl text-slate-950"/>
                 <p className="text-xs">Generar QR</p>
             </div>
-            <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <FileWarning className="text-xl text-amber-500"/>
-                <p className="text-xs">No Corre</p>
-            </div>
+            {permisoViaje && <PermisoNoCorre 
+                page={1}
+                permisoViaje={permisoViaje}
+                setNoCorre={setNoCorre}
+            />}
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput 

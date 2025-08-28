@@ -30,7 +30,7 @@ export interface PermisoViaje {
     num_formu: string;
     lugar_formu: string;
     observacion: string;
-    swt_est: string;
+    swt_est: string | null;
     partida_e: string;
     sede_regis: string;
     qr: number;
