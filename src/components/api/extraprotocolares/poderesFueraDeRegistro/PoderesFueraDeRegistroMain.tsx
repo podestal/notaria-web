@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import useGetIngresoPoderes from '../../../../hooks/api/extraprotocolares/ingresoPoderes/useGetIngresoPoderes'
 import useAuthStore from '../../../../store/useAuthStore'
 import GenericHeader from '../../../ui/GenericHeader'
@@ -18,6 +18,17 @@ const PoderesFueraDeRegistroMain = () => {
 
     const { data: poderes, isLoading, error, isError, isSuccess, refetch } = useGetIngresoPoderes({ access, page, dateFrom, dateTo, dateType })
 
+    const handleReset = useCallback(() => {
+      setDateFrom(undefined);
+      setDateTo(undefined);
+      setDateType('1');
+      setPage(1);
+
+      requestAnimationFrame(() => {
+        refetch();
+      });
+    }, [refetch]);
+
     if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>
     if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>
 
@@ -29,6 +40,7 @@ const PoderesFueraDeRegistroMain = () => {
           <GenericHeader 
             title="Poderes Fuera de Registro"
             setOpen={setOpen}
+            handleReset={handleReset}
           />
           <PoderesFueraDeRegistroFilters 
             refetch={refetch}

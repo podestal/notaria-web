@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import GenericHeader from '../../../ui/GenericHeader'
 import CartasNotarialesFilters from './CartasNotarialesFilters';
 import useGetIngresoCartas from '../../../../hooks/api/extraprotocolares/ingresoCartas/useGetIngresoCartas';
@@ -23,6 +23,19 @@ const CartasNotarialesMain = () => {
 
   const { data: ingresoCartas, isLoading, isError, error, isSuccess, refetch } = useGetIngresoCartas({ access, page, numCarta, remitente, destinatario, dateFrom, dateTo, dateType });
 
+  const handleReset = useCallback(() => {
+    setNumCarta('');
+    setRemitente('');
+    setDestinatario('');
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setPage(1);
+
+    requestAnimationFrame(() => {
+      refetch();
+    });
+  }, [refetch]);
+
   if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>;
   if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>;
 
@@ -34,6 +47,7 @@ const CartasNotarialesMain = () => {
         <GenericHeader 
           title="Cartas Notariales"
           setOpen={setOpen}
+          handleReset={handleReset}
         />
         <CartasNotarialesFilters 
           dateFrom={dateFrom}

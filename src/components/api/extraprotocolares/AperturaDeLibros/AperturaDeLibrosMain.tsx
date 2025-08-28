@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import GenericHeader from '../../../ui/GenericHeader'
 import TopModal from '../../../ui/TopModal';
 import LibrosFilters from './LibrosFilters';
@@ -23,6 +23,20 @@ const AperturaDeLibrosMain = () => {
 
   const { data: librosData, isLoading, isError, error, isSuccess, refetch } = useGetLibros({access, page, cliente, numDoc, cronologico, dateFrom, dateTo });
 
+  const handleReset = useCallback(() => {
+    setCliente('');
+    setNumDoc('');
+    setCronologico('');
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setPage(1);
+    
+    requestAnimationFrame(() => {
+      refetch();
+    });
+  }, [refetch]);
+
+
   if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando ...</p>;
   if (isError) return <p className="text-center text-xs text-red-500 my-4">Error: {error.message}</p>;
 
@@ -34,6 +48,7 @@ const AperturaDeLibrosMain = () => {
         <GenericHeader 
           title="Apertura de Libros"
           setOpen={setOpen}
+          handleReset={handleReset}
         />
         <LibrosFilters
           cliente={cliente}
