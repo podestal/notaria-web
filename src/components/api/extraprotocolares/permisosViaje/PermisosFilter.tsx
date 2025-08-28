@@ -3,6 +3,7 @@ import Calendar from "../../../ui/Calendar";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { PermisoViajePage } from "../../../../services/api/extraprotocolares/permisoViajeService";
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
+import { useState } from "react";
 
 const TIPO_PERMISO = [
     { value: '0', label: "Tipo Permiso" },
@@ -41,8 +42,13 @@ const PermisosFilter = ({
     setNumeroControl, 
     refetch }: Props) => {
 
+    const [loading, setLoading] = useState(false);
+
     const handleFilter = () => {
-        refetch();
+        setLoading(true);
+        refetch().finally(() => {
+            setLoading(false);
+        });
     }
 
   return (
@@ -91,7 +97,11 @@ const PermisosFilter = ({
                 <div>
                     <button 
                         onClick={handleFilter}
-                        className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
+                        className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer"
+                        disabled={loading}
+                    >
+                        {loading ? 'Buscando...' : 'Buscar'}
+                    </button>
                 </div>
             </div>
         </div>
