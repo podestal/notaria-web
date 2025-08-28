@@ -34,7 +34,7 @@ import PermisoViajes from "../components/api/reportes/cronologicos/reportes/perm
 import Poderes from "../components/api/reportes/cronologicos/reportes/poderes/Poderes";
 import SupervivenciaCapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaCapaz";
 import SupervivenciaIncapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaIncapaz";
-import Domiciliario from "../components/api/reportes/cronologicos/reportes/Domiciliario";
+import Domiciliario from "../components/api/reportes/cronologicos/reportes/domiciliario/Domiciliario";
 import AlfabeticosMain from "../components/api/reportes/alfabeticos/AlfabeticosMain";
 import ArchivosPdtMain from "../components/api/reportes/archivosPdt/ArchivosPdtMain";
 import RegistrosUifMain from "../components/api/reportes/registrosUif/RegistrosUifMain";
