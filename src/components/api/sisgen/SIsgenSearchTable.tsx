@@ -14,7 +14,7 @@ const SIsgenSearchTable = ({ sisgenDocs }: Props) => {
         {sisgenDocs.length > 0 
         ? 
         <>
-            {sisgenDocs.map(doc => <SisgenSearchTableBody key={doc.idkardex} sisgenDoc={doc} />)}
+            {sisgenDocs.map((doc, idx) => <SisgenSearchTableBody idx={idx + 1} key={doc.idkardex} sisgenDoc={doc} />)}
         </> 
         : 
         <div className="text-center text-gray-500 p-4">
