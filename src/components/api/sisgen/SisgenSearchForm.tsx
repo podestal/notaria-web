@@ -24,6 +24,7 @@ interface Props {
 const SisgenSearchForm = ({ instrumentType, setSisgenDocs }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+    const [isLoading, setIsLoading] = useState(false)
 
     const [selectedFromDate, setSelectedFromDate] = useState<Date | undefined>(undefined);
     const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
@@ -54,6 +55,8 @@ const SisgenSearchForm = ({ instrumentType, setSisgenDocs }: Props) => {
             return;
         }
 
+        setIsLoading(true)
+
         searchSisgen.mutate({
             access,
             sisgen: {
@@ -73,6 +76,9 @@ const SisgenSearchForm = ({ instrumentType, setSisgenDocs }: Props) => {
             },
             onError: (error) => {
                 setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
+            },
+            onSettled: () => {
+                setIsLoading(false)
             }
         })
 
@@ -110,8 +116,11 @@ const SisgenSearchForm = ({ instrumentType, setSisgenDocs }: Props) => {
                         setSelectedDate={setSelectedToDate}
                     />
                 </div>
-                <button className="bg-blue-600 cursor-pointer text-sm text-white px-2 py-1 rounded-md hover:bg-blue-500 transition-colors">
-                    Buscar
+                <button 
+                    className="bg-blue-600 cursor-pointer text-sm text-white px-2 py-1 rounded-md hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Buscando...' : 'Buscar'}
                 </button>
             </div>
         </form>
