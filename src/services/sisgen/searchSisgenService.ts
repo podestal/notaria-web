@@ -19,6 +19,11 @@ export interface SISGENDocument {
     errores: string[];
     observaciones: string[];
     personas: string[];
+    uif_validation: {
+        has_errors: boolean;
+        errors: { error_type: string; error_description: string }[];
+        observations: string[];
+    };
 }
 
 export interface SISGENSearchResponse {
