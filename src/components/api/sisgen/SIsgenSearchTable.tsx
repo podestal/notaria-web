@@ -11,16 +11,7 @@ const SIsgenSearchTable = ({ sisgenDocs }: Props) => {
     <div>
         <h2 className="my-2 font-semibold">Errores encontrados (Estos kardex no son enviados)</h2>
         <SisgenSearchTableHeader />
-        {sisgenDocs.length > 0 
-        ? 
-        <>
-            {sisgenDocs.map((doc, idx) => <SisgenSearchTableBody idx={idx + 1} key={doc.idkardex} sisgenDoc={doc} />)}
-        </> 
-        : 
-        <div className="text-center text-gray-500 p-4">
-            No se encontraron documentos SISGEN.
-        </div>
-        }
+        <SisgenSearchTableBody sisgenDocs={sisgenDocs} />
     </div>
   )
 }
