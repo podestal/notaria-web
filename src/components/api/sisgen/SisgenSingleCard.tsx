@@ -5,7 +5,9 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import useAuthStore from "../../../store/useAuthStore"
 import getTitleCase from "../../../utils/getTitleCase"
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { ChevronDownIcon, ChevronUpIcon, AlertTriangleIcon, UserIcon } from "lucide-react"
+import TopModal from "../../ui/TopModal"
+import PreKardexForm from "../reportes/registrosUif/PreKardexForm"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -18,6 +20,7 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const [loading, setLoading] = useState(false)
     const sendDocument = useProcessDocument()
     const [showErrors, setShowErrors] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
   
     const handleSend = () => {
       console.log(sisgenDoc)
@@ -49,13 +52,20 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     }
 
   return (
-    <div>
+    <>
+        <div>
     <div 
         key={sisgenDoc.idkardex} 
         className="grid grid-cols-7 gap-4 p-2 border-b text-xs align-middle"
     >
         <p>{idx}</p>
-        <p className="col-span-2">{sisgenDoc.kardex}</p>
+        <p 
+            
+            className="col-span-2 text-blue-500 cursor-pointer hover:text-blue-700"
+            onClick={() => setIsOpen(true)}
+        >
+            {sisgenDoc.kardex}
+        </p>
         <p>{getTitleCase(sisgenDoc.contrato)}</p>
         <p>{sisgenDoc.estado_sisgen}</p>
         {showErrors ? <ChevronUpIcon 
@@ -74,12 +84,50 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
         </button>
     </div>
     {showErrors && (
-        <div className="p-4">
-            <h3 className="text-lg font-semibold">Errores encontrados</h3>
-          
+        <div className="p-4 text-xs flex flex-col gap-2">
+            <div>
+                <h3 className="font-semibold mb-2">Errores Sisgen</h3>
+                <>
+                {sisgenDoc.errores.map((error, idx) => (
+                    <div key={idx + 'error'} className="flex items-center gap-2">
+                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
+                        <p >{error}</p>
+                    </div>
+                ))}
+                </>
+                <>
+                    {sisgenDoc.observaciones.map((observacion, idx) => (
+                        <div key={idx + 'observacion'} className="flex items-center gap-2">
+                            <AlertTriangleIcon className="w-4 h-4 text-amber-500" />
+                            <p >{observacion}</p>
+                        </div>
+                    ))}
+                </>
+                <>
+                    {sisgenDoc.personas.map((persona, idx) => (
+                        <div key={idx + 'persona'} className="flex items-center gap-2">
+                            <UserIcon className="w-4 h-4 text-blue-500" />
+                            <p >{persona}</p>
+                        </div>
+                    ))}
+                </>
+            </div>
+            <h3 className="font-semibold">Errores Uif</h3>
+            <h3 className="font-semibold">Errores Pdt</h3>
+
         </div>
     )}
     </div>
+    <TopModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+    >
+        <PreKardexForm
+            isOpen={isOpen}
+            kardexId={sisgenDoc.idkardex}
+        />
+    </TopModal>
+    </>
   )
 }
 

@@ -16,6 +16,9 @@ export interface SISGENDocument {
     cod_ancert: string;
     actouif: string;
     actosunat: string;
+    errores: string[];
+    observaciones: string[];
+    personas: string[];
 }
 
 export interface SISGENSearchResponse {
