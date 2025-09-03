@@ -15,6 +15,7 @@ const SisgenBody = ({ typekardex, instrumentType }: Props) => {
     const [sisgenDocs, setSisgenDocs] = useState<SISGENDocument[]>([]);
     const [page, setPage] = useState(1);
     const [itemsCount, setItemsCount] = useState(0);
+    const [searchId, setSearchId] = useState('');
 
   return (
     <div className="w-full my-6">
@@ -24,6 +25,8 @@ const SisgenBody = ({ typekardex, instrumentType }: Props) => {
           setSisgenDocs={setSisgenDocs}
           page={page}
           setItemsCount={setItemsCount}
+          searchId={searchId}
+          setSearchId={setSearchId}
         />
         <SIsgenSearchTable sisgenDocs={sisgenDocs} />
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}

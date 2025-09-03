@@ -54,7 +54,8 @@ export interface SISGENSearchRequest {
     tipoInstrumento: number;   // 1-5 (Escritura, Certificado, etc.)
     estado: number;            // -1 to 5 (No Enviado, Enviado, etc.)
     codigoActo: number;   
-    page: number;     // 0 for all, or specific act code
+    page: number;
+    search_id?: string;
 }
 
 export const TIPO_INSTRUMENTO = {

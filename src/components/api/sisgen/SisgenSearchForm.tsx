@@ -1,5 +1,5 @@
 import Calendar from "../../ui/Calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SimpleSelector from "../../ui/SimpleSelector";
 import useSearchSisgen from "../../../hooks/sisgen/useSearchSisgen";
 import useAuthStore from "../../../store/useAuthStore";
@@ -21,9 +21,17 @@ interface Props {
     setSisgenDocs: React.Dispatch<React.SetStateAction<SISGENDocument[]>>
     page: number
     setItemsCount: React.Dispatch<React.SetStateAction<number>>
+    searchId: string
+    setSearchId: React.Dispatch<React.SetStateAction<string>>
 }
 
-const SisgenSearchForm = ({ instrumentType, setSisgenDocs, page, setItemsCount }: Props) => {
+const SisgenSearchForm = ({ 
+    instrumentType, 
+    setSisgenDocs, 
+    page, 
+    setItemsCount, 
+    searchId,
+    setSearchId }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const [isLoading, setIsLoading] = useState(false)
@@ -35,6 +43,31 @@ const SisgenSearchForm = ({ instrumentType, setSisgenDocs, page, setItemsCount }
     const [errorDisplay, setErrorDisplay] = useState('');
 
     const searchSisgen = useSearchSisgen()
+
+    useEffect(() => {
+        searchId && searchSisgen.mutate({
+            access,
+            sisgen: {
+                tipoInstrumento: instrumentType,
+                fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
+                fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
+                estado: selectedEstado,
+                codigoActo: 0,
+                page: page,
+                search_id: searchId,
+            },
+        }, {
+            onSuccess: (data) => {
+                if (data.error === 0) {
+                    setSisgenDocs(data.data);
+                    setItemsCount(data.pagination.total_documents);
+                }
+            },
+            onError: (error) => {
+                setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
+            }
+        })
+    }, [page])
 
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -74,6 +107,7 @@ const SisgenSearchForm = ({ instrumentType, setSisgenDocs, page, setItemsCount }
                 if (data.error === 0) {
                     setSisgenDocs(data.data);
                     setItemsCount(data.pagination.total_documents);
+                    setSearchId(data.pagination.search_id);
                 } else {
                     setErrorDisplay(data.message || 'Error al buscar documentos SISGEN.');
                 }

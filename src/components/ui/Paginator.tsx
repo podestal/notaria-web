@@ -5,9 +5,10 @@ interface Props {
   setPage: React.Dispatch<React.SetStateAction<number>>;
   itemsCount: number;
   itemsPerPage?: number;
+  refetch?: () => void;
 }
 
-const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10 }: Props) => {
+const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Props) => {
   const totalPages = Math.ceil(itemsCount / itemsPerPage);
   const maxVisiblePages = 10;
 
@@ -37,6 +38,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10 }: Props) => {
           className='cursor-pointer text-gray-500 hover:text-gray-700'
           onClick={() => {
             setPage(prev => Math.max(1, prev - 1))
+            refetch?.()
           }}
           disabled={page === 1}
         >
@@ -63,6 +65,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10 }: Props) => {
           className='cursor-pointer text-gray-500 hover:text-gray-700'
           onClick={() => {
             setPage(prev => Math.min(totalPages, prev + 1))
+            refetch?.()
           }}
           disabled={page === totalPages}
         >
