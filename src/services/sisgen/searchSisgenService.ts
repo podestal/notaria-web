@@ -26,6 +26,17 @@ export interface SISGENDocument {
     };
 }
 
+export interface Pagination {
+    current_page: number;
+    has_next: boolean;
+    has_previous: boolean;
+    page_size: number;
+    processed: number;
+    search_id: string;
+    total_documents: number;
+    total_pages: number;
+}
+
 export interface SISGENSearchResponse {
     error: number;            
     data: SISGENDocument[];
@@ -33,7 +44,8 @@ export interface SISGENSearchResponse {
     errores: string[];
     observaciones: string[];
     personas: any[];          
-    message?: string;          
+    message?: string;     
+    pagination: Pagination;
 }
 
 export interface SISGENSearchRequest {
@@ -41,7 +53,8 @@ export interface SISGENSearchRequest {
     fechaHasta: string;        // Format: "YYYY-MM-DD"
     tipoInstrumento: number;   // 1-5 (Escritura, Certificado, etc.)
     estado: number;            // -1 to 5 (No Enviado, Enviado, etc.)
-    codigoActo: number;        // 0 for all, or specific act code
+    codigoActo: number;   
+    page: number;     // 0 for all, or specific act code
 }
 
 export const TIPO_INSTRUMENTO = {

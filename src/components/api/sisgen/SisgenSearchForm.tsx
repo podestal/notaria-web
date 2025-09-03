@@ -19,9 +19,11 @@ const estadoSisgenOptions = [
 interface Props {
     instrumentType: number
     setSisgenDocs: React.Dispatch<React.SetStateAction<SISGENDocument[]>>
+    page: number
+    setItemsCount: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SisgenSearchForm = ({ instrumentType, setSisgenDocs }: Props) => {
+const SisgenSearchForm = ({ instrumentType, setSisgenDocs, page, setItemsCount }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const [isLoading, setIsLoading] = useState(false)
@@ -64,12 +66,14 @@ const SisgenSearchForm = ({ instrumentType, setSisgenDocs }: Props) => {
                 fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
                 fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
                 estado: selectedEstado,
-                codigoActo: 0
+                codigoActo: 0,
+                page: page,
             }
         }, {
             onSuccess: (data) => {
                 if (data.error === 0) {
                     setSisgenDocs(data.data);
+                    setItemsCount(data.pagination.total_documents);
                 } else {
                     setErrorDisplay(data.message || 'Error al buscar documentos SISGEN.');
                 }
