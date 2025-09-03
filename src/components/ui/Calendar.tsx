@@ -5,6 +5,7 @@ import moment from 'moment';
 import 'react-day-picker/dist/style.css';
 // import { RiCalendar2Fill } from '@remixicon/react';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import { es } from "react-day-picker/locale";
 
 interface Props {
   selectedDate: Date | undefined;
@@ -14,6 +15,33 @@ interface Props {
 const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
   const [open, setOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement | null>(null);
+
+  // Spanish month names mapping
+  const spanishMonths = {
+    0: 'Enero',
+    1: 'Febrero', 
+    2: 'Marzo',
+    3: 'Abril',
+    4: 'Mayo',
+    5: 'Junio',
+    6: 'Julio',
+    7: 'Agosto',
+    8: 'Septiembre',
+    9: 'Octubre',
+    10: 'Noviembre',
+    11: 'Diciembre'
+  };
+
+  // Spanish day names mapping
+  const spanishDays = {
+    0: 'Dom',
+    1: 'Lun', 
+    2: 'Mar',
+    3: 'Mié',
+    4: 'Jue',
+    5: 'Vie',
+    6: 'Sáb'
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,6 +84,18 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
               mode="single"
               selected={selectedDate}
               onSelect={setSelectedDate}
+              locale={es}
+              captionLayout="dropdown"
+              formatters={{
+                formatCaption: (date) => {
+                  const month = spanishMonths[date.getMonth() as keyof typeof spanishMonths];
+                  const year = date.getFullYear();
+                  return `${month} ${year}`;
+                },
+                formatWeekdayName: (day) => {
+                  return spanishDays[day as unknown as keyof typeof spanishDays];
+                }
+              }}
               styles={{
                 caption: { color: 'black' },
                 head: { color: 'black' },
