@@ -9,9 +9,10 @@ import PreParticipanteForm from "./PreParticipanteForm";
 
 interface Props {
     viajeId: number;
+    participantesDocs: string[];
 }
 
-const CreateParticipante = ({ viajeId }: Props) => {
+const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
 
     const [open, setOpen] = useState(false);
     const [document, setDocument] = useState('');
@@ -55,6 +56,7 @@ const CreateParticipante = ({ viajeId }: Props) => {
                     setContratanteInfo={setContratanteInfo as React.Dispatch<React.SetStateAction<any>>} 
                     setDocument={setDocument}
                     document={document}
+                    participantesDocs={participantesDocs}
                 />
                 <ParticipantesForm 
                    createContratante={createContratante}

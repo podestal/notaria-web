@@ -17,15 +17,25 @@ interface Props {
     }>>
     setDocument: React.Dispatch<React.SetStateAction<string>>
     document: string
+    participantesDocs: string[]
 }
 
-const PreParticipanteForm = ({ setContratanteInfo, setDocument, document }: Props) => {
+const PreParticipanteForm = ({ setContratanteInfo, setDocument, document, participantesDocs }: Props) => {
 
     const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [alreadyExists, setAlreadyExists] = useState('');
 
     const handleClienteLookup = () => {
         setLoading(true);
+        setAlreadyExists('');
+
+        if (participantesDocs.includes(document)) {
+            setAlreadyExists('Un participante con este documento ya existe');
+            setLoading(false);
+            return;
+        }
+
         // initialize contratanteInfo
         setContratanteInfo({
             apePaterno: '',
@@ -92,6 +102,8 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document }: Prop
     }
 
   return (
+    <>
+    {alreadyExists && <p className="text-red-500 text-center text-xs my-6">{alreadyExists}</p>}
     <div className="grid grid-cols-5 gap-4">
         <div className="w-full col-span-2">
             <Selector 
@@ -124,6 +136,7 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document }: Prop
         </div>
         }
     </div>
+    </>
   )
 }
 
