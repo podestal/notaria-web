@@ -5,6 +5,7 @@ import ExplanationMessage from "../../../ui/ExplanationMessage";
 import useUpdatePermisoViaje from "../../../../hooks/api/extraprotocolares/permisosViaje/useUpdatePermisoViaje";
 import { PermisoViaje } from "../../../../services/api/extraprotocolares/permisoViajeService";
 import useAuthStore from "../../../../store/useAuthStore";
+import moment from "moment";
 
 interface Props {
     page: number
@@ -30,8 +31,8 @@ const PermisoNoCorre = ({
             permisoViaje: {
                 ...permisoViaje,
                 swt_est: 'NC',
-                fecha_desde: permisoViaje.fecha_desde ? permisoViaje.fecha_desde.toISOString().split('T')[0] : '',
-                fecha_hasta: permisoViaje.fecha_hasta ? permisoViaje.fecha_hasta.toISOString().split('T')[0] : '',
+                fecha_desde: permisoViaje.fecha_desde ? moment(permisoViaje.fecha_desde).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+                fecha_hasta: permisoViaje.fecha_hasta ? moment(permisoViaje.fecha_hasta).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
             }
         }, {
             onSuccess: () => {

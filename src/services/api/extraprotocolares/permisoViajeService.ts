@@ -35,8 +35,8 @@ export interface PermisoViaje {
     sede_regis: string;
     qr: number;
     via: string;
-    fecha_desde: Date;
-    fecha_hasta: Date;
+    fecha_desde: Date | string;
+    fecha_hasta: Date | string;
     contratantes: PermisoViajeSimpleContratante[];
 }
 
