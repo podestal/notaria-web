@@ -266,7 +266,7 @@ con quien permanecerá hasta su retorno.`);
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput 
                 label="Nro de control"
-                value={permisoViaje?.num_formu || ''}
+                value={permisoViaje?.num_formu || numFormu}
                 setValue={() => {}}
                 horizontal
                 disabled
