@@ -38,7 +38,7 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
     );
 
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
-        permisoViaje?.fec_ingreso ? new Date(permisoViaje.fec_ingreso) : undefined
+        permisoViaje?.fec_ingreso ? moment(permisoViaje.fec_ingreso, "YYYY-MM-DD").toDate() : moment().toDate()
     )
     const [motivo, setMotivo] = useState(permisoViaje?.referencia || '');
     const [nomComunicarse, setNomComunicarse] = useState(permisoViaje?.nom_comu || '');
