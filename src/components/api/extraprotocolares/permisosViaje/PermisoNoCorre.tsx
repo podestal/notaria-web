@@ -30,8 +30,8 @@ const PermisoNoCorre = ({
             permisoViaje: {
                 ...permisoViaje,
                 swt_est: 'NC',
-                fecha_desde: permisoViaje.fecha_desde.toISOString().split('T')[0],
-                fecha_hasta: permisoViaje.fecha_hasta.toISOString().split('T')[0],
+                fecha_desde: permisoViaje.fecha_desde ? permisoViaje.fecha_desde.toISOString().split('T')[0] : '',
+                fecha_hasta: permisoViaje.fecha_hasta ? permisoViaje.fecha_hasta.toISOString().split('T')[0] : '',
             }
         }, {
             onSuccess: () => {
