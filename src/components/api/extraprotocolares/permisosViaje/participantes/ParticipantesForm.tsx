@@ -11,6 +11,7 @@ import { Ubigeo } from "../../../../../services/api/ubigeoService";
 import { Nacionalidad } from "../../../../../services/api/nacionalidadesService";
 import { ESTADO_CIVIL } from "../../../../../data/clienteData";
 import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput";
+import SimpleSelector from "../../../../ui/SimpleSelector";
 
 interface Props {
     contratanteViaje?: ViajeContratante;
@@ -37,7 +38,7 @@ interface Props {
 
 const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo, document, setContratanteInfo, setDocument }: Props) => {
 
-    console.log('contratanteInfo ->',contratanteInfo);
+    // console.log('contratanteInfo ->',contratanteInfo);
     
 
     const access = useAuthStore(s => s.access_token) || ""
@@ -64,9 +65,20 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         }
         return null;
       })
-    const [estadoCivil, setEstadoCivil] = useState(contratanteInfo.estadoCivil || '');
+    const [estadoCivil, setEstadoCivil] = useState(contratanteInfo.estadoCivil ? contratanteInfo.estadoCivil : 0);
     const [genero, setGenero] = useState(contratanteInfo.genero || '');
-    const [nacionalidad, setNacionalidad] = useState(contratanteInfo ? nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad)?.descripcion || '' : '');
+    const [selectedNacionalidad, setSelectedNacionalidad] = useState<{ id: string; label: string } | null>(() => {
+        if (contratanteInfo.nacionalidad) {
+          const match = nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad);
+          if (match) {
+            return {
+              id: match.idnacionalidad.toString(),
+              label: match.descripcion,
+            };
+          }
+        }
+        return null;
+      })
 
     useEffect(() => {
         setAppePaterno(contratanteInfo.apePaterno || '');
@@ -75,11 +87,33 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         setSegNombre(contratanteInfo.segNombre || '');
         setDireccion(contratanteInfo.direccion || '');
         setSelectedUbigeo(contratanteInfo.ubigeo ? { id: contratanteInfo.ubigeo, label: `${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomdpto} - ${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomprov} - ${ubigeos.find(ubi => ubi.coddis === contratanteInfo.ubigeo)?.nomdis}` } : null);
-        setEstadoCivil(contratanteInfo ? ESTADO_CIVIL.find(estado => (estado.value) === contratanteInfo.estadoCivil)?.desestcivil || '' : '');
-        setGenero(contratanteInfo ? contratanteInfo.genero === 'M' ? 'Masculino' : contratanteInfo.genero === 'F' ? 'Femenino' : '' : '');
-        setNacionalidad(contratanteInfo ? nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad)?.descripcion || '' : '');
+        setEstadoCivil(
+            contratanteInfo && contratanteInfo.estadoCivil
+                ? ESTADO_CIVIL.find(estado => estado.value === contratanteInfo.estadoCivil)?.value || 0
+                : 0
+        );
+        setGenero(
+            contratanteInfo && contratanteInfo.genero
+                ? contratanteInfo.genero === 'M'
+                    ? 'Masculino'
+                    : contratanteInfo.genero === 'F'
+                        ? 'Femenino'
+                        : ''
+                : ''
+        );
+        setSelectedNacionalidad(
+            contratanteInfo && contratanteInfo.nacionalidad
+                ? (() => {
+                    const match = nacionalidades.find(
+                        nacionalidad => nacionalidad.idnacionalidad.toString() === contratanteInfo.nacionalidad
+                    );
+                    return match
+                        ? { id: match.idnacionalidad.toString(), label: match.descripcion }
+                        : null;
+                })()
+                : null
+        );
     }, [contratanteInfo]);
-
     const handleCreateContratante = () => {
 
         console.log(idViaje, 'idViaje');
@@ -229,11 +263,11 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
             </div>
                
             <div className="grid grid-cols-2 gap-4 my-4">
-                <SimpleInput 
+                <SimpleSelector 
                     label="Estado Civil"
-                    value={estadoCivil}
-                    setValue={setEstadoCivil}
-                    horizontal
+                    options={[{ value: 0, label: 'Seleccionar estado civil' }, ...ESTADO_CIVIL.map(estado => ({ value: estado.value, label: estado.desestcivil }))]}
+                    defaultValue={estadoCivil}
+                    setter={setEstadoCivil}
                 />
                 <SimpleInput 
                     label="Género"
@@ -242,12 +276,13 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                     horizontal
                 />
             </div>
-            <div className="grid grid-cols-2 gap-4 my-4">
-                <SimpleInput 
-                    label="Nacionalidad"
-                    value={nacionalidad}
-                    setValue={setNacionalidad}
-                    horizontal
+            <div className="w-full flex justify-center items-center gap-4 col-span-2">
+                <p className="pl-2 block text-xs font-semibold text-slate-700">Nacionalidad</p>
+                <SearchableDropdownInput
+                    options={[...nacionalidades.map(nacionalidad => ({ id: nacionalidad.idnacionalidad.toString(), label: nacionalidad.descripcion }))]}
+                    selected={selectedNacionalidad}
+                    setSelected={setSelectedNacionalidad}
+                    placeholder="Buscar Nacionalidad"
                 />
             </div>
             <button
