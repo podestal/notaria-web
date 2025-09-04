@@ -3,6 +3,7 @@ import { PERMISO_VIAJE_CONDICIONES, PERMISO_VIAJE_ASUNTOS } from "../../../../da
 import TopModal from "../../../ui/TopModal";
 import { useState } from "react";
 import UpdatePermiso from "./UpdatePermiso";
+import getTitleCase from "../../../../utils/getTitleCase";
 
 interface Props {
     permisoViaje: PermisoViaje
@@ -39,7 +40,7 @@ const PermisoCard = ({ permisoViaje, readyOnly }: Props) => {
         <p className="text-center">{permisoViaje.fecha_crono}</p>
         <p className="text-center">{PERMISO_VIAJE_ASUNTOS.find(asunto => asunto.cod_asunto === permisoViaje.asunto)?.des_asunto}</p>
         <p className="text-center">{permisoViaje.fec_ingreso}</p>
-        <p className="col-span-2 text-center">{permisoViaje.lugar_formu}</p>
+        <p className="col-span-2 text-center">{getTitleCase(permisoViaje.lugar_formu || '')}</p>
       </div>
       <TopModal
         isOpen={open}
