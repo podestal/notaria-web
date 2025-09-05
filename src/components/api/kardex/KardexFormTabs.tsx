@@ -12,12 +12,14 @@ interface Props {
     tabs: Tab[];
     setFilter?: React.Dispatch<React.SetStateAction<string>>
     initialActiveTab?: string
+    extraFunction?: () => void
 }
 
 const KardexFormTabs = ({ 
     tabs, 
     setFilter,
-    initialActiveTab
+    initialActiveTab,
+    extraFunction
 }: Props) => {
 
     const [activeTab, setActiveTab] = useState(initialActiveTab || (tabs[0]?.id ?? ''))
@@ -37,7 +39,7 @@ const KardexFormTabs = ({
                     onClick={() => {
                         setFilter &&setFilter(tab.id)
                         setActiveTab(tab.id)
-                        
+                        extraFunction && extraFunction()
                     }}
                     disabled={tab.notAllowed}
                     className={`px-4 py-2 rounded-full font-medium text-sm transition-all cursor-pointer

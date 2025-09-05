@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import SisgenSearchForm from "./SisgenSearchForm";
 import SIsgenSearchTable from "./SIsgenSearchTable";
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
@@ -8,11 +8,12 @@ import Paginator from "../../ui/Paginator";
 interface Props {
     typekardex: string;
     instrumentType: number
+    sisgenDocs: SISGENDocument[]
+    setSisgenDocs: Dispatch<SetStateAction<SISGENDocument[]>>
 }
 
-const SisgenBody = ({ typekardex, instrumentType }: Props) => {
+const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs }: Props) => {
 
-    const [sisgenDocs, setSisgenDocs] = useState<SISGENDocument[]>([]);
     const [page, setPage] = useState(1);
     const [itemsCount, setItemsCount] = useState(0);
     const [searchId, setSearchId] = useState('');
@@ -28,7 +29,7 @@ const SisgenBody = ({ typekardex, instrumentType }: Props) => {
           searchId={searchId}
           setSearchId={setSearchId}
         />
-        <SIsgenSearchTable sisgenDocs={sisgenDocs} />
+        {instrumentType === 5 ? '' : <SIsgenSearchTable sisgenDocs={sisgenDocs} />}
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}
     </div>
   )
