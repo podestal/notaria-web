@@ -560,7 +560,6 @@ const ClientesForm = ({
             setApemat(response.data.resultado.apellido_materno || '')
             setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
             setBirthdate(response.data.resultado.fecha_nacimiento || '')
-            // setDireccion('Avis Luz y Fuerza D-8')
             if (response.data.resultado.genero === 'M') {
                 setGender(1) // Masculino
             }
@@ -574,7 +573,13 @@ const ClientesForm = ({
     }
 
     const handleSunat = () => {
-        console.log('Consulta SUNAT');
+        console.log('Consulta SUNAT', dni);
+        axios.get(`${import.meta.env.VITE_PERUDEVS_RUC_URL}document=${dni}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
+        ).then(response => {
+            console.log('response', response.data)
+        }).catch(error => {
+            console.error('Error al consultar SUNAT:', error)
+        });
         
     }
 
