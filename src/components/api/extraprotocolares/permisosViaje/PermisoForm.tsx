@@ -32,13 +32,15 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
     const user = useGetUserInfo(u => u.user)
     const { setMessage, setShow, setType } = useNotificationsStore()
 
+    console.log('permisoViaje', permisoViaje);
+
     const [tipoPermiso, setTipoPermiso] = useState(permisoViaje ? permisoViaje.asunto : '');
     const [hora, setHora] = useState<string | undefined>(
         permisoViaje?.hora_recep ? moment(permisoViaje.hora_recep, "HH:mm").format("HH:mm") : undefined
     );
 
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
-        permisoViaje?.fec_ingreso ? moment(permisoViaje.fec_ingreso, "YYYY-MM-DD").toDate() : moment().toDate()
+        permisoViaje?.fec_ingreso ? new Date(permisoViaje.fec_ingreso + 'T00:00:00') : moment().toDate()
     )
     const [motivo, setMotivo] = useState(permisoViaje?.referencia || '');
     const [nomComunicarse, setNomComunicarse] = useState(permisoViaje?.nom_comu || '');
@@ -47,10 +49,10 @@ const PermisoForm = ({ permisoViaje, createPermisoViaje, updatePermisoViaje }: P
     const [via, setVia] = useState(permisoViaje?.via || '');
     const [lugarFormu, setLugarFormu] = useState(permisoViaje?.lugar_formu || '');
     const [fechaDesde, setFechaDesde] = useState<Date | undefined>(
-        permisoViaje?.fecha_desde ? new Date(permisoViaje.fecha_desde) : undefined
+        permisoViaje?.fecha_desde ? new Date(permisoViaje.fecha_desde + 'T00:00:00') : undefined
     );
     const [fechaHasta, setFechaHasta] = useState<Date | undefined>(
-        permisoViaje?.fecha_hasta ? new Date(permisoViaje.fecha_hasta) : undefined
+        permisoViaje?.fecha_hasta ? new Date(permisoViaje.fecha_hasta + 'T00:00:00') : undefined
     );
 
     const [observacion, setObservacion] = useState(permisoViaje?.observacion || `El menor realizará el viaje en compañia...
