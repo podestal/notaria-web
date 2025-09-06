@@ -574,13 +574,20 @@ const ClientesForm = ({
 
     const handleSunat = () => {
         console.log('Consulta SUNAT', dni);
-        axios.get(`${import.meta.env.VITE_PERUDEVS_RUC_URL}document=${dni}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
-        ).then(response => {
+        axios.post(`${import.meta.env.VITE_MIGO_RUC_URL}`, {
+            ruc: dni,
+            token: import.meta.env.VITE_MIGO_TOKEN
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
             console.log('response', response.data)
+            setRazonSocial(response.data.nombre_o_razon_social)
+            setDomFiscal(response.data.direccion_simple)
         }).catch(error => {
             console.error('Error al consultar SUNAT:', error)
         });
-        
     }
 
   return (
