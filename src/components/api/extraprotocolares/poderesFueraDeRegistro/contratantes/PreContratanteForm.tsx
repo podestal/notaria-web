@@ -11,9 +11,10 @@ import CreateCliente from "../../../clientes/CreateCliente";
 interface Props {
     poderId: number;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    contratantesDocs: string[];
 }
 
-const PreContratanteForm = ({ poderId, setOpen }: Props) => {
+const PreContratanteForm = ({ poderId, setOpen, contratantesDocs }: Props) => {
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
@@ -24,9 +25,12 @@ const PreContratanteForm = ({ poderId, setOpen }: Props) => {
     const [cliente1, setCliente1] = useState<Cliente | null>(null)
     const [loading, setLoading] = useState(false)
 
+    const [contratanteExists, setContratanteExists] = useState('')
+
 const handleLookup = (e: React.FormEvent) => {
 
         e.preventDefault()
+        setContratanteExists('')
 
         if (selectedTipoPersona === 0) {
             setType('error')
@@ -60,6 +64,10 @@ const handleLookup = (e: React.FormEvent) => {
             setType('error')
             setMessage('Debe proporcionar un número de documento.')
             setShow(true)
+            return
+        }
+        if (contratantesDocs.includes(document)) {
+            setContratanteExists('El contratante con este documento ya existe.')
             return
         }
         setLoading(true)
@@ -115,6 +123,7 @@ const handleLookup = (e: React.FormEvent) => {
   return (
     <div>
         <h2 className="text-xl font-bold text-center mb-10 text-black">Buscar Cliente</h2>
+        {contratanteExists && <p className="text-red-500 text-center mb-4">{contratanteExists}</p>}
         <form
             onSubmit={handleLookup}
             className="grid grid-cols-5 items-center gap-6 text-black"

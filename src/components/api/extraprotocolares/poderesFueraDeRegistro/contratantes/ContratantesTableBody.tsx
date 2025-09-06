@@ -1,18 +1,29 @@
 import useAuthStore from "../../../../../store/useAuthStore"
 import useGetIngresoPoderesContratantesByPoder from "../../../../../hooks/api/extraprotocolares/ingresoPoderes/contratantes/useGetIngresoPoderesContratantesByPoder";
 import ContratantesCard from "./ContratantesCard";
+import { useEffect } from "react";
 
 interface Props {
     idPoder: number;
+    setContratantesDocs: (docs: string[]) => void;
 }
 
-const ContratantesTableBody = ({ idPoder }: Props) => {
+const ContratantesTableBody = ({ idPoder, setContratantesDocs }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+
+
     const { data: contratantes, isLoading, isError, error, isSuccess } = useGetIngresoPoderesContratantesByPoder({
         access,
         idPoder
     });
+
+    useEffect(() => {
+        if (contratantes) {
+          const docs = contratantes.map(contratante => contratante.c_codcontrat);
+          setContratantesDocs(docs);
+        }
+    }, [contratantes]);
 
     if (isLoading) return <p className="text-center my-4 animate-pulse">Cargando ...</p>
 

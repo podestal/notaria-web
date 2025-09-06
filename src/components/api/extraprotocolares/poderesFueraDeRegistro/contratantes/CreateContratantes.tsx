@@ -5,9 +5,10 @@ import PreContratanteForm from "./PreContratanteForm"
 
 interface Props {
     poderId: number;
+    contratantesDocs: string[];
 }
 
-const CreateContratantes = ({ poderId }: Props) => {
+const CreateContratantes = ({ poderId, contratantesDocs }: Props) => {
   const [open, setOpen] = useState(false)
     
   return (
@@ -25,6 +26,7 @@ const CreateContratantes = ({ poderId }: Props) => {
             <PreContratanteForm 
                 poderId={poderId}
                 setOpen={setOpen}
+                contratantesDocs={contratantesDocs}
             />
         </TopModal>
     </>
