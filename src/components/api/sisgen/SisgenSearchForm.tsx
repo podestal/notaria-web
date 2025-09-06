@@ -7,13 +7,12 @@ import moment from "moment";
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
 
 const estadoSisgenOptions = [
-    { value: -1, label: "Todos" },
+    { value: -1, label: "Todos los Documentos" },
     { value: 0, label: "No Enviado" },
     { value: 1, label: "Enviado" },
     { value: 2, label: "Enviado Observado" },
     { value: 3, label: "No Enviado Fallido" },
     { value: 4, label: "Sin Codigo Ancert" },
-    { value: 5, label: "Todos Documentos" }
 ]
 
 interface Props {
@@ -23,6 +22,8 @@ interface Props {
     setItemsCount: React.Dispatch<React.SetStateAction<number>>
     searchId: string
     setSearchId: React.Dispatch<React.SetStateAction<string>>
+    selectedEstado: number
+    setSelectedEstado: React.Dispatch<React.SetStateAction<number>>
 }
 
 const SisgenSearchForm = ({ 
@@ -31,14 +32,16 @@ const SisgenSearchForm = ({
     page, 
     setItemsCount, 
     searchId,
-    setSearchId }: Props) => {
+    setSearchId,
+    selectedEstado,
+    setSelectedEstado,
+ }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const [isLoading, setIsLoading] = useState(false)
 
     const [selectedFromDate, setSelectedFromDate] = useState<Date | undefined>(undefined);
     const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
-    const [selectedEstado, setSelectedEstado] = useState(-1);
 
     const [errorDisplay, setErrorDisplay] = useState('');
 

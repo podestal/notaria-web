@@ -18,6 +18,7 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs }: P
     const [page, setPage] = useState(1);
     const [itemsCount, setItemsCount] = useState(0);
     const [searchId, setSearchId] = useState('');
+    const [selectedEstado, setSelectedEstado] = useState(-1);
 
   return (
     <div className="w-full my-6">
@@ -29,6 +30,8 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs }: P
           setItemsCount={setItemsCount}
           searchId={searchId}
           setSearchId={setSearchId}
+          selectedEstado={selectedEstado}
+          setSelectedEstado={setSelectedEstado}
         />
         {instrumentType === 5 ? <SisgenBooksTable sisgenDocs={sisgenDocs} /> : <SIsgenSearchTable sisgenDocs={sisgenDocs} />}
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}
