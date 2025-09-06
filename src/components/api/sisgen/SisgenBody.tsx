@@ -4,6 +4,7 @@ import SisgenSearchForm from "./SisgenSearchForm";
 import SIsgenSearchTable from "./SIsgenSearchTable";
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
 import Paginator from "../../ui/Paginator";
+import SisgenBooksTable from "./SisgenBooksTable";
 
 interface Props {
     typekardex: string;
@@ -29,7 +30,7 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs }: P
           searchId={searchId}
           setSearchId={setSearchId}
         />
-        {instrumentType === 5 ? '' : <SIsgenSearchTable sisgenDocs={sisgenDocs} />}
+        {instrumentType === 5 ? <SisgenBooksTable sisgenDocs={sisgenDocs} /> : <SIsgenSearchTable sisgenDocs={sisgenDocs} />}
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}
     </div>
   )

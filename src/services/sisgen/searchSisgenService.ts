@@ -1,5 +1,28 @@
 import SisgenClient from "./sisgenClient"
 
+// ​
+// descripcionLibro: "ACTAS"
+// ​​
+// descripcionTipoLibro: "ACTAS"
+// ​​
+// domfiscal: "ILAVE"
+// ​​
+// empresa: "TENIENTE GOBERNADOR DE LA COMUNIDAD CAMPESINA MOROCOLLO - ILAVE"
+// ​​
+// estadoSisgen: "ENVIADO"
+// ​​
+// fechaIngreso: "2022-01-02"
+// ​​
+// id: 953
+// ​​
+// idtiplib: 21
+// ​​
+// libro: "000001-2022"
+// ​​
+// ruc: ""
+// ​​
+// tipoPersona: "J"
+
 export interface SISGENDocument {
     idkardex: number;
     kardex: string;
@@ -19,6 +42,17 @@ export interface SISGENDocument {
     errores: string[];
     observaciones: string[];
     personas: string[];
+    descripcionLibro: string;
+    descripcionTipoLibro: string;
+    domfiscal: string;
+    empresa: string;
+    estadoSisgen: string;
+    fechaIngreso: string;
+    id: number;
+    idtiplib: number;
+    libro: string;
+    ruc: string;
+    tipoPersona: string;
     uif_validation: {
         has_errors: boolean;
         errors: { error_type: string; error_description: string }[];
