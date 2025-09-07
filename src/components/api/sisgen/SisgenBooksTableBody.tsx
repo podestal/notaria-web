@@ -12,7 +12,7 @@ const SisgenBooksTableBody = ({ sisgenDocs }: Props) => {
     {sisgenDocs.length > 0 
     ? 
     <>
-       {sisgenDocs.map((doc, idx) => <SisgenBookCard key={doc.idkardex} sisgenDoc={doc} idx={idx + 1} />)}
+       {sisgenDocs.map((doc, idx) => <SisgenBookCard key={doc.libro} sisgenDoc={doc} idx={idx + 1} />)}
     </>
     :
     <div className="text-center text-gray-500 p-4">No se encontraron documentos SISGEN.</div>}
