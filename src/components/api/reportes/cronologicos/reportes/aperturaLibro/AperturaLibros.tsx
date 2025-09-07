@@ -20,6 +20,7 @@ const AperturaLibros = () => {
     const now = new Date()
     return new Date(now.getFullYear(), now.getMonth() + 1, 0)
   })
+  const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal')
 
   const { data: librosPage, isLoading, isError, error, isSuccess, refetch } = useGetLibros({ access, page:1, dateFrom, dateTo })
 

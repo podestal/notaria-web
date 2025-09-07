@@ -15,7 +15,7 @@ const LibrosTableBody = ({ libros, readyOnly, page }: Libros) => {
                 <LibrosCard key={libro.id} libro={libro} readyOnly={readyOnly} page={page} />
             ))
         ) : (
-            <p>No hay libros disponibles</p>
+            <p className="text-center text-xs my-4 py-4">No hay libros disponibles</p>
         )}
     </>
   )

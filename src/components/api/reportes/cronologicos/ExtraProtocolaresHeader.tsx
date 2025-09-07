@@ -4,6 +4,7 @@ import { Sheet, FileText, Loader2 } from "lucide-react"
 import { useState } from "react"
 import axios from "axios"
 import useAuthStore from "../../../../store/useAuthStore"
+import SingleSelect from "../../../ui/SingleSelect"
 
 
 
@@ -18,6 +19,7 @@ interface Props {
     url: string
     params: Record<string, string>
     name: string
+    orientation?: 'horizontal' | 'vertical'
 }
 
 const ExtraProtocolaresHeader = ({ 
@@ -30,13 +32,15 @@ const ExtraProtocolaresHeader = ({
     generatesExcel,
     url,
     params,
-    name
+    name,
+    orientation = 'horizontal'
 }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
     const apiURL = import.meta.env.VITE_API_URL
     const [loadingWord, setLoadingWord] = useState(false)
     const [loadingExcel, setLoadingExcel] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [selectedOrientation, setSelectedOrientation] = useState(orientation)
 
 
     const handleFilter = () => {
@@ -156,15 +160,18 @@ const ExtraProtocolaresHeader = ({
     }
 
   return (
-<div className="w-full grid grid-cols-6 gap-4 justify-center items-center text-center my-6">
-        <div className="flex flex-col col-span-2 justify-center items-center gap-4 font-semibold text-sm">
-            <p>Fecha Inicio</p>
-            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
+    <div className={`w-full grid ${orientation ? 'grid-cols-6' : 'grid-cols-4'}  gap-4 justify-center items-center text-center my-6`}>
+        <div className={`flex justify-center items-center gap-12 ${orientation ? 'col-span-3' : 'col-span-2'}`}>
+          <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
+              <p>Fecha Inicio</p>
+              <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
+          </div>
+          <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
+              <p>Fecha Fin</p>
+              <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
+          </div>
         </div>
-        <div className="flex flex-col col-span-2 justify-center items-center gap-4 font-semibold text-sm">
-            <p>Fecha Fin</p>
-            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
-        </div>
+        {orientation && <SingleSelect options={[{value: 'horizontal', label: 'Horizontal'}, {value: 'vertical', label: 'Vertical'}]} selected={selectedOrientation} onChange={setSelectedOrientation} />}
         <div>
             <button 
                 onClick={handleFilter}
