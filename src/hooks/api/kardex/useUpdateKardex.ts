@@ -8,6 +8,7 @@ export interface UpdateKardexData {
 
 interface Props {
     kardexId: number;
+
 }
 
 const useUpdateKardex = ({ kardexId }: Props): UseMutationResult<Kardex, Error, UpdateKardexData> => {
@@ -18,8 +19,10 @@ const useUpdateKardex = ({ kardexId }: Props): UseMutationResult<Kardex, Error, 
         mutationFn: (data: UpdateKardexData) => kardexService.update(data.kardex, data.access),
         onSuccess: (data) => {
             console.log('data res', data);
-            queryClient.invalidateQueries({ queryKey: ['kardex'] });
+            queryClient.invalidateQueries({ queryKey: ['kardex', kardexId] });
             queryClient.invalidateQueries({ queryKey: ["contratantes by kardex",data.kardex] })
+            queryClient.invalidateQueries({ queryKey: ['kardex list', "1", data?.idtipkar] })
+            
             // queryClient.invalidateQueries({ queryKey: ['kardex'] });
             // queryClient.invalidateQueries({ queryKey: ['kardex', data.idkardex] });
         },

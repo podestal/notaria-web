@@ -24,7 +24,7 @@ import KardexActosSelector from "./KardexActosSelector"
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
-import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
+import useUpdateKardex, { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
 import ParticipaMain from "../uif_pdt_participa/ParticipaMain"
@@ -67,7 +67,13 @@ const KardexForm = ({
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
     const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
+
     const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
+
+    const [kardexId, setKardexId] = useState(kardex?.idkardex || 0)
+    const [doneCreate, setDoneCreate] = useState(false);
+    const updateKardexInternal = useUpdateKardex({ kardexId })
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -88,52 +94,99 @@ const KardexForm = ({
 
         const formattedContratoDes = contratosDes.map(des => des.trim()).join(' / ')
 
-        createKardex && createKardex.mutate({
-            access,
-            kardex: {
-                idtipkar: selectedKardexType,
-                fechaingreso: moment(date).format('DD/MM/YYYY'),
-                referencia: karedexReference,
-                codactos: contratos.join(''),
-                idusuario: Number(responsible.id),
-                responsable: Number(responsible.id),
-                retenido: 0,
-                desistido: 0,
-                autorizado: 0,
-                idrecogio: 0,
-                pagado: 0,
-                visita: 0,
-                idnotario: 1,
-                contrato: `${formattedContratoDes} / `, 
-                numescritura: '', 
-                fktemplate: selectedTemplate,
-                papelini: '',
-                papelfin: '',
-                folioini: '',
-                foliofin: '',
-                fechaescritura: '',
-            }
-        }, {
-            onSuccess: (res) => {
-                setMessage('Kardex creado exitosamente')
-                setShow(true)
-                setType('success')
-                setNotAllowed && setNotAllowed(false)
-                const newKardex = res as unknown as Kardex
-                setKardex && setKardex(newKardex)
-                
-                // setKardex && setKardex(res.)
-            }, 
-            onError: (error) => {
-                setMessage(`Error al crear el kardex: ${error.message}`)
-                setShow(true)
-                setType('error')
-            }
-        })
+        if (createKardex && !doneCreate) {
+            createKardex.mutate({
+                access,
+                kardex: {
+                    idtipkar: selectedKardexType,
+                    fechaingreso: moment(date).format('DD/MM/YYYY'),
+                    referencia: karedexReference,
+                    codactos: contratos.join(''),
+                    idusuario: Number(responsible.id),
+                    responsable: Number(responsible.id),
+                    retenido: 0,
+                    desistido: 0,
+                    autorizado: 0,
+                    idrecogio: 0,
+                    pagado: 0,
+                    visita: 0,
+                    idnotario: 1,
+                    contrato: `${formattedContratoDes} / `, 
+                    numescritura: '', 
+                    fktemplate: selectedTemplate,
+                    papelini: '',
+                    papelfin: '',
+                    folioini: '',
+                    foliofin: '',
+                    fechaescritura: '',
+                }
+            }, {
+                onSuccess: (res) => {
+                    setMessage('Kardex creado exitosamente')
+                    setShow(true)
+                    setType('success')
+                    setNotAllowed && setNotAllowed(false)
+                    const newKardex = res as unknown as Kardex
+                    setKardex && setKardex(newKardex)
+                    setKardexId(newKardex.idkardex)
+                    setDoneCreate(true)
+                    // setKardex && setKardex(res.)
+                }, 
+                onError: (error) => {
+                    setMessage(`Error al crear el kardex: ${error.message}`)
+                    setShow(true)
+                    setType('error')
+                }
+            })
+        }
 
-        console.log('contratos before updating', contratos)
+        if (doneCreate) {
+            updateKardexInternal.mutate({
+                kardex: {
+                    idtipkar: selectedKardexType,
+                    fechaingreso: moment(date).format('DD/MM/YYYY'),
+                    referencia: karedexReference,
+                    codactos: contratos.join(''),
+                    idusuario: Number(responsible.id),
+                    responsable: Number(responsible.id),
+                    retenido: 0,
+                    desistido: 0,
+                    autorizado: 0,
+                    idrecogio: 0,
+                    pagado: 0,
+                    visita: 0,
+                    idnotario: 1,
+                    contrato: `${formattedContratoDes} / `, 
+                    numescritura: '', 
+                    fktemplate: selectedTemplate,
+                    papelini: '',
+                    papelfin: '',
+                    folioini: '',
+                    foliofin: '',
+                    fechaescritura: '',
+                },
+                access
+            }, {
+                onSuccess: () => {
+                    setMessage('Kardex actualizado exitosamente')
+                    setShow(true)
+                    setType('success')
+                }, 
+                onError: (error) => {
+                    let errorMessage = ''
+                    if ((error as any)?.response?.data?.error ) {
+                        setCannotUpdateKardex(true)
+                        setCannotUpdateKardexMessage((error as any)?.response?.data?.error)
+                    } else {
+                        setMessage(`Error al actualizar el kardex: ${errorMessage}`)
+                        setShow(true)
+                        setType('error')
+                    }
+                }
+            })
+        } 
 
-        if (kardex && updateKardex) {
+        if (kardex && updateKardex && !doneCreate) {
             updateKardex.mutate({
                 kardex: {
                     // idkardex: kardex?.idkardex || 0,
