@@ -56,7 +56,6 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
   return (
     <>
     <div>
-        <>{console.log(sisgenDoc)}</>
     <div 
         key={sisgenDoc.idkardex} 
         className="grid grid-cols-7 gap-4 p-2 border-b text-xs align-middle"

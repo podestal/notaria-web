@@ -1,7 +1,6 @@
 import SimpleSelector from "../../ui/SimpleSelector"
 import { MEDIOS_PAGO, BANCOS, MONEDAS } from "../../../data/patrimonialData"
 import SimpleInput from "../../ui/SimpleInput"
-import DateInput from "../../ui/DateInput"
 import { CreateDetalleMedioDePagoData } from "../../../hooks/api/detalleMedioDePago/useCreateDetalleMedioDePago"
 import { DetalleMedioDePago } from "../../../services/api/detalleMedioDePago"
 import { UseMutationResult } from "@tanstack/react-query"
@@ -103,7 +102,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 idbancos: banco, // Replace with actual idbancos
                 importemp: importe, // Replace with actual importemp
                 idmon: moneda.toString(), // Replace with actual idmon
-                foperacion: fechaOperacion, // Replace with actual foperacion
+                foperacion: moment(fechaOperacion).format('DD/MM/YYYY'), // Replace with actual foperacion
                 documentos // Replace with actual documentos
             },
         }, {
@@ -128,6 +127,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
   return (
     <div className=" w-[80%] mx-auto flex flex-col justify-center items-center gap-2">
         <h2 className="text-center font-bold text-lg mb-8">Nuevo Medio de Pago/Tipo de fondo</h2>
+        <>{console.log('patrimonial', patrimonial)}</>
        <div className="flex items-center justify-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-1 rounded-md mb-4">
         <TriangleAlert />
         <p>Recuerde que su importe no puede exceder los {MONEDAS.find(moneda => patrimonial.idmon === moneda.idmon)?.simbolo || ''} {patrimonial.importetrans - patrimonial.medios_pago_sum}</p>

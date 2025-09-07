@@ -11,18 +11,21 @@ interface Props {
     instrumentType: number
     sisgenDocs: SISGENDocument[]
     setSisgenDocs: Dispatch<SetStateAction<SISGENDocument[]>>
+    itemsCount: number
+    setItemsCount: Dispatch<SetStateAction<number>>
 }
 
-const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs }: Props) => {
+const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, itemsCount, setItemsCount }: Props) => {
 
     const [page, setPage] = useState(1);
-    const [itemsCount, setItemsCount] = useState(0);
+
     const [searchId, setSearchId] = useState('');
     const [selectedEstado, setSelectedEstado] = useState(-1);
 
   return (
     <div className="w-full my-6">
         <h2 className="text-xl font-bold">{typekardex}</h2>
+        {itemsCount > 0 && <p className="text-sm my-4 text-gray-700">Total de documentos encontrados: {itemsCount}</p>}
         <SisgenSearchForm 
           instrumentType={instrumentType}
           setSisgenDocs={setSisgenDocs}
