@@ -11,6 +11,8 @@ import { useState } from "react"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { TriangleAlert } from "lucide-react"
 import { UpdateDetalleMedioDePagoData } from "../../../hooks/api/detalleMedioDePago/useUpdateDetalleMedioDePago"
+import Calendar from "../../ui/Calendar"
+import moment from "moment"
 
 interface Props {
     patrimonial: Patrimonial
@@ -29,7 +31,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
     const [banco, setBanco] = useState(detalleMedioDePago ? detalleMedioDePago.idbancos : 0)
     const [moneda, setMoneda] = useState(detalleMedioDePago ? parseInt(detalleMedioDePago.idmon) : 0)
     const [documentos, setDocumentos] = useState( detalleMedioDePago ? detalleMedioDePago.documentos : "")
-    const [fechaOperacion, setFechaOperacion] = useState( detalleMedioDePago ? detalleMedioDePago.foperacion : "")
+    const [fechaOperacion, setFechaOperacion] = useState( detalleMedioDePago ? moment(detalleMedioDePago.foperacion, 'DD/MM/YYYY').toDate() : moment().toDate())
     const notExceedImport = patrimonial.importetrans - patrimonial.medios_pago_sum
 
     const [loading, setLoading] = useState(false)
@@ -62,7 +64,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 idbancos: banco, // Replace with actual idbancos
                 importemp: importe, // Replace with actual importemp
                 idmon: moneda.toString(), // Replace with actual idmon
-                foperacion: fechaOperacion, // Replace with actual foperacion
+                foperacion: moment(fechaOperacion).format('DD/MM/YYYY'), // Replace with actual foperacion
                 documentos // Replace with actual documentos
             }
         }, {
@@ -161,12 +163,20 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 horizontal
                 setter={setBanco}
             />
-            <DateInput 
+            {/* <DateInput 
                 value={fechaOperacion}
                 setValue={setFechaOperacion}
                 horizontal
                 label="Fecha de operación"
-            />
+            /> */}
+            <div className="flex items-center justify-center gap-2">
+                <p className=" text-xs font-semibold text-slate-700 pr-4">Fecha de operación</p>
+                <Calendar 
+                    selectedDate={fechaOperacion}
+                    setSelectedDate={setFechaOperacion}
+                    horizontal
+                />
+            </div>
         </div>
         <div className="grid grid-cols-2 gap-8 my-4">
             <SimpleSelector 
