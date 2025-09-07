@@ -32,6 +32,7 @@ import useAuthStore from "../../../store/useAuthStore"
 import useGetTemplatesByActos from "../../../hooks/api/templates/useGetTemplatesByActos"
 import DigitacionMain from "../digitacion/DigitacionMain"
 import EscrituracionMain from "../escrituracion/EscrituracionMain"
+import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -50,6 +51,9 @@ const KardexForm = ({
 }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+    const user = useUserInfoStore(s => s.user)
+    console.log('user', user)
+    
     const [open, setOpen] = useState(false)
     const [cannotUpdateKardex, setCannotUpdateKardex] = useState(false)
     const [cannotUpdateKardexMessage, setCannotUpdateKardexMessage] = useState('')
@@ -66,7 +70,7 @@ const KardexForm = ({
     // const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
     const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
-    const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: '1', label: 'ADMINISTRADOR' }) 
+    const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: user?.idusuario.toString() || '0', label: user?.username || '' }) 
 
     const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
 
