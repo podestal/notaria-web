@@ -19,7 +19,7 @@ interface Props {
     url: string
     params: Record<string, string>
     name: string
-    orientation?: 'horizontal' | 'vertical'
+    orientation?: string
 }
 
 const ExtraProtocolaresHeader = ({ 
@@ -28,12 +28,10 @@ const ExtraProtocolaresHeader = ({
     setDateFrom, 
     setDateTo, 
     refetch,
-    generatesWord,
-    generatesExcel,
     url,
     params,
     name,
-    orientation = 'horizontal'
+    orientation
 }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
     const apiURL = import.meta.env.VITE_API_URL
@@ -70,7 +68,8 @@ const ExtraProtocolaresHeader = ({
                 'Authorization': `JWT ${access}`,
               },
               params: {
-                ...params
+                ...params,
+                orientation: selectedOrientation
               }
             }
           );
@@ -171,7 +170,7 @@ const ExtraProtocolaresHeader = ({
               <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
           </div>
         </div>
-        {orientation && <SingleSelect options={[{value: 'horizontal', label: 'Horizontal'}, {value: 'vertical', label: 'Vertical'}]} selected={selectedOrientation} onChange={setSelectedOrientation} />}
+        {selectedOrientation && <SingleSelect options={[{value: 'horizontal', label: 'Horizontal'}, {value: 'vertical', label: 'Vertical'}]} selected={selectedOrientation} onChange={(value) => setSelectedOrientation(value)} />}
         <div>
             <button 
                 onClick={handleFilter}

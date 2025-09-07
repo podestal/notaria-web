@@ -45,6 +45,7 @@ const AperturaLibros = () => {
             fechaa: moment(dateTo).format('DD/MM/YYYY') || '',
           }}
           name='reporte_libros'
+          orientation={'horizontal'}
         />
         <LibrosTable 
           libros={librosPage.results}
