@@ -8,10 +8,12 @@ const SisgenMain = () => {
 
   const [sisgenDocs, setSisgenDocs] = useState<SISGENDocument[]>([]);
   const [itemsCount, setItemsCount] = useState(0);
+  const [page, setPage] = useState(1);
 
   const extraFunction = () => {
     setSisgenDocs([]);
     setItemsCount(0);
+    setPage(1);
   }
 
   return (
@@ -20,11 +22,11 @@ const SisgenMain = () => {
             extraFunction={extraFunction}
             tabs={[
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
-                { id: 'escrituras', label: 'Escrituras', content: <SisgenBody itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Escrituras Públicas" instrumentType={1} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/>},
-                { id: 'transferencias', label: 'Transferencias', content: <SisgenBody itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Transferencias Vehiculares" instrumentType={3} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
-                { id: 'garantias', label: 'Garantías', content: <SisgenBody itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Garantías Inmobiliarias" instrumentType={4} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
-                { id: 'no-contenciosos', label: 'No Contenciosos', content: <SisgenBody itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="No Contenciosos" instrumentType={2} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
-                { id: 'libros', label: 'Libros', content: <SisgenBody itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Libros Contables" instrumentType={5} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
+                { id: 'escrituras', label: 'Escrituras', content: <SisgenBody page={page} setPage={setPage} itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Escrituras Públicas" instrumentType={1} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/>},
+                { id: 'transferencias', label: 'Transferencias', content: <SisgenBody page={page} setPage={setPage} itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Transferencias Vehiculares" instrumentType={3} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
+                { id: 'garantias', label: 'Garantías', content: <SisgenBody page={page} setPage={setPage} itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Garantías Inmobiliarias" instrumentType={4} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
+                { id: 'no-contenciosos', label: 'No Contenciosos', content: <SisgenBody page={page} setPage={setPage} itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="No Contenciosos" instrumentType={2} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
+                { id: 'libros', label: 'Libros', content: <SisgenBody page={page} setPage={setPage} itemsCount={itemsCount} setItemsCount={setItemsCount} typekardex="Libros Contables" instrumentType={5} sisgenDocs={sisgenDocs} setSisgenDocs={setSisgenDocs}/> },
             ]}
         />
     </div>

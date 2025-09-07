@@ -13,11 +13,13 @@ interface Props {
     setSisgenDocs: Dispatch<SetStateAction<SISGENDocument[]>>
     itemsCount: number
     setItemsCount: Dispatch<SetStateAction<number>>
+    page: number
+    setPage: Dispatch<SetStateAction<number>>
 }
 
-const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, itemsCount, setItemsCount }: Props) => {
+const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, itemsCount, setItemsCount, page, setPage }: Props) => {
 
-    const [page, setPage] = useState(1);
+
 
     const [searchId, setSearchId] = useState('');
     const [selectedEstado, setSelectedEstado] = useState(-1);
