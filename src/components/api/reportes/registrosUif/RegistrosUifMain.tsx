@@ -11,7 +11,7 @@ const RegistrosUifMain = () => {
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
-  const [cronologico, setCronologico] = useState<string>('')
+  const [cronologico, setCronologico] = useState<string>('cronologico')
   // const [listType, setListType] = useState<string>('errors')
   const [page, setPage] = useState<number>(1)
 

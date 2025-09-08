@@ -5,8 +5,8 @@ moment.locale('es')
 
 interface Props {
     count: number
-    dateFrom: Date
-    dateTo: Date
+    dateFrom: Date | undefined
+    dateTo: Date | undefined
 }
 
 const spanishMonths = {
@@ -16,7 +16,7 @@ const spanishMonths = {
 }
 
 const RegistroUifSummary = ({ count, dateFrom, dateTo }: Props) => {
-  const monthName = spanishMonths[dateFrom.getMonth() as keyof typeof spanishMonths]
+  const monthName = dateFrom ? spanishMonths[dateFrom.getMonth() as keyof typeof spanishMonths] : ''
   
   return (
     <>

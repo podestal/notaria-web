@@ -10,8 +10,8 @@ interface Props {
     // setListType: React.Dispatch<React.SetStateAction<string>>
     kardexRO: KardexRO
     count: number
-    dateFrom: Date
-    dateTo: Date
+    dateFrom: Date | undefined
+    dateTo: Date | undefined
 }
 
 const RegistroUifBody = ({
