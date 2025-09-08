@@ -39,6 +39,9 @@ const RegistrosUifMain = () => {
         {isSuccess &&
         <RegistroUifBody 
           kardexRO={uifErrors.results}
+          count={uifErrors.count}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
         />}
     </div>
   )

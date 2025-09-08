@@ -9,16 +9,22 @@ interface Props {
     // listType: string
     // setListType: React.Dispatch<React.SetStateAction<string>>
     kardexRO: KardexRO
+    count: number
+    dateFrom: Date
+    dateTo: Date
 }
 
 const RegistroUifBody = ({
     // listType,
     // setListType,
-    kardexRO
+    kardexRO,
+    count,
+    dateFrom,
+    dateTo
 }: Props) => {
   return (
     <div className="w-[85%] mx-auto mb-10 text-black">
-       <RegistroUifSummary />
+       <RegistroUifSummary count={count} dateFrom={dateFrom} dateTo={dateTo} />
        <KardexFormTabs 
             tabs={[
                 { id: 'errors', label: 'Lista de Errores', content: <ListaDeErrores kardexErrors={kardexRO.lista_errores} /> },
