@@ -4,14 +4,15 @@ import SisgenBooksTableHeader from "./SisgenBooksTableHeader";
 
 interface Props {
     sisgenDocs: SISGENDocument[]
+    noDocsMessage: string
 }
 
-const SisgenBooksTable = ({ sisgenDocs }: Props) => {
+const SisgenBooksTable = ({ sisgenDocs, noDocsMessage }: Props) => {
 
     return (
         <div>
             <SisgenBooksTableHeader />
-            <SisgenBooksTableBody sisgenDocs={sisgenDocs} />
+            <SisgenBooksTableBody sisgenDocs={sisgenDocs} noDocsMessage={noDocsMessage} />
         </div>
       )
 }

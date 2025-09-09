@@ -15,9 +15,11 @@ interface Props {
     setItemsCount: Dispatch<SetStateAction<number>>
     page: number
     setPage: Dispatch<SetStateAction<number>>
+    noDocsMessage: string
+    setNoDocsMessage: Dispatch<SetStateAction<string>>
 }
 
-const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, itemsCount, setItemsCount, page, setPage }: Props) => {
+const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, itemsCount, setItemsCount, page, setPage, noDocsMessage, setNoDocsMessage }: Props) => {
 
 
 
@@ -40,9 +42,10 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
           setSelectedEstado={setSelectedEstado}
           loading={loading}
           setLoading={setLoading}
+          setNoDocsMessage={setNoDocsMessage}
         />
         {loading ? <p className="text-center text-gray-700 my-8 animate-pulse text-xs ">Cargando...</p> : <>
-        {instrumentType === 5 ? <SisgenBooksTable sisgenDocs={sisgenDocs} /> : <SIsgenSearchTable sisgenDocs={sisgenDocs} />}
+        {instrumentType === 5 ? <SisgenBooksTable sisgenDocs={sisgenDocs} noDocsMessage={noDocsMessage} /> : <SIsgenSearchTable sisgenDocs={sisgenDocs} noDocsMessage={noDocsMessage} />}
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}
         </>}
     </div>

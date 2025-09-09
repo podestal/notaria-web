@@ -3,9 +3,10 @@ import SisgenSingleCard from "./SisgenSingleCard"
 
 interface Props {
     sisgenDocs: SISGENDocument[]
+    noDocsMessage: string
 }
 
-const SisgenSearchTableBody = ({ sisgenDocs }: Props) => {
+const SisgenSearchTableBody = ({ sisgenDocs, noDocsMessage }: Props) => {
 
   return (
     <>
@@ -15,7 +16,7 @@ const SisgenSearchTableBody = ({ sisgenDocs }: Props) => {
           {sisgenDocs.map((doc, idx) => <SisgenSingleCard key={doc.idkardex} sisgenDoc={doc} idx={idx + 1} />)}
        </>
        :
-       <div className="text-center text-gray-500 p-4">No se encontraron documentos SISGEN.</div>}
+       <div className="text-center text-gray-500 p-4">{noDocsMessage}</div>}
     </>
   )
 }

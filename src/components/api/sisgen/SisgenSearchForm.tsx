@@ -26,6 +26,7 @@ interface Props {
     setSelectedEstado: React.Dispatch<React.SetStateAction<number>>
     loading: boolean
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setNoDocsMessage: React.Dispatch<React.SetStateAction<string>>
 }
 
 const SisgenSearchForm = ({ 
@@ -38,7 +39,8 @@ const SisgenSearchForm = ({
     selectedEstado,
     setSelectedEstado,
     loading,
-    setLoading
+    setLoading,
+    setNoDocsMessage
  }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
@@ -54,6 +56,7 @@ const SisgenSearchForm = ({
     useEffect(() => {
         if (searchId) {
             setLoading(true)
+            setNoDocsMessage('')
             searchSisgen.mutate({
                 access,
                 sisgen: {
@@ -68,6 +71,7 @@ const SisgenSearchForm = ({
             }, {
                 onSuccess: (data) => {
                     if (data.error === 0) {
+
                         setSisgenDocs(data.data);
                         setItemsCount(data.pagination.total_documents);
                     }
@@ -121,6 +125,11 @@ const SisgenSearchForm = ({
                     setSisgenDocs(data.data);
                     setItemsCount(data.pagination.total_documents);
                     setSearchId(data.pagination.search_id);
+                    if (data.data.length === 0) {
+                        setNoDocsMessage('No se encontraron documentos SISGEN.')
+                    } else {
+                        setNoDocsMessage('')
+                    }
                 } else {
                     setErrorDisplay(data.message || 'Error al buscar documentos SISGEN.');
                 }

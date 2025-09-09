@@ -3,9 +3,10 @@ import SisgenBookCard from "./SisgenBookCard"
 
 interface Props {
     sisgenDocs: SISGENDocument[]
+    noDocsMessage: string
 }
 
-const SisgenBooksTableBody = ({ sisgenDocs }: Props) => {
+const SisgenBooksTableBody = ({ sisgenDocs, noDocsMessage }: Props) => {
     console.log('sisgenDocs', sisgenDocs);
   return (
     <>
@@ -15,7 +16,7 @@ const SisgenBooksTableBody = ({ sisgenDocs }: Props) => {
        {sisgenDocs.map((doc, idx) => <SisgenBookCard key={doc.libro} sisgenDoc={doc} idx={idx + 1} />)}
     </>
     :
-    <div className="text-center text-gray-500 p-4">No se encontraron documentos SISGEN.</div>}
+    <div className="text-center text-gray-500 p-4">{noDocsMessage}</div>}
  </>
   )
 }
