@@ -44,6 +44,10 @@ import CorrelativoMain from "../components/api/reportes/correlativo/CorrelativoM
 import CronologicosPasadoMain from "../components/api/reportes/cronologicosPasado/CronologicosPasadoMain";
 import ReporteFirmaMain from "../components/api/reportes/reportePendFirma.tsx/ReporteFirmaMain";
 import BusquedaAvanzadaMain from "../components/api/extraprotocolares/busqueda/BusquedaAvanzadaMain";
+import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/ArchivosPdtEscrituras";
+import ArchivosPdtTransferencias from "../components/api/reportes/archivosPdt/ArchivosPdtTransferencias";
+import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/ArchivosPdtGarantias";
+import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/ArchivosPdtLibros";
 
 const routes = createBrowserRouter([
     {
@@ -193,7 +197,25 @@ const routes = createBrowserRouter([
                     },
                     {
                         path: "archivos-pdt",
-                        element: <PrivateRoutes><ArchivosPdtMain /></PrivateRoutes>
+                        element: <PrivateRoutes><ArchivosPdtMain /></PrivateRoutes>,
+                        children: [
+                            {
+                                path: "escrituras",
+                                element: <PrivateRoutes><ArchivosPdtEscrituras /></PrivateRoutes>
+                            },
+                            {
+                                path: "transferencias",
+                                element: <PrivateRoutes><ArchivosPdtTransferencias /></PrivateRoutes>
+                            },
+                            {
+                                path: "garantias",
+                                element: <PrivateRoutes><ArchivosPdtGarantias /></PrivateRoutes>
+                            },
+                            {
+                                path: "libros",
+                                element: <PrivateRoutes><ArchivosPdtLibros /></PrivateRoutes>
+                            }
+                        ]
                     },
                     {
                         path: "registros-uif",
@@ -201,7 +223,7 @@ const routes = createBrowserRouter([
                     },
                     {
                         path: "reporte-uif-iaoc",
-                        element: <PrivateRoutes><ReoporteUifMian /></PrivateRoutes>
+                        element: <PrivateRoutes><ReoporteUifMian /></PrivateRoutes>,
                     },
                     {
                         path: "busqueda-avanzada",
