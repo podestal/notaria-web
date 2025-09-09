@@ -23,6 +23,7 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
 
     const [searchId, setSearchId] = useState('');
     const [selectedEstado, setSelectedEstado] = useState(-1);
+    const [loading, setLoading] = useState(false)
 
   return (
     <div className="w-full my-6">
@@ -37,9 +38,13 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
           setSearchId={setSearchId}
           selectedEstado={selectedEstado}
           setSelectedEstado={setSelectedEstado}
+          loading={loading}
+          setLoading={setLoading}
         />
+        {loading ? <p className="text-center text-gray-700 my-8 animate-pulse text-xs ">Cargando...</p> : <>
         {instrumentType === 5 ? <SisgenBooksTable sisgenDocs={sisgenDocs} /> : <SIsgenSearchTable sisgenDocs={sisgenDocs} />}
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}
+        </>}
     </div>
   )
 }

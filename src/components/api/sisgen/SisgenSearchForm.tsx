@@ -24,6 +24,8 @@ interface Props {
     setSearchId: React.Dispatch<React.SetStateAction<string>>
     selectedEstado: number
     setSelectedEstado: React.Dispatch<React.SetStateAction<number>>
+    loading: boolean
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const SisgenSearchForm = ({ 
@@ -35,10 +37,12 @@ const SisgenSearchForm = ({
     setSearchId,
     selectedEstado,
     setSelectedEstado,
+    loading,
+    setLoading
  }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
-    const [isLoading, setIsLoading] = useState(false)
+    // const [isLoading, setIsLoading] = useState(false)
 
     const [selectedFromDate, setSelectedFromDate] = useState<Date | undefined>(undefined);
     const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
@@ -48,28 +52,34 @@ const SisgenSearchForm = ({
     const searchSisgen = useSearchSisgen()
 
     useEffect(() => {
-        searchId && searchSisgen.mutate({
-            access,
-            sisgen: {
-                tipoInstrumento: instrumentType,
-                fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
-                fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
-                estado: selectedEstado,
-                codigoActo: 0,
-                page: page,
-                search_id: searchId,
-            },
-        }, {
-            onSuccess: (data) => {
-                if (data.error === 0) {
-                    setSisgenDocs(data.data);
-                    setItemsCount(data.pagination.total_documents);
+        if (searchId) {
+            setLoading(true)
+            searchSisgen.mutate({
+                access,
+                sisgen: {
+                    tipoInstrumento: instrumentType,
+                    fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
+                    fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
+                    estado: selectedEstado,
+                    codigoActo: 0,
+                    page: page,
+                    search_id: searchId,
+                },
+            }, {
+                onSuccess: (data) => {
+                    if (data.error === 0) {
+                        setSisgenDocs(data.data);
+                        setItemsCount(data.pagination.total_documents);
+                    }
+                },
+                onError: (error) => {
+                    setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
+                },
+                onSettled: () => {
+                    setLoading(false)
                 }
-            },
-            onError: (error) => {
-                setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
-            }
-        })
+            })
+        }
     }, [page])
 
 
@@ -93,7 +103,7 @@ const SisgenSearchForm = ({
             return;
         }
 
-        setIsLoading(true)
+        setLoading(true)
 
         searchSisgen.mutate({
             access,
@@ -119,7 +129,7 @@ const SisgenSearchForm = ({
                 setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
             },
             onSettled: () => {
-                setIsLoading(false)
+                setLoading(false)
             }
         })
 
@@ -159,9 +169,9 @@ const SisgenSearchForm = ({
                 </div>
                 <button 
                     className="bg-blue-600 cursor-pointer text-sm text-white px-2 py-1 rounded-md hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={isLoading}
+                    disabled={loading}
                 >
-                    {isLoading ? 'Buscando...' : 'Buscar'}
+                    {loading ? 'Buscando...' : 'Buscar'}
                 </button>
             </div>
         </form>
