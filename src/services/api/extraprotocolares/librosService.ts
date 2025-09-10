@@ -71,14 +71,17 @@ export type CreateUpdateLibro = Omit<Libro, 'id'>;
 interface Props {
     libroId?: number;
     libroPdt?: boolean;
+    byNumlibro?: boolean;
 }
 
-export const getLibrosServiceSingle = ({ libroId, libroPdt }: Props) => {
+export const getLibrosServiceSingle = ({ libroId, libroPdt, byNumlibro }: Props) => {
     let url = '/libros/';
     if (libroId) {
         url += `${libroId}/`;
     } else if (libroPdt) {
         url += 'pdt-errors/';
+    } else if (byNumlibro) {
+        url += 'by_numlibro/';
     }
     return new APIClient<Libro, CreateUpdateLibro>(url);
 }

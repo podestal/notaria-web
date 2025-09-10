@@ -1,4 +1,5 @@
 import { LibroPdt } from "../../../../../services/api/extraprotocolares/librosService";
+import ArchivoPdtLibrosCard from "./ArchivoPdtLibrosCard";
 
 interface Props {
     errors: LibroPdt[];
@@ -12,10 +13,7 @@ const ArchivosPdtLibrosBody = ({ errors }: Props) => {
         <p>Descripción del Error</p>
     </div>
     {errors.map((error, index) => (
-        <div key={index + error.bookNumber} className="grid grid-cols-2 gap-4 justify-center items-center text-center text-xs p-2 my-4 mx-6 text-black">
-            <p>{error.bookNumber}</p>
-            <p>{error.errorItem}</p>
-        </div>
+        <ArchivoPdtLibrosCard key={index + error.bookNumber} error={error} />
     ))}
     </div>
   )
