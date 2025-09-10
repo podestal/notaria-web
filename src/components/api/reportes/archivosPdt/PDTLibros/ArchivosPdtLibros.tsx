@@ -5,6 +5,7 @@ import ArchivosPdtLibrosHeader from './ArchivosPdtLibrosHeader'
 import ArchivosPdtLibrosBody from './ArchivosPdtLibrosBody'
 import useAuthStore from '../../../../../store/useAuthStore'
 import useGetLibrosPdt from '../../../../../hooks/api/extraprotocolares/aperturaLibros/useGetLibrosPdt'
+import Paginator from '../../../../ui/Paginator'
 
 const ArchivosPdtLibros = () => {
 
@@ -35,7 +36,8 @@ const ArchivosPdtLibros = () => {
         {isSuccess && (
             <>
                 <ArchivosPdtLibrosHeader dateFrom={dateFrom} dateTo={dateTo} count={librosPdt.count} />
-                <ArchivosPdtLibrosBody />
+                <ArchivosPdtLibrosBody errors={librosPdt.results} />
+                <Paginator page={page} setPage={setPage} itemsCount={librosPdt.count} refetch={refetch}/>
             </>
         )}
         {isError && (
