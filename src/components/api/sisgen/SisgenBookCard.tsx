@@ -2,6 +2,11 @@ import { useState } from "react"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import getTitleCase from "../../../utils/getTitleCase"
 import { AlertTriangleIcon, ChevronUpIcon, ChevronDownIcon, UserIcon } from "lucide-react"
+import TopModal from "../../ui/TopModal"
+import ArchivoPdtPreLibroForm from "../reportes/archivosPdt/PDTLibros/ArchivoPdtPreLibroForm"
+import useGetLibroByNumlibro from "../../../hooks/api/extraprotocolares/aperturaLibros/useGetLibroByNumlibro"
+import useAuthStore from "../../../store/useAuthStore"
+import useGetTipoLibros from "../../../hooks/api/extraprotocolares/aperturaLibros/useGetTipoLibros"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -10,9 +15,12 @@ interface Props {
 
 const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
 
-  const [loading, setLoading] = useState(false)
-  const [isDisabled, setIsDisabled] = useState(false)
-  const [showErrors, setShowErrors] = useState(false)
+    const access = useAuthStore( s => s.access_token) || ''
+
+    const [loading, setLoading] = useState(false)
+    const [isDisabled, setIsDisabled] = useState(false)
+    const [showErrors, setShowErrors] = useState(false)
+    const [showLibro, setShowLibro] = useState(false)
 
   const handleSend = () => {
     setLoading(true)
@@ -22,8 +30,13 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
     <>
       <div className="grid grid-cols-9 gap-4 p-2 border-b text-xs align-middle">
         <p>{idx}</p>
-        <p>{sisgenDoc.libro}</p>
-        <p>{sisgenDoc.tipoPersona}</p>
+        <p 
+            onClick={() => setShowLibro(true)}
+            className="text-blue-500 cursor-pointer hover:text-blue-700 transition-all duration-300"
+        >
+            {sisgenDoc.libro}
+        </p>
+        <p>{sisgenDoc.tipoPersona === 'J' ? 'Jurídica' : sisgenDoc.tipoPersona === 'N' ? 'Natural' : ''}</p>
         <p>{sisgenDoc.ruc}</p>
         <p>{getTitleCase(sisgenDoc.empresa || '')}</p>
         <p>{getTitleCase(sisgenDoc.descripcionTipoLibro || '')}</p>
@@ -97,6 +110,20 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
 
         </div>
     )}
+        <TopModal isOpen={showLibro} onClose={() => setShowLibro(false)}>
+        {(() => {
+            const numlibro = sisgenDoc.libro.split('-')[0]
+            const { data: libro, isLoading: isLoadingLibro, isError: isErrorLibro, isSuccess: isSuccessLibro } = useGetLibroByNumlibro({ access, numlibro })
+
+            const { data: tipoLibros, isLoading: isLoadingTipoLibros, isError: isErrorTipoLibros, isSuccess: isSuccessTipoLibros } = useGetTipoLibros({access})
+
+            if (isLoadingLibro || isLoadingTipoLibros) return <div className="flex justify-center items-center h-full">Cargando...</div>
+            if (isErrorLibro || isErrorTipoLibros) return <div className="flex justify-center items-center h-full">Error al cargar el libro</div>
+            if (isSuccessLibro && isSuccessTipoLibros) return (
+                <ArchivoPdtPreLibroForm libro={libro} tipoLibros={tipoLibros} />
+            )
+        })()}
+    </TopModal>
     </>
   )
 }
