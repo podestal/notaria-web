@@ -16,7 +16,10 @@ const ArchivosPdtHeader = ({
     dateFrom, 
     setDateFrom, 
     dateTo, 
-    setDateTo, loading, setLoading, refetch }: Props) => {
+    setDateTo, 
+    loading, 
+    setLoading, 
+    refetch }: Props) => {
 
     const handleGeneratePDT = () => {
         setLoading(true)

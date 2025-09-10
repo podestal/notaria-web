@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ArchivosPdtHeader from '../ArchivosPdtHeader'
 import ArchivosPdtLibrosHeader from './ArchivosPdtLibrosHeader'
 import ArchivosPdtLibrosBody from './ArchivosPdtLibrosBody'
@@ -15,6 +15,10 @@ const ArchivosPdtLibros = () => {
     const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
     const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
     const [loading, setLoading] = useState<boolean>(false)
+
+    useEffect(() => {
+        setPage(1)
+    }, [dateFrom, dateTo])
 
     const { data: librosPdt, isLoading, isError, error, isSuccess, refetch } = useGetLibrosPdt({ access, page, dateFrom, dateTo })
 
@@ -37,7 +41,7 @@ const ArchivosPdtLibros = () => {
             <>
                 <ArchivosPdtLibrosHeader dateFrom={dateFrom} dateTo={dateTo} count={librosPdt.count} />
                 <ArchivosPdtLibrosBody errors={librosPdt.results} />
-                <Paginator page={page} setPage={setPage} itemsCount={librosPdt.count} refetch={refetch}/>
+                <Paginator page={page} setPage={setPage} itemsCount={librosPdt.count}/>
             </>
         )}
         {isError && (

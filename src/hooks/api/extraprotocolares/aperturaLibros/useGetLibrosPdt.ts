@@ -18,9 +18,9 @@ const useGetLibrosPdt = ({ access, page, dateFrom, dateTo }: Props): UseQueryRes
         finalDate: dateTo ? moment(dateTo).format('DD/MM/YYYY') : '',
     }
     return useQuery({
-        queryKey: ['librosPdt', page, dateFrom, dateTo],
+        queryKey: ['librosPdt', page],
         queryFn: () => librosService.get(access, params),
-        enabled: false
+        enabled: !!dateFrom && !!dateTo
     })
 }
 
