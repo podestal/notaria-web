@@ -58,7 +58,13 @@ export interface SISGENDocument {
         errors: { error_type: string; error_description: string }[];
         observations: string[];
     };
-}
+    pdt_validation: {
+        has_errors: boolean;
+        errors: string[];
+        observations: string[];
+    };
+  }
+
 
 export interface Pagination {
     current_page: number;

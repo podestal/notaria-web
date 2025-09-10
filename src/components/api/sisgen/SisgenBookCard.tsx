@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import getTitleCase from "../../../utils/getTitleCase"
+import { AlertTriangleIcon, ChevronUpIcon, ChevronDownIcon, UserIcon } from "lucide-react"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -11,13 +12,15 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
 
   const [loading, setLoading] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
+  const [showErrors, setShowErrors] = useState(false)
 
   const handleSend = () => {
     setLoading(true)
     setIsDisabled(true)
   }
   return (
-    <div className="grid grid-cols-8 gap-4 p-2 border-b text-xs align-middle">
+    <>
+      <div className="grid grid-cols-9 gap-4 p-2 border-b text-xs align-middle">
         <p>{idx}</p>
         <p>{sisgenDoc.libro}</p>
         <p>{sisgenDoc.tipoPersona}</p>
@@ -25,6 +28,13 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
         <p>{getTitleCase(sisgenDoc.empresa || '')}</p>
         <p>{getTitleCase(sisgenDoc.descripcionTipoLibro || '')}</p>
         <p>{getTitleCase(sisgenDoc.estadoSisgen || '')}</p>
+        {showErrors ? <ChevronUpIcon 
+            className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
+            onClick={() => setShowErrors(!showErrors)}
+        /> : <ChevronDownIcon 
+            className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
+            onClick={() => setShowErrors(!showErrors)}
+        />}
         {sisgenDoc.estadoSisgen?.toLocaleLowerCase() !== "enviado" 
         ? 
         <button 
@@ -44,6 +54,50 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
       </button>
         }
     </div>
+    {showErrors && (
+        <div className="p-4 text-xs flex flex-col gap-2">
+            <div>
+                <h3 className="font-semibold mb-2">Errores Sisgen</h3>
+                <>
+                {sisgenDoc.errores?.map((error, idx) => (
+                    <div key={idx + 'error'} className="flex items-center gap-2">
+                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
+                        <p >{error}</p>
+                    </div>
+                ))}
+                </>
+                <>
+                    {sisgenDoc.observaciones?.map((observacion, idx) => (
+                        <div key={idx + 'observacion'} className="flex items-center gap-2">
+                            <AlertTriangleIcon className="w-4 h-4 text-amber-500" />
+                            <p >{observacion}</p>
+                        </div>
+                    ))}
+                </>
+                <>
+                    {sisgenDoc.personas?.map((persona, idx) => (
+                        <div key={idx + 'persona'} className="flex items-center gap-2">
+                            <UserIcon className="w-4 h-4 text-blue-500" />
+                            <p >{persona}</p>
+                        </div>
+                    ))}
+                </>
+            </div>
+            <div>
+            <h3 className="font-semibold mb-2">Errores Pdt</h3>
+            <>
+                {sisgenDoc.pdt_validation.errors.map((error, idx) => (
+                    <div key={idx + 'error'} className="flex items-center gap-2">
+                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
+                        <p className="text-xs">{error}</p>
+                    </div>
+                ))}
+            </>
+            </div>
+
+        </div>
+    )}
+    </>
   )
 }
 
