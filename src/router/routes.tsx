@@ -47,7 +47,7 @@ import BusquedaAvanzadaMain from "../components/api/extraprotocolares/busqueda/B
 import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/ArchivosPdtEscrituras";
 import ArchivosPdtTransferencias from "../components/api/reportes/archivosPdt/ArchivosPdtTransferencias";
 import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/ArchivosPdtGarantias";
-import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/ArchivosPdtLibros";
+import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/PDTLibros/ArchivosPdtLibros";
 
 const routes = createBrowserRouter([
     {
@@ -204,7 +204,7 @@ const routes = createBrowserRouter([
                                 element: <PrivateRoutes><ArchivosPdtEscrituras /></PrivateRoutes>
                             },
                             {
-                                path: "transferencias",
+                                path: "vehiculares",
                                 element: <PrivateRoutes><ArchivosPdtTransferencias /></PrivateRoutes>
                             },
                             {
