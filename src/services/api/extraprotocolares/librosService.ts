@@ -1,5 +1,29 @@
 import APIClient from "../apiClient"
 
+export interface LibroPdt {
+    bookNumber: string;
+    errorItem: string;
+    isCorrectable: number;
+    typeOfCorrection: string;
+    categoryCorrect: string;
+    fileType: string;
+}
+
+export interface LibroPdtSummary {
+    total_kardex: number;
+    total_errors: number;
+    error_breakdown: Record<string, number>;
+}
+
+export interface LibroPdtPage {
+    count: number;
+    total_pages: number;
+    current_page: number;
+    page_size: number;
+    results: LibroPdt[];
+    summary: LibroPdtSummary;
+}
+
 export interface LibrosPage {
     count: number;
     next: string | null;
@@ -46,12 +70,15 @@ export type CreateUpdateLibro = Omit<Libro, 'id'>;
 
 interface Props {
     libroId?: number;
+    libroPdt?: boolean;
 }
 
-export const getLibrosServiceSingle = ({ libroId }: Props) => {
+export const getLibrosServiceSingle = ({ libroId, libroPdt }: Props) => {
     let url = '/libros/';
     if (libroId) {
         url += `${libroId}/`;
+    } else if (libroPdt) {
+        url += 'pdt-errors/';
     }
     return new APIClient<Libro, CreateUpdateLibro>(url);
 }

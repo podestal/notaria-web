@@ -9,7 +9,7 @@ interface Props {
     setDateTo: Dispatch<SetStateAction<Date | undefined>>
     loading: boolean
     setLoading: Dispatch<SetStateAction<boolean>>
-    refetch: () => Promise<void>
+    refetch: any
 }
 
 const ArchivosPdtHeader = ({ 
