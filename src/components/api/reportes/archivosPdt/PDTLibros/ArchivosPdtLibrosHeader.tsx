@@ -1,5 +1,5 @@
-import { File } from 'lucide-react'
 import moment from 'moment'
+import ArchivoPdtLibroDownload from './ArchivoPdtLibroDownload'
 
 interface Props {
     dateFrom: Date | undefined
@@ -22,7 +22,7 @@ const ArchivosPdtLibrosHeader = ({ dateFrom, dateTo, count }: Props) => {
         <div className="col-span-4 flex flex-col justify-center items-start gap-2">
             <h2>{moment(dateFrom).format('DD/MM/YYYY')} - {moment(dateTo).format('DD/MM/YYYY')}</h2>
             <h2>{count}</h2>
-            <File className="w-4 h-4 font-semibold text-blue-600 cursor-pointer hover:text-blue-700 transition-all duration-300" />
+            <ArchivoPdtLibroDownload initialDate={dateFrom} finalDate={dateTo} />
         </div>
     </div>
     </div>
