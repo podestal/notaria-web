@@ -126,7 +126,7 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
                 </>
             </div>
             <div>
-            <h3 className="font-semibold mb-2">Errores Uif</h3>
+            {sisgenDoc.uif_validation.has_errors && <h3 className="font-semibold mb-2">Errores Uif</h3>}
             <>
                 {sisgenDoc.uif_validation.errors.map((error, idx) => (
                     <div key={idx + 'error'} className="flex items-center gap-2">
@@ -142,7 +142,20 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
                 ))}
             </>
             </div>
-            <h3 className="font-semibold">Errores Pdt</h3>
+            <div>
+                
+                {(sisgenDoc.idtipkar === 1 || sisgenDoc.idtipkar === 3 || sisgenDoc.idtipkar === 4) && 
+                <>
+                {sisgenDoc.pdt_validation.has_errors && <h3 className="font-semibold mb-2">Errores Pdt</h3>}
+                {sisgenDoc.pdt_validation.errors.map((error, idx) => (
+                    <div key={idx + 'error'} className="flex items-center gap-2">
+                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
+                        <p className="text-xs">{error}</p>
+                    </div>
+                ))}
+                </>}
+            </div>
+            
 
         </div>
     )}
