@@ -29,8 +29,6 @@ const ParticipaMain = ({ kardex }: Props) => {
 
   return (
     <div className="my-6">
-        <>{console.log('UIF/PDT Participa kardex', detalleActos)}</>
-        <>{console.log('UIF/PDT Participa contratantes', contratantes)}</>
         <ParticipaTable 
             contratantes={contratantes}
             detalleActo={detalleActo}
