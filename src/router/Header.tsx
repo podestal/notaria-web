@@ -197,8 +197,6 @@ const Header = ({ kardexTypes }: Props) => {
 
   return (
     <div>
-      <>{console.log('user', user)
-      }</>
     <div className='grid grid-cols-9 h-[138px] bg-black'>
         <div className='w-full h-full flex items-center justify-center col-span-2'>
             <img src={notariaLogo} alt="" className='col-span-2 w-[280px]' />

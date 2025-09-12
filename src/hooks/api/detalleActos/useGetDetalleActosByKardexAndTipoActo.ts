@@ -9,6 +9,7 @@ interface Props {
 
 const useGetDetalleActosByKardexAndTipoActo = ({ access, kardex, tipoacto }: Props): UseQueryResult<DetalleActoKardex, Error> => {
     const detalleActosKardexService = getDetalleActosKardeService({ byKardexTipoActo: true })
+    console.log('calling detalle actos')
     const params = { kardex, tipoacto }
     return useQuery({
         queryKey: ['detalleactos', 'byKardexTipoActo', kardex, tipoacto],
