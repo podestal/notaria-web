@@ -1,3 +1,4 @@
+import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
 import useGetDetalleActosByKardexAndTipoActo from "../../../hooks/api/detalleActos/useGetDetalleActosByKardexAndTipoActo"
 import { Kardex } from "../../../services/api/kardexService"
 import useAuthStore from "../../../store/useAuthStore"
@@ -11,19 +12,28 @@ interface Props {
 const ParticipaMain = ({ kardex }: Props) => {
 
   const access = useAuthStore( s => s.access_token) || ''
-  const tipoacto = kardex.codactos.slice(0, 3)
+  const tipoacto = kardex.codactos?.slice(0, 3)
+  const detalleActo = kardex.contrato?.split('/')[0]
+  console.log('detalleActo', detalleActo);
   
-  const { data: detalleActos, isLoading, isError, error, isSuccess } = useGetDetalleActosByKardexAndTipoActo({ access, kardex: kardex.kardex, tipoacto: tipoacto })
+  
+  const { data: detalleActos, isLoading: isLoadingDetalleActos, isError: isErrorDetalleActos, error: errorDetalleActos, isSuccess: isSuccessDetalleActos } = useGetDetalleActosByKardexAndTipoActo({ access, kardex: kardex.kardex, tipoacto: tipoacto })
+  const { data: contratantes, isLoading: isLoadingContratantes, isError: isErrorContratantes, error: errorContratantes, isSuccess: isSuccessContratantes } = useGetContratantesByKardex({ kardex: kardex.kardex})
 
-  if (isLoading) return <p className="text-center text-gray-500 text-xs animate-pulse">Cargando...</p>
+  if (isLoadingDetalleActos || isLoadingContratantes) return <p className="text-center text-gray-500 text-xs animate-pulse">Cargando...</p>
 
-  if (isError) return <p className="text-center text-red-500 text-xs">Error al cargar los actos: ${error.message}</p>
+  if (isErrorDetalleActos || isErrorContratantes) return <p className="text-center text-red-500 text-xs">Error al cargar los actos: ${errorDetalleActos?.message}</p>
 
-  if (isSuccess)
+  if (isSuccessDetalleActos && isSuccessContratantes) 
+
   return (
     <div className="my-6">
         <>{console.log('UIF/PDT Participa kardex', detalleActos)}</>
-        <ParticipaTable />
+        <>{console.log('UIF/PDT Participa contratantes', contratantes)}</>
+        <ParticipaTable 
+            contratantes={contratantes}
+            detalleActo={detalleActo}
+        />
         <ParticipaGenerate />
     </div>
   )
