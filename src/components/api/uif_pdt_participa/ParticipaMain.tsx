@@ -1,4 +1,5 @@
 import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
+import useGetContratantesPorActoByKardex from "../../../hooks/api/contratantesPorActo/useGetContratantesPorActoByKardex"
 import useGetDetalleActosByKardexAndTipoActo from "../../../hooks/api/detalleActos/useGetDetalleActosByKardexAndTipoActo"
 import { Kardex } from "../../../services/api/kardexService"
 import useAuthStore from "../../../store/useAuthStore"
@@ -18,7 +19,7 @@ const ParticipaMain = ({ kardex }: Props) => {
   
   
   const { data: detalleActos, isLoading: isLoadingDetalleActos, isError: isErrorDetalleActos, error: errorDetalleActos, isSuccess: isSuccessDetalleActos } = useGetDetalleActosByKardexAndTipoActo({ access, kardex: kardex.kardex, tipoacto: tipoacto })
-  const { data: contratantes, isLoading: isLoadingContratantes, isError: isErrorContratantes, error: errorContratantes, isSuccess: isSuccessContratantes } = useGetContratantesByKardex({ kardex: kardex.kardex})
+  const { data: contratantes, isLoading: isLoadingContratantes, isError: isErrorContratantes, isSuccess: isSuccessContratantes } = useGetContratantesPorActoByKardex({ access, kardex: kardex.kardex})
 
   if (isLoadingDetalleActos || isLoadingContratantes) return <p className="text-center text-gray-500 text-xs animate-pulse">Cargando...</p>
 

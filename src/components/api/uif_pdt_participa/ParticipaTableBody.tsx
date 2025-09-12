@@ -1,8 +1,8 @@
-import { Contratante } from "../../../services/api/contratantesService"
+import { ContratantesPorActo } from "../../../services/api/contratantesPorActoService"
 import getTitleCase from "../../../utils/getTitleCase"
 
 interface Props {
-    contratantes: Contratante[]
+    contratantes: ContratantesPorActo[]
     detalleActo: string
 }
 

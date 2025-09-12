@@ -1,9 +1,9 @@
-import { Contratante } from "../../../services/api/contratantesService"
+import { ContratantesPorActo } from "../../../services/api/contratantesPorActoService"
 import ParticipaTableBody from "./ParticipaTableBody"
 import ParticipaTableHeader from "./ParticipaTableHeader"
 
 interface Props {
-    contratantes: Contratante[]
+    contratantes: ContratantesPorActo[]
     detalleActo: string
 }
 
