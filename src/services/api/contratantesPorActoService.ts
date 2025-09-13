@@ -24,13 +24,16 @@ export interface ContratantesPorActo {
 export type CreateUpdateContratantesPorActo = Omit<ContratantesPorActo, 'id' | 'cliente' | 'cliente_id' | 'condicion_str'>
 
 interface Props {
-    byKardex: boolean
+    byKardex?: boolean
+    id?: number
 }
 
-const getContratantesPorActoService = ({ byKardex }: Props) => {
+const getContratantesPorActoService = ({ byKardex, id }: Props) => {
     let url = '/contratantesxacto/'
     if (byKardex) {
         url += 'by_kardex/'
+    } else if (id) {
+        url += id + '/'
     }
     return new APIClient<ContratantesPorActo, CreateUpdateContratantesPorActo>(url)
 }

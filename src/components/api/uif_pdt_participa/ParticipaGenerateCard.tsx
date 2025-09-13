@@ -2,16 +2,24 @@ import { useState, useCallback } from "react"
 import { debounce } from "lodash" 
 import { ContratantesPorActo } from "../../../services/api/contratantesPorActoService"
 import getTitleCase from "../../../utils/getTitleCase"
+import useUpdateContratantePorActo from "../../../hooks/api/contratantesPorActo/useUpdateContratantePorActo"
+import useAuthStore from "../../../store/useAuthStore"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 interface Props {
     contratante: ContratantesPorActo
     detalleActo: string
+    monto?: string
 }
 
-const ParticipaGenerateCard = ({ contratante, detalleActo }: Props) => {
+const ParticipaGenerateCard = ({ contratante, detalleActo, monto }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
     const [porcentaje, setPorcentaje] = useState(contratante.porcentaje || '')
     const [isUpdating, setIsUpdating] = useState(false)
-
+    const updateContratantePorActo = useUpdateContratantePorActo({ kardex: contratante.kardex, id: contratante.id })
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    
     // Updated regex to properly handle decimal points
     const isValidPercentage = (value: string): boolean => {
         // Allow empty string
@@ -33,8 +41,26 @@ const ParticipaGenerateCard = ({ contratante, detalleActo }: Props) => {
                 setIsUpdating(true)
                 // Your API call here
                 // await updatePorcentaje(contratante.id, newPorcentaje)
-                console.log('newPorcentaje', newPorcentaje);
-                
+                const newMonto = (Number(newPorcentaje) / 100) * Number(monto)
+                updateContratantePorActo.mutate({
+                    access,
+                    contratantePorActo: {
+                        ...contratante,
+                        porcentaje: newPorcentaje,
+                        monto: newMonto.toString(),
+                    }
+                }, {
+                    onSuccess: () => {
+                        setMessage('Porcentaje actualizado correctamente')
+                        setShow(true)
+                        setType('success')
+                    },
+                    onError: () => {
+                        setMessage('Error al actualizar el porcentaje')
+                        setShow(true)
+                        setType('error')
+                    }
+                })
             } catch (error) {
                 console.error('Error updating percentage:', error)
             } finally {

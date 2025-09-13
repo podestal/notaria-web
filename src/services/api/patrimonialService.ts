@@ -7,7 +7,7 @@ export interface Patrimonial {
     nminuta: string
     idmon: number
     tipocambio: string
-    importetrans: number
+    importetrans: string
     exhibiomp: string
     presgistral: string
     nregistral: string

@@ -5,12 +5,14 @@ import ParticipaTableHeader from "./ParticipaTableHeader"
 interface Props {
     contratantes: ContratantesPorActo[]
     detalleActo: string
+    monto?: string
 }
 
-const ParticipaTable = ({ contratantes, detalleActo }: Props) => {
+const ParticipaTable = ({ contratantes, detalleActo, monto }: Props) => {
 
   console.log('contratantes', contratantes)
   console.log('detalleActo', detalleActo)
+  console.log('monto', monto)
 
   return (
     <>
@@ -18,6 +20,7 @@ const ParticipaTable = ({ contratantes, detalleActo }: Props) => {
         <ParticipaTableBody 
             contratantes={contratantes}
             detalleActo={detalleActo}
+            monto={monto}
         />
     </>
   )
