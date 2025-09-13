@@ -2,6 +2,7 @@ import axios from "axios"
 import useAuthStore from "../../../store/useAuthStore"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface Props {
   kardex: string
@@ -12,6 +13,7 @@ const ParticipaGenerate = ({ kardex, item }: Props) => {
 
   const access = useAuthStore(s => s.access_token) || ''
   const [isLoading, setIsLoading] = useState(false)
+  const queryClient = useQueryClient()
 
   const handleCalculate = () => {
     setIsLoading(true)
@@ -25,6 +27,7 @@ const ParticipaGenerate = ({ kardex, item }: Props) => {
     })
     .then(res => {
       console.log(res)
+      queryClient.invalidateQueries({ queryKey: ['contratantesPorActoByKardex', kardex] })
     })
     .catch(err => {
       console.log(err)
