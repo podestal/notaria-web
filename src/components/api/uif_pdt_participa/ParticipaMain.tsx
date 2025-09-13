@@ -14,11 +14,10 @@ const ParticipaMain = ({ kardex }: Props) => {
 
   const access = useAuthStore( s => s.access_token) || ''
   const tipoacto = kardex.codactos?.slice(0, 3)
-  const detalleActo = kardex.contrato?.split('/')[0]
-  console.log('detalleActo', detalleActo);
+  const detalleActoDescripcion = kardex.contrato?.split('/')[0]
   
   
-  const { data: detalleActos, isLoading: isLoadingDetalleActos, isError: isErrorDetalleActos, error: errorDetalleActos, isSuccess: isSuccessDetalleActos } = useGetDetalleActosByKardexAndTipoActo({ access, kardex: kardex.kardex, tipoacto: tipoacto })
+  const { data: detalleActoObj, isLoading: isLoadingDetalleActos, isError: isErrorDetalleActos, error: errorDetalleActos, isSuccess: isSuccessDetalleActos } = useGetDetalleActosByKardexAndTipoActo({ access, kardex: kardex.kardex, tipoacto: tipoacto })
   const { data: contratantes, isLoading: isLoadingContratantes, isError: isErrorContratantes, isSuccess: isSuccessContratantes } = useGetContratantesPorActoByKardex({ access, kardex: kardex.kardex})
 
   if (isLoadingDetalleActos || isLoadingContratantes) return <p className="text-center text-gray-500 text-xs animate-pulse">Cargando...</p>
@@ -31,9 +30,12 @@ const ParticipaMain = ({ kardex }: Props) => {
     <div className="my-6">
         <ParticipaTable 
             contratantes={contratantes}
-            detalleActo={detalleActo}
+            detalleActo={detalleActoDescripcion}
         />
-        <ParticipaGenerate />
+        <ParticipaGenerate 
+            kardex={kardex.kardex}
+            item={detalleActoObj.item}
+        />
     </div>
   )
 }

@@ -10,6 +10,7 @@ interface Props {
 const ParticipaTable = ({ contratantes, detalleActo }: Props) => {
 
   console.log('contratantes', contratantes)
+  console.log('detalleActo', detalleActo)
 
   return (
     <>
