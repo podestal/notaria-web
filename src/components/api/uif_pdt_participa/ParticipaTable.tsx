@@ -6,9 +6,10 @@ interface Props {
     contratantes: ContratantesPorActo[]
     detalleActo: string
     monto?: string
+    kardex: string
 }
 
-const ParticipaTable = ({ contratantes, detalleActo, monto }: Props) => {
+const ParticipaTable = ({ contratantes, detalleActo, monto, kardex }: Props) => {
 
   console.log('contratantes', contratantes)
   console.log('detalleActo', detalleActo)
@@ -21,6 +22,7 @@ const ParticipaTable = ({ contratantes, detalleActo, monto }: Props) => {
             contratantes={contratantes}
             detalleActo={detalleActo}
             monto={monto}
+            kardex={kardex}
         />
     </>
   )

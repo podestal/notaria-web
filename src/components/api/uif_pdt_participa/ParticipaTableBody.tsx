@@ -5,14 +5,15 @@ interface Props {
     contratantes: ContratantesPorActo[]
     detalleActo: string
     monto?: string
+    kardex: string
 }
 
-const ParticipaTableBody = ({ contratantes, detalleActo, monto }: Props) => {
+const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props) => {
 
   return (
     <>
     {contratantes.map((contratante) => (
-        <ParticipaGenerateCard key={contratante.idcontratante} contratante={contratante} detalleActo={detalleActo} monto={monto} />
+        <ParticipaGenerateCard key={contratante.idcontratante} contratante={contratante} detalleActo={detalleActo} monto={monto} kardex={kardex} />
     ))}
     </>
   )

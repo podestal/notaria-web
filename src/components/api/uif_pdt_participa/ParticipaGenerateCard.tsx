@@ -12,9 +12,10 @@ interface Props {
     contratante: ContratantesPorActo
     detalleActo: string
     monto?: string
+    kardex: string
 }
 
-const ParticipaGenerateCard = ({ contratante, detalleActo, monto }: Props) => {
+const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const [porcentaje, setPorcentaje] = useState(contratante.porcentaje || '')
@@ -102,7 +103,10 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto }: Props) => {
             />
 
             <p>{contratante.uif}</p>
-            <ParticipaRenta />
+            <ParticipaRenta 
+                kardex={kardex}
+                idcontratante={contratante.id.toString()}
+            />
         </div>
     )
 }

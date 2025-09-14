@@ -32,6 +32,7 @@ const ParticipaMain = ({ kardex }: Props) => {
             contratantes={contratantes}
             detalleActo={detalleActoDescripcion}
             monto={patrimonial[0]?.importetrans || '0'}
+            kardex={kardex.kardex}
         />
         <ParticipaGenerate 
             kardex={kardex.kardex}

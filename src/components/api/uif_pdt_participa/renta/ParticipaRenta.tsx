@@ -4,7 +4,12 @@ import { useState } from "react"
 import ParticipaRentaForm from "./ParticipaRentaForm"
 
 
-const ParticipaRenta = () => {
+interface Props {
+    kardex: string
+    idcontratante: string
+}
+
+const ParticipaRenta = ({ kardex, idcontratante }: Props) => {
 
     const [open, setOpen] = useState(false)
   return (
@@ -19,7 +24,7 @@ const ParticipaRenta = () => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <ParticipaRentaForm />
+        <ParticipaRentaForm kardex={kardex} idcontratante={idcontratante} />
     </TopModal>
     </>
   )

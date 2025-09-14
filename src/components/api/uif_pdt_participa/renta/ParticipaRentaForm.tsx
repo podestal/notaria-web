@@ -1,40 +1,24 @@
 import { BrushCleaning } from "lucide-react"
 import SingleSelect from "../../../ui/SingleSelect"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
-// type Option = {
-//     value: string;
-//     label: string;
-//   };
-  
-//   interface SingleSelectProps {
-//       options: Option[];
-//       selected: string;
-//       onChange: (value: string) => void;
-//       disabled?: boolean;
-//   }
 
-const optionsPregunta1 = [
-    { value: 'si', label: 'Si' },
-    { value: 'no', label: 'No' },
+
+const options = [
+    { value: '1', label: 'Si' },
+    { value: '0', label: 'No' },
 ]
 
-const optionsPregunta2 = [
-    { value: 'si', label: 'Si' },
-    { value: 'no', label: 'No' },
-]
+interface Props {
+    kardex: string
+    idcontratante: string
+}
 
-const optionsPregunta3 = [
-    { value: 'si', label: 'Si' },
-    { value: 'no', label: 'No' },
-]
+const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
 
-const ParticipaRentaForm = () => {
-    // pregu1 | pregu2 | pregu3
-
-    const [pregu1, setPregu1] = useState('n')
-    const [pregu2, setPregu2] = useState('n')
-    const [pregu3, setPregu3] = useState('n')
+    const [pregu1, setPregu1] = useState('')
+    const [pregu2, setPregu2] = useState('')
+    const [pregu3, setPregu3] = useState('')
 
     const [pregu1Error, setPregu1Error] = useState(false)
     const [pregu2Error, setPregu2Error] = useState(false)
@@ -51,19 +35,21 @@ const ParticipaRentaForm = () => {
         setPregu2Error(false)
         setPregu3Error(false)
 
-        if (pregu1 === 'n' || pregu1 === '') {
+        if (pregu1 === '') {
             setPregu1Error(true)
             return
         } 
-        if (pregu2 === 'n' || pregu2 === '') {
+        if (pregu2 === '') {
             setPregu2Error(true)
             return
         }
-        if (pregu3 === 'n' || pregu3 === '') {
+        if (pregu3 === '') {
             setPregu3Error(true)
             return
         }
-        console.log('Grabar')
+        console.log('Grabando')
+        console.log(kardex, idcontratante)
+        console.log(pregu1, pregu2, pregu3)
     }
 
   return (
@@ -83,28 +69,28 @@ const ParticipaRentaForm = () => {
             <div className="w-full flex flex-col items-start justify-center gap-2">
                 <div className="w-full flex items-center justify-between">
                     <p>¿La enajenación generó renta de 3ra Categoría?</p>
-                    <SingleSelect name="pregunta1" options={optionsPregunta1} selected={pregu1} onChange={(value) => {
+                    <SingleSelect name="pregunta1" options={options} selected={pregu1} onChange={(value) => {
                         setPregu1(value)
                         setPregu1Error(false)
                     }} />
                 </div>
-                {pregu1Error && <p className="text-red-500 text-sm">Esta pregunta es requerida</p>}
+                {pregu1Error && <p className="text-red-500 text-[10px]">Esta pregunta es requerida</p>}
                 <div className="w-full flex items-center justify-between">
                     <p>¿El bien enajenado era la casa habitación del enajenante?</p>
-                    <SingleSelect name="pregunta2" options={optionsPregunta2} selected={pregu2} onChange={(value) => {
+                    <SingleSelect name="pregunta2" options={options} selected={pregu2} onChange={(value) => {
                         setPregu2(value)
                         setPregu2Error(false)
                     }} />
                 </div>
-                {pregu2Error && <p className="text-red-500 text-sm">Esta pregunta es requerida</p>}
+                {pregu2Error && <p className="text-red-500 text-[10px]">Esta pregunta es requerida</p>}
                 <div className="w-full flex items-center justify-between">
                     <p>¿El impuesto por pagar es cero?</p>
-                    <SingleSelect name="pregunta3" options={optionsPregunta3} selected={pregu3} onChange={(value) => {
+                    <SingleSelect name="pregunta3" options={options} selected={pregu3} onChange={(value) => {
                         setPregu3(value)
                         setPregu3Error(false)
                     }} />
                 </div>
-                {pregu3Error && <p className="text-red-500 text-sm">Esta pregunta es requerida</p>}
+                {pregu3Error && <p className="text-red-500 text-[10px]">Esta pregunta es requerida</p>}
             </div>
         </div>
         <div className="flex items-center justify-start my-4">
