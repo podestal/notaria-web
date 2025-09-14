@@ -1,6 +1,9 @@
-import { BrushCleaning } from "lucide-react"
+import { BrushCleaning, Loader2 } from "lucide-react"
 import SingleSelect from "../../../ui/SingleSelect"
 import { useState } from "react"
+import useAuthStore from "../../../../store/useAuthStore"
+import useCreateRenta from "../../../../hooks/api/renta/useCreateRenta"
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 
 
 
@@ -16,6 +19,9 @@ interface Props {
 
 const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setShow, setType} = useNotificationsStore()
+
     const [pregu1, setPregu1] = useState('')
     const [pregu2, setPregu2] = useState('')
     const [pregu3, setPregu3] = useState('')
@@ -23,6 +29,10 @@ const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
     const [pregu1Error, setPregu1Error] = useState(false)
     const [pregu2Error, setPregu2Error] = useState(false)
     const [pregu3Error, setPregu3Error] = useState(false)
+
+    const [loading, setLoading] = useState(false)
+
+    const createRenta = useCreateRenta()
 
     const handleLimpiarPreguntas = () => {
         setPregu1('')
@@ -50,6 +60,33 @@ const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
         console.log('Grabando')
         console.log(kardex, idcontratante)
         console.log(pregu1, pregu2, pregu3)
+
+        setLoading(true)
+
+        createRenta.mutate({
+            access: access,
+            renta: {
+                kardex: kardex,
+                idcontratante: idcontratante,
+                pregu1: pregu1,
+                pregu2: pregu2,
+                pregu3: pregu3,
+            }
+        }, {
+            onSuccess: () => {
+                setMessage('Renta creada correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: () => {
+                setMessage('Error al crear la renta')
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
     }
 
   return (
@@ -98,7 +135,7 @@ const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
                 onClick={handleGrabar}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer transition-all duration-300"
             >
-                Grabar
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Grabar'}
             </button>
         </div>
     </div>

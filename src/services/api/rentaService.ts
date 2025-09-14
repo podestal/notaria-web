@@ -9,7 +9,7 @@ export interface Renta {
     pregu3: string
 }
 
-export type CreateUpdateRenta = Omit<Renta, 'idrenta' | 'idcontratante'>
+export type CreateUpdateRenta = Omit<Renta, 'idrenta'>
 
 interface Props {
     byKardexAndContratante?: boolean
