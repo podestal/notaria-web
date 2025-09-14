@@ -10,9 +10,10 @@ interface SingleSelectProps {
     selected: string;
     onChange: (value: string) => void;
     disabled?: boolean;
+    name?: string; // Add name prop to make each radio group unique
 }
 
-const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange, disabled }) => {
+const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange, disabled, name='single-select' }) => {
   return (
     <div className="flex justify-baseline items-center gap-10">
       {options.map((option) => (
@@ -24,7 +25,7 @@ const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange
         >
           <input
             type="radio"
-            name="single-select"
+            name={name} // Use the unique name prop
             value={option.value}
             checked={selected === option.value}
             onChange={() => onChange(option.value)}
