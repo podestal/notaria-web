@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { debounce } from "lodash" 
 import { ContratantesPorActo } from "../../../services/api/contratantesPorActoService"
 import getTitleCase from "../../../utils/getTitleCase"
@@ -19,6 +19,10 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto }: Props) => {
     const [isUpdating, setIsUpdating] = useState(false)
     const updateContratantePorActo = useUpdateContratantePorActo({ kardex: contratante.kardex, id: contratante.id })
     const { setMessage, setShow, setType } = useNotificationsStore()
+
+    useEffect(() => {
+        setPorcentaje(contratante.porcentaje || '')
+    }, [contratante.porcentaje])
     
     // Updated regex to properly handle decimal points
     const isValidPercentage = (value: string): boolean => {
