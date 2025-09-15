@@ -13,12 +13,14 @@ export type CreateUpdateRenta = Omit<Renta, 'idrenta'>
 
 interface Props {
     byKardexAndContratante?: boolean
+    idrenta?: string
 }
 
-const getRentaService = ({ byKardexAndContratante }: Props) => {
+const getRentaService = ({ byKardexAndContratante, idrenta }: Props) => {
     let url = 'renta/'
-
-    if (byKardexAndContratante) {
+    if (idrenta) {
+        url += `${idrenta}/` 
+    } else if (byKardexAndContratante) {
         url += 'by-kardex-and-contratante/'
     }
 

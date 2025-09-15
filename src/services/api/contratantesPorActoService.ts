@@ -21,6 +21,7 @@ export interface ContratantesPorActo {
     condicion_str: string
     renta: {
             idrenta: string
+            idcontratante: string
             kardex: string
             pregu1: string
             pregu2: string

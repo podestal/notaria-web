@@ -5,6 +5,8 @@ import useAuthStore from "../../../../store/useAuthStore"
 import useCreateRenta from "../../../../hooks/api/renta/useCreateRenta"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 import { ContratantesPorActo } from "../../../../services/api/contratantesPorActoService"
+import useUpdateRenta from "../../../../hooks/api/renta/useUpdateRenta"
+import { Renta } from "../../../../services/api/rentaService"
 
 
 
@@ -32,8 +34,12 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
     const [pregu3Error, setPregu3Error] = useState(false)
 
     const [loading, setLoading] = useState(false)
+    const [renta, setRenta] = useState<Renta | undefined>(contratante.renta)
 
-    const createRenta = useCreateRenta()
+    const createRenta = useCreateRenta({ kardex })
+    const updateRenta = useUpdateRenta({ idrenta: renta?.idrenta || '', kardex })
+
+    const [doneCreate, setDoneCreate] = useState(false)
 
     const handleLimpiarPreguntas = () => {
         setPregu1('')
@@ -61,30 +67,64 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
 
         setLoading(true)
 
-        createRenta.mutate({
-            access: access,
-            renta: {
-                kardex: kardex,
-                idcontratante: contratante.id.toString(),
-                pregu1: pregu1,
-                pregu2: pregu2,
-                pregu3: pregu3,
-            }
-        }, {
-            onSuccess: () => {
-                setMessage('Renta creada correctamente')
-                setShow(true)
-                setType('success')
-            },
-            onError: () => {
-                setMessage('Error al crear la renta')
-                setShow(true)
-                setType('error')
-            },
-            onSettled: () => {
-                setLoading(false)
-            }
-        })
+        if (!contratante.renta?.idrenta && !doneCreate) {
+            createRenta.mutate({
+                access: access,
+                renta: {
+                    kardex: kardex,
+                    idcontratante: contratante.id.toString(),
+                    pregu1: pregu1,
+                    pregu2: pregu2,
+                    pregu3: pregu3,
+                }
+            }, {
+                onSuccess: (res) => {
+                    setMessage('Renta creada correctamente')
+                    setShow(true)
+                    setType('success')
+                    setDoneCreate(true)
+                    console.log(res)
+                    // setIdRenta(res.idrenta)
+                    setRenta(res)
+                },
+                onError: () => {
+                    setMessage('Error al crear la renta')
+                    setShow(true)
+                    setType('error')
+                },
+                onSettled: () => {
+                    setLoading(false)
+                }
+            })
+        }
+
+        if (renta?.idrenta) {
+            updateRenta.mutate({
+                access: access,
+                renta: {
+                    ...renta,
+                    pregu1: pregu1,
+                    pregu2: pregu2,
+                    pregu3: pregu3,
+                }
+            }, {
+                onSuccess: () => {
+                    setMessage('Renta actualizada correctamente')
+                    setShow(true)
+                    setType('success')
+                },
+                onError: () => {
+                    setMessage('Error al actualizar la renta')
+                    setShow(true)
+                    setType('error')
+                },
+                onSettled: () => {
+                    setLoading(false)
+                }
+            })
+        }
+
+        
     }
 
   return (
