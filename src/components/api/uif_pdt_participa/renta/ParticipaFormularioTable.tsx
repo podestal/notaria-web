@@ -17,14 +17,14 @@ const ParticipaFormularioTable = ({ idrenta }: Props) => {
             <p className="col-span-4">N° Op. Sunat/N° Orden</p>
             <p className="col-span-4">Monto</p>
         </div>
-        <div className="">
+        <div className="flex flex-col gap-2">
             {isLoading && <p className="text-center text-xs text-gray-500 animate-pulse my-4">Cargando...</p>}
             {isError && <p className="text-center text-xs text-red-500 my-4">Error: {error?.message}</p>}
             {isSuccess && formularios && formularios.length > 0 && (
                 <>
                 {formularios.map((formulario) => (
                     <div key={formulario.idformulario}
-                    className="grid grid-cols-9 gap-4"
+                    className="grid grid-cols-9 gap-4 border-b-2 border-gray-200 pb-2"
                     >
                         <p className="col-span-4">{formulario.numformu}</p>
                         <p className="col-span-4">{formulario.monto}</p>

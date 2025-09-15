@@ -15,7 +15,7 @@ export interface Formulario {
 export type CreateUpdateFormulario = Omit<Formulario, 'idformulario'>;
 
 interface Props {
-    byRenta: boolean
+    byRenta?: boolean
 }
 
 const getFormularioService = ({ byRenta }: Props) => {
