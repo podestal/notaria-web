@@ -1,12 +1,14 @@
 import { BrushCleaning, Loader2 } from "lucide-react"
 import SingleSelect from "../../../ui/SingleSelect"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useAuthStore from "../../../../store/useAuthStore"
 import useCreateRenta from "../../../../hooks/api/renta/useCreateRenta"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 import { ContratantesPorActo } from "../../../../services/api/contratantesPorActoService"
 import useUpdateRenta from "../../../../hooks/api/renta/useUpdateRenta"
 import { Renta } from "../../../../services/api/rentaService"
+import ParticipaFormularioForm from "./ParticipaFormularioForm"
+import TopModal from "../../../ui/TopModal"
 
 
 
@@ -21,6 +23,8 @@ interface Props {
 }
 
 const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
+
+    const [showFormulario, setShowFormulario] = useState(false)
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType} = useNotificationsStore()
@@ -40,6 +44,10 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
     const updateRenta = useUpdateRenta({ idrenta: renta?.idrenta || '', kardex })
 
     const [doneCreate, setDoneCreate] = useState(false)
+
+    useEffect(() => {
+        setRenta(contratante.renta)
+    }, [contratante.renta])
 
     const handleLimpiarPreguntas = () => {
         setPregu1('')
@@ -72,7 +80,7 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
                 access: access,
                 renta: {
                     kardex: kardex,
-                    idcontratante: contratante.id.toString(),
+                    idcontratante: contratante.idcontratante,
                     pregu1: pregu1,
                     pregu2: pregu2,
                     pregu3: pregu3,
@@ -128,7 +136,8 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
     }
 
   return (
-    <div className="w-full">
+    <>
+        <div className="w-full">
         <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">Datos de la Renta</h2>
             <div 
@@ -168,15 +177,28 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
                 {pregu3Error && <p className="text-red-500 text-[10px]">Esta pregunta es requerida</p>}
             </div>
         </div>
-        <div className="flex items-center justify-start my-4">
+        <div className="flex items-center justify-between my-4">
             <button 
                 onClick={handleGrabar}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer transition-all duration-300"
             >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Grabar'}
             </button>
+            {renta?.pregu3 === '0' && <button 
+                onClick={() => setShowFormulario(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 cursor-pointer transition-all duration-300"
+            >
+                Ingresar Formulario
+            </button>}
         </div>
     </div>
+    <TopModal 
+        isOpen={showFormulario}
+        onClose={() => setShowFormulario(false)}
+    >
+        <ParticipaFormularioForm />
+    </TopModal>
+    </>
   )
 }
 
