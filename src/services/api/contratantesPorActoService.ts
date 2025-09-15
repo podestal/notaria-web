@@ -19,9 +19,17 @@ export interface ContratantesPorActo {
     cliente: string
     cliente_id: string
     condicion_str: string
-}
+    renta: {
+            idrenta: string
+            kardex: string
+            pregu1: string
+            pregu2: string
+            pregu3: string
+        }
+    }
 
-export type CreateUpdateContratantesPorActo = Omit<ContratantesPorActo, 'id' | 'cliente' | 'cliente_id' | 'condicion_str'>
+
+export type CreateUpdateContratantesPorActo = Omit<ContratantesPorActo, 'id' | 'cliente' | 'cliente_id' | 'condicion_str' | 'renta'>
 
 interface Props {
     byKardex?: boolean

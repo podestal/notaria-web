@@ -2,14 +2,15 @@ import { NotebookText } from "lucide-react"
 import TopModal from "../../../ui/TopModal"
 import { useState } from "react"
 import ParticipaRentaForm from "./ParticipaRentaForm"
+import { ContratantesPorActo } from "../../../../services/api/contratantesPorActoService"
 
 
 interface Props {
     kardex: string
-    idcontratante: string
+    contratante: ContratantesPorActo
 }
 
-const ParticipaRenta = ({ kardex, idcontratante }: Props) => {
+const ParticipaRenta = ({ kardex, contratante }: Props) => {
 
     const [open, setOpen] = useState(false)
   return (
@@ -24,7 +25,7 @@ const ParticipaRenta = ({ kardex, idcontratante }: Props) => {
         isOpen={open}
         onClose={() => setOpen(false)}
     >
-        <ParticipaRentaForm kardex={kardex} idcontratante={idcontratante} />
+        <ParticipaRentaForm kardex={kardex} contratante={contratante} />
     </TopModal>
     </>
   )

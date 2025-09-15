@@ -4,6 +4,7 @@ import { useState } from "react"
 import useAuthStore from "../../../../store/useAuthStore"
 import useCreateRenta from "../../../../hooks/api/renta/useCreateRenta"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
+import { ContratantesPorActo } from "../../../../services/api/contratantesPorActoService"
 
 
 
@@ -14,17 +15,17 @@ const options = [
 
 interface Props {
     kardex: string
-    idcontratante: string
+    contratante: ContratantesPorActo
 }
 
-const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
+const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType} = useNotificationsStore()
 
-    const [pregu1, setPregu1] = useState('')
-    const [pregu2, setPregu2] = useState('')
-    const [pregu3, setPregu3] = useState('')
+    const [pregu1, setPregu1] = useState(contratante.renta?.pregu1 || '')
+    const [pregu2, setPregu2] = useState(contratante.renta?.pregu2 || '')
+    const [pregu3, setPregu3] = useState(contratante.renta?.pregu3 || '')
 
     const [pregu1Error, setPregu1Error] = useState(false)
     const [pregu2Error, setPregu2Error] = useState(false)
@@ -57,9 +58,6 @@ const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
             setPregu3Error(true)
             return
         }
-        console.log('Grabando')
-        console.log(kardex, idcontratante)
-        console.log(pregu1, pregu2, pregu3)
 
         setLoading(true)
 
@@ -67,7 +65,7 @@ const ParticipaRentaForm = ({ kardex, idcontratante }: Props) => {
             access: access,
             renta: {
                 kardex: kardex,
-                idcontratante: idcontratante,
+                idcontratante: contratante.id.toString(),
                 pregu1: pregu1,
                 pregu2: pregu2,
                 pregu3: pregu3,

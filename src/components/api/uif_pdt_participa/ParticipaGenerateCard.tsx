@@ -5,7 +5,6 @@ import getTitleCase from "../../../utils/getTitleCase"
 import useUpdateContratantePorActo from "../../../hooks/api/contratantesPorActo/useUpdateContratantePorActo"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
-import { NotebookText } from "lucide-react"
 import ParticipaRenta from "./renta/ParticipaRenta"
 
 interface Props {
@@ -105,7 +104,7 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
             <p>{contratante.uif}</p>
             <ParticipaRenta 
                 kardex={kardex}
-                idcontratante={contratante.id.toString()}
+                contratante={contratante}
             />
         </div>
     )

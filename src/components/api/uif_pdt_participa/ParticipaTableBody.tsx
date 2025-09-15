@@ -13,7 +13,13 @@ const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props)
   return (
     <>
     {contratantes.map((contratante) => (
-        <ParticipaGenerateCard key={contratante.idcontratante} contratante={contratante} detalleActo={detalleActo} monto={monto} kardex={kardex} />
+        <ParticipaGenerateCard 
+          key={contratante.idcontratante} 
+          contratante={contratante} 
+          detalleActo={detalleActo} 
+          monto={monto} 
+          kardex={kardex} 
+        />
     ))}
     </>
   )
