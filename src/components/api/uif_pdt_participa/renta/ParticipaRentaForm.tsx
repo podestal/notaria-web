@@ -196,7 +196,9 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
         isOpen={showFormulario}
         onClose={() => setShowFormulario(false)}
     >
-        <ParticipaFormularioForm />
+        <ParticipaFormularioForm 
+            idrenta={renta?.idrenta || ''}
+        />
     </TopModal>
     </>
   )

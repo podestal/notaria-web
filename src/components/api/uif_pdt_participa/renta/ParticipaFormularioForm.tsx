@@ -3,7 +3,11 @@ import SimpleInput from "../../../ui/SimpleInput"
 import ParticipaFormularioTable from "./ParticipaFormularioTable"
 
 
-const ParticipaFormularioForm = () => {
+interface Props {
+    idrenta: string
+}
+
+const ParticipaFormularioForm = ({ idrenta }: Props) => {
 
     const [numOp, setNumOp] = useState('')
     const [monto, setMonto] = useState('')
@@ -34,7 +38,7 @@ const ParticipaFormularioForm = () => {
         </div>
         <div className="w-full">
             <h2 className="text-md font-bold mb-6">Formularios</h2>
-            <ParticipaFormularioTable />
+            <ParticipaFormularioTable idrenta={idrenta} />
         </div>
     </div>
   )
