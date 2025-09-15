@@ -16,12 +16,16 @@ export type CreateUpdateFormulario = Omit<Formulario, 'idformulario'>;
 
 interface Props {
     byRenta?: boolean
+    id?: number
 }
 
-const getFormularioService = ({ byRenta }: Props) => {
+const getFormularioService = ({ byRenta, id }: Props) => {
     let url = 'formulario/'
     if (byRenta) {
         url += 'by_renta/'
+    }
+    if (id) {
+        url += `${id}/`
     }
     return new APIClient<Formulario, CreateUpdateFormulario>(url)
 }

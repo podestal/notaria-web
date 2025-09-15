@@ -1,6 +1,6 @@
-import { Trash2 } from "lucide-react"
 import useGetFormularioByRenta from "../../../../hooks/api/formulario/useGetFormularioByRenta"
 import useAuthStore from "../../../../store/useAuthStore"
+import ParticipaFormularioCard from "./ParticipaFormularioCard"
 
 interface Props {
     idrenta: string
@@ -23,15 +23,7 @@ const ParticipaFormularioTable = ({ idrenta }: Props) => {
             {isSuccess && formularios && formularios.length > 0 && (
                 <>
                 {formularios.map((formulario) => (
-                    <div key={formulario.idformulario}
-                    className="grid grid-cols-9 gap-4 border-b-2 border-gray-200 pb-2"
-                    >
-                        <p className="col-span-4">{formulario.numformu}</p>
-                        <p className="col-span-4">{formulario.monto}</p>
-                        <button className="col-span-1">
-                            <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700 cursor-pointer transition-all duration-300" />
-                        </button>
-                    </div>
+                    <ParticipaFormularioCard key={formulario.idformulario} formulario={formulario} />
                 ))}
                 </>
             )}
