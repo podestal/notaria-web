@@ -102,10 +102,11 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
             />
 
             <p>{contratante.uif}</p>
+            {contratante.formulario === '1' && 
             <ParticipaRenta 
                 kardex={kardex}
                 contratante={contratante}
-            />
+            />}
         </div>
     )
 }
