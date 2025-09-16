@@ -42,19 +42,6 @@ const ArchivosPdtEscrituras = () => {
         {isError && (
             <div className="text-center text-red-500">{error.message}</div>
         )}
-        {/* {isLoading && (
-            <div className="text-center animate-pulse text-xs ">Cargando...</div>
-        )}
-        {isSuccess && (
-            <>
-                <ArchivosPdtLibrosHeader dateFrom={dateFrom} dateTo={dateTo} count={librosPdt.count} />
-                <ArchivosPdtLibrosBody errors={librosPdt.results} />
-                <Paginator page={page} setPage={setPage} itemsCount={librosPdt.count}/>
-            </>
-        )}
-        {isError && (
-            <div className="text-center text-red-500">{error.message}</div>
-        )} */}
     </div>
   )
 }
