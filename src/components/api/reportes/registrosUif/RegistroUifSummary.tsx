@@ -1,6 +1,7 @@
 import { FileSpreadsheet } from "lucide-react"
 import moment from "moment"
 import RegistroUifPlaneText from "./RegistroUifPlaneText"
+import RegistroUifExcel from "./RegistroUifExcel"
 
 // Set Spanish locale
 moment.locale('es')
@@ -36,7 +37,7 @@ const RegistroUifSummary = ({ count, dateFrom, dateTo }: Props) => {
             <h2>{monthName} - {moment(dateFrom).format('YYYY')}</h2>
             <h2>{count}</h2>
             <RegistroUifPlaneText dateFrom={dateFrom} dateTo={dateTo} />
-            <FileSpreadsheet className="w-4 h-4 text-green-600 cursor-pointer hover:text-green-700 transition-all duration-300" />
+            <RegistroUifExcel dateFrom={dateFrom} dateTo={dateTo} />
         </div>
     </div>
     </>
