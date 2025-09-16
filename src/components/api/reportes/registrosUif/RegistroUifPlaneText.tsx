@@ -28,29 +28,28 @@ const RegistroUifPlaneText = ({ dateFrom, dateTo }: Props) => {
                     headers: {
                         'Authorization': `JWT ${access}`
                     },
-                    responseType: 'blob' // Important for file downloads
+                    responseType: 'json' // Change back to json since backend returns JSON
                 }
             )
 
-            // Create blob from response
-            const blob = new Blob([response.data], { type: 'text/plain' })
+            // The response.data should contain your file content
+            console.log('Response data:', response.data);
+            
+            // Extract filename and content from the response
+            const { filename, content } = response.data;
+
+            // Decode the base64 content
+            const fileContent = atob(content);
+            
+            // Create blob from the decoded content
+            const blob = new Blob([fileContent], { type: 'text/plain' })
             
             // Create download link
             const url = window.URL.createObjectURL(blob)
             const link = document.createElement('a')
             link.href = url
             
-            // Get filename from Content-Disposition header if available
-            const contentDisposition = response.headers['content-disposition']
-            let filename = 'registro_uif.txt' // fallback filename
-            
-            if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename="(.+)"/)
-                if (filenameMatch) {
-                    filename = filenameMatch[1]
-                }
-            }
-            
+            // Use the filename from the response
             link.download = filename
             
             // Trigger download
