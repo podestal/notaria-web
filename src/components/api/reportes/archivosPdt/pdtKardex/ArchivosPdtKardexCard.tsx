@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import useAuthStore from '../../../../../store/useAuthStore'
 import { PdtError } from '../../../../../services/api/pdtKardexErrors'
+import TopModal from '../../../../ui/TopModal'
+import PreKardexForm from '../../registrosUif/PreKardexForm'
 
 interface Props {
     error: PdtError
@@ -20,19 +22,15 @@ const ArchivosPdtKardexCard = ({ error }: Props) => {
         </p>
         <p>{error.errorItem}</p>
     </div>
-    {/* <TopModal isOpen={open} onClose={() => setOpen(false)}>
-        {(() => {
-            const { data: libro, isLoading: isLoadingLibro, isError: isErrorLibro, isSuccess: isSuccessLibro } = useGetLibroByNumlibro({ access, numlibro: error.bookNumber })
-
-            const { data: tipoLibros, isLoading: isLoadingTipoLibros, isError: isErrorTipoLibros, isSuccess: isSuccessTipoLibros } = useGetTipoLibros({access})
-
-            if (isLoadingLibro || isLoadingTipoLibros) return <div className="flex justify-center items-center h-full">Cargando...</div>
-            if (isErrorLibro || isErrorTipoLibros) return <div className="flex justify-center items-center h-full">Error al cargar el libro</div>
-            if (isSuccessLibro && isSuccessTipoLibros) return (
-                <ArchivoPdtPreLibroForm libro={libro} tipoLibros={tipoLibros} />
-            )
-        })()}
-    </TopModal> */}
+    <TopModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+    >
+        <PreKardexForm
+            isOpen={open}
+            kardexId={error.idKardex}
+        />
+    </TopModal>
     </>
   )
 }
