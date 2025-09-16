@@ -44,7 +44,7 @@ import CorrelativoMain from "../components/api/reportes/correlativo/CorrelativoM
 import CronologicosPasadoMain from "../components/api/reportes/cronologicosPasado/CronologicosPasadoMain";
 import ReporteFirmaMain from "../components/api/reportes/reportePendFirma.tsx/ReporteFirmaMain";
 import BusquedaAvanzadaMain from "../components/api/extraprotocolares/busqueda/BusquedaAvanzadaMain";
-import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/ArchivosPdtEscrituras";
+import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/PDTEscrituras/ArchivosPdtEscrituras";
 import ArchivosPdtTransferencias from "../components/api/reportes/archivosPdt/ArchivosPdtTransferencias";
 import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/ArchivosPdtGarantias";
 import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/PDTLibros/ArchivosPdtLibros";
