@@ -46,7 +46,7 @@ import ReporteFirmaMain from "../components/api/reportes/reportePendFirma.tsx/Re
 import BusquedaAvanzadaMain from "../components/api/extraprotocolares/busqueda/BusquedaAvanzadaMain";
 import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtEscrituras";
 import ArchivosPdtTransferencias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtTransferencias";
-import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/ArchivosPdtGarantias";
+import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtGarantias";
 import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/PDTLibros/ArchivosPdtLibros";
 
 const routes = createBrowserRouter([
