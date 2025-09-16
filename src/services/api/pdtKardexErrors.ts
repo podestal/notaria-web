@@ -19,7 +19,10 @@ export interface PdtPage {
     count: number;
     next: string | null;
     previous: string | null;
-    results: PdtError[];
+    results: {
+        list: PdtError[];
+        totalRecords: number;
+    }
     summary: {
         total_kardex: number;
         total_errors: number;

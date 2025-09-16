@@ -2,6 +2,9 @@ import { useState } from 'react'
 import ArchivosPdtHeader from '../ArchivosPdtHeader'
 import useAuthStore from '../../../../../store/useAuthStore'
 import useGetEscriturasPdt from '../../../../../hooks/api/kardex/pdt/useGetEscriturasPdt'
+import ArchivosPdtKardexHeader from './ArchivosPdtKardexHeader'
+import Paginator from '../../../../ui/Paginator'
+import ArchivosPdtKardexBody from './ArchivosPdtKardexBody'
 
 const ArchivosPdtEscrituras = () => {
 
@@ -24,12 +27,21 @@ const ArchivosPdtEscrituras = () => {
             setDateTo={setDateTo}
             loading={loading}
             setLoading={setLoading}
-            refetch={() => {}}
+            refetch={refetch}
         />
         {isLoading && (
             <div className="text-center animate-pulse text-xs ">Cargando...</div>
         )}
-        <>{console.log('escriturasPdt', escriturasPdt)}</>
+        {isSuccess && (
+            <>
+                <ArchivosPdtKardexHeader dateFrom={dateFrom} dateTo={dateTo} count={escriturasPdt.results.totalRecords} />
+                <ArchivosPdtKardexBody errors={escriturasPdt.results.list} />
+                <Paginator page={page} setPage={setPage} itemsCount={escriturasPdt.count}/>
+            </>
+        )}
+        {isError && (
+            <div className="text-center text-red-500">{error.message}</div>
+        )}
         {/* {isLoading && (
             <div className="text-center animate-pulse text-xs ">Cargando...</div>
         )}
