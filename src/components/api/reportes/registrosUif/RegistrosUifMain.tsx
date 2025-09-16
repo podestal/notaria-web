@@ -22,7 +22,6 @@ const RegistrosUifMain = () => {
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-      <>{console.log(uifErrors)}</>
       <RegistroUifFilters 
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
