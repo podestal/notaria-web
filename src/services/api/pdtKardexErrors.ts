@@ -22,6 +22,7 @@ export interface PdtPage {
     results: {
         list: PdtError[];
         totalRecords: number;
+        totalError: number;
     }
     summary: {
         total_kardex: number;

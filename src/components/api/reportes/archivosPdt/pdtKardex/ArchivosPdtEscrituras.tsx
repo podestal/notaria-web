@@ -34,9 +34,20 @@ const ArchivosPdtEscrituras = () => {
         )}
         {isSuccess && (
             <>
-                <ArchivosPdtKardexHeader dateFrom={dateFrom} dateTo={dateTo} count={escriturasPdt.results.totalRecords} />
-                <ArchivosPdtKardexBody errors={escriturasPdt.results.list} />
-                <Paginator page={page} setPage={setPage} itemsCount={escriturasPdt.count}/>
+                <ArchivosPdtKardexHeader 
+                    dateFrom={dateFrom} 
+                    dateTo={dateTo} 
+                    count={escriturasPdt.results.totalRecords} 
+                    errors={escriturasPdt.results.totalError} 
+                    refetch={refetch}
+                />
+                <ArchivosPdtKardexBody 
+                    errors={escriturasPdt.results.list} 
+                />
+                <Paginator 
+                    page={page} 
+                    setPage={setPage} 
+                    itemsCount={escriturasPdt.count}/>
             </>
         )}
         {isError && (

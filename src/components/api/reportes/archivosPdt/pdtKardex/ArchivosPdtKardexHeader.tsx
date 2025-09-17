@@ -1,13 +1,27 @@
-import React from 'react'
+import { Loader, RefreshCcw } from 'lucide-react'
 import moment from 'moment'
+import ArchivoPdtKardexFiles from './ArchivoPdtKardexFiles'
+import { useState } from 'react'
 
 interface Props {
     dateFrom: Date | undefined
     dateTo: Date | undefined
     count: number
+    errors: number
+    refetch: any
 }
 
-const ArchivosPdtKardexHeader = ({ dateFrom, dateTo, count }: Props) => {
+const ArchivosPdtKardexHeader = ({ dateFrom, dateTo, count, errors, refetch }: Props) => {
+
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleRefetch = () => {
+        setIsLoading(true)
+        refetch().finally(() => {
+            setIsLoading(false)
+        })
+    }
+
   return (
     <div className="w-[85%] mx-auto">
         <h2 className="text-lg text-center font-semibold my-4 mx-6">Resumen de Operaciones PDT</h2>
@@ -22,6 +36,17 @@ const ArchivosPdtKardexHeader = ({ dateFrom, dateTo, count }: Props) => {
                 <h2>{count}</h2>
                 {/* <ArchivoPdtLibroDownload initialDate={dateFrom} finalDate={dateTo} /> */}
                 <p>No disponible</p>
+            </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 justify-center items-center text-center">
+            <ArchivoPdtKardexFiles />
+            <div className="flex justify-center items-center">
+                <button 
+                    onClick={handleRefetch}
+                    className="bg-blue-600 text-white px-4 py-2 text-xs cursor-pointer rounded-md hover:bg-blue-700 transition-all duration-300 flex justify-center items-center gap-2">
+                    {isLoading ? <Loader className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4" />}
+                    <p>Actualizar Errores ({errors})</p>
+                </button>
             </div>
         </div>
     </div>
