@@ -1,4 +1,4 @@
-import { File } from 'lucide-react'
+import { File, Loader } from 'lucide-react'
 import useAuthStore from '../../../../../store/useAuthStore'
 import useNotificationsStore from '../../../../../hooks/store/useNotificationsStore'
 import axios from 'axios'
@@ -50,10 +50,11 @@ const ArchivoPdtLibroDownload = ({ initialDate, finalDate }: Props) => {
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${import.meta.env.VITE_API_URL}libros/download-pdt/`,
+                url: `${import.meta.env.VITE_API_URL}kardex/pdt-file/`,
                 params: {
                     initialDate: moment(initialDate).format('DD/MM/YYYY'),
-                    finalDate: moment(finalDate).format('DD/MM/YYYY')
+                    finalDate: moment(finalDate).format('DD/MM/YYYY'),
+                    fileType: 6,
                 },
                 responseType: 'blob',
                 headers: {
@@ -96,16 +97,18 @@ const ArchivoPdtLibroDownload = ({ initialDate, finalDate }: Props) => {
     }
 
     return (
-        <>
-        <File 
+        <div>
+        
+        {isLoading ? <Loader className="w-4 h-4 animate-spin text-blue-600" /> : <File 
             onClick={() => {
                 if (isLoading) return
                 handleDownload()
             }}
             className={`w-4 h-4 font-semibold text-blue-600 cursor-pointer hover:text-blue-700 transition-all duration-300 ${isLoading ? 'animate-pulse' : ''}`}
             
-        />
-        </>
+        />}
+
+        </div>
     )
 }
 
