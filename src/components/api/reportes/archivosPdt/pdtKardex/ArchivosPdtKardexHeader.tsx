@@ -9,10 +9,14 @@ interface Props {
     count: number
     errors: number
     refetch: any
+    typeKardex: number
 }
 
-const ArchivosPdtKardexHeader = ({ dateFrom, dateTo, count, errors, refetch }: Props) => {
-
+const ArchivosPdtKardexHeader = ({ dateFrom, dateTo, count, errors, refetch, typeKardex }: Props) => {
+    console.log('kardex header pdt');
+    console.log('dateFrom', dateFrom)
+    console.log('dateTo', dateTo)
+    
     const [isLoading, setIsLoading] = useState(false)
 
     const handleRefetch = () => {
@@ -39,7 +43,11 @@ const ArchivosPdtKardexHeader = ({ dateFrom, dateTo, count, errors, refetch }: P
             </div>
         </div>
         <div className="grid grid-cols-2 gap-4 justify-center items-center text-center">
-            <ArchivoPdtKardexFiles />
+            <ArchivoPdtKardexFiles 
+                initialDate={dateFrom} 
+                finalDate={dateTo} 
+                typeKardex={typeKardex} 
+            />
             <div className="flex justify-center items-center">
                 <button 
                     onClick={handleRefetch}

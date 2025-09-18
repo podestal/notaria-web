@@ -33,7 +33,12 @@ const ArchivosPdtTransferencias = () => {
         )}
         {isSuccess && (
             <>
-                <ArchivosPdtKardexHeader dateFrom={dateFrom} dateTo={dateTo} count={vehicularesPdt.results.totalRecords} />
+                <ArchivosPdtKardexHeader 
+                    dateFrom={dateFrom} dateTo={dateTo} count={vehicularesPdt.results.totalRecords} 
+                    errors={vehicularesPdt.results.totalError} 
+                    refetch={refetch}
+                    typeKardex={3}
+                />
                 <ArchivosPdtKardexBody errors={vehicularesPdt.results.list} />
                 <Paginator page={page} setPage={setPage} itemsCount={vehicularesPdt.count}/>
             </>

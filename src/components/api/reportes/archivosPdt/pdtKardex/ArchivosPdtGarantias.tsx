@@ -33,7 +33,12 @@ const ArchivosPdtGarantias = () => {
         )}
         {isSuccess && (
             <>
-                <ArchivosPdtKardexHeader dateFrom={dateFrom} dateTo={dateTo} count={garantiasPdt.results.totalRecords} />
+                <ArchivosPdtKardexHeader 
+                    dateFrom={dateFrom} dateTo={dateTo} count={garantiasPdt.results.totalRecords} 
+                    errors={garantiasPdt.results.totalError} 
+                    refetch={refetch}
+                    typeKardex={4}
+                />
                 <ArchivosPdtKardexBody errors={garantiasPdt.results.list} />
                 <Paginator page={page} setPage={setPage} itemsCount={garantiasPdt.count}/>
             </>
