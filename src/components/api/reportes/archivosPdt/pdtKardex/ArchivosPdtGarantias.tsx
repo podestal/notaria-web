@@ -5,6 +5,7 @@ import useGetGarantiasPdt from '../../../../../hooks/api/kardex/pdt/useGetGarant
 import ArchivosPdtKardexHeader from './ArchivosPdtKardexHeader'
 import ArchivosPdtKardexBody from './ArchivosPdtKardexBody'
 import Paginator from '../../../../ui/Paginator'
+import moment from 'moment'
 
 const ArchivosPdtGarantias = () => {
   const access = useAuthStore(s => s.access_token) || ''
@@ -34,10 +35,15 @@ const ArchivosPdtGarantias = () => {
         {isSuccess && (
             <>
                 <ArchivosPdtKardexHeader 
-                    dateFrom={dateFrom} dateTo={dateTo} count={garantiasPdt.results.totalRecords} 
+                    // dateFrom={new Date(moment(dateFrom).format('YYYY-MM-DD') + 'T00:00:00.000Z')}
+                    // dateTo={new Date(moment(dateTo).format('YYYY-MM-DD') + 'T23:59:59.999Z')}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    count={garantiasPdt.results.totalRecords} 
                     errors={garantiasPdt.results.totalError} 
                     refetch={refetch}
                     typeKardex={4}
+                    typeKardexName="Garantias"
                 />
                 <ArchivosPdtKardexBody errors={garantiasPdt.results.list} />
                 <Paginator page={page} setPage={setPage} itemsCount={garantiasPdt.count}/>

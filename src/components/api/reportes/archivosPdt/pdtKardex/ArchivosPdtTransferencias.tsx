@@ -5,6 +5,7 @@ import useAuthStore from '../../../../../store/useAuthStore'
 import ArchivosPdtKardexHeader from './ArchivosPdtKardexHeader'
 import ArchivosPdtKardexBody from './ArchivosPdtKardexBody'
 import Paginator from '../../../../ui/Paginator'
+// import moment from 'moment'
 
 const ArchivosPdtTransferencias = () => {
   const access = useAuthStore(s => s.access_token) || ''
@@ -34,10 +35,13 @@ const ArchivosPdtTransferencias = () => {
         {isSuccess && (
             <>
                 <ArchivosPdtKardexHeader 
-                    dateFrom={dateFrom} dateTo={dateTo} count={vehicularesPdt.results.totalRecords} 
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    count={vehicularesPdt.results.totalRecords} 
                     errors={vehicularesPdt.results.totalError} 
                     refetch={refetch}
                     typeKardex={3}
+                    typeKardexName="Transferencias"
                 />
                 <ArchivosPdtKardexBody errors={vehicularesPdt.results.list} />
                 <Paginator page={page} setPage={setPage} itemsCount={vehicularesPdt.count}/>

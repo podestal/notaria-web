@@ -36,12 +36,15 @@ const ArchivosPdtEscrituras = () => {
         {isSuccess && dateFrom && dateTo && (
             <>
                 <ArchivosPdtKardexHeader 
-                    dateFrom={new Date(moment(dateFrom).format('YYYY-MM-DD'))}
-                    dateTo={new Date(moment(dateTo).format('YYYY-MM-DD'))}
+                    // dateFrom={new Date(moment(dateFrom).format('YYYY-MM-DD'))}
+                    // dateTo={new Date(moment(dateTo).format('YYYY-MM-DD'))}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
                     count={escriturasPdt.results.totalRecords} 
                     errors={escriturasPdt.results.totalError} 
                     refetch={refetch}
                     typeKardex={1}
+                    typeKardexName="Escrituras"
                 />
                 <ArchivosPdtKardexBody 
                     errors={escriturasPdt.results.list} 
