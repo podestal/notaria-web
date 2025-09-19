@@ -1,5 +1,5 @@
 import Calendar from "../../ui/Calendar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import SimpleSelector from "../../ui/SimpleSelector";
 import useSearchSisgen from "../../../hooks/sisgen/useSearchSisgen";
 import useAuthStore from "../../../store/useAuthStore";
@@ -28,6 +28,12 @@ interface Props {
     loading: boolean
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
     setNoDocsMessage: React.Dispatch<React.SetStateAction<string>>
+    selectedFromDate: Date | undefined
+    setSelectedFromDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+    selectedToDate: Date | undefined
+    setSelectedToDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+    setErrorDisplay: React.Dispatch<React.SetStateAction<string>>
+    errorDisplay: string
 }
 
 const SisgenSearchForm = ({ 
@@ -41,16 +47,16 @@ const SisgenSearchForm = ({
     setSelectedEstado,
     loading,
     setLoading,
-    setNoDocsMessage
+    setNoDocsMessage,
+    selectedFromDate,
+    setSelectedFromDate,
+    selectedToDate,
+    setSelectedToDate,
+    setErrorDisplay,
+    errorDisplay
  }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
-    // const [isLoading, setIsLoading] = useState(false)
-
-    const [selectedFromDate, setSelectedFromDate] = useState<Date | undefined>(undefined);
-    const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
-
-    const [errorDisplay, setErrorDisplay] = useState('');
 
     const searchSisgen = useSearchSisgen()
 
@@ -104,7 +110,8 @@ const SisgenSearchForm = ({
             setErrorDisplay,
             setLoading,
             access,
-            searchSisgen
+            searchSisgen,
+            searchId
         })
 
     }

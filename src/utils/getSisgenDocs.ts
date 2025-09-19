@@ -18,6 +18,7 @@ interface Props {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
     access: string
     searchSisgen: UseMutationResult<SISGENSearchResponse, Error, SearchSisgenData>
+    searchId: string
 }
 
 const getSisgenDocs = ({
@@ -33,7 +34,8 @@ const getSisgenDocs = ({
     setErrorDisplay,
     setLoading,
     access,
-    searchSisgen
+    searchSisgen,
+    searchId
 }: Props) => {
 
     setErrorDisplay('');
@@ -64,6 +66,7 @@ const getSisgenDocs = ({
             estado: selectedEstado,
             codigoActo: 0,
             page: page,
+            search_id: searchId,
         }
     }, {
         onSuccess: (data) => {

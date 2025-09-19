@@ -25,6 +25,10 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
     const [selectedEstado, setSelectedEstado] = useState(-1);
     const [loading, setLoading] = useState(false)
 
+    const [selectedFromDate, setSelectedFromDate] = useState<Date | undefined>(undefined);
+    const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
+    const [errorDisplay, setErrorDisplay] = useState('');
+
   return (
     <div className="w-full my-6">
         <h2 className="text-xl font-bold">{typekardex}</h2>
@@ -41,9 +45,35 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
           loading={loading}
           setLoading={setLoading}
           setNoDocsMessage={setNoDocsMessage}
+          selectedFromDate={selectedFromDate}
+          setSelectedFromDate={setSelectedFromDate}
+          selectedToDate={selectedToDate}
+          setSelectedToDate={setSelectedToDate}
+          setErrorDisplay={setErrorDisplay}
+          errorDisplay={errorDisplay}
         />
         {loading ? <p className="text-center text-gray-700 my-8 animate-pulse text-xs ">Cargando...</p> : <>
-        {instrumentType === 5 ? <SisgenBooksTable sisgenDocs={sisgenDocs} noDocsMessage={noDocsMessage} /> : <SIsgenSearchTable sisgenDocs={sisgenDocs} noDocsMessage={noDocsMessage} setPage={setPage} />}
+        {instrumentType === 5 
+        ? 
+        <SisgenBooksTable sisgenDocs={sisgenDocs} noDocsMessage={noDocsMessage} /> 
+        : 
+        <SIsgenSearchTable 
+          sisgenDocs={sisgenDocs} 
+          noDocsMessage={noDocsMessage} 
+          setPage={setPage} 
+          instrumentType={instrumentType} 
+          selectedFromDate={selectedFromDate} 
+          selectedToDate={selectedToDate} 
+          selectedEstado={selectedEstado} 
+          page={page} 
+          setSisgenDocs={setSisgenDocs}
+          setItemsCount={setItemsCount}
+          setSearchId={setSearchId} 
+          setNoDocsMessage={setNoDocsMessage} 
+          setErrorDisplay={setErrorDisplay} 
+          searchId={searchId}
+          setLoading={setLoading}
+        />}
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}
         </>}
     </div>

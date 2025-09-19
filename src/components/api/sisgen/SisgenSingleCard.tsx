@@ -31,8 +31,12 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
   
         access,
         data: {
-          idkardex: (sisgenDoc.idkardex).toString(),
-          kardex: sisgenDoc.kardex,
+          documents: [
+            {
+              kardex: sisgenDoc.kardex,
+              idkardex: sisgenDoc.idkardex.toString()
+            }
+          ],
           all: 0
         }
       }, {

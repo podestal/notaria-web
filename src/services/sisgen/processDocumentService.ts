@@ -38,9 +38,11 @@ export interface SisgenResponse {
 } 
 
 export interface SisgenRequest {
-    idkardex: string;
-    kardex: string;
     all: number;
+    documents: {
+        kardex: string;
+        idkardex: string;
+    }[];
 }
 
 export default new SisgenClient<SisgenResponse, SisgenRequest>('/send-sisgen/');
