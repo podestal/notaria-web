@@ -5,15 +5,20 @@ import SisgenSearchTableHeader from "./SisgenSearchTableHeader"
 interface Props {
     sisgenDocs: SISGENDocument[]
     noDocsMessage: string
+    setPage: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SIsgenSearchTable = ({ sisgenDocs, noDocsMessage }: Props) => {
+const SIsgenSearchTable = ({ sisgenDocs, noDocsMessage, setPage }: Props) => {
   return (
-    <div>
-        {/* <h2 className="my-2 font-semibold">Errores encontrados (Estos kardex no son enviados)</h2> */}
-        <SisgenSearchTableHeader />
-        <SisgenSearchTableBody sisgenDocs={sisgenDocs} noDocsMessage={noDocsMessage} />
-    </div>
+    <>
+    {sisgenDocs.length > 0 ? 
+    <>
+        <SisgenSearchTableHeader setPage={setPage} />
+        <SisgenSearchTableBody sisgenDocs={sisgenDocs} />
+    </>
+    :
+    <div className="text-center text-gray-500 p-4">{noDocsMessage}</div>}
+    </>
   )
 }
 

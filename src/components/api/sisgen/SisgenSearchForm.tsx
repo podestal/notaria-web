@@ -5,6 +5,7 @@ import useSearchSisgen from "../../../hooks/sisgen/useSearchSisgen";
 import useAuthStore from "../../../store/useAuthStore";
 import moment from "moment";
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
+import getSisgenDocs from "../../../utils/getSisgenDocs";
 
 const estadoSisgenOptions = [
     { value: -1, label: "Todos los Documentos" },
@@ -90,56 +91,20 @@ const SisgenSearchForm = ({
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        setErrorDisplay('');
-        
-        if (!selectedFromDate) {
-            setErrorDisplay('Por favor, seleccione una fecha de inicio.');
-            return;
-        }
-
-        if (!selectedToDate) {
-            setErrorDisplay('Por favor, seleccione una fecha de fin.');
-            return;
-        }
-
-        if (selectedFromDate > selectedToDate) {
-            setErrorDisplay('La fecha de inicio no puede ser posterior a la fecha de fin.');
-            return;
-        }
-
-        setLoading(true)
-
-        searchSisgen.mutate({
+        getSisgenDocs({
+            instrumentType,
+            selectedFromDate,
+            selectedToDate,
+            selectedEstado,
+            page,
+            setSisgenDocs,
+            setItemsCount,
+            setSearchId,
+            setNoDocsMessage,
+            setErrorDisplay,
+            setLoading,
             access,
-            sisgen: {
-                tipoInstrumento: instrumentType,
-                fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
-                fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
-                estado: selectedEstado,
-                codigoActo: 0,
-                page: page,
-            }
-        }, {
-            onSuccess: (data) => {
-                if (data.error === 0) {
-                    setSisgenDocs(data.data);
-                    setItemsCount(data.pagination.total_documents);
-                    setSearchId(data.pagination.search_id);
-                    if (data.data.length === 0) {
-                        setNoDocsMessage('No se encontraron documentos SISGEN.')
-                    } else {
-                        setNoDocsMessage('')
-                    }
-                } else {
-                    setErrorDisplay(data.message || 'Error al buscar documentos SISGEN.');
-                }
-            },
-            onError: (error) => {
-                setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
-            },
-            onSettled: () => {
-                setLoading(false)
-            }
+            searchSisgen
         })
 
     }
