@@ -197,13 +197,13 @@ const Header = ({ kardexTypes }: Props) => {
 
   return (
     <div>
-    <div className='grid grid-cols-9 h-[138px] bg-black'>
-        <div className='w-full h-full flex items-center justify-center col-span-2'>
+    <div className='flex justify-evenly items-center h-[138px] bg-black px-20'>
+        <div className='w-full h-full flex items-center justify-between'>
             <img src={notariaLogo} alt="" className='col-span-2 w-[280px]' />
         </div>
-        <div className='col-span-5 flex items-center justify-center'>
+        {/* <div className='col-span-5 flex items-center justify-center'>
             <img src={headerImg} alt="" className='w-[727px]' />
-        </div>
+        </div> */}
         <div className='text-white mt-4 mr-4 text-right'>
             <p className='italic text-lg mb-2'>Bienvenido..!</p>
             <div className='flex justify-end items-center gap-2'>

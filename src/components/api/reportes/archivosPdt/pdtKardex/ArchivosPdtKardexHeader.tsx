@@ -34,13 +34,10 @@ const ArchivosPdtKardexHeader = ({ dateFrom, dateTo, count, errors, refetch, typ
             <div className="flex flex-col justify-center items-start font-semibold gap-2">
                 <h2>Mes</h2>
                 <h2>Cantidad de Kardex</h2>
-                <h2>Archivo Plano</h2>
             </div>
             <div className="col-span-4 flex flex-col justify-center items-start gap-2">
                 <h2>{moment(dateFrom).format('DD/MM/YYYY')} - {moment(dateTo).format('DD/MM/YYYY')}</h2>
                 <h2>{count}</h2>
-                {/* <ArchivoPdtLibroDownload initialDate={dateFrom} finalDate={dateTo} /> */}
-                <p>No disponible</p>
             </div>
         </div>
         <div className="grid grid-cols-2 gap-4 justify-center items-center text-center">
