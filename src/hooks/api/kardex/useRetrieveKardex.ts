@@ -4,14 +4,15 @@ import { Kardex, getSingleKardexService } from "../../../services/api/kardexServ
 interface Props {
     id: number
     enabled: boolean
+    access: string
 }
 
-const useRetrieveKardex = ({ id, enabled }: Props): UseQueryResult<Kardex, Error> => {
+const useRetrieveKardex = ({ id, enabled, access }: Props): UseQueryResult<Kardex, Error> => {
     const kardexService = getSingleKardexService({ id })
 
     return useQuery({
         queryKey: ['kardex', id],
-        queryFn: () => kardexService.get(),
+        queryFn: () => kardexService.get(access),
         enabled: enabled
     })
 }

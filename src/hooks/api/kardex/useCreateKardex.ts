@@ -15,7 +15,7 @@ const useCreateKardex = ({ idtipkar }: Props): UseMutationResult<Kardex, Error, 
     const kardexService = getSingleKardexService({})
 
     return useMutation({
-        mutationFn: (data: CreateKardexData) => kardexService.post(data.kardex),
+        mutationFn: (data: CreateKardexData) => kardexService.post(data.kardex, data.access),
         onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['kardex list', "1", idtipkar] })
             queryClient.invalidateQueries({ queryKey: ["contratantes by kardex",res.kardex] })

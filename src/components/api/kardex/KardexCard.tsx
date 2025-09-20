@@ -5,13 +5,14 @@ import KardexForm from "./KardexForm"
 import TopModal from "../../ui/TopModal"
 import useUpdateKardex from "../../../hooks/api/kardex/useUpdateKardex"
 import useRetrieveKardex from "../../../hooks/api/kardex/useRetrieveKardex"
+import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
     kardex: Kardex
 }
 
 const KardexCard = ({ kardex }: Props) => {
-
+    const access = useAuthStore(s => s.access_token) || ''
     const [open, setOpen] = useState(false)
     const [getKardex, setGetKardex] = useState(false)
     const updateKardex = useUpdateKardex({ kardexId: kardex.idkardex })
@@ -46,7 +47,7 @@ const KardexCard = ({ kardex }: Props) => {
     >
         <>
         {(() => {
-            const {data: singleKardex, isLoading, isError, error, isSuccess} = useRetrieveKardex({ id: kardex.idkardex , enabled: getKardex })
+            const {data: singleKardex, isLoading, isError, error, isSuccess} = useRetrieveKardex({ id: kardex.idkardex , enabled: getKardex, access })
             if (isLoading) return <p className="text-md animate-pulse text-center my-2">Cargando ...</p>
             if (isError) return <p className="text-md text-red-500 text-center">Error: {error.message}</p>
             if (isSuccess)
