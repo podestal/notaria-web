@@ -85,7 +85,6 @@ const SisgenSearchTableHeader = ({
           setLoading,
           access,
           searchSisgen,
-          searchId
       })
       },
       onError: () => {
