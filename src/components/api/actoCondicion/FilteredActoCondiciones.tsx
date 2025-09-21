@@ -13,7 +13,7 @@ interface Props {
 const FilteredActoCondiciones = ({ idtipoacto, kardex, selectedActos, setSelectedActos }: Props) => {
 
     const access = useAuthStore((state) => state.access_token) || ''
-    const { data: actoCondiciones, isLoading: isLoadingCondicion, isError: isErrorCondicion, isSuccess: isSuccessCondicion } = useGetActoCondicionByTipoActo({ idtipoacto })
+    const { data: actoCondiciones, isLoading: isLoadingCondicion, isError: isErrorCondicion, isSuccess: isSuccessCondicion } = useGetActoCondicionByTipoActo({ idtipoacto, access })
     const { data: detalleActo, isLoading: isLoadingDetalleActos, isError: isErrorDetalleActos, isSuccess: isSuccessDetalleActos } = useGetDetalleActosByKardexAndTipoActo({ access, kardex, tipoacto: idtipoacto })
 
     if (isLoadingCondicion || isLoadingDetalleActos) return <p className="animate-pulse text-center text-xs my-6">Cargando condiciones...</p>

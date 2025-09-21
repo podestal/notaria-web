@@ -2,6 +2,7 @@ import { useMutation, UseMutationResult, useQueryClient } from "@tanstack/react-
 import getCliente1Service, { Cliente, CreateUpdateCliente1 } from "../../../services/api/cliente1Service"
 
 export interface UpdateClienteData {
+    access: string
     cliente: CreateUpdateCliente1
 }
 
@@ -14,7 +15,7 @@ const useUpdateCliente = ({clienteId, dni}: Props): UseMutationResult<Cliente, E
     const clienteService = getCliente1Service({ clienteId })
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: (data: UpdateClienteData) => clienteService.update(data.cliente),
+        mutationFn: (data: UpdateClienteData) => clienteService.update(data.cliente, data.access),
         onSuccess: (data) => {
             console.log("Cliente updated successfully:", data)
             // Invalidate the query to refetch the updated cliente

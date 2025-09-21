@@ -3,14 +3,15 @@ import getActoCondicionService, {ActoCondicion} from "../../../services/api/acto
 
 interface Props {
     idtipoacto: string
+    access: string
 }
-const useGetActoCondicionByTipoActo = ({ idtipoacto }: Props): UseQueryResult<ActoCondicion[]> => {
+const useGetActoCondicionByTipoActo = ({ idtipoacto, access }: Props): UseQueryResult<ActoCondicion[]> => {
     const actoCondicionService = getActoCondicionService({ byTipoActo: true })
     const params = { tipoacto: idtipoacto }
     
     return useQuery({
         queryKey: ['actocondicion', 'by_tipoacto', idtipoacto],
-        queryFn: () => actoCondicionService.get('', params),
+        queryFn: () => actoCondicionService.get(access, params),
         enabled: !!idtipoacto, // Only run the query if idtipoacto is provided
     })
 }

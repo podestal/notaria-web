@@ -13,6 +13,7 @@ import { Profesion } from '../../../services/api/profesionesService'
 import { Nacionalidad } from '../../../services/api/nacionalidadesService'
 import { GIRO_NEGOCIO, SEDES_REGISTRALES } from '../../../data/patrimonialData'
 import SimpleSelectorStr from '../../ui/SimpleSelectosStr'
+import useAuthStore from '../../../store/useAuthStore'
 
 interface Props {
     dni: string
@@ -59,6 +60,7 @@ const Cliente2Form = ({
 
 
         const { setMessage, setShow, setType } = useNotificationsStore()
+        const access = useAuthStore(s => s.access_token) || ''
 
         const [apepat, setApepat] = useState(cliente2 ? cliente2.apepat : '')
         const [apemat, setApemat] = useState( cliente2 ? cliente2.apemat : '')
@@ -296,7 +298,7 @@ const Cliente2Form = ({
                 }
         
                 updateCliente2.mutate({
-                    access: '',
+                    access,
                     cliente: {
                         tipper: 'N',
                         apepat,
@@ -395,7 +397,7 @@ const Cliente2Form = ({
                     return
                 }
                 updateCliente2.mutate({
-                    access: '',
+                    access,
                     cliente: {
                         tipper: 'J',
                         apepat,

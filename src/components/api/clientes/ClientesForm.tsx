@@ -15,6 +15,7 @@ import { UpdateClienteData } from "../../../hooks/api/cliente/useUpdateCliente"
 import { CreateClienteData } from "../../../hooks/api/cliente/useCreateCliente"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import { SEDES_REGISTRALES, GIRO_NEGOCIO } from "../../../data/patrimonialData"
+import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
     dni: string
@@ -66,6 +67,7 @@ const ClientesForm = ({
     console.log('selectedTipoDocumento', selectedTipoDocumento)
 
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const access = useAuthStore(s => s.access_token) || ''
 
     // NATURAL PERSON
 
@@ -304,6 +306,7 @@ const ClientesForm = ({
                 return
             }
             createCliente && createCliente.mutate({
+                access,
                 cliente: {
                     tipper: 'N',
                     apepat,
@@ -356,6 +359,7 @@ const ClientesForm = ({
             })
     
             updateCliente && updateCliente.mutate({
+                access,
                 cliente: {
                     tipper: 'N',
                     apepat,
@@ -445,6 +449,7 @@ const ClientesForm = ({
             }
 
             createCliente && createCliente.mutate({
+                access,
                 cliente: {
                     tipper: 'J',
                     apepat,
@@ -497,6 +502,7 @@ const ClientesForm = ({
             })
     
             updateCliente && updateCliente.mutate({
+                access,
                 cliente: {
                     tipper: 'N',
                     apepat,

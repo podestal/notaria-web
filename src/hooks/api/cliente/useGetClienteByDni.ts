@@ -3,14 +3,15 @@ import getCliente1Service, { Cliente } from "../../../services/api/cliente1Servi
 
 interface  Props {
     dni: string
+    access: string
 }
 
-const useGetClienteByDni = ({ dni }: Props): UseQueryResult<Cliente> => {
+const useGetClienteByDni = ({ dni, access }: Props): UseQueryResult<Cliente> => {
     const clienteService = getCliente1Service({ clienteId: '', byDni: true })
     const params = { dni }
     return useQuery({
         queryKey: ['cliente', 'by_dni', dni],
-        queryFn: () => clienteService.get('', params),
+        queryFn: () => clienteService.get(access, params),
     })
 }
 export default useGetClienteByDni
