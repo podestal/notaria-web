@@ -48,7 +48,6 @@ const KardexMain = () => {
         ?
         <>
           <KardexHeader />
-          {/* <KardexList /> */}
           <KardexFilters 
             setCorrelative={setCorrelative}
             setName={setName}

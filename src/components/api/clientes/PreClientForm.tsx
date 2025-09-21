@@ -7,6 +7,7 @@ import CreateCliente from "./CreateCliente"
 import UpdateCliente from "./UpdateCliente"
 import CreateContratante from "../contratantes/CreateContratante"
 import { documentoJuridicaOptions, documentNaturalOptions } from "../../../data/clienteData"
+import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
     idtipoacto: string
@@ -16,6 +17,8 @@ interface Props {
 }
 
 const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
@@ -77,7 +80,12 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
         // get client here
         if (selectedTipoPersona === 1) {
             axios.get(
-                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
+                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`,
+                {
+                    headers: {
+                        'Authorization': `JWT ${access}`
+                    }
+                }
             ).then(response => {
                 if (response.data.idcliente) {
                     console.log('Cliente encontrado:', response.data);
@@ -100,7 +108,12 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
 
         if (selectedTipoPersona === 2) {
             axios.get(
-                `${import.meta.env.VITE_API_URL}cliente/by_ruc/?ruc=${document}`
+                `${import.meta.env.VITE_API_URL}cliente/by_ruc/?ruc=${document}`,
+                {
+                    headers: {
+                        'Authorization': `JWT ${access}`
+                    }
+                }
             ).then(response => {
                 if (response.data.idcliente) {
                     console.log('Cliente encontrado:', response.data);
