@@ -4,6 +4,7 @@ import useGetNacionalidades from "../../../hooks/api/nacionalidades/useGetNacion
 import useGetProfesiones from "../../../hooks/api/profesiones/useGetProfesiones"
 import useGetUbigeos from "../../../hooks/api/ubigeo/useGetUbigeos"
 import { Cliente2 } from "../../../services/api/clienteService"
+import useAuthStore from "../../../store/useAuthStore"
 import Cliente2Form from "./Cliente2Form"
 
 interface Props {
@@ -24,14 +25,14 @@ const UpdateCliente2 = ({
     kardex,
  }: Props) => {
 
-
+    const access = useAuthStore(s => s.access_token) || ''
     const tipoPersona = cliente2.tipper === 'N' ? 1 : 2
     const updateCliente2 = useUpdateCliente2({ clienteId: cliente2.idcontratante, kardex })
 
-    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
-    const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
-    const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos()
-    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
+    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades({ access })
+    const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones({ access })
+    const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos({ access })
+    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos({ access })
 
     if (isNacionalidadesLoading || isLoadingProfesiones || isLoadingCargos || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 

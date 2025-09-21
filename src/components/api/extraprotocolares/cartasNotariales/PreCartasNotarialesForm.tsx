@@ -16,7 +16,7 @@ const PreCartasNotarialesForm = ({ carta, createIngresoCarta, updateCartaNotaria
 
     const access =useAuthStore(s => s.access_token) || '';
 
-    const { data: ubigeos, isLoading, isError, isSuccess, error } = useGetUbigeos();
+    const { data: ubigeos, isLoading, isError, isSuccess, error } = useGetUbigeos({ access });
     const { data: usuarios, isLoading: isLoadingUsuarios, isError: isErrorUsuarios, error: errorUsuarios, isSuccess: isSuccessUsuarios } = useGetUsuarios({ access });
 
     if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando Ubigeos ...</p>;

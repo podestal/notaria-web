@@ -4,6 +4,7 @@ import { DetalleBien } from "../../../services/api/detalleBienService"
 import DetalleBienForm from "./DetalleBienForm"
 import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateDetalleBienes"
 import { DetalleBienUpdateData } from "../../../hooks/api/detalleBien/useUpdateDetalleBien"
+import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
     detalleBien?: DetalleBien
@@ -17,7 +18,9 @@ interface Props {
 
 const PreDetalleBienForm = ({ detalleBien, kardex, idtipoacto, itemmp, createDetalleBien, setOpen, updateDetalleBien }: Props) => {
 
-    const { data: ubigeos, isLoading, isError, error, isSuccess } = useGetUbigeos()
+    const access = useAuthStore(s => s.access_token) || ''
+
+    const { data: ubigeos, isLoading, isError, error, isSuccess } = useGetUbigeos({ access })
 
     if (isLoading) return <p className="text-center animate-pulse my-4">Cargando...</p>
 

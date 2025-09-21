@@ -1,10 +1,14 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import ubigeoService, { Ubigeo } from "../../../services/api/ubigeoService"
 
-const useGetUbigeos = (): UseQueryResult<Ubigeo[], Error> => {
+interface Props {
+    access: string
+}
+
+const useGetUbigeos = ({ access }: Props): UseQueryResult<Ubigeo[], Error> => {
     return useQuery({
         queryKey: ['ubigeos'],
-        queryFn: () => ubigeoService.get(),
+        queryFn: () => ubigeoService.get(access),
     })
 }
 

@@ -6,6 +6,7 @@ import useCreateContratante from "../../../../../hooks/api/extraprotocolares/per
 import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos";
 import useGetNacionalidades from "../../../../../hooks/api/nacionalidades/useGetNacionalidades";
 import PreParticipanteForm from "./PreParticipanteForm";
+import useAuthStore from "../../../../../store/useAuthStore";
 
 interface Props {
     viajeId: number;
@@ -13,6 +14,8 @@ interface Props {
 }
 
 const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
 
     const [open, setOpen] = useState(false);
     const [document, setDocument] = useState('');
@@ -29,8 +32,8 @@ const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
         nacionalidad: ''
     });
 
-    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
-    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
+    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos({ access })
+    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades({ access })
 
     if (isNacionalidadesLoading || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 

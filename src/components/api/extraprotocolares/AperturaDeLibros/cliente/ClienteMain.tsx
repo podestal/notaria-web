@@ -8,6 +8,7 @@ import useGetProfesiones from "../../../../../hooks/api/profesiones/useGetProfes
 import useGetCargos from "../../../../../hooks/api/cargos/useGetCargos"
 import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos"
 import NuevoClienteForm from "./NuevoClienteForm"
+import useAuthStore from "../../../../../store/useAuthStore"
 
 interface Props {
     selectedTipoPersona: number
@@ -56,11 +57,13 @@ const ClienteMain = ({
     setUbigeo,
  }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
+
     const [openCreateCliente, setOpenCreateCliente] = useState(false)
-    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
-    const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones()
-    const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos()
-    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
+    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades({ access })
+    const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones({ access })
+    const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos({ access })
+    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos({ access })
 
     if (isNacionalidadesLoading || isLoadingProfesiones || isLoadingCargos || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 

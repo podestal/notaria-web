@@ -7,6 +7,7 @@ import PreSolicitanteForm from "./PreSolicitanteForm"
 import SolicitanteForm from "./SolicitanteForm"
 import useGetCargos from "../../../../../hooks/api/cargos/useGetCargos";
 import NuevoClienteForm from "./NuevoClienteForm";
+import useAuthStore from "../../../../../store/useAuthStore";
 
 interface Props {
     solicitante: string;
@@ -47,10 +48,12 @@ const SolicitanteMain = ({
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos()
-    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades()
-    const { data: profesiones, isLoading: isProfesionesLoading, isError: isProfesionesError, isSuccess: isProfesionesSuccess } = useGetProfesiones()
-    const { data: cargos, isLoading: isCargosLoading, isError: isCargosError, isSuccess: isCargosSuccess } = useGetCargos()
+    const access = useAuthStore(s => s.access_token) || ''
+
+    const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos({ access })
+    const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades({ access })
+    const { data: profesiones, isLoading: isProfesionesLoading, isError: isProfesionesError, isSuccess: isProfesionesSuccess } = useGetProfesiones({ access })
+    const { data: cargos, isLoading: isCargosLoading, isError: isCargosError, isSuccess: isCargosSuccess } = useGetCargos({ access })
 
     if (isNacionalidadesLoading || isLoadingUbigeos || isProfesionesLoading || isCargosLoading) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 
