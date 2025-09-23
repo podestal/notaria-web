@@ -2,6 +2,7 @@ import { useState } from "react";
 import Selector from "../../../../ui/Selector"
 import axios from "axios";
 import { documentNaturalOptions } from "../../../../../data/clienteData";
+import useAuthStore from "../../../../../store/useAuthStore";
 
 interface Props {
     setContratanteInfo: React.Dispatch<React.SetStateAction<{
@@ -21,7 +22,8 @@ interface Props {
 }
 
 const PreParticipanteForm = ({ setContratanteInfo, setDocument, document, participantesDocs }: Props) => {
-
+    
+    const access = useAuthStore(s => s.access_token) || ''
     const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1);
     const [loading, setLoading] = useState(false);
     const [alreadyExists, setAlreadyExists] = useState('');
@@ -50,7 +52,12 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document, partic
         })
     
         axios.get(
-            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
+            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`,
+            {
+                headers: {
+                    'Authorization': `JWT ${access}`
+                }
+            }
         ).then(response => {
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);

@@ -7,6 +7,7 @@ import { Cliente } from "../../../../../services/api/cliente1Service";
 import ContratantesForm from "./ContratantesForm";
 import ContratanteFormJuridica from "./ContratanteFormJuridica";
 import CreateCliente from "../../../clientes/CreateCliente";
+import useAuthStore from "../../../../../store/useAuthStore";
 
 interface Props {
     poderId: number;
@@ -16,6 +17,7 @@ interface Props {
 
 const PreContratanteForm = ({ poderId, setOpen, contratantesDocs }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
     const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1)
@@ -75,7 +77,12 @@ const handleLookup = (e: React.FormEvent) => {
         // get client here
         if (selectedTipoPersona === 1) {
             axios.get(
-                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
+                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`,
+                {
+                    headers: {
+                        'Authorization': `JWT ${access}`
+                    }
+                }
             ).then(response => {
                 if (response.data.idcliente) {
                     console.log('Cliente encontrado:', response.data);

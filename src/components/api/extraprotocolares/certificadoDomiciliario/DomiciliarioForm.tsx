@@ -260,7 +260,6 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
                 value={numFormulario}
                 setValue={setNumFormulario}
                 horizontal
-                disabled
             />
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">

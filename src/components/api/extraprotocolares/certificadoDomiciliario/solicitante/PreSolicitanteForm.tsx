@@ -3,6 +3,7 @@ import { documentNaturalOptions } from "../../../../../data/clienteData";
 import SimpleSelector from "../../../../ui/SimpleSelector";
 import SimpleInput from "../../../../ui/SimpleInput";
 import axios from "axios";
+import useAuthStore from "../../../../../store/useAuthStore";
 
 interface Props {
     setSolicitante: React.Dispatch<React.SetStateAction<string>>;
@@ -33,7 +34,7 @@ const PreSolicitanteForm = ({
     setIsOpen
 }: Props) => {
 
-
+    const access = useAuthStore(s => s.access_token) || ''
     const [loading, setLoading] = useState(false);
 
     const handleClienteLookup = (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,7 +42,12 @@ const PreSolicitanteForm = ({
         setLoading(true);
         // Simulate an API call
         axios.get(
-            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
+            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`,
+            {
+                headers: {
+                    'Authorization': `JWT ${access}`
+                }
+            }
         ).then(response => {
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);

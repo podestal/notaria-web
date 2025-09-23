@@ -137,7 +137,6 @@ const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, 
             setValue={setGenero}
             horizontal
             fullWidth
-            disabled
         />
     </div>
   )
