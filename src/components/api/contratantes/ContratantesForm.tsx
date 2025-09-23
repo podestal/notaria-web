@@ -434,6 +434,7 @@ const ContratantesForm = ({
             kardex={kardex}
             setRepresentanteCreated={setRepresentanteCreated}
             setContratanteRepresented={setContratanteRepresented}
+            setOpenRepForm={setOpenRepForm}
         />
     </TopModal>
     </>

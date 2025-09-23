@@ -8,9 +8,10 @@ interface Props {
     kardex: string
     setRepresentanteCreated: React.Dispatch<React.SetStateAction<boolean>>
     setContratanteRepresented: React.Dispatch<React.SetStateAction<string>>
+    setOpenRepForm: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const CreateRepresentante = ({ kardex, setRepresentanteCreated, setContratanteRepresented }: Props) => {
+const CreateRepresentante = ({ kardex, setRepresentanteCreated, setContratanteRepresented, setOpenRepForm }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const createRepresentante = useCreateRepresentante()
@@ -31,6 +32,7 @@ const CreateRepresentante = ({ kardex, setRepresentanteCreated, setContratanteRe
             createRepresentante={createRepresentante}
             setRepresentanteCreated={setRepresentanteCreated}
             setContratanteRepresented={setContratanteRepresented}
+            setOpenRepForm={setOpenRepForm}
         />
     </div>
   )
