@@ -121,7 +121,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
 
         setLoading(true);
 
-        createLibro && createLibro.mutate({
+        createLibro && !doneCreate && createLibro.mutate({
             access: access,
             libro: {
                 numlibro: '0',
@@ -166,6 +166,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
                 setAnoLibro(res.ano)
                 setIdLibro(res.id)
                 setDoneCreate(true)
+                setCronologico(`${res.numlibro}-${res.ano}`)
             },
             onError: () => {
                 setMessage('Error al crear el libro')

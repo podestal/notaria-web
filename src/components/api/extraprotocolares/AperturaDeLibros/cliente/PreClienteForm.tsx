@@ -2,6 +2,7 @@ import { useState } from "react"
 import Selector from "../../../../ui/Selector"
 import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore"
 import axios from "axios"
+import useAuthStore from "../../../../../store/useAuthStore"
 
 interface Props {
     selectedTipoPersona: number
@@ -36,6 +37,8 @@ const PreClienteForm = ({
     setUbigeo,
     setOpenCreateCliente
  }: Props) => {
+
+    const access = useAuthStore(state => state.access_token) || ''
     const { setMessage, setType, setShow } = useNotificationsStore()
     const [loading, setLoading] = useState(false)
 
@@ -67,7 +70,12 @@ const PreClienteForm = ({
 
         if (selectedTipoPersona === 1) {
             axios.get(
-                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`
+                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`,
+                {
+                    headers: {
+                        'Authorization': `JWT ${access}`
+                    }
+                }
             ).then(response => {
                 if (response.data.idcliente) {
                     setApellidoPaterno(response.data.apepat);
@@ -89,7 +97,11 @@ const PreClienteForm = ({
             })
         } else if (selectedTipoPersona === 2) {
             axios.get(
-                `${import.meta.env.VITE_API_URL}cliente/by_ruc/?ruc=${document}`
+                `${import.meta.env.VITE_API_URL}cliente/by_ruc/?ruc=${document}`,{
+                    headers: {
+                        'Authorization': `JWT ${access}`
+                    }
+                }
             ).then(response => {
                 console.log(response.data);
                 if (response.data.idcliente) {

@@ -3,6 +3,7 @@ import SimpleInput from "../../../../ui/SimpleInput"
 import { useState } from "react"
 import { MessageSquareText, UserSearch } from "lucide-react"
 import TopModal from "../../../../ui/TopModal"
+import useAuthStore from "../../../../../store/useAuthStore"
 
 interface Props {
     solicitanteName: string
@@ -26,6 +27,7 @@ const SolicitanteLookup = ({
     setSolicitanteNameError,
  }: Props) => {
 
+    const access = useAuthStore(s => s.access_token) || ''
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
 
@@ -40,7 +42,12 @@ const SolicitanteLookup = ({
 
         setLoading(true);
         axios.get(
-            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${solicitanteDocument}`
+            `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${solicitanteDocument}`,
+            {
+                headers: {
+                    'Authorization': `JWT ${access}`
+                }
+            }
         ).then(response => {
             console.log(response.data);
             if (response.data.idcliente) {

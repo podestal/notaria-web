@@ -12,6 +12,7 @@ import DateInput from "../../../../ui/DateInput"
 import useCreateCliente from "../../../../../hooks/api/cliente/useCreateCliente"
 import useAuthStore from "../../../../../store/useAuthStore"
 import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore"
+import axios from "axios"
 
 interface Props {
     selectedTipoPersona: number
@@ -306,6 +307,7 @@ const NuevoClienteForm = ({
                 return
             }
             createCliente && createCliente.mutate({
+                access,
                 cliente: {
                     tipper: 'N',
                     apepat,
@@ -396,6 +398,7 @@ const NuevoClienteForm = ({
             }
 
             createCliente && createCliente.mutate({
+                access,
                 cliente: {
                     tipper: 'J',
                     apepat,
@@ -451,11 +454,42 @@ const NuevoClienteForm = ({
     }
 
     const handleReniec = () => {
-        console.log('Consulta Reniec')
+        console.log('Consulta RENIEC')
+        axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${document}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
+        ).then(response => {
+            console.log('response', response.data)
+            setApepat(response.data.resultado.apellido_paterno || '')
+            setApemat(response.data.resultado.apellido_materno || '')
+            setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
+            setBirthdate(response.data.resultado.fecha_nacimiento || '')
+            if (response.data.resultado.genero === 'M') {
+                setGender(1) // Masculino
+            }
+            else if (response.data.resultado.genero === 'F') {
+                setGender(2) // Femenino
+            }
+
+        }).catch(error => {
+            console.error('Error al consultar RENIEC:', error)
+        });
     }
 
     const handleSunat = () => {
-        console.log('Consulta Sunat')
+        console.log('Consulta SUNAT', document);
+        axios.post(`${import.meta.env.VITE_MIGO_RUC_URL}`, {
+            ruc: document,
+            token: import.meta.env.VITE_MIGO_TOKEN
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            console.log('response', response.data)
+            setRazonSocial(response.data.nombre_o_razon_social)
+            setDomFiscal(response.data.direccion_simple)
+        }).catch(error => {
+            console.error('Error al consultar SUNAT:', error)
+        });
     }
 
   return (

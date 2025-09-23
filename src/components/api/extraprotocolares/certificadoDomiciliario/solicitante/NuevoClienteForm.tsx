@@ -10,6 +10,7 @@ import DateInput from "../../../../ui/DateInput"
 import SimpleSelector from "../../../../ui/SimpleSelector"
 import axios from "axios"
 import useCreateCliente from "../../../../../hooks/api/cliente/useCreateCliente"
+import useAuthStore from "../../../../../store/useAuthStore"
 
 
 interface Props {
@@ -61,6 +62,8 @@ const NuevoClienteForm = ({
     setProfesion,
     setOpen
 }: Props) => {
+
+    const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [loading, setLoading] = useState(false)
 
@@ -233,6 +236,7 @@ const NuevoClienteForm = ({
         setLoading(true)
 
         createCliente.mutate({
+            access,
             cliente: {
                 tipper: 'N',
                 apepat,
