@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas"
 import TopModal from "../../../ui/TopModal";
 import UpdateCartasNotariales from "./UpdateCartasNotariales";
+import getTitleCase from "../../../../utils/getTitleCase";
 
 interface Props {
     carta: IngresoCartas
@@ -25,8 +26,8 @@ const CartasNotarialesCard = ({ carta, readyOnly }: Props) => {
         >{carta.num_carta}</p>
         <p>{carta.fec_ingreso}</p>
         <p>{carta.fec_entrega}</p>
-        <p className="col-span-2">{carta.nom_remitente}</p>
-        <p className="col-span-2">{carta.nom_destinatario}</p>
+        <p className="col-span-2">{getTitleCase(carta.nom_remitente || "")}</p>
+        <p className="col-span-2">{getTitleCase(carta.nom_destinatario || "")}</p>
       </div>
       <TopModal
         isOpen={open}

@@ -3,6 +3,8 @@ import Calendar from "../../../ui/Calendar"
 import SimpleInput from "../../../ui/SimpleInput"
 import SingleSelect from "../../../ui/SingleSelect"
 import { IngresoCartasPage } from "../../../../services/api/extraprotocolares/ingresoCartas";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 interface Props {
     dateFrom: Date | undefined;
@@ -37,19 +39,12 @@ const CartasNotarialesFilters = ({
     refetch,
 }: Props) => {
 
+    const [loading, setLoading] = useState(false)
+
     const handleRefetch = () => {
-        // Logic to refetch data based on the filters
-        // This could be a function passed down from a parent component
-        console.log("Refetching with filters:", {
-            dateFrom,
-            dateTo,
-            dateType,
-            numCarta,
-            remitente,
-            destinatario,
-        });
+        setLoading(true)
         
-        refetch()
+        refetch().finally(() => setLoading(false))
     }
 
   return (
@@ -102,7 +97,10 @@ const CartasNotarialesFilters = ({
             <div>
                 <button 
                     onClick={handleRefetch}
-                    className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
+                    disabled={loading}
+                    className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                    {loading ? <Loader2 className="animate-spin" /> : "Buscar"}
+                </button>
             </div>
         </div>
     </div>

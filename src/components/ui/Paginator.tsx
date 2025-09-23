@@ -34,6 +34,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
   return (
     itemsCount > 0 && (
       <div className='flex items-center justify-center px-4 py-3 sm:px-6 gap-10 mt-10'>
+        <p className='text-sm text-gray-500'>{`${page} de ${totalPages}`}</p>
         <button
           className='cursor-pointer text-gray-500 hover:text-gray-700'
           onClick={() => {
