@@ -22,6 +22,8 @@ export interface Kardex {
     papelfin: string;
     responsable: number;
     referencia: string;
+    papeltrasladoini?: string;
+    papeltrasladofin?: string;
 }
 
 export interface KardexPage {
@@ -94,8 +96,6 @@ export type CreateUpdateKardex = Omit<Kardex,
     'usuario' | 
     'cliente' | 
     'numminuta' | 
-    'numinstrmento' |
-    'txa_minuta' |
     'cliente'> & {
 
     idtipkar: number;

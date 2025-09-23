@@ -62,8 +62,8 @@ const ContratantesForm = ({
     const [representanteCreated, setRepresentanteCreated] = useState(false)
     const [selectedRepresentation, setSelectedRepresentation] = useState('0')
     const [selectedActos, setSelectedActos] = useState<string[]>(contratante ? contratante.condicion.split('/') : [])
-    const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : false)
-    const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : false)
+    const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : true)
+    const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : true)
     const [isLoading, setIsLoading] = useState(false)
     const [contratanteRepresented, setContratanteRepresented] = useState(contratante ? contratante.idcontratanterp : '')
 

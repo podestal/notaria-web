@@ -49,13 +49,15 @@ const PatrimonialForm = ({
     const [cannotUpdatePatrimonialMessage, setCannotUpdatePatrimonialMessage] = useState('')
 
     const access = useAuthStore(s => s.access_token) || ''
+    const isDonation = kardex?.contrato.includes('DONACION')
+    console.log('isDonation', isDonation);
 
-    const [formaDePagoSelected, setFormaDePagoSelected] = useState(patrimonial ? patrimonial.fpago : '');
-    const [oportunidadSelected, setOportunidadSelected] = useState( patrimonial ? patrimonial.idoppago : '');
+    const [formaDePagoSelected, setFormaDePagoSelected] = useState(patrimonial ? patrimonial.fpago : isDonation ? '4' : '');
+    const [oportunidadSelected, setOportunidadSelected] = useState( patrimonial ? patrimonial.idoppago : isDonation ? '10' : '');
     const [selectedTipoDeActo, setSelectedTipoDeActo] = useState( patrimonial ? patrimonial.idtipoacto : '');
 
     const [inporteTransaccion, setImporteTransaccion] = useState(patrimonial ? patrimonial.importetrans.toString() : '');
-    const [monedaSelected, setMonedaSelected] = useState(patrimonial ? patrimonial.idmon : 2);
+    const [monedaSelected, setMonedaSelected] = useState(patrimonial ? patrimonial.idmon : 1);
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(patrimonial ? moment(patrimonial.nminuta, "DD/MM/YYYY").toDate() : undefined);
 
@@ -202,6 +204,7 @@ const PatrimonialForm = ({
                 error={formaDePagoError}
                 setError={setFormaDePagoError}
                 required
+                disabled={isDonation}
             />
             <SimpleSelectorStr 
                 options={[{ value: 'S', label: 'Seleccione' }, ...OPPORTUNIDADES_PAGO.map((oportunidad) => ({
@@ -214,6 +217,7 @@ const PatrimonialForm = ({
                 error={oportunidadError}
                 setError={setOportunidadError}
                 required
+                disabled={isDonation}
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -262,12 +266,12 @@ const PatrimonialForm = ({
                 setter={setExhibiompSelected}
                 label="Exhibió medio de pago"
             />
-            <SimpleInput 
+            {monedaSelected !== 1 && <SimpleInput 
                 value={tipoDeCambio}
                 setValue={setTipoDeCambio}
                 label="Tipo de Cambio"
                 horizontal
-            />
+            />}
         </div>
         <>{console.log('currentPatrimonial', currentPatrimonial)}</>
         <div className="w-full grid grid-cols-3 my-4">

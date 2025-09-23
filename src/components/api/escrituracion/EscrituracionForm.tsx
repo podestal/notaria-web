@@ -16,6 +16,7 @@ interface Props {
 
 const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
+    console.log('kardex', kardex);
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
 
@@ -26,6 +27,13 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const [serieNotarialFin, setSerieNotarialFin] = useState(kardex.papelfin || '')
     const [fechaActa, setFechaActa] = useState(kardex.fechaescritura || '')
 
+    const [tomo, setTomo] = useState(kardex.txa_minuta || '')
+    const [registro, setRegistro] = useState(kardex.numinstrmento || '')
+
+    const [papelTraslNotarialIni, setPapelTraslNotarialIni] = useState(kardex.papeltrasladoini || '')
+    const [papelTraslNotarialFin, setPapelTraslNotarialFin] = useState(kardex.papeltrasladofin || '')
+
+
     // ERRORS
     const [errorNumActa, setErrorNumActa] = useState('')
     const [errorFechaActa, setErrorFechaActa] = useState('')
@@ -33,12 +41,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         console.log('Submitting EscrituracionForm with values:');
-        
 
-        if (!numActa) {
-            setErrorNumActa('El número de acta es requerido')
-            return
-        }
 
         if (!fechaActa) {
             setErrorFechaActa('La fecha de acta es requerida')
@@ -47,8 +50,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
         updateKardex.mutate({
             kardex: {
-                // idkardex: kardex?.idkardex || 0,
-                kardex: kardex.kardex,
                 idtipkar: kardex.idtipkar,
                 fechaingreso:kardex.fechaingreso,
                 referencia: kardex.referencia || '',
@@ -70,7 +71,10 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 folioini: follioIni,
                 foliofin: folioFin,
                 fechaescritura: fechaActa,
-                
+                txa_minuta: tomo,
+                numinstrmento: registro,
+                papeltrasladoini: papelTraslNotarialIni,
+                papeltrasladofin: papelTraslNotarialFin,
             },
             access
         }, {
@@ -98,7 +102,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center items-center gap-6 w-full my-6">
             <div className=" w-[80%]">
-                <div className="grid grid-cols-2 gap-8 my-4">
+                {kardex.idtipkar === 3 && <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
                         setValue={setNumActa}
                         value={numActa}
@@ -108,7 +112,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         error={errorNumActa}
                         setError={setErrorNumActa}
                     />
-                </div>
+                </div>}
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
                         setValue={setFolioIni}
@@ -140,28 +144,28 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setTomo}
+                        value={tomo}
                         horizontal
                         label="Tomo"
                     />
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setRegistro}
+                        value={registro}
                         horizontal
                         label="Registro"
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setPapelTraslNotarialIni}
+                        value={papelTraslNotarialIni}
                         horizontal
                         label="Papel de trasl notarial"
                     />
                     <SimpleInput 
-                        setValue={() => {}}
-                        value=""
+                        setValue={setPapelTraslNotarialFin}
+                        value={papelTraslNotarialFin}
                         horizontal
                         label="Al"
                     />

@@ -16,6 +16,7 @@ interface Props {
     required?: boolean;
     error?: string;
     setError?: (val: string) => void;
+    disabled?: boolean;
   }
 
 
@@ -32,6 +33,7 @@ const SimpleSelectorStr = ({
     required = false,
     error,
     setError,
+    disabled = false,
 }: Props) => {
 
     const [value, setValue] = useState<string>(defaultValue ?? '');
@@ -47,6 +49,7 @@ const SimpleSelectorStr = ({
         <p className="pl-2 block text-xs font-semibold text-slate-700">{label}</p>
         <div className="flex items-center gap-1 w-full col-span-2">
             <motion.select 
+                disabled={disabled}
                 {...(error ? shakeAnimation : {})}
                 // defaultValue={value ? value?.toString() : '0'}
                 value={value ? value?.toString() : '0'}
