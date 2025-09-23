@@ -17,8 +17,6 @@ class APIClient<ResponseType, RequestType = ResponseType> {
     
     get = (access?: string, params?: Record<string, string>) => {
 
-        console.log('access', access)
-
         const config: any = {}
         if (params) {
             config.params = params

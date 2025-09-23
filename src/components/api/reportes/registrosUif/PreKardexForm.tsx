@@ -1,5 +1,6 @@
 import KardexForm from "../../kardex/KardexForm"
 import useRetrieveKardex from "../../../../hooks/api/kardex/useRetrieveKardex"
+import useAuthStore from "../../../../store/useAuthStore"
 
 interface Props {
     isOpen: boolean
@@ -11,7 +12,8 @@ const PreKardexForm = ({
     kardexId
 }: Props) => {
 
-    const { data: kardex, isLoading, isError, error, isSuccess } = useRetrieveKardex({ id: kardexId, enabled: isOpen })
+    const access = useAuthStore(s => s.access_token) || ''
+    const { data: kardex, isLoading, isError, error, isSuccess } = useRetrieveKardex({ id: kardexId, enabled: isOpen, access })
 
     if (isLoading) return <div>Cargando...</div>
     if (isError) return <div>Error al cargar el kardex {error?.message}</div>
