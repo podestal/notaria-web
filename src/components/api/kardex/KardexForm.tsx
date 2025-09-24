@@ -54,7 +54,7 @@ const KardexForm = ({
     const user = useUserInfoStore(s => s.user)
     console.log('user', user)
     
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(true)
     const [cannotUpdateKardex, setCannotUpdateKardex] = useState(false)
     const [cannotUpdateKardexMessage, setCannotUpdateKardexMessage] = useState('')
     const [filteredActos, setFilteredActos] = useState('')
@@ -261,7 +261,7 @@ const KardexForm = ({
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
         </div>
-        <>{console.log('kardex', kardex )}</>
+        <>{console.log('tipoActos', tipoActos )}</>
         {/* <>{console.log('contrato', kardex?.contrato)}</> */}
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
             <div className="flex justify-between items-center gap-4 mb-6">
@@ -321,9 +321,10 @@ const KardexForm = ({
                 tipoActos={tipoActos.filter(acto => acto.idtipkar === selectedKardexType)}
                 contratos={contratos}
                 setContratosDes={setContratosDes}
+                setSelectedIds={setContratos}
             />
             </div>
-            <div className="w-full flex flex-col justify-center items-center gap-4">
+            {/* <div className="w-full flex flex-col justify-center items-center gap-4">
                 <button 
                     type="button"
                     onClick={() => setOpen(true)}
@@ -338,7 +339,7 @@ const KardexForm = ({
                     <span className="font-bold text-red-600 text-md">-</span>
                     <span>Ocultar Actos</span>
                 </button>
-            </div>
+            </div> */}
             </div>
             <AnimatePresence>
             {open && 
@@ -361,7 +362,7 @@ const KardexForm = ({
                     options={tipoActos
                         .filter(acto => acto.idtipkar === selectedKardexType)
                         .filter(acto => acto.desacto.toLowerCase().includes(filteredActos.toLowerCase()))
-                        .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} /` }))}
+                        .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} ${acto.actosunat && `/ Sunat: ${acto.actosunat}`}  ${acto.actouif && `/ UIF: ${acto.actouif}`}` }))}
                     placeholder="Buscar contrato..."
                     label=""
                     selectedIds={contratos}
