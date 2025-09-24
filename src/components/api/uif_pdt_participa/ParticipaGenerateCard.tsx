@@ -18,6 +18,7 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
 
     const access = useAuthStore(s => s.access_token) || ''
     const [porcentaje, setPorcentaje] = useState(contratante.porcentaje || '')
+    const [origenDeFondos, setOrigenDeFondos] = useState(contratante.ofondo || '')
     const [isUpdating, setIsUpdating] = useState(false)
     const updateContratantePorActo = useUpdateContratantePorActo({ kardex: contratante.kardex, id: contratante.id })
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -42,18 +43,17 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
 
     // Debounced update function
     const debouncedUpdate = useCallback(
-        debounce(async (newPorcentaje: string) => {
+        debounce(async (newPorcentaje: string, newOrigenDeFondos: string) => {
             try {
                 setIsUpdating(true)
-                // Your API call here
-                // await updatePorcentaje(contratante.id, newPorcentaje)
                 const newMonto = (Number(newPorcentaje) / 100) * Number(monto)
                 updateContratantePorActo.mutate({
                     access,
                     contratantePorActo: {
                         ...contratante,
                         porcentaje: newPorcentaje,
-                        monto: newMonto.toString(),
+                        monto: newMonto.toFixed(2),
+                        ofondo: newOrigenDeFondos
                     }
                 }, {
                     onSuccess: () => {
@@ -82,15 +82,21 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
         // Only update if the value is valid
         if (isValidPercentage(newValue)) {
             setPorcentaje(newValue)
-            debouncedUpdate(newValue)
+            debouncedUpdate(newValue, origenDeFondos)
         }
     }
 
+    const handleChangeOrigenDeFondos = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value
+        setOrigenDeFondos(newValue)
+        debouncedUpdate(porcentaje, newValue)
+    }
+
     return (
-        <div className="grid grid-cols-11 text-xs text-black p-2 my-2 place-content-center border-b-2 border-gray-200 text-center">
-            <p className="col-span-3">{getTitleCase(detalleActo || '')}</p>
-            <p className="col-span-3">{getTitleCase(contratante.cliente || '')}</p>
-            <p className="col-span-2">{getTitleCase(contratante.condicion_str || '')}</p>
+        <div className="grid grid-cols-11 text-xs text-black p-2 place-content-center border-b-2 border-gray-200 text-center my-auto">
+            <p className="col-span-2 text-left">{getTitleCase(detalleActo || '')}</p>
+            <p className="col-span-2 text-left">{getTitleCase(contratante.cliente || '')}</p>
+            <p className="text-left">{getTitleCase(contratante.condicion_str || '')}</p>
             <input 
                 className="text-center rounded-xl py-1 bg-slate-100" 
                 value={porcentaje} 
@@ -102,11 +108,21 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
             />
 
             <p>{contratante.uif}</p>
-            {contratante.formulario === '1' && 
+            {contratante.formulario === '1' ? 
             <ParticipaRenta 
                 kardex={kardex}
                 contratante={contratante}
-            />}
+            />: <p></p>}
+            <p>{contratante.monto}</p>
+            <input 
+                className="px-1 rounded-xl pb-4 bg-slate-100 col-span-2" 
+                value={origenDeFondos} 
+                onChange={handleChangeOrigenDeFondos}
+                disabled={isUpdating}
+                placeholder="Origen de Fondos"
+                type="text"
+
+            />
         </div>
     )
 }
