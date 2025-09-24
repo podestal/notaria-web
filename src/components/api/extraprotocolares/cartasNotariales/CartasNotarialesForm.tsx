@@ -20,6 +20,8 @@ import useGetUserInfo from "../../../../hooks/store/useGetUserInfo";
 import GenerarDocumento from "../documentos/GenerarDocumento";
 import AbrirDocumento from "../documentos/AbrirDocumento";
 import useUpdateIngresoCarta from "../../../../hooks/api/extraprotocolares/ingresoCartas/useUpdateIngresoCarta";
+import TopModal from "../../../ui/TopModal";
+import SellosMain from "./sellos/SellosMain";
 
 interface Props {
     carta?: IngresoCartas;
@@ -35,6 +37,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const access = useAuthStore(s => s.access_token) || '';
     const { setMessage, setShow, setType } = useNotificationsStore()
     const user = useGetUserInfo(s => s.user);
+    const [openSellos, setOpenSellos] = useState(false);
 
 
     const [numCarta, setNumCarta] = useState(carta?.num_carta || '');
@@ -229,7 +232,8 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     }
 
   return (
-    <div>
+    <>
+        <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Cartas Notariales</h2>
         {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
         <div className="grid grid-cols-8 gap-2">
@@ -418,7 +422,9 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
             <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-end gap-2">
                     <p className="text-xs font-semibold text-slate-700">Contenido</p>
-                    <button>
+                    <button
+                        onClick={() => setOpenSellos(true)}
+                    >
                         <MessageCircleQuestionIcon className="w-4 h-4 text-blue-600 hover:text-blue-500 cursor-pointer transition-all duration-300" />
                     </button>
                 </div>
@@ -434,6 +440,15 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
             />
         </div>
     </div>
+    <TopModal
+        isOpen={openSellos}
+        onClose={() => setOpenSellos(false)}
+    >
+        <div>
+            <SellosMain />
+        </div>
+    </TopModal>
+    </>
   )
 }
 
