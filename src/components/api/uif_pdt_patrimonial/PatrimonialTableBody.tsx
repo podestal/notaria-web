@@ -15,7 +15,7 @@ const PatrimonialTableBody = ({ kardex }: Props) => {
     if (isLoading) return <p className="text-md animate-pulse text-center my-2">Cargando ...</p>
     if (isError) return <p className="text-md text-red-500 text-center">Error: {error.message}</p>
 
-    if (isSuccess && patrimonials.length === 0) return <p className="text-md text-center my-2">No hay datos patrimoniales</p>
+    if (isSuccess && patrimonials.length === 0) return <p className="text-md text-center my-2 text-xs text-gray-500">No hay datos patrimoniales</p>
     if (isSuccess && patrimonials.length > 0)
     
 

@@ -30,7 +30,7 @@ const ContratantesTableBody = ({ kardex }: Props) => {
     ))}
     </>
     :
-    <p className="text-xs text-center text-gray-80 my-4">No se encontraron contratanes para este documento</p>
+    <p className="text-xs text-center text-gray-500 my-4">No se encontraron contratanes para este documento</p>
     }
     </>
   )

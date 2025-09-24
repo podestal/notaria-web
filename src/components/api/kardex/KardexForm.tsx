@@ -123,6 +123,8 @@ const KardexForm = ({
                     folioini: '',
                     foliofin: '',
                     fechaescritura: '',
+                    numinstrmento: '',
+                    txa_minuta: '',
                 }
             }, {
                 onSuccess: (res) => {
@@ -168,6 +170,8 @@ const KardexForm = ({
                     folioini: '',
                     foliofin: '',
                     fechaescritura: '',
+                    numinstrmento: '',
+                    txa_minuta: '',
                 },
                 access
             }, {
@@ -215,6 +219,8 @@ const KardexForm = ({
                     folioini: kardex.folioini,
                     foliofin: kardex.foliofin,
                     fechaescritura: kardex.fechaescritura,
+                    numinstrmento: kardex.numinstrmento,
+                    txa_minuta: kardex.txa_minuta,
                 },
                 access
             }, {
@@ -294,7 +300,7 @@ const KardexForm = ({
                 <button 
                     type={kardex ? 'button' : 'submit'}
                     disabled={!!kardex}
-                    className={`bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300   rounded-md ${kardex ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-300'}`}>Generar Kardex</button>
+                    className={`bg-green-400 px-2 py-1 transition text-slate-50 font-bold duration-300 text-xs border-1 border-green-300   rounded-md ${kardex ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer hover:bg-green-500'}`}>Generar Kardex</button>
             </div>
             <div className="flex justify-between items-center gap-4">
                 <input 
@@ -317,29 +323,13 @@ const KardexForm = ({
             </div>
             <div className="grid grid-cols-9 items-start my-4">
             <div className="col-span-8">
-            <KardexActosSelector 
-                tipoActos={tipoActos.filter(acto => acto.idtipkar === selectedKardexType)}
-                contratos={contratos}
-                setContratosDes={setContratosDes}
-                setSelectedIds={setContratos}
-            />
+                <KardexActosSelector 
+                    tipoActos={tipoActos.filter(acto => acto.idtipkar === selectedKardexType)}
+                    contratos={contratos}
+                    setContratosDes={setContratosDes}
+                    setSelectedIds={setContratos}
+                />
             </div>
-            {/* <div className="w-full flex flex-col justify-center items-center gap-4">
-                <button 
-                    type="button"
-                    onClick={() => setOpen(true)}
-                    className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
-                    <span className="font-bold text-green-600 text-md">+</span>
-                    <span>Mostrar Actos</span>
-                </button>
-                <button 
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
-                    <span className="font-bold text-red-600 text-md">-</span>
-                    <span>Ocultar Actos</span>
-                </button>
-            </div> */}
             </div>
             <AnimatePresence>
             {open && 
@@ -475,9 +465,9 @@ const KardexForm = ({
             tabs={[
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
+                { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
                 { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardex} /> },
                 { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardex} /> },
-                { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
                 { id: 'uifp', label: 'UIF/PDT Participa', content: <ParticipaMain kardex={kardex}/> },
             ]}
         />}

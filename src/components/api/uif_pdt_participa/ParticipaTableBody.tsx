@@ -12,7 +12,8 @@ const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props)
 
   return (
     <>
-    {contratantes.map((contratante) => (
+    {contratantes.length > 0 ? 
+    contratantes.map((contratante) => (
         <ParticipaGenerateCard 
           key={contratante.idcontratante} 
           contratante={contratante} 
@@ -20,7 +21,10 @@ const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props)
           monto={monto} 
           kardex={kardex} 
         />
-    ))}
+    ))
+    :
+    <p className="text-md text-center my-2 text-xs text-gray-500">No hay contratantes participantes</p>
+    }
     </>
   )
 }
