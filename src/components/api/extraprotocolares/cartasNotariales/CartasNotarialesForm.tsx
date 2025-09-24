@@ -1,4 +1,4 @@
-import { FileCog, FileText, QrCode, Save } from "lucide-react";
+import { MessageCircleQuestionIcon, Save } from "lucide-react";
 import { useState } from "react";
 import SimpleInput from "../../../ui/SimpleInput";
 import { IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas";
@@ -416,7 +416,12 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
         </div>
         <div className="flex gap-4 justify-center items-center my-4">
             <div className="flex flex-col gap-2">
-                <p className="pl-2 text-xs font-semibold text-slate-700">Contenido</p>
+                <div className="flex items-center justify-end gap-2">
+                    <p className="text-xs font-semibold text-slate-700">Contenido</p>
+                    <button>
+                        <MessageCircleQuestionIcon className="w-4 h-4 text-blue-600 hover:text-blue-500 cursor-pointer transition-all duration-300" />
+                    </button>
+                </div>
                 <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                     <p className="text-xs">Actualizar</p>
                 </div>
