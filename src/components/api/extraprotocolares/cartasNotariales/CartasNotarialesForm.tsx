@@ -445,7 +445,10 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
         onClose={() => setOpenSellos(false)}
     >
         <div>
-            <SellosMain />
+            <SellosMain 
+                setContenido={setContenido}
+                setOpenSellos={setOpenSellos}
+            />
         </div>
     </TopModal>
     </>

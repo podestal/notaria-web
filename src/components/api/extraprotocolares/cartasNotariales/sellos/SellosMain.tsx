@@ -2,7 +2,15 @@ import { useState } from "react"
 import SellosTable from "./SellosTable"
 import SellosFilter from "./SellosFilter"
 
-const SellosMain = () => {
+interface Props {
+    setContenido: React.Dispatch<React.SetStateAction<string>>
+    setOpenSellos: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const SellosMain = ({
+    setContenido,
+    setOpenSellos,
+}: Props) => {
 
     const [description, setDescription] = useState('')
   return (
@@ -13,6 +21,8 @@ const SellosMain = () => {
         />
         <SellosTable
             description={description}
+            setContenido={setContenido}
+            setOpenSellos={setOpenSellos}
         />
     </div>
   )

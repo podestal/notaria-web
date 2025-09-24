@@ -4,10 +4,14 @@ import getTitleCase from "../../../../../utils/getTitleCase"
 
 interface Props {
     description: string
+    setContenido: React.Dispatch<React.SetStateAction<string>>
+    setOpenSellos: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const SellosTable = ({
     description,
+    setContenido,
+    setOpenSellos,
 }: Props) => {
     
     const access = useAuthStore(s => s.access_token) || ''
@@ -31,6 +35,10 @@ const SellosTable = ({
             .map(s => (
                 <div 
                 key={s.idsello}
+                onClick={() => {
+                    setContenido(s.contenido || '')
+                    setOpenSellos(false)
+                }}
                 className="grid grid-cols-4 px-2 py-1 gap-4 hover:bg-blue-100 cursor-pointer transition-all duration-300"
                 >
                     <p>{s.idsello}</p>
