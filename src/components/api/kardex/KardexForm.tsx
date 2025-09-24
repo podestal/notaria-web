@@ -2,7 +2,7 @@ import { FileText } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Calendar from "../../ui/Calendar"
 import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
@@ -33,6 +33,7 @@ import useGetTemplatesByActos from "../../../hooks/api/templates/useGetTemplates
 import DigitacionMain from "../digitacion/DigitacionMain"
 import EscrituracionMain from "../escrituracion/EscrituracionMain"
 import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
+import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -58,6 +59,7 @@ const KardexForm = ({
     const [cannotUpdateKardex, setCannotUpdateKardex] = useState(false)
     const [cannotUpdateKardexMessage, setCannotUpdateKardexMessage] = useState('')
     const [filteredActos, setFilteredActos] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
@@ -71,6 +73,7 @@ const KardexForm = ({
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
     const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: user?.idusuario.toString() || '0', label: user?.username || '' }) 
+    const [recepcion, setRecepcion] = useState<string>(kardex?.recepcion || user?.idusuario.toString() || '0')
 
     const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
 
@@ -97,6 +100,7 @@ const KardexForm = ({
         }
 
         const formattedContratoDes = contratosDes.map(des => des.trim()).join(' / ')
+        setLoading(true)
 
         if (createKardex && !doneCreate) {
             createKardex.mutate({
@@ -125,6 +129,7 @@ const KardexForm = ({
                     fechaescritura: '',
                     numinstrmento: '',
                     txa_minuta: '',
+                    recepcion: recepcion,
                 }
             }, {
                 onSuccess: (res) => {
@@ -142,6 +147,9 @@ const KardexForm = ({
                     setMessage(`Error al crear el kardex: ${error.message}`)
                     setShow(true)
                     setType('error')
+                },
+                onSettled: () => {
+                    setLoading(false)
                 }
             })
         }
@@ -172,6 +180,7 @@ const KardexForm = ({
                     fechaescritura: '',
                     numinstrmento: '',
                     txa_minuta: '',
+                    recepcion: recepcion,
                 },
                 access
             }, {
@@ -221,6 +230,7 @@ const KardexForm = ({
                     fechaescritura: kardex.fechaescritura,
                     numinstrmento: kardex.numinstrmento,
                     txa_minuta: kardex.txa_minuta,
+                    recepcion: recepcion,
                 },
                 access
             }, {
@@ -299,8 +309,8 @@ const KardexForm = ({
                 />
                 <button 
                     type={kardex ? 'button' : 'submit'}
-                    disabled={!!kardex}
-                    className={`bg-green-400 px-2 py-1 transition text-slate-50 font-bold duration-300 text-xs border-1 border-green-300   rounded-md ${kardex ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer hover:bg-green-500'}`}>Generar Kardex</button>
+                    disabled={!!kardex || loading}
+                    className={`bg-green-400 px-2 py-1 transition text-slate-50 font-bold duration-300 text-xs border-1 border-green-300   rounded-md ${kardex ? 'opacity-55 cursor-not-allowed' : loading ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer hover:bg-green-500'}`}>{loading ? 'Generando ...' : 'Generar Kardex'}</button>
             </div>
             <div className="flex justify-between items-center gap-4">
                 <input 
@@ -371,9 +381,10 @@ const KardexForm = ({
                     />
                 </div>
                 <div className="flex justify-center items-center gap-4">
-                    <Selector 
-                        options={[{ value: 0, label: 'Seleccionar Usuario' }, ...usuarios.map(user => ({ value: user.idusuario, label: getTitleCase(user.loginusuario) }))]}
-                        setter={() => {}}
+                    <SimpleSelectorStr 
+                        options={[{ value: '0', label: 'Seleccionar Usuario' }, ...usuarios.map(user => ({ value: String(user.idusuario), label: getTitleCase(user.loginusuario) }))]}
+                        setter={setRecepcion}
+                        defaultValue={recepcion}
                         label="Recepción"
                         horizontal
                     />

@@ -24,6 +24,7 @@ export interface Kardex {
     referencia: string;
     papeltrasladoini?: string;
     papeltrasladofin?: string;
+    recepcion?: string;
 }
 
 export interface KardexPage {
