@@ -8,6 +8,7 @@ import UpdateCliente from "./UpdateCliente"
 import CreateContratante from "../contratantes/CreateContratante"
 import { documentoJuridicaOptions, documentNaturalOptions } from "../../../data/clienteData"
 import useAuthStore from "../../../store/useAuthStore"
+import ClienteLookByName from "./byName/ClienteLookByName"
 
 interface Props {
     idtipoacto: string
@@ -210,6 +211,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 </button>}
             </>
             }
+            <ClienteLookByName />
         </form>
     </div>
     {showContratanteForm &&

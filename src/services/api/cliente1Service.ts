@@ -35,19 +35,29 @@ export interface Cliente {
     numdoc_plantilla: string;
 }
 
+export interface ClientePage {
+    count: number
+    next: string | null
+    previous: string | null
+    results: Cliente[]
+}
+
 export type CreateUpdateCliente1 = Omit<Cliente, 'idcliente' | 'numdoc_plantilla'> 
 
 interface Props {
-    clienteId: string
+    clienteId?: string
     byDni?: boolean
+    byNameOrRazon?: boolean
 }
 
-const getCliente1Service = ({ clienteId, byDni = false }: Props) => {
+const getCliente1Service = ({ clienteId, byDni = false, byNameOrRazon }: Props) => {
     let url = '/cliente/'
     if (byDni) {
         url = '/cliente/by_dni/'
     } else if (clienteId) {
         url = `/cliente/${clienteId}/`
+    } else if (byNameOrRazon) {
+        url = `/cliente/by_name/`
     }
     return new APIClient<Cliente, CreateUpdateCliente1>(url)
 }
