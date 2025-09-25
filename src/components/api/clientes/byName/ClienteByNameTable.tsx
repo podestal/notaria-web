@@ -42,15 +42,15 @@ const ClienteByNameTable = ({
                     <div className="">
                         {clientes?.map(cliente => (
                             <div key={cliente.idcliente} className="w-full grid grid-cols-5 gap-4 bg-white text-black text-xs p-2 mb-4 items-center hover:cursor-pointer hover:bg-slate-100">
-                                <p className="col-span-3">{getTitleCase(cliente.nombre || cliente.razonsocial || '')}</p>
+                                <p className="col-span-3">{cliente.tipper === 'N' ? getTitleCase(cliente.nombre || '') : getTitleCase(cliente.razonsocial || '')}</p>
                                 <p className="col-span-1">{cliente.numdoc}</p>
                                 <button 
                                 type="button"
                                 className="bg-blue-600 w-24 text-white rounded-md py-2 text-center transition-colors duration-300 hover:cursor-pointer hover:bg-blue-500"
                                 onClick={() => {
                                     setCliente1(cliente)
-                                    cliente.nombre.length > 0 ? setSelectedTipoPersona(1) : setSelectedTipoPersona(2)
                                     setShowTable(false)
+                                    cliente.tipper === 'N' ? setSelectedTipoPersona(1) : setSelectedTipoPersona(2)
                                     setShowContratanteForm(true)
                                 }}
                                 >Seleccionar</button>
