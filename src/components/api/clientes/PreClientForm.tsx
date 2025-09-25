@@ -211,7 +211,11 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                 </button>}
             </>
             }
-            <ClienteLookByName />
+            <ClienteLookByName 
+                setShowContratanteForm={setShowContratanteForm}
+                setSelectedTipoPersona={setSelectedTipoPersona}
+                setCliente1={setCliente1}
+            />
         </form>
     </div>
     {showContratanteForm &&
