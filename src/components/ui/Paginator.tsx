@@ -36,6 +36,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
       <div className='flex items-center justify-center px-4 py-3 sm:px-6 gap-10 mt-10'>
         <p className='text-sm text-gray-500'>{`${page} de ${totalPages}`}</p>
         <button
+          type='button'
           className='cursor-pointer text-gray-500 hover:text-gray-700'
           onClick={() => {
             setPage(prev => Math.max(1, prev - 1))
@@ -49,6 +50,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
         <div>
           {visiblePages.map(p => (
             <button
+              type='button'
               key={p}
               onClick={() => setPage(p)}
               className={`mx-1 cursor-pointer rounded-md transition duration-300 border border-gray-300 ${
@@ -63,6 +65,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
         </div>
 
         <button
+          type='button'
           className='cursor-pointer text-gray-500 hover:text-gray-700'
           onClick={() => {
             setPage(prev => Math.min(totalPages, prev + 1))
