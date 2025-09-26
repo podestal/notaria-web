@@ -1,26 +1,23 @@
-import { useState } from "react"
 import { Cliente } from "../../../../services/api/cliente1Service"
-import ClienteConyugeLooker from "./ClienteConyugeLooker"
 import ClienteConyugue from "./ClienteConyugue"
 
 type Props = {
     cliente1: Cliente
+    setConyuge: React.Dispatch<React.SetStateAction<string>>
 }
 
-const ClienteMarriedMain = ({ cliente1 }: Props) => {
-
-    const [document, setDocument] = useState('')
+const ClienteMarriedMain = ({ cliente1, setConyuge }: Props) => {
 
   return (
     <>
     {
         cliente1.idestcivil === 2 
-        ? 
+        &&
         <ClienteConyugue 
-            clienteId={cliente1.conyuge || ''}
+            clienteConyuge={cliente1.conyugue_name || ''}
+            setConyuge={setConyuge}
         />
-        : 
-        <ClienteConyugeLooker document={document} setDocument={setDocument} />
+        
     }
     </>
   )

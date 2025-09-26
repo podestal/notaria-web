@@ -1,23 +1,41 @@
-import useRetrieveClient from "../../../../hooks/api/cliente/useRetrieveClient"
-import useAuthStore from "../../../../store/useAuthStore"
+import { useState } from "react"
+import getTitleCase from "../../../../utils/getTitleCase"
+import TopModal from "../../../ui/TopModal"
+import ClienteConyugeLooker from "./ClienteConyugeLooker"
 
 interface Props {
-    clienteId: string
+    clienteConyuge: string
+    setConyuge: React.Dispatch<React.SetStateAction<string>>
 }
 
-const ClienteConyugue = ({ clienteId }: Props) => {
+const ClienteConyugue = ({ clienteConyuge, setConyuge }: Props) => {
 
-    const access = useAuthStore(s => s.access_token) || ''
-    const { data: cliente, isLoading, isError, error, isSuccess} = useRetrieveClient({ access, id: clienteId })
-
-    if (isLoading) return <p className="text-center text-xs text-gray-500 animate-pulse my-2">Cargando...</p>
-    if (isError) return <p className="text-center text-xs text-red-500 my-2">Error: {error.message}</p>
-    if (isSuccess) 
+    const [isOpen, setIsOpen] = useState(false)
+    const [conyugeName, setConyugeName] = useState(clienteConyuge || '')
 
   return (
-    <div>
-        <p>Casado con: {cliente?.nombre}</p>
+    <>
+    <div className="w-full mx-2 bg-slate-200 rounded-md p-2 text-sm flex items-center justify-between my-2">
+        <p>Casado con: {getTitleCase(conyugeName)}</p>
+        <button
+            onClick={() => setIsOpen(true)}
+            type="button"
+            className="w-30 border mx-4 bg-yellow-400 border-yellow-500 text-white text-sm rounded-md py-1 px-4 cursor-pointer hover:bg-yellow-500 transition-all duration-300"
+        >
+            <p>Actualizar</p>
+        </button>
     </div>
+    <TopModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+    >
+        <ClienteConyugeLooker 
+            setConyuge={setConyuge}
+            setConyugeName={setConyugeName}
+            setIsOpen={setIsOpen}
+        />
+    </TopModal>
+    </>
   )
 }
 

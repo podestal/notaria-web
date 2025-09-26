@@ -34,6 +34,7 @@ export interface Cliente {
     fechaconstitu: string; // Date in 'DD/MM/YYYY' format
     numdoc_plantilla: string;
     conyuge?: string;
+    conyugue_name?: string;
 }
 
 export interface ClientePage {

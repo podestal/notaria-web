@@ -94,6 +94,7 @@ const ClientesForm = ({
     const [naturalFrom, setNaturalFrom] = useState('')
 
     const [civilStatus, setCivilStatus] = useState(cliente1 ? civilStatusOptions.find( option => option.value === cliente1.idestcivil)?.value : 0)
+    const [conyuge, setConyuge] = useState(cliente1 ? cliente1.conyuge || '' : '')
     const [gender, setGender] = useState(cliente1 ? sexOptions.find( option => option.label[0] === cliente1.sexo)?.value : 0)
     const [nationality, setNationality] = useState<{ id: string; label: string } | null>(() => {
         if (cliente1 && cliente1.idubigeo) {
@@ -392,6 +393,7 @@ const ClientesForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
+                    conyuge: conyuge,
                 }
             }, {
                 onSuccess: (data) => {
@@ -535,6 +537,7 @@ const ClientesForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
+                    conyuge: conyuge,
                 }
             }, {
                 onSuccess: (data) => {
@@ -604,6 +607,7 @@ const ClientesForm = ({
         {selectedTipoPersona === 1 && 
         <>
         <div className="grid grid-cols-3 items-center gap-6 mb-10">
+            <>{console.log('conyuge', conyuge)}</>
             <div></div>
             <h2 className="text-xl font-bold text-center text-black">Nuevo Cliente</h2>
             <button
@@ -695,9 +699,10 @@ const ClientesForm = ({
                 setError={setGenderError}
             />
         </div>
-        {civilStatus === 2 && 
+        {civilStatus === 2 && cliente1 &&
         <ClienteMarriedMain 
             cliente1={cliente1}
+            setConyuge={setConyuge}
         />}
         <div className="grid grid-cols-3 items-center gap-6 mb-6">
             <div className="w-full flex justify-center items-center gap-4 col-span-2">

@@ -12,7 +12,6 @@ const useGetClienteByDni = ({ dni, access }: Props): UseQueryResult<Cliente> => 
     return useQuery({
         queryKey: ['cliente', 'by_dni', dni],
         queryFn: () => clienteService.get(access, params),
-        // enabled: !!dni
     })
 }
 export default useGetClienteByDni
