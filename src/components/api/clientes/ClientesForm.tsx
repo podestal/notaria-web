@@ -16,6 +16,7 @@ import { CreateClienteData } from "../../../hooks/api/cliente/useCreateCliente"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import { SEDES_REGISTRALES, GIRO_NEGOCIO } from "../../../data/patrimonialData"
 import useAuthStore from "../../../store/useAuthStore"
+import ClienteMarriedMain from "./married/ClienteMarriedMain"
 
 interface Props {
     dni: string
@@ -672,7 +673,7 @@ const ClientesForm = ({
             </div>
 
         </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
+        <div className="w-full grid grid-cols-2 gap-6 mb-6">
             <SimpleSelector 
                 label="Estado Civil"
                 setter={setCivilStatus}
@@ -694,6 +695,10 @@ const ClientesForm = ({
                 setError={setGenderError}
             />
         </div>
+        {civilStatus === 2 && 
+        <ClienteMarriedMain 
+            cliente1={cliente1}
+        />}
         <div className="grid grid-cols-3 items-center gap-6 mb-6">
             <div className="w-full flex justify-center items-center gap-4 col-span-2">
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Nacionalidad</p>

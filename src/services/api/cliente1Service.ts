@@ -33,6 +33,7 @@ export interface Cliente {
     contacempresa: string; // Contact person in the company
     fechaconstitu: string; // Date in 'DD/MM/YYYY' format
     numdoc_plantilla: string;
+    conyuge?: string;
 }
 
 export interface ClientePage {
