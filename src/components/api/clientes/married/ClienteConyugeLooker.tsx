@@ -54,24 +54,27 @@ const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen, cliente1,
     }
 
     const handleSelect = () => {
-        updateCliente.mutate({
-            access,
-            cliente: {
-                ...cliente1,
-                conyuge: client?.idcliente,
-                idestcivil: civilStatus,
-                // conyuge_name: client?.nombre
-            }
-        }, {
-            onSuccess: () => {
-                setConyuge(client?.idcliente || '')
-                setConyugeName(client?.nombre || '')
-                setIsOpen(false)
-            },
-            onError: (error) => {
-                console.log('Error al actualizar el cliente:', error)
-            }
-        })
+        setConyuge(client?.idcliente || '')
+        setConyugeName(client?.nombre || '')
+        setIsOpen(false)
+        // updateCliente.mutate({
+        //     access,
+        //     cliente: {
+        //         ...cliente1,
+        //         conyuge: client?.idcliente,
+        //         idestcivil: civilStatus,
+        //         // conyuge_name: client?.nombre
+        //     }
+        // }, {
+        //     onSuccess: () => {
+        //         setConyuge(client?.idcliente || '')
+        //         setConyugeName(client?.nombre || '')
+        //         setIsOpen(false)
+        //     },
+        //     onError: (error) => {
+        //         console.log('Error al actualizar el cliente:', error)
+        //     }
+        // })
 
     }
 

@@ -11,17 +11,29 @@ const ClienteMarriedMain = ({ cliente1, setConyuge, civilStatus }: Props) => {
 
   return (
     <>
-    {
+    {/* {
         cliente1.idestcivil === 2 
-        &&
+        ?
         <ClienteConyugue 
             clienteConyuge={cliente1.conyugue_name || ''}
             setConyuge={setConyuge}
             cliente1={cliente1}
             civilStatus={civilStatus}
         />
-        
-    }
+        :
+        <ClienteCreateConyugue 
+            clienteConyuge={cliente1.conyugue_name || ''}
+            setConyuge={setConyuge}
+            cliente1={cliente1}
+            civilStatus={civilStatus}
+        />
+    } */}
+        <ClienteConyugue 
+            clienteConyuge={cliente1.conyugue_name || ''}
+            setConyuge={setConyuge}
+            cliente1={cliente1}
+            civilStatus={civilStatus}
+        />
     </>
   )
 }

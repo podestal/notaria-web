@@ -34,12 +34,19 @@ interface Props {
     selectedTipoDocumento: number
 }
 
+// +------------+-------------+-------------+
+// |          1 | S           | SOLTERO     |
+// |          2 | C           | CASADO      |
+// |          3 | V           | VIUDO       |
+// |          4 | D           | DIVORCIADO  |
+// |          5 | O           | CONVIVIENTE |
+
 const civilStatusOptions = [
     { value: 0, label: 'Seleccionar Estado Civil' },
     { value: 1, label: 'Soltero' },
     { value: 2, label: 'Casado' },
-    { value: 3, label: 'Divorciado' },
-    { value: 4, label: 'Viudo' },
+    { value: 3, label: 'Viudo' },
+    { value: 4, label: 'Divorciado' },
     { value: 5, label: 'Conviviente' },
 ]
 
@@ -64,8 +71,6 @@ const ClientesForm = ({
     selectedTipoPersona,
     selectedTipoDocumento
     }: Props) => {
-
-    console.log('selectedTipoDocumento', selectedTipoDocumento)
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const access = useAuthStore(s => s.access_token) || ''
@@ -340,6 +345,7 @@ const ClientesForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
+                    conyuge: conyuge,
                 }
             }, {
                 onSuccess: (data) => {
@@ -359,7 +365,10 @@ const ClientesForm = ({
                     setShow(true)
                 }
             })
-    
+
+            console.log('civilStatus', civilStatus);
+            
+
             updateCliente && updateCliente.mutate({
                 access,
                 cliente: {
@@ -393,11 +402,10 @@ const ClientesForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
-                    conyuge: conyuge,
+                    conyuge: civilStatus === 1 || civilStatus === 4 ? '' : conyuge,
                 }
             }, {
                 onSuccess: (data) => {
-                    console.log('Cliente actualizado:', data)
                     setType('success')
                     setMessage('Cliente actualizado exitosamente')
                     setShow(true)
@@ -507,7 +515,7 @@ const ClientesForm = ({
             updateCliente && updateCliente.mutate({
                 access,
                 cliente: {
-                    tipper: 'N',
+                    tipper: 'J',
                     apepat,
                     apemat,
                     prinom,
@@ -537,7 +545,6 @@ const ClientesForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
-                    conyuge: conyuge,
                 }
             }, {
                 onSuccess: (data) => {
@@ -607,7 +614,6 @@ const ClientesForm = ({
         {selectedTipoPersona === 1 && 
         <>
         <div className="grid grid-cols-3 items-center gap-6 mb-10">
-            <>{console.log('conyuge', conyuge)}</>
             <div></div>
             <h2 className="text-xl font-bold text-center text-black">Nuevo Cliente</h2>
             <button
@@ -737,7 +743,6 @@ const ClientesForm = ({
                 setValue={setNaturalFrom}
                 horizontal={true}
             />
-            <>{console.log('cliente', cliente1)}</>
             <DateInput 
                 label="Fecha de Nacimiento"
                 value={birthdate}

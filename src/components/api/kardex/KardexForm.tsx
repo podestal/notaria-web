@@ -53,7 +53,6 @@ const KardexForm = ({
 
     const access = useAuthStore(s => s.access_token) || ''
     const user = useUserInfoStore(s => s.user)
-    console.log('user', user)
     
     const [open, setOpen] = useState(true)
     const [cannotUpdateKardex, setCannotUpdateKardex] = useState(false)
@@ -235,7 +234,6 @@ const KardexForm = ({
                 access
             }, {
                 onSuccess: (res) => {
-                    console.log('res', res)
                     setMessage('Kardex actualizado exitosamente')
                     setShow(true)
                     setType('success')
@@ -277,8 +275,6 @@ const KardexForm = ({
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
         </div>
-        <>{console.log('tipoActos', tipoActos )}</>
-        {/* <>{console.log('contrato', kardex?.contrato)}</> */}
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
             <div className="flex justify-between items-center gap-4 mb-6">
                 <Selector 
