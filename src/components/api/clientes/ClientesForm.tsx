@@ -703,6 +703,7 @@ const ClientesForm = ({
         <ClienteMarriedMain 
             cliente1={cliente1}
             setConyuge={setConyuge}
+            civilStatus={civilStatus}
         />}
         <div className="grid grid-cols-3 items-center gap-6 mb-6">
             <div className="w-full flex justify-center items-center gap-4 col-span-2">

@@ -4,9 +4,10 @@ import ClienteConyugue from "./ClienteConyugue"
 type Props = {
     cliente1: Cliente
     setConyuge: React.Dispatch<React.SetStateAction<string>>
+    civilStatus: number
 }
 
-const ClienteMarriedMain = ({ cliente1, setConyuge }: Props) => {
+const ClienteMarriedMain = ({ cliente1, setConyuge, civilStatus }: Props) => {
 
   return (
     <>
@@ -16,6 +17,8 @@ const ClienteMarriedMain = ({ cliente1, setConyuge }: Props) => {
         <ClienteConyugue 
             clienteConyuge={cliente1.conyugue_name || ''}
             setConyuge={setConyuge}
+            cliente1={cliente1}
+            civilStatus={civilStatus}
         />
         
     }

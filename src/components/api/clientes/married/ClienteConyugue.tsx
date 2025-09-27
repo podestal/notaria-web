@@ -2,13 +2,16 @@ import { useState } from "react"
 import getTitleCase from "../../../../utils/getTitleCase"
 import TopModal from "../../../ui/TopModal"
 import ClienteConyugeLooker from "./ClienteConyugeLooker"
+import { Cliente } from "../../../../services/api/cliente1Service"
 
 interface Props {
     clienteConyuge: string
     setConyuge: React.Dispatch<React.SetStateAction<string>>
+    cliente1: Cliente
+    civilStatus: number
 }
 
-const ClienteConyugue = ({ clienteConyuge, setConyuge }: Props) => {
+const ClienteConyugue = ({ clienteConyuge, setConyuge, cliente1, civilStatus }: Props) => {
 
     const [isOpen, setIsOpen] = useState(false)
     const [conyugeName, setConyugeName] = useState(clienteConyuge || '')
@@ -33,6 +36,8 @@ const ClienteConyugue = ({ clienteConyuge, setConyuge }: Props) => {
             setConyuge={setConyuge}
             setConyugeName={setConyugeName}
             setIsOpen={setIsOpen}
+            cliente1={cliente1}
+            civilStatus={civilStatus}
         />
     </TopModal>
     </>

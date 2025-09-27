@@ -4,19 +4,25 @@ import { useState } from "react"
 import { Loader } from "lucide-react"
 import { Cliente } from "../../../../services/api/cliente1Service"
 import getTitleCase from "../../../../utils/getTitleCase"
+import useUpdateCliente from "../../../../hooks/api/cliente/useUpdateCliente"
 
 interface Props {
     setConyuge: React.Dispatch<React.SetStateAction<string>>
     setConyugeName: React.Dispatch<React.SetStateAction<string>>
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+    cliente1: Cliente
+    civilStatus: number
 }
 
-const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) => {
+const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen, cliente1, civilStatus }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const [document, setDocument] = useState('')
     const [loading, setLoading] = useState(false)
     const [client, setClient] = useState<Cliente | null>(null)
+
+    const updateCliente = useUpdateCliente({ dni: cliente1.numdoc, clienteId: cliente1.idcliente })
+
     const handleLookup = () => {
         setLoading(true)
         axios.get(
@@ -48,9 +54,25 @@ const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) 
     }
 
     const handleSelect = () => {
-        setConyuge(client?.idcliente || '')
-        setConyugeName(client?.nombre || '')
-        setIsOpen(false)
+        updateCliente.mutate({
+            access,
+            cliente: {
+                ...cliente1,
+                conyuge: client?.idcliente,
+                idestcivil: civilStatus,
+                // conyuge_name: client?.nombre
+            }
+        }, {
+            onSuccess: () => {
+                setConyuge(client?.idcliente || '')
+                setConyugeName(client?.nombre || '')
+                setIsOpen(false)
+            },
+            onError: (error) => {
+                console.log('Error al actualizar el cliente:', error)
+            }
+        })
+
     }
 
     return (
