@@ -34,13 +34,6 @@ interface Props {
     selectedTipoDocumento: number
 }
 
-// +------------+-------------+-------------+
-// |          1 | S           | SOLTERO     |
-// |          2 | C           | CASADO      |
-// |          3 | V           | VIUDO       |
-// |          4 | D           | DIVORCIADO  |
-// |          5 | O           | CONVIVIENTE |
-
 const civilStatusOptions = [
     { value: 0, label: 'Seleccionar Estado Civil' },
     { value: 1, label: 'Soltero' },
@@ -709,7 +702,6 @@ const ClientesForm = ({
         <ClienteMarriedMain 
             cliente1={cliente1}
             setConyuge={setConyuge}
-            civilStatus={civilStatus}
         />}
         <div className="grid grid-cols-3 items-center gap-6 mb-6">
             <div className="w-full flex justify-center items-center gap-4 col-span-2">
@@ -812,7 +804,7 @@ const ClientesForm = ({
         <div className="flex justify-center items-center gap-6 mb-4">
             <button 
                 type="submit"
-                className="mt-8 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
+                className="mt-8 bg-blue-600 text-white px-4 cursor-pointer py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
                 {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
             </button>
         </div>

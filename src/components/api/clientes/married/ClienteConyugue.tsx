@@ -2,23 +2,20 @@ import { useState } from "react"
 import getTitleCase from "../../../../utils/getTitleCase"
 import TopModal from "../../../ui/TopModal"
 import ClienteConyugeLooker from "./ClienteConyugeLooker"
-import { Cliente } from "../../../../services/api/cliente1Service"
 
 interface Props {
     clienteConyuge: string
     setConyuge: React.Dispatch<React.SetStateAction<string>>
-    cliente1: Cliente
-    civilStatus: number
 }
 
-const ClienteConyugue = ({ clienteConyuge, setConyuge, cliente1, civilStatus }: Props) => {
+const ClienteConyugue = ({ clienteConyuge, setConyuge }: Props) => {
 
     const [isOpen, setIsOpen] = useState(false)
     const [conyugeName, setConyugeName] = useState(clienteConyuge || '')
 
   return (
     <>
-    {clienteConyuge 
+    {conyugeName.length > 0 
     ? 
     <div className="w-full mx-2 bg-slate-200 rounded-md p-2 text-sm flex items-center justify-between my-2">
         <p>Casado con: {getTitleCase(conyugeName)}</p>
@@ -46,8 +43,6 @@ const ClienteConyugue = ({ clienteConyuge, setConyuge, cliente1, civilStatus }: 
             setConyuge={setConyuge}
             setConyugeName={setConyugeName}
             setIsOpen={setIsOpen}
-            cliente1={cliente1}
-            civilStatus={civilStatus}
         />
     </TopModal>
     </>
