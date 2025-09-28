@@ -15,6 +15,7 @@ interface Props {
     cliente1: Cliente | null
     selectedTipoPersona: number
     selectedTipoDocumento: number
+    closeModal?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const CreateCliente = ({ 
@@ -23,7 +24,8 @@ const CreateCliente = ({
     setShowClienteForm, 
     setCliente1, 
     selectedTipoPersona,
-    selectedTipoDocumento
+    selectedTipoDocumento,
+    closeModal
  }: Props) => {
 
     const createCliente = useCreateCliente()
@@ -55,6 +57,7 @@ const CreateCliente = ({
         createCliente={createCliente} // Pass the createCliente mutation
         selectedTipoPersona={selectedTipoPersona} // Assuming 1 is for natural person, adjust as needed
         selectedTipoDocumento={selectedTipoDocumento}
+        closeModal={closeModal}
     />
   )
 }

@@ -32,6 +32,7 @@ interface Props {
     createCliente?: UseMutationResult<Cliente, Error, CreateClienteData>
     selectedTipoPersona: number
     selectedTipoDocumento: number
+    closeModal?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const civilStatusOptions = [
@@ -62,7 +63,8 @@ const ClientesForm = ({
     updateCliente,
     createCliente,
     selectedTipoPersona,
-    selectedTipoDocumento
+    selectedTipoDocumento,
+    closeModal,
     }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -177,9 +179,7 @@ const ClientesForm = ({
     const [ciiu, setCiiu] = useState(cliente1 ? cliente1.actmunicipal || '' : '')
     const [contacEmpresa, setContacEmpresa] = useState(cliente1 ? cliente1.contacempresa || '' : '')
     
-    const handleSubmit = (e: React.FormEvent) => {
-
-        e.preventDefault()
+    const handleSubmit = () => {
 
         if (selectedTipoPersona === 1) {
             if (!apepat) {
@@ -313,7 +313,7 @@ const ClientesForm = ({
                     apemat,
                     prinom,
                     segnom,
-                    nombre,
+                    nombre: `${apepat} ${apemat}, ${prinom} ${segnom}`,
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
@@ -349,6 +349,7 @@ const ClientesForm = ({
                     setShowClienteForm(false)
                     setShowContratanteForm(true)
                     setCliente1(data)
+                    closeModal && closeModal(false)
     
                 },
                 onError: (error) => {
@@ -370,7 +371,7 @@ const ClientesForm = ({
                     apemat,
                     prinom,
                     segnom,
-                    nombre,
+                    nombre: `${apepat} ${apemat}, ${prinom} ${segnom}`,
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
@@ -405,6 +406,7 @@ const ClientesForm = ({
                     setShowClienteForm(false)
                     setShowContratanteForm(true)
                     setCliente1(data)
+                    closeModal && closeModal(false)
     
                 },
                 onError: (error) => {
@@ -495,6 +497,7 @@ const ClientesForm = ({
                     setShowClienteForm(false)
                     setShowContratanteForm(true)
                     setCliente1(data)
+                    closeModal && closeModal(false)
     
                 },
                 onError: (error) => {
@@ -548,6 +551,7 @@ const ClientesForm = ({
                     setShowClienteForm(false)
                     setShowContratanteForm(true)
                     setCliente1(data)
+                    closeModal && closeModal(false)
     
                 },
                 onError: (error) => {
@@ -601,9 +605,7 @@ const ClientesForm = ({
     }
 
   return (
-    <form
-        onSubmit={handleSubmit}
-    >
+    <div>
         {selectedTipoPersona === 1 && 
         <>
         <div className="grid grid-cols-3 items-center gap-6 mb-10">
@@ -803,7 +805,7 @@ const ClientesForm = ({
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <button 
-                type="submit"
+                onClick={handleSubmit}
                 className="mt-8 bg-blue-600 text-white px-4 cursor-pointer py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
                 {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
             </button>
@@ -918,14 +920,14 @@ const ClientesForm = ({
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <button 
-                type="submit"
+                onClick={handleSubmit}
                 className="mt-8 bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
                 {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
             </button>
         </div>
         </>
         }
-    </form>
+    </div>
   )
 }
 

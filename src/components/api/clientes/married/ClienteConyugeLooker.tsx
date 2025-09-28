@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Loader } from "lucide-react"
 import { Cliente } from "../../../../services/api/cliente1Service"
 import getTitleCase from "../../../../utils/getTitleCase"
+import CreateCliente from "../CreateCliente"
+import TopModal from "../../../ui/TopModal"
 
 interface Props {
     setConyuge: React.Dispatch<React.SetStateAction<string>>
@@ -18,8 +20,11 @@ const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) 
     const [loading, setLoading] = useState(false)
     const [client, setClient] = useState<Cliente | null>(null)
 
+    const [newClient, setNewClient] = useState(false)
+
     const handleLookup = () => {
         setLoading(true)
+        setClient(null)
         axios.get(
             `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`,
             {
@@ -36,6 +41,7 @@ const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) 
                 // setShowClienteForm(false)
             } else {
                 console.log('Cliente no encontrado, creando nuevo cliente')
+                setNewClient(true)
                 // setCliente1(null)
                 // setShowContratanteForm(false)
                 // setShowClienteForm(true)
@@ -111,6 +117,21 @@ const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) 
             </button>
         </div>
         }
+        <TopModal
+            isOpen={newClient}
+            onClose={() => setNewClient(false)}
+        >
+        <CreateCliente 
+                setShowContratanteForm={() => {}}
+                setShowClienteForm={() => {}}
+                setCliente1={setClient}
+                dni={document}
+                cliente1={client}
+                selectedTipoPersona={1}
+                selectedTipoDocumento={1}
+                closeModal={setNewClient}
+            />
+        </TopModal>
         </>
     )
 }
