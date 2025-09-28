@@ -181,6 +181,27 @@ const ClientesForm = ({
     
     const handleSubmit = () => {
 
+        if (selectedTipoDocumento === 0) {
+            setType('error')
+            setMessage('Debe seleccionar un tipo de documento.')
+            setShow(true)
+            return
+        }
+
+        if (selectedTipoDocumento === 1 && dni.length !== 8) {
+            setType('error')
+            setMessage('El DNI debe tener 8 dígitos.')
+            setShow(true)
+            return
+        }
+        
+        if (selectedTipoDocumento === 8 && dni.length !== 11) {
+            setType('error')
+            setMessage('El RUC debe tener 11 dígitos.')
+            setShow(true)
+            return
+        }
+
         if (selectedTipoPersona === 1) {
             if (!apepat) {
                 setApepatError('Apellido Paterno es requerido')

@@ -23,13 +23,17 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
 
     const { setType, setMessage, setShow } = useNotificationsStore()
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(0)   
-    const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1)
+    const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(0)
     const [document, setDocument] = useState('')
     const [showContratanteForm, setShowContratanteForm] = useState(false)
     const [showClienteForm, setShowClienteForm] = useState(false)
     const [cliente1, setCliente1] = useState<Cliente | null>(null)
     const [loading, setLoading] = useState(false)
     // const token = import.meta.env.VITE_FACTILIZA_TOKEN
+
+    useEffect(() => {
+        setSelectedTipoDocumento(0)
+    }, [selectedTipoPersona])
 
     useEffect(() => {
         if (selectedTipoPersona === 2 && selectedTipoDocumento === 10) {
@@ -63,7 +67,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
             return
         }
 
-        if (selectedTipoDocumento === 0) {
+        if (selectedTipoDocumento === 0 || selectedTipoDocumento === null) {
             setType('error')
             setMessage('Debe seleccionar un tipo de documento.')
             setShow(true)
@@ -192,7 +196,8 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                     setter={setSelectedTipoDocumento}
                     defaultValue={selectedTipoDocumento}
                 />
-                <div className="flex flex-col gap-2 col-span-2">
+                {selectedTipoDocumento > 0 && <div className="flex flex-col gap-2 col-span-2">
+                    <>{console.log('selectedTipoDocumento', selectedTipoDocumento)}</>
                     <p className="text-md font-bold py-2">RUC</p>
                     <input 
                         type="text"
@@ -201,8 +206,8 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                         placeholder={'Ingrese el RUC'}
                         className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                     />
-                </div>
-                {selectedTipoDocumento > 0 && 
+                </div>}
+                {document.length === 11 && 
                 <button 
                     disabled={loading}
                     className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${loading && 'animate-pulse'} ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 

@@ -19,7 +19,7 @@ const ExplanationMessage = ({
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-8">
         <TriangleAlert className="text-amber-400"/>
-        <h2 className="text-lg text-center font-bold">{message}</h2>
+        <h2 className="text-lg text-center font-bold text-black">{message}</h2>
         <div className="my-6 flex justify-center items-center gap-12">
             <button 
                 onClick={onClick}
