@@ -13,9 +13,10 @@ const DigitacionMutations = ({ kardex, enableCreate }: Props) => {
 
   return (
     <div className="w-full flex items-center justify-center mb-6 gap-12">
-        {enableCreate && <CreateDocumento 
+        {/* {enableCreate && >} */}
+        <CreateDocumento 
           kardex={kardex}
-        />}
+        />
         <UpdateDocumento 
           kardex={kardex}
         />

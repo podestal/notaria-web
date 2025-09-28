@@ -130,6 +130,7 @@ const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) 
                 selectedTipoPersona={1}
                 selectedTipoDocumento={1}
                 closeModal={setNewClient}
+                noCivilStatus={true}
             />
         </TopModal>
         </>

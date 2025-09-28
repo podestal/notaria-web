@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import ExplanationMessage from "../../ui/ExplanationMessage";
 import { useState } from "react";
 import TopModal from "../../ui/TopModal";
+import { Loader } from "lucide-react";
 
 interface Props {
   kardex: Kardex
@@ -16,6 +17,7 @@ const CreateDocumento = ({ kardex }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ''
     const queryClient = useQueryClient()
     const [open, setOpen] = useState(false)
+    const [loading, setLoading] = useState(false)
     
     const handleOpenDocument = async () => {
       if (kardex.fktemplate === 0) {
@@ -26,6 +28,7 @@ const CreateDocumento = ({ kardex }: Props) => {
       try {
         const isWindows = /Windows/.test(navigator.userAgent);
         const mode = isWindows ? 'open' : 'download';
+        setLoading(true)
 
         console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
 // generate-document
@@ -34,7 +37,7 @@ const CreateDocumento = ({ kardex }: Props) => {
           {
             responseType: mode === 'download' ? 'blob' : 'json',
             headers: {
-              'Authorization': `Bearer ${access}`,
+              'Authorization': `JWT ${access}`,
             }
           }
         );
@@ -64,6 +67,7 @@ const CreateDocumento = ({ kardex }: Props) => {
         console.error('Error opening Word document:', error);
       } finally {
         queryClient.invalidateQueries({ queryKey: ["documents by kardex", `${kardex.kardex}`] })
+        setLoading(false)
       }
     };
 
@@ -71,9 +75,9 @@ const CreateDocumento = ({ kardex }: Props) => {
   <>
       <button
         onClick={handleOpenDocument}
-        className="mt-8 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300 text-xs cursor-pointer"
+        className="mt-8 bg-red-600 text-white flex items-center justify-center gap-2 px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300 text-xs cursor-pointer"
       >
-        Generar Proyecto
+        {loading ? <Loader className="animate-spin w-20 h-4" /> : 'Generar Proyecto'}
       </button>
       <TopModal
         isOpen={open}

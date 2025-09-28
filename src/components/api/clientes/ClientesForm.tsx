@@ -33,6 +33,7 @@ interface Props {
     selectedTipoPersona: number
     selectedTipoDocumento: number
     closeModal?: React.Dispatch<React.SetStateAction<boolean>>
+    noCivilStatus?: boolean
 }
 
 const civilStatusOptions = [
@@ -65,6 +66,7 @@ const ClientesForm = ({
     selectedTipoPersona,
     selectedTipoDocumento,
     closeModal,
+    noCivilStatus
     }: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -245,7 +247,7 @@ const ClientesForm = ({
                 return
             }
     
-            if (civilStatus === 0) {
+            if (civilStatus === 0 && !noCivilStatus) {
                 setCivilStatusError('Estado Civil es requerido')
                 setType('error')
                 setMessage('Estado Civil es requerido')
@@ -342,7 +344,7 @@ const ClientesForm = ({
                     numdoc: dni,
                     email,
                     nacionalidad: nationality.id,
-                    idestcivil: civilStatus,
+                    idestcivil: noCivilStatus ? 1 : civilStatus,
                     sexo: gender === 1 ? 'M' : 'F',
                     telfijo: fixedPhone,
                     telcel: celphone,
@@ -700,7 +702,7 @@ const ClientesForm = ({
 
         </div>
         <div className="w-full grid grid-cols-2 gap-6 mb-6">
-            <SimpleSelector 
+            {!noCivilStatus && <SimpleSelector 
                 label="Estado Civil"
                 setter={setCivilStatus}
                 options={civilStatusOptions}
@@ -709,7 +711,7 @@ const ClientesForm = ({
                 error={civilStatusError}
                 setError={setCivilStatusError}
                 defaultValue={civilStatus}
-            />
+            />}
             <SimpleSelector 
                 label="Sexo"
                 setter={setGender}
@@ -721,7 +723,7 @@ const ClientesForm = ({
                 setError={setGenderError}
             />
         </div>
-        {civilStatus === 2 && cliente1 &&
+        {(civilStatus === 2 || civilStatus === 5) && cliente1 &&
         <ClienteMarriedMain 
             cliente1={cliente1}
             setConyuge={setConyuge}

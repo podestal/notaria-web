@@ -16,6 +16,7 @@ interface Props {
     selectedTipoPersona: number
     selectedTipoDocumento: number
     closeModal?: React.Dispatch<React.SetStateAction<boolean>>
+    noCivilStatus?: boolean
 }
 
 const CreateCliente = ({ 
@@ -25,7 +26,8 @@ const CreateCliente = ({
     setCliente1, 
     selectedTipoPersona,
     selectedTipoDocumento,
-    closeModal
+    closeModal,
+    noCivilStatus
  }: Props) => {
 
     const createCliente = useCreateCliente()
@@ -58,6 +60,7 @@ const CreateCliente = ({
         selectedTipoPersona={selectedTipoPersona} // Assuming 1 is for natural person, adjust as needed
         selectedTipoDocumento={selectedTipoDocumento}
         closeModal={closeModal}
+        noCivilStatus={noCivilStatus}
     />
   )
 }
