@@ -6,9 +6,10 @@ import ClienteConyugeLooker from "./ClienteConyugeLooker"
 interface Props {
     clienteConyuge: string
     setConyuge: React.Dispatch<React.SetStateAction<string>>
+    setConyugeMarried: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ClienteConyugue = ({ clienteConyuge, setConyuge }: Props) => {
+const ClienteConyugue = ({ clienteConyuge, setConyuge, setConyugeMarried }: Props) => {
 
     const [isOpen, setIsOpen] = useState(false)
     const [conyugeName, setConyugeName] = useState(clienteConyuge || '')
@@ -43,6 +44,7 @@ const ClienteConyugue = ({ clienteConyuge, setConyuge }: Props) => {
             setConyuge={setConyuge}
             setConyugeName={setConyugeName}
             setIsOpen={setIsOpen}
+            setConyugeMarried={setConyugeMarried}
         />
     </TopModal>
     </>

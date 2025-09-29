@@ -17,6 +17,8 @@ import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import { SEDES_REGISTRALES, GIRO_NEGOCIO } from "../../../data/patrimonialData"
 import useAuthStore from "../../../store/useAuthStore"
 import ClienteMarriedMain from "./married/ClienteMarriedMain"
+import TopModal from "../../ui/TopModal"
+import ExplanationMessage from "../../ui/ExplanationMessage"
 
 interface Props {
     dni: string
@@ -96,7 +98,11 @@ const ClientesForm = ({
     const [naturalFrom, setNaturalFrom] = useState('')
 
     const [civilStatus, setCivilStatus] = useState(cliente1 ? civilStatusOptions.find( option => option.value === cliente1.idestcivil)?.value : 0)
+    
     const [conyuge, setConyuge] = useState(cliente1 ? cliente1.conyuge || '' : '')
+    const [conyugeMarried, setConyugeMarried] = useState(false)
+    const [openChangeConyuge, setOpenChangeConyuge] = useState(false)
+    
     const [gender, setGender] = useState(cliente1 ? sexOptions.find( option => option.label[0] === cliente1.sexo)?.value : 0)
     const [nationality, setNationality] = useState<{ id: string; label: string } | null>(() => {
         if (cliente1 && cliente1.idubigeo) {
@@ -328,6 +334,12 @@ const ClientesForm = ({
                 setShow(true)
                 return
             }
+
+            if (conyugeMarried) {
+                setOpenChangeConyuge(true)
+                return
+            }
+
             createCliente && createCliente.mutate({
                 access,
                 cliente: {
@@ -727,6 +739,7 @@ const ClientesForm = ({
         <ClienteMarriedMain 
             cliente1={cliente1}
             setConyuge={setConyuge}
+            setConyugeMarried={setConyugeMarried}
         />}
         <div className="grid grid-cols-3 items-center gap-6 mb-6">
             <div className="w-full flex justify-center items-center gap-4 col-span-2">
@@ -833,6 +846,19 @@ const ClientesForm = ({
                 {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
             </button>
         </div>
+        <TopModal
+            isOpen={openChangeConyuge}
+            onClose={() => setOpenChangeConyuge(false)}
+        >
+            <ExplanationMessage 
+                message="El cliente está casado, está seguro de querer cambiar el conyuge?"
+                onClick={() => {
+                    setConyugeMarried(false)
+                    setOpenChangeConyuge(false)
+                }}
+                onClickMessage="Proceder"
+            />
+        </TopModal>
         </>}
         {selectedTipoPersona === 2 &&
         <>

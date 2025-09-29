@@ -11,9 +11,15 @@ interface Props {
     setConyuge: React.Dispatch<React.SetStateAction<string>>
     setConyugeName: React.Dispatch<React.SetStateAction<string>>
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setConyugeMarried: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) => {
+const ClienteConyugeLooker = ({ 
+    setConyuge, 
+    setConyugeName, 
+    setIsOpen, 
+    setConyugeMarried,
+}: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const [document, setDocument] = useState('')
@@ -36,15 +42,12 @@ const ClienteConyugeLooker = ({ setConyuge, setConyugeName, setIsOpen }: Props) 
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);
                 setClient(response.data)
-                // setCliente1(response.data)
-                // setShowContratanteForm(true)
-                // setShowClienteForm(false)
+                if (response.data.idestcivil === 2 || response.data.idestcivil === 5) {
+                    setConyugeMarried(true)
+                }
             } else {
                 console.log('Cliente no encontrado, creando nuevo cliente')
                 setNewClient(true)
-                // setCliente1(null)
-                // setShowContratanteForm(false)
-                // setShowClienteForm(true)
             }
         }).catch(error => {
             console.log('Error al buscar el cliente:', error);
