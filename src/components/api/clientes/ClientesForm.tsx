@@ -857,6 +857,8 @@ const ClientesForm = ({
                     setOpenChangeConyuge(false)
                 }}
                 onClickMessage="Proceder"
+                onClickSecondary={() => setOpenChangeConyuge(false)}
+                onClickSecondaryMessage="Cancelar"
             />
         </TopModal>
         </>}
