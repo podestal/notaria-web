@@ -11,10 +11,6 @@ interface Props {
 
 const ParticipaTable = ({ contratantes, detalleActo, monto, kardex }: Props) => {
 
-  console.log('contratantes', contratantes)
-  console.log('detalleActo', detalleActo)
-  console.log('monto', monto)
-
   return (
     <>
         <ParticipaTableHeader />

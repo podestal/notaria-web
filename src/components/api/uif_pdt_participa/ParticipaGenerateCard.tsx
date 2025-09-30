@@ -18,7 +18,8 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
 
     const access = useAuthStore(s => s.access_token) || ''
     const [porcentaje, setPorcentaje] = useState(contratante.porcentaje || '')
-    const [origenDeFondos, setOrigenDeFondos] = useState(contratante.ofondo || '')
+    const [origenDeFondos, setOrigenDeFondos] = useState(getTitleCase(contratante.ofondo || '') || '')
+    const [localMonto, setLocalMonto] = useState(contratante.monto || '')
     const [isUpdating, setIsUpdating] = useState(false)
     const updateContratantePorActo = useUpdateContratantePorActo({ kardex: contratante.kardex, id: contratante.id })
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -41,9 +42,46 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
         return percentageRegex.test(value)
     }
 
+    const debouncedUpdateMonto = useCallback(
+        debounce(async (newMonto: string) => {
+            try {
+                setIsUpdating(true)
+                // const newMonto = (Number(newPorcentaje) / 100) * Number(monto)
+                const newPorcentaje = (Number(newMonto) / Number(monto)) * 100
+                updateContratantePorActo.mutate({
+                    access,
+                    contratantePorActo: {
+                        ...contratante,
+                        monto: newMonto,
+                        porcentaje: newPorcentaje.toFixed(2)
+                    }
+                }, {
+                    onSuccess: res => {
+                        console.log('res', res)
+                        setPorcentaje(res.porcentaje)
+                        setMessage('Monto actualizado correctamente')
+                        setShow(true)
+                        setType('success')
+                    },
+                    onError: () => {
+                        setMessage('Error al actualizar el porcentaje')
+                        setShow(true)
+                        setType('error')
+                    }
+                })
+            } catch (error) {
+                console.error('Error updating percentage:', error)
+            } finally {
+                setIsUpdating(false)
+            }
+        }, 700),
+        []
+    )
+
     // Debounced update function
-    const debouncedUpdate = useCallback(
+    const debouncedUpdatePorcentaje = useCallback(
         debounce(async (newPorcentaje: string, newOrigenDeFondos: string) => {
+            
             try {
                 setIsUpdating(true)
                 const newMonto = (Number(newPorcentaje) / 100) * Number(monto)
@@ -56,7 +94,9 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
                         ofondo: newOrigenDeFondos
                     }
                 }, {
-                    onSuccess: () => {
+                    onSuccess: res => {
+                        console.log('res', res)
+                        setLocalMonto(res.monto)
                         setMessage('Porcentaje actualizado correctamente')
                         setShow(true)
                         setType('success')
@@ -82,14 +122,20 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
         // Only update if the value is valid
         if (isValidPercentage(newValue)) {
             setPorcentaje(newValue)
-            debouncedUpdate(newValue, origenDeFondos)
+            debouncedUpdatePorcentaje(newValue, origenDeFondos)
         }
     }
 
     const handleChangeOrigenDeFondos = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value
         setOrigenDeFondos(newValue)
-        debouncedUpdate(porcentaje, newValue)
+        debouncedUpdatePorcentaje(porcentaje, newValue)
+    }
+
+    const handleChangeMonto = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value
+        setLocalMonto(newValue)
+        debouncedUpdateMonto(newValue)
     }
 
     return (
@@ -113,9 +159,16 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
                 kardex={kardex}
                 contratante={contratante}
             />: <p></p>}
-            <p>{contratante.monto}</p>
             <input 
-                className="px-1 rounded-xl pb-4 bg-slate-100 col-span-2" 
+                className="px-1 rounded-xl py-1 bg-slate-100" 
+                value={localMonto}
+                onChange={handleChangeMonto}
+                disabled={isUpdating}
+                placeholder="Monto"
+                type="text"
+            />
+            <input 
+                className="px-1 rounded-xl pb-4 bg-slate-100 col-span-2 mx-auto" 
                 value={origenDeFondos} 
                 onChange={handleChangeOrigenDeFondos}
                 disabled={isUpdating}
