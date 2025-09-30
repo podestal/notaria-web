@@ -62,6 +62,7 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
 
   return (
     <div className="relative my-auto w-56">
+      <>{console.log(selectedDate)}</>
       <p
         className="flex justify-center items-center gap-6 cursor-pointer text-center bg-white border-neutral-400 border-2 rounded-lg w-full text-xs px-2 py-2 focus:border-blue-700 focus:outline-none"
         onClick={() => setOpen(true)}

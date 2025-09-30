@@ -7,7 +7,7 @@ export interface Kardex {
     fechaingreso: string;
     fechaescritura: string;
     numescritura: string;
-    numminuta: string;
+    numminuta?: string;
     folioini: string;
     foliofin: string;
     numinstrmento: string;
@@ -96,7 +96,6 @@ export type CreateUpdateKardex = Omit<Kardex,
     'idkardex' | 
     'usuario' | 
     'cliente' | 
-    'numminuta' | 
     'cliente'> & {
 
     idtipkar: number;

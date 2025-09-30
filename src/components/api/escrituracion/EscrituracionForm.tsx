@@ -7,6 +7,7 @@ import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import moment from "moment"
+import Calendar from "../../ui/Calendar"
 
 interface Props {
     kardex: Kardex
@@ -20,6 +21,9 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
 
+    const [numMinuta, setNumMinuta] = useState(kardex.numminuta || '')
+    const [numEscritura, setNumEscritura] = useState(kardex.numescritura || '')
+    const [fechaMinuta, setFechaMinuta] = useState<Date | undefined>(kardex.fechaescritura ? moment(kardex.fechaescritura, 'YYYY-MM-DD').toDate() : undefined)
     const [numActa, setNumActa] = useState(kardex.numescritura || '')
     const [follioIni, setFolioIni] = useState(kardex.folioini || '')
     const [folioFin, setFolioFin] = useState(kardex.foliofin || '')
@@ -48,6 +52,8 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             return
         }
 
+        const fechaMinutaStr = fechaMinuta ? moment(fechaMinuta).format('YYYY-MM-DD') : ''
+
         updateKardex.mutate({
             kardex: {
                 idtipkar: kardex.idtipkar,
@@ -64,13 +70,14 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 visita: 0,
                 idnotario: 1,
                 contrato: kardex.contrato, 
-                numescritura: numActa,
+                numescritura: numActa || numEscritura,
+                numminuta: numMinuta,
                 fktemplate: kardex.fktemplate,
                 papelini: serieNotarialIni,
                 papelfin: serieNotarialFin,
                 folioini: follioIni,
                 foliofin: folioFin,
-                fechaescritura: fechaActa,
+                fechaescritura: fechaMinutaStr,
                 txa_minuta: tomo,
                 numinstrmento: registro,
                 papeltrasladoini: papelTraslNotarialIni,
@@ -102,7 +109,36 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center items-center gap-6 w-full my-6">
             <div className=" w-[80%]">
-                {kardex.idtipkar === 3 && <div className="grid grid-cols-2 gap-8 my-4">
+                {kardex.idtipkar === 1 && 
+                <>
+                <div className="grid grid-cols-2 gap-8 my-4">
+                    <SimpleInput 
+                        setValue={setNumMinuta}
+                        value={numMinuta}
+                        horizontal
+                        label="N° de Minuta"
+                    />
+                    <SimpleInput 
+                        setValue={setNumEscritura}
+                        value={numEscritura}
+                        horizontal
+                        label="N° de Escritura"
+                        required
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-8 my-4">
+                    <div className="grid grid-cols-3 items-center gap-2">
+                        <p className="pl-2 block text-xs font-semibold text-slate-700">Fecha de escritura</p>
+                        <Calendar
+                            selectedDate={fechaMinuta}
+                            setSelectedDate={setFechaMinuta}   
+                        />
+                    </div>
+                </div>
+                </>
+                }
+                {kardex.idtipkar === 3 && 
+                <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
                         setValue={setNumActa}
                         value={numActa}
