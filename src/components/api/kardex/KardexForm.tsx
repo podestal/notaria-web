@@ -338,7 +338,6 @@ const KardexForm = ({
             </div>
             </div>
             <AnimatePresence>
-            {open && 
             <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -354,7 +353,7 @@ const KardexForm = ({
                     placeholder="Buscar Acto..."
                     className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none mb-4"
                 />
-                <MultiSelect 
+                {filteredActos.length > 0 && <MultiSelect 
                     options={tipoActos
                         .filter(acto => acto.idtipkar === selectedKardexType)
                         .filter(acto => acto.desacto.toLowerCase().includes(filteredActos.toLowerCase()))
@@ -363,8 +362,8 @@ const KardexForm = ({
                     label=""
                     selectedIds={contratos}
                     setSelectedIds={setContratos}
-                />
-            </motion.div>}
+                />}
+            </motion.div>
             </AnimatePresence>
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-center items-center gap-4">
