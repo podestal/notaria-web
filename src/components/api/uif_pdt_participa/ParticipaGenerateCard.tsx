@@ -139,43 +139,44 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
     }
 
     return (
-        <div className="grid grid-cols-11 text-xs text-black p-2 place-content-center border-b-2 border-gray-200 text-center my-auto">
-            <p className="col-span-2 text-left">{getTitleCase(detalleActo || '')}</p>
-            <p className="col-span-2 text-left">{getTitleCase(contratante.cliente || '')}</p>
-            <p className="text-left">{getTitleCase(contratante.condicion_str || '')}</p>
-            <input 
-                className="text-center rounded-xl py-1 bg-slate-100" 
-                value={porcentaje} 
-                onChange={handleChangePorcentaje}
-                disabled={isUpdating}
-                placeholder="0.00"
-                type="text"
-                inputMode="decimal"
-            />
+        <div>
+            <div className="min-w-[1200px] grid grid-cols-11 text-xs text-black p-2 place-content-center border-b-2 border-gray-200 text-center my-auto gap-2">
+                <p className="col-span-2">{getTitleCase(detalleActo || '')}</p>
+                <p className="col-span-2">{getTitleCase(contratante.cliente || '')}</p>
+                <p className="">{getTitleCase(contratante.condicion_str || '')}</p>
+                <input 
+                    className="text-center rounded-xl py-1 bg-slate-100 mx-1 h-6" 
+                    value={porcentaje} 
+                    onChange={handleChangePorcentaje}
+                    disabled={isUpdating}
+                    placeholder="0.00"
+                    type="text"
+                    inputMode="decimal"
+                />
 
-            <p>{contratante.uif}</p>
-            {contratante.formulario === '1' ? 
-            <ParticipaRenta 
-                kardex={kardex}
-                contratante={contratante}
-            />: <p></p>}
-            <input 
-                className="px-1 rounded-xl py-1 bg-slate-100" 
-                value={localMonto}
-                onChange={handleChangeMonto}
-                disabled={isUpdating}
-                placeholder="Monto"
-                type="text"
-            />
-            <input 
-                className="px-1 rounded-xl pb-4 bg-slate-100 col-span-2 mx-auto" 
-                value={origenDeFondos} 
-                onChange={handleChangeOrigenDeFondos}
-                disabled={isUpdating}
-                placeholder="Origen de Fondos"
-                type="text"
-
-            />
+                <p className="">{contratante.uif}</p>
+                {contratante.formulario === '1' ? 
+                <ParticipaRenta 
+                    kardex={kardex}
+                    contratante={contratante}
+                />: <p></p>}
+                <input 
+                    className="rounded-xl py-1 px-2 bg-slate-100 mx- h-6 text-center" 
+                    value={localMonto}
+                    onChange={handleChangeMonto}
+                    disabled={isUpdating}
+                    placeholder="Monto"
+                    type="text"
+                />
+                <input 
+                    className="rounded-xl pb-4 px-2 bg-slate-100 col-span-2 mx-1" 
+                    value={origenDeFondos} 
+                    onChange={handleChangeOrigenDeFondos}
+                    disabled={isUpdating}
+                    placeholder="Origen de Fondos"
+                    type="text"
+                />
+            </div>
         </div>
     )
 }
