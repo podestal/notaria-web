@@ -180,6 +180,7 @@ const KardexForm = ({
                     numinstrmento: '',
                     txa_minuta: '',
                     recepcion: recepcion,
+                    estado_sisgen: 0,
                 },
                 access
             }, {
@@ -230,6 +231,7 @@ const KardexForm = ({
                     numinstrmento: kardex.numinstrmento,
                     txa_minuta: kardex.txa_minuta,
                     recepcion: recepcion,
+                    estado_sisgen: 0,
                 },
                 access
             }, {

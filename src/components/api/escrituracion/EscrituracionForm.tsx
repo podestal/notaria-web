@@ -23,7 +23,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
     const [numMinuta, setNumMinuta] = useState(kardex.numminuta || '')
     const [numEscritura, setNumEscritura] = useState(kardex.numescritura || '')
-    const [fechaMinuta, setFechaMinuta] = useState<Date | undefined>(kardex.fechaescritura ? moment(kardex.fechaescritura, 'YYYY-MM-DD').toDate() : undefined)
+    const [fechaMinuta, setFechaMinuta] = useState<Date | undefined>(kardex.fechaminuta ? moment(kardex.fechaminuta, 'YYYY-MM-DD').toDate() : undefined)
     const [numActa, setNumActa] = useState(kardex.numescritura || '')
     const [follioIni, setFolioIni] = useState(kardex.folioini || '')
     const [folioFin, setFolioFin] = useState(kardex.foliofin || '')
@@ -83,6 +83,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 papeltrasladoini: papelTraslNotarialIni,
                 papeltrasladofin: papelTraslNotarialFin,
                 estado_sisgen: 0,
+                fechaminuta: fechaMinutaStr,
             },
             access
         }, {
@@ -130,6 +131,34 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <div className="grid grid-cols-3 items-center gap-2">
                         <p className="pl-2 block text-xs font-semibold text-slate-700">Fecha de escritura</p>
+                        <Calendar
+                            selectedDate={fechaMinuta}
+                            setSelectedDate={setFechaMinuta}   
+                        />
+                    </div>
+                </div>
+                </>
+                }
+                {kardex.idtipkar === 2 && 
+                <>
+                <div className="grid grid-cols-2 gap-8 my-4">
+                    <SimpleInput 
+                        setValue={setNumMinuta}
+                        value={numMinuta}
+                        horizontal
+                        label="N° de minuta/sol"
+                    />
+                    <SimpleInput 
+                        setValue={setNumEscritura}
+                        value={numEscritura}
+                        horizontal
+                        label="N° instrumento"
+                        required
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-8 my-4">
+                    <div className="grid grid-cols-3 items-center gap-2">
+                        <p className="pl-2 block text-xs font-semibold text-slate-700">Fecha minuta</p>
                         <Calendar
                             selectedDate={fechaMinuta}
                             setSelectedDate={setFechaMinuta}   
