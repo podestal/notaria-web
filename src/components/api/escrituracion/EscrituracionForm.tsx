@@ -82,6 +82,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 numinstrmento: registro,
                 papeltrasladoini: papelTraslNotarialIni,
                 papeltrasladofin: papelTraslNotarialFin,
+                estado_sisgen: 0,
             },
             access
         }, {

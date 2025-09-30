@@ -2,7 +2,7 @@ import { FileText } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Calendar from "../../ui/Calendar"
 import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
@@ -54,7 +54,6 @@ const KardexForm = ({
     const access = useAuthStore(s => s.access_token) || ''
     const user = useUserInfoStore(s => s.user)
     
-    const [open, setOpen] = useState(true)
     const [cannotUpdateKardex, setCannotUpdateKardex] = useState(false)
     const [cannotUpdateKardexMessage, setCannotUpdateKardexMessage] = useState('')
     const [filteredActos, setFilteredActos] = useState('')
@@ -129,6 +128,7 @@ const KardexForm = ({
                     numinstrmento: '',
                     txa_minuta: '',
                     recepcion: recepcion,
+                    estado_sisgen: 0,
                 }
             }, {
                 onSuccess: (res) => {

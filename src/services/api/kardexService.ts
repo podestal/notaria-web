@@ -25,6 +25,7 @@ export interface Kardex {
     papeltrasladoini?: string;
     papeltrasladofin?: string;
     recepcion?: string;
+    estado_sisgen?: number;
 }
 
 export interface KardexPage {
