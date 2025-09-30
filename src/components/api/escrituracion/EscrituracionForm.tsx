@@ -111,7 +111,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center items-center gap-6 w-full my-6">
             <div className=" w-[80%]">
-                {kardex.idtipkar === 1 && 
+                {(kardex.idtipkar === 1 || kardex.idtipkar === 5) && 
                 <>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
@@ -179,6 +179,29 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         setError={setErrorNumActa}
                     />
                 </div>}
+                {kardex.idtipkar === 4 && 
+                <>
+                <div className="grid grid-cols-2 gap-8 my-4">
+                    <div></div>
+                    <SimpleInput 
+                        setValue={setNumEscritura}
+                        value={numEscritura}
+                        horizontal
+                        label="N° Acta"
+                        required
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-8 my-4">
+                    <div className="grid grid-cols-3 items-center gap-2">
+                        <p className="pl-2 block text-xs font-semibold text-slate-700">Fecha minuta</p>
+                        <Calendar
+                            selectedDate={fechaMinuta}
+                            setSelectedDate={setFechaMinuta}   
+                        />
+                    </div>
+                </div>
+                </>
+                }
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
                         setValue={setFolioIni}
@@ -241,7 +264,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         setValue={setFechaActa}
                         value={fechaActa}
                         horizontal
-                        label="Fecha de Acta"
+                        label="Fecha"
                         required
                         error={errorFechaActa}
                         setError={setErrorFechaActa}
