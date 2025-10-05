@@ -27,6 +27,7 @@ export interface Kardex {
     recepcion?: string;
     estado_sisgen?: number;
     fechaminuta?: string;
+    nc?: string;
 }
 
 export interface KardexPage {

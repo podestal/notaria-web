@@ -98,6 +98,8 @@ const KardexForm = ({
         }
 
         const formattedContratoDes = contratosDes.map(des => des.trim()).join(' / ')
+        console.log('formattedContratoDes', formattedContratoDes);
+        
         setLoading(true)
 
         if (createKardex && !doneCreate) {
@@ -129,6 +131,8 @@ const KardexForm = ({
                     txa_minuta: '',
                     recepcion: recepcion,
                     estado_sisgen: 0,
+                    numminuta: '',
+                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : ''
                 }
             }, {
                 onSuccess: (res) => {
@@ -181,6 +185,8 @@ const KardexForm = ({
                     txa_minuta: '',
                     recepcion: recepcion,
                     estado_sisgen: 0,
+                    numminuta: '',
+                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : ''
                 },
                 access
             }, {
@@ -199,6 +205,9 @@ const KardexForm = ({
                         setShow(true)
                         setType('error')
                     }
+                },
+                onSettled: () => {
+                    setLoading(false)
                 }
             })
         } 
@@ -232,10 +241,12 @@ const KardexForm = ({
                     txa_minuta: kardex.txa_minuta,
                     recepcion: recepcion,
                     estado_sisgen: 0,
+                    numminuta: kardex.numminuta,
+                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : ''
                 },
                 access
             }, {
-                onSuccess: (res) => {
+                onSuccess: () => {
                     setMessage('Kardex actualizado exitosamente')
                     setShow(true)
                     setType('success')
@@ -250,6 +261,9 @@ const KardexForm = ({
                         setShow(true)
                         setType('error')
                     }
+                },
+                onSettled: () => {
+                    setLoading(false)
                 }
             })
         }
@@ -276,6 +290,7 @@ const KardexForm = ({
         <div className="flex justify-center items-center gap-2 p-4 rounded-t-lg text-slate-50 ">
             <FileText className="text-green-600"/>
             <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
+            {/* <>{console.log("formattedContratoDes", contratosDes)}</> */}
         </div>
         <div className="bg-slate-50 text-black p-4 rounded-b-lg">
             <div className="flex justify-between items-center gap-4 mb-6">
