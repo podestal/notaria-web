@@ -1,12 +1,12 @@
-import moment from "moment"
-import ReportHeader from "../../../../../ui/ReportHeader"
-import ExtraProtocolaresHeader from "../../ExtraProtocolaresHeader"
 import { useState } from "react"
-import useGetKardexList from "../../../../../../hooks/api/kardex/useGetKardexList"
 import useAuthStore from "../../../../../../store/useAuthStore"
+import useGetKardexList from "../../../../../../hooks/api/kardex/useGetKardexList"
 import KardexTable from "../../../../kardex/KardexTable"
+import moment from "moment"
+import ExtraProtocolaresHeader from "../../ExtraProtocolaresHeader"
+import ReportHeader from "../../../../../ui/ReportHeader"
 
-const EscriturasPublicas = () => {
+const GarantiasMobiliarias = () => {
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
     const now = new Date()
@@ -18,7 +18,7 @@ const EscriturasPublicas = () => {
   })
   const [page, setPage] = useState(1)
   const access = useAuthStore(s => s.access_token) || ''
-  const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 1, indexReport: 'yes', access, dateFrom, dateTo})
+  const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 4, indexReport: 'yes', access, dateFrom, dateTo})
 
   if (isLoading) return <p className="text-sm animate-pulse text-center my-10">Un momento</p>
   if (isError) return <p>Error: {error.message}</p>
@@ -34,7 +34,7 @@ const EscriturasPublicas = () => {
         refetch={refetch}
         generatesWord={false}
         generatesExcel={false}
-        url='kardex/escrituras-cronologico'
+        url='kardex/garantias-cronologico'
         params={{
           initialDate: moment(dateFrom).format('YYYY-MM-DD') || '',
           finalDate: moment(dateTo).format('YYYY-MM-DD') || '',
@@ -51,4 +51,4 @@ const EscriturasPublicas = () => {
   )
 }
 
-export default EscriturasPublicas
+export default GarantiasMobiliarias
