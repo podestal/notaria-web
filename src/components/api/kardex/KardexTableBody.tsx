@@ -3,9 +3,10 @@ import KardexCard from "./KardexCard"
 
 interface Props {
     kardexList: KardexPage | Kardex[]
+    readyOnly?: boolean
 }
 
-const KardexTableBody = ({ kardexList }: Props) => {
+const KardexTableBody = ({ kardexList, readyOnly }: Props) => {
 
   return (
     <>
@@ -14,6 +15,7 @@ const KardexTableBody = ({ kardexList }: Props) => {
             <KardexCard 
                 key={singleKardex.idkardex}
                 kardex={singleKardex}
+                readyOnly={readyOnly}
             />
         ))}
     </div>

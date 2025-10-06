@@ -53,6 +53,7 @@ const EscriturasPublicas = () => {
         kardexPage={escrituras}
         setPage={setPage}
         page={page}
+        readyOnly={true}
       />
 
       {/* 

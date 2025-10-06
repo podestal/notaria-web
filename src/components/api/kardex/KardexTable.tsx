@@ -7,9 +7,10 @@ interface Props {
     kardexPage: KardexPage
     setPage: React.Dispatch<React.SetStateAction<number>>
     page: number
+    readyOnly?: boolean
 }
 
-const KardexTable = ({ kardexPage, setPage, page }: Props) => {
+const KardexTable = ({ kardexPage, setPage, page, readyOnly }: Props) => {
 
 
   return (
@@ -18,6 +19,7 @@ const KardexTable = ({ kardexPage, setPage, page }: Props) => {
           <KardexTableHeader />
           <KardexTableBody 
               kardexList={kardexPage.results }
+              readyOnly={readyOnly}
           />
           <KardexTableFooter 
               page={page}

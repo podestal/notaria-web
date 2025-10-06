@@ -9,9 +9,10 @@ import useAuthStore from "../../../store/useAuthStore"
 
 interface Props {
     kardex: Kardex
+    readyOnly?: boolean
 }
 
-const KardexCard = ({ kardex }: Props) => {
+const KardexCard = ({ kardex, readyOnly }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
     const [open, setOpen] = useState(false)
     const [getKardex, setGetKardex] = useState(false)
@@ -25,8 +26,10 @@ const KardexCard = ({ kardex }: Props) => {
     >
         <h2 
             onClick={() => {
+                if (readyOnly) return
                 setGetKardex(true)
-                setOpen(true)}}
+                setOpen(true)
+            }}
             className="text-blue-600 hover:text-blue-400 cursor-pointer">{kardex.kardex}</h2>
         <p>{kardex.fechaingreso}</p>
         <p>{kardex.contrato}</p>
