@@ -21,7 +21,7 @@ import CertDomiciliarioMain from "../components/api/extraprotocolares/certificad
 import CambioCaracteristicasMain from "../components/api/extraprotocolares/cambioCaracteristicas/CambioCaracteristicasMain";
 import CronologicosMain from "../components/api/reportes/cronologicos/CronologicosMain";
 import EscriturasPublicas from "../components/api/reportes/cronologicos/reportes/escritruasPublicas/EscriturasPublicas";
-import NoContenciosos from "../components/api/reportes/cronologicos/reportes/NoContenciosos";
+import NoContenciosos from "../components/api/reportes/cronologicos/reportes/noContenciosos/NoContenciosos";
 import TransferenciasVehiculares from "../components/api/reportes/cronologicos/reportes/TransferenciasVehiculares";
 import GarantiasMobiliarias from "../components/api/reportes/cronologicos/reportes/garantias/GarantiasMobiliarias";
 import Testamentos from "../components/api/reportes/cronologicos/reportes/testamento/Testamentos";

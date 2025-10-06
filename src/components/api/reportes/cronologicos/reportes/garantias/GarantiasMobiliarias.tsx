@@ -39,7 +39,7 @@ const GarantiasMobiliarias = () => {
           initialDate: moment(dateFrom).format('YYYY-MM-DD') || '',
           finalDate: moment(dateTo).format('YYYY-MM-DD') || '',
         }}
-        name='reporte_domiciliario'
+        name='reporte_garantias_mobiliarias'
       />
       <KardexTable 
         kardexPage={escrituras}

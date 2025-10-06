@@ -39,7 +39,7 @@ const EscriturasPublicas = () => {
           initialDate: moment(dateFrom).format('YYYY-MM-DD') || '',
           finalDate: moment(dateTo).format('YYYY-MM-DD') || '',
         }}
-        name='reporte_domiciliario'
+        name='reporte_escrituras_publicas'
       />
       <KardexTable 
         kardexPage={escrituras}
