@@ -8,13 +8,14 @@ interface Props {
     name?: string
     document?: string
     numescritura?: string
+    indexReport?: string
     access: string
 }
 
-const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescritura, access }: Props): UseQueryResult<KardexPage, Error> => {
+const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescritura, indexReport, access }: Props): UseQueryResult<KardexPage, Error> => {
     let kardexService = getKardexService()
 
-    let params: Record<string, string> = { page, idtipkar: idtipkar.toString() }
+    let params: Record<string, string> = { page, idtipkar: idtipkar.toString()}
 
     if (correlative && correlative.length > 3) {
         params.correlative = correlative
@@ -28,6 +29,13 @@ const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescr
     
     if (numescritura) {
         params.numescritura = numescritura
+    }
+
+    console.log('indexReport', indexReport);
+    
+
+    if (indexReport) {
+        params.indexReport = indexReport
     }
 
     return useQuery({

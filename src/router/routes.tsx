@@ -20,7 +20,7 @@ import SuperIncapazMain from "../components/api/extraprotocolares/supervivenciaI
 import CertDomiciliarioMain from "../components/api/extraprotocolares/certificadoDomiciliario/CertDomiciliarioMain";
 import CambioCaracteristicasMain from "../components/api/extraprotocolares/cambioCaracteristicas/CambioCaracteristicasMain";
 import CronologicosMain from "../components/api/reportes/cronologicos/CronologicosMain";
-import EscriturasPublicas from "../components/api/reportes/cronologicos/reportes/EscriturasPublicas";
+import EscriturasPublicas from "../components/api/reportes/cronologicos/reportes/escritruasPublicas/EscriturasPublicas";
 import NoContenciosos from "../components/api/reportes/cronologicos/reportes/NoContenciosos";
 import TransferenciasVehiculares from "../components/api/reportes/cronologicos/reportes/TransferenciasVehiculares";
 import GarantiasMobiliarias from "../components/api/reportes/cronologicos/reportes/GarantiasMobiliarias";
