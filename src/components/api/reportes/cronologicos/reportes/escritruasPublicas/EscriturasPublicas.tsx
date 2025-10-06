@@ -42,10 +42,10 @@ const EscriturasPublicas = () => {
         refetch={refetch}
         generatesWord={false}
         generatesExcel={false}
-        url='cert_domiciliario/reporte'
+        url='kardex/escrituras-cronologico'
         params={{
-          fechade: moment(dateFrom).format('DD/MM/YYYY') || '',
-          fechaa: moment(dateTo).format('DD/MM/YYYY') || '',
+          initialDate: moment(dateFrom).format('YYYY-MM-DD') || '',
+          finalDate: moment(dateTo).format('YYYY-MM-DD') || '',
         }}
         name='reporte_domiciliario'
       />
