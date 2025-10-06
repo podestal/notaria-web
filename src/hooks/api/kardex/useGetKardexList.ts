@@ -1,5 +1,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 import getKardexService, { KardexPage } from "../../../services/api/kardexService"
+import moment from "moment"
 
 interface Props {
     page: string
@@ -9,10 +10,23 @@ interface Props {
     document?: string
     numescritura?: string
     indexReport?: string
+    dateFrom?: Date;
+    dateTo?: Date;
     access: string
 }
 
-const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescritura, indexReport, access }: Props): UseQueryResult<KardexPage, Error> => {
+const useGetKardexList = ({ 
+    page, 
+    idtipkar, 
+    correlative, 
+    name, 
+    document, 
+    numescritura, 
+    indexReport, 
+    access,
+    dateFrom,
+    dateTo
+}: Props): UseQueryResult<KardexPage, Error> => {
     let kardexService = getKardexService()
 
     let params: Record<string, string> = { page, idtipkar: idtipkar.toString()}
@@ -30,6 +44,9 @@ const useGetKardexList = ({ page, idtipkar, correlative, name, document, numescr
     if (numescritura) {
         params.numescritura = numescritura
     }
+
+    if (dateFrom) params = { ...params, dateFrom: moment(dateFrom).format('YYYY-MM-DD') }
+    if (dateTo) params = { ...params, dateTo: moment(dateTo).format('YYYY-MM-DD') }
 
     console.log('indexReport', indexReport);
     
