@@ -22,7 +22,7 @@ import CambioCaracteristicasMain from "../components/api/extraprotocolares/cambi
 import CronologicosMain from "../components/api/reportes/cronologicos/CronologicosMain";
 import EscriturasPublicas from "../components/api/reportes/cronologicos/reportes/escritruasPublicas/EscriturasPublicas";
 import NoContenciosos from "../components/api/reportes/cronologicos/reportes/noContenciosos/NoContenciosos";
-import TransferenciasVehiculares from "../components/api/reportes/cronologicos/reportes/TransferenciasVehiculares";
+import TransferenciasVehiculares from "../components/api/reportes/cronologicos/reportes/vehicular/TransferenciasVehiculares";
 import GarantiasMobiliarias from "../components/api/reportes/cronologicos/reportes/garantias/GarantiasMobiliarias";
 import Testamentos from "../components/api/reportes/cronologicos/reportes/testamento/Testamentos";
 import Protestos from "../components/api/reportes/cronologicos/reportes/Protestos";
