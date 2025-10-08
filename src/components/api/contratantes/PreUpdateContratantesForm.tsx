@@ -42,7 +42,7 @@ const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante, 
                 kardex={kardex}
                 contratante={contratante}
                 updateContratante={updateContratante}
-                selectedTipoPersona={cliente2.numdoc.length > 8 ? 2 : 1}
+                selectedTipoPersona={cliente2.tipper === 'N' ? 1 : 2}
             />}
         {showClienteForm &&
         <UpdateCliente2 

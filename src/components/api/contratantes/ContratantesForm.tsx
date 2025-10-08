@@ -277,6 +277,7 @@ const ContratantesForm = ({
                     disabled={true}
                 />
             </div>
+            <>{console.log('selectedTipoPersona', selectedTipoPersona)}</>
             </>}
             {selectedTipoPersona === 2 && 
             <div className="col-span-4">
