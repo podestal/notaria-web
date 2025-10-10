@@ -8,14 +8,15 @@ interface Props {
 const UpdateDocumento = ({ kardex }: Props) => {
 
     console.log('UpdateDocumento', kardex);
+    const docsURL = import.meta.env.VITE_DOC_URL
 
     const handleUpdate = () => {
         const formData = new FormData();
         formData.append('template_id', kardex.fktemplate.toString());
         formData.append('kardex', kardex.kardex);
-
+        console.log('formData', formData);
         axios.post(
-        'http://127.0.0.1:8001/docs/update-docx/',
+        `${docsURL}update-docx/`,
         formData
         ).then((response) => {
                 console.log('Documento actualizado', response.data);
