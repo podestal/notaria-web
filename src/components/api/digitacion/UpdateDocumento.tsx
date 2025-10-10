@@ -24,11 +24,10 @@ const UpdateDocumento = ({ kardex }: Props) => {
         axios.post(
         `${docsURL}update-docx/`,
         formData
-        ).then((response) => {
+        ).then(() => {
                 setType('success');
                 setMessage('Documento actualizado correctamente');
                 setShow(true);
-                // Aquí puedes manejar la respuesta, como mostrar un mensaje de éxito
             }).catch((error) => {
                 console.error('Error al actualizar el documento:', error);
                 setType('error');
@@ -38,7 +37,6 @@ const UpdateDocumento = ({ kardex }: Props) => {
                     setMessage('Error al actualizar el documento');
                 }
                 setShow(true);
-                // Aquí puedes manejar el error, como mostrar un mensaje de error
             }).finally(() => {
                 setIsLoading(false);
             });
