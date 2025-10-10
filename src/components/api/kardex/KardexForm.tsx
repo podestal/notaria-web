@@ -132,7 +132,8 @@ const KardexForm = ({
                     recepcion: recepcion,
                     estado_sisgen: 0,
                     numminuta: '',
-                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : ''
+                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
+                    
                 }
             }, {
                 onSuccess: (res) => {
@@ -378,6 +379,7 @@ const KardexForm = ({
                     label=""
                     selectedIds={contratos}
                     setSelectedIds={setContratos}
+                    resetInput={() => setFilteredActos('')}
                 />}
             </motion.div>
             </AnimatePresence>

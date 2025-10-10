@@ -15,6 +15,7 @@ interface MultiSelectProps {
   placeholder?: string;
   required?: boolean;
   label?: string;
+  resetInput?: () => void;
 }
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
@@ -23,12 +24,14 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   setSelectedIds,
   required = false,
   label,
+  resetInput,
 }) => {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const toggleDescription = () => {
     console.log('selectedIds', selectedIds);
+    resetInput?.();
     
   }
 
