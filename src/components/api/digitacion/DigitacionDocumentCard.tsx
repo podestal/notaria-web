@@ -8,6 +8,7 @@ import { Kardex } from "../../../services/api/kardexService"
 import TopModal from "../../ui/TopModal"
 import { useState } from "react"
 import { Logs } from "lucide-react"
+import LogsMain from "./logs/LogsMain"
 
 interface Props {
     document: Documento
@@ -44,7 +45,9 @@ const DigitacionDocumentCard = ({ document, kardex }: Props) => {
       isOpen={open}
       onClose={() => setOpen(false)}
     >
-      <p>Logs</p>
+      <LogsMain 
+        kardex={kardex.kardex}
+      />
 
     </TopModal>
     </>
