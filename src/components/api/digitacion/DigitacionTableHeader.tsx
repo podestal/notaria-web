@@ -7,7 +7,7 @@ const DigitacionTableHeader = () => {
         <p className="col-span-2">Documento</p>
         <p className="col-span-2">Fecha</p>
         <p className="col-span-2">Hora</p>
-        <p className="col-span-2">Usuario</p>
+        <p className="col-span-2">Logs</p>
         <p>Proy</p>
         <p>Part</p>
         <p>Test</p>
