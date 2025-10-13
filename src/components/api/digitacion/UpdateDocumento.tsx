@@ -38,11 +38,7 @@ const UpdateDocumento = ({ kardex }: Props) => {
             }).catch((error) => {
                 console.error('Error al actualizar el documento:', error);
                 setType('error');
-                if (error.response.status === 400) {
-                    setMessage('Falta Escritración info');
-                } else {
-                    setMessage('Error al actualizar el documento');
-                }
+                setMessage(error.response.data.message);
                 setShow(true);
             }).finally(() => {
                 setIsLoading(false);
