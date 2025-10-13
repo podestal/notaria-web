@@ -3,6 +3,7 @@ import { Kardex } from "../../../services/api/kardexService"
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore";
+import useAuthStore from "../../../store/useAuthStore";
 
 interface Props {
     kardex: Kardex
@@ -14,6 +15,7 @@ const UpdateDocumento = ({ kardex }: Props) => {
     const docsURL = import.meta.env.VITE_DOC_URL
     const [isLoading, setIsLoading] = useState(false);
     const { setMessage, setShow, setType } = useNotificationsStore();
+    const access = useAuthStore((s) => s.access_token) || ''
 
     const handleUpdate = () => {
         setIsLoading(true);
@@ -23,7 +25,12 @@ const UpdateDocumento = ({ kardex }: Props) => {
         console.log('formData', formData);
         axios.post(
         `${docsURL}update-docx/`,
-        formData
+        formData,
+        {
+            headers: {
+                'Authorization': `JWT ${access}`,
+            }
+        }
         ).then(() => {
                 setType('success');
                 setMessage('Documento actualizado correctamente');
