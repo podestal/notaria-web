@@ -27,33 +27,33 @@ const Domiciliario = () => {
 
   return (
     <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black py-6">
-    <ReportHeader title="Indice Cronológico de Certificados Domiciliarios" />
-    <ExtraProtocolaresHeader 
-      dateFrom={dateFrom} 
-      dateTo={dateTo} 
-      setDateFrom={setDateFrom} 
-      setDateTo={setDateTo} 
-      refetch={refetch}
-      generatesWord={false}
-      generatesExcel={false}
-      url='cert_domiciliario/reporte'
-      params={{
-        fechade: moment(dateFrom).format('DD/MM/YYYY') || '',
-        fechaa: moment(dateTo).format('DD/MM/YYYY') || '',
-      }}
-      name='reporte_domiciliario'
-    />
-    <DomiciliarioTable 
-      domiciliarios={domiciliariosPage.results}
-      page={page}
-      readyOnly={true}
-    />
-    <Paginator
-      page={page}
-      setPage={setPage}
-      itemsCount={domiciliariosPage.count}
-    />
-</div>
+      <ReportHeader title="Indice Cronológico de Certificados Domiciliarios" />
+      <ExtraProtocolaresHeader 
+        dateFrom={dateFrom} 
+        dateTo={dateTo} 
+        setDateFrom={setDateFrom} 
+        setDateTo={setDateTo} 
+        refetch={refetch}
+        generatesWord={false}
+        generatesExcel={false}
+        url='cert_domiciliario/reporte'
+        params={{
+          fechade: moment(dateFrom).format('DD/MM/YYYY') || '',
+          fechaa: moment(dateTo).format('DD/MM/YYYY') || '',
+        }}
+        name='reporte_domiciliario'
+      />
+      <DomiciliarioTable 
+        domiciliarios={domiciliariosPage.results}
+        page={page}
+        readyOnly={true}
+      />
+      <Paginator
+        page={page}
+        setPage={setPage}
+        itemsCount={domiciliariosPage.count}
+      />
+  </div>
   )
 }
 

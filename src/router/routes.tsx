@@ -48,6 +48,11 @@ import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/pdtKar
 import ArchivosPdtTransferencias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtTransferencias";
 import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtGarantias";
 import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/PDTLibros/ArchivosPdtLibros";
+import AlfabeticosEscrituras from "../components/api/reportes/alfabeticos/AlfabeticosEscrituras";
+import AlfabeticosGarantias from "../components/api/reportes/alfabeticos/AlfabeticosGarantias";
+import AlfabeticosNoCont from "../components/api/reportes/alfabeticos/AlfebeticosNoCont";
+import AlfabeticosTransferencias from "../components/api/reportes/alfabeticos/AlfabeticosTransferencias";
+import AlfabeticosTestamento from "../components/api/reportes/alfabeticos/AlfabeticosTestamento";
 
 const routes = createBrowserRouter([
     {
@@ -193,7 +198,29 @@ const routes = createBrowserRouter([
                     },
                     {
                         path: "alfabeticos",
-                        element: <PrivateRoutes><AlfabeticosMain /></PrivateRoutes>
+                        element: <PrivateRoutes><AlfabeticosMain /></PrivateRoutes>,
+                        children: [
+                            {
+                                path: "escrituras",
+                                element: <PrivateRoutes><AlfabeticosEscrituras /></PrivateRoutes>
+                            },
+                            {
+                                path: "garantias-mobiliarias",
+                                element: <PrivateRoutes><AlfabeticosGarantias /></PrivateRoutes>
+                            },
+                            {
+                                path: "no-contenciosos",
+                                element: <PrivateRoutes><AlfabeticosNoCont /></PrivateRoutes>
+                            },
+                            {
+                                path: "transferencias-vehiculares",
+                                element: <PrivateRoutes><AlfabeticosTransferencias /></PrivateRoutes>
+                            },
+                            {
+                                path: "testamentos",
+                                element: <PrivateRoutes><AlfabeticosTestamento /></PrivateRoutes>
+                            }
+                        ]
                     },
                     {
                         path: "archivos-pdt",
