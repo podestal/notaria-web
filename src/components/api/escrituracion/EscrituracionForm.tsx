@@ -8,6 +8,7 @@ import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import moment from "moment"
 import Calendar from "../../ui/Calendar"
+import { Loader2 } from "lucide-react"
 
 interface Props {
     kardex: Kardex
@@ -37,6 +38,8 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const [papelTraslNotarialIni, setPapelTraslNotarialIni] = useState(kardex.papeltrasladoini || '')
     const [papelTraslNotarialFin, setPapelTraslNotarialFin] = useState(kardex.papeltrasladofin || '')
 
+    const [loading, setLoading] = useState(false)
+
 
     // ERRORS
     const [errorNumActa, setErrorNumActa] = useState('')
@@ -51,6 +54,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             setErrorFechaActa('La fecha de acta es requerida')
             return
         }
+        setLoading(true)
 
         const fechaMinutaStr = fechaMinuta ? moment(fechaMinuta).format('YYYY-MM-DD') : ''
 
@@ -84,6 +88,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 papeltrasladofin: papelTraslNotarialFin,
                 estado_sisgen: 0,
                 fechaminuta: fechaMinutaStr,
+                nc: '',
             },
             access
         }, {
@@ -97,6 +102,9 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 setMessage(err.message)
                 setShow(true)
                 setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
             }
         })
     }
@@ -271,7 +279,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     />
                     <div className="flex items-center justify-start">
                     <button
-                        className="gap-1 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors cursor-pointer flex flex-col my-4 justify-center items-center"
+                        className="gap-1 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors cursor-pointer flex flex-col my-4 justify-center items-center"
                         type="button"
                         onClick={generateDate}
                     >
@@ -282,9 +290,11 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 </div>
                 <button
 
-                    className="mt-8 bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300"
+                    className={`mt-8 bg-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-white text-xs px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 `}
+                    disabled={loading}
                 >
-                    Guardar
+                    {loading ? <Loader2 className="animate-spin text-white text-xs w-4 h-4" /> : 'Guardar'}
+                    
                 </button>
             </div>
 
