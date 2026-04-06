@@ -21,7 +21,8 @@ const useCreateTemplate = (): UseMutationResult<Template, Error, CreateTemplateD
             formData.append('fktypekardex', fktypekardex.toString())
             formData.append('codeacts', codeacts)
             formData.append('contract', contract)
-            formData.append('document', document)
+            formData.append('filename', document.name)
+            formData.append('file', document, document.name)
             return templateService.post(formData as any, access)
         },
         onSuccess: () => {
