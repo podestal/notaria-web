@@ -1,6 +1,10 @@
+import CreatePlantilla from "./CreatePlantilla"
+
 const PlantillasMain = () => {
   return (
-    <div>PlantillasMain</div>
+    <div>
+        <CreatePlantilla />
+    </div>
   )
 }
 
