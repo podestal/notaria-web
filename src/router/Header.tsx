@@ -183,7 +183,11 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Editar Servidor"},
                 {name: "Backup Servidor"},
                 {name: "Configurar SISNOT"},
-                {name: "Activar Errores Usuarios"}
+                {name: "Activar Errores Usuarios"},
+                {name: "Plantillas", path: "/app/configuracion/plantillas"}
+            ]},
+        { label: "SISGEN", options:
+            [   {name: "SISGEN", path: "/app/sisgen"}
             ]},
         
     //   { label: "EXTRAPROTOCOLARES", options: ["Calificacíon de Firmas", "Cert. Autorización de viaje", "Poderes Fuera de Registro", "Cartas Notariales", "Cert. Apertura de Libros", "Cert. Supervivencia Persona Capaz", "Cert. Supervivencia Persona Incapaz", "Certificado Domiciliario", "Cambio de Características", "Busqueda Avanzada"] },
@@ -197,13 +201,7 @@ const Header = ({ kardexTypes }: Props) => {
 
   return (
     <div>
-    <div className='flex justify-evenly items-center h-[138px] bg-black px-20'>
-        <div className='w-full h-full flex items-center justify-between'>
-            <img src={notariaLogo} alt="" className='col-span-2 w-[280px]' />
-        </div>
-        {/* <div className='col-span-5 flex items-center justify-center'>
-            <img src={headerImg} alt="" className='w-[727px]' />
-        </div> */}
+    <div className='flex justify-center items-center h-[138px] bg-black px-20'>
         <div className='text-white mt-4 mr-4 text-right'>
             <p className='italic text-lg mb-2'>Bienvenido..!</p>
             <div className='flex justify-end items-center gap-2'>
@@ -312,7 +310,7 @@ const Header = ({ kardexTypes }: Props) => {
         </div>
 
         {/* SISGEN - No Dropdown */}
-        <li className="cursor-pointer hover:text-slate-50 mt-3 px-4" onClick={() => navigate(`/app/sisgen`)}>SISGEN</li>
+        {/* <li className="cursor-pointer hover:text-slate-50 mt-3 px-4" onClick={() => navigate(`/app/sisgen`)}>SISGEN</li> */}
       </ul>
     </div>
 

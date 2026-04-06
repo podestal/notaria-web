@@ -53,6 +53,7 @@ import AlfabeticosGarantias from "../components/api/reportes/alfabeticos/Alfabet
 import AlfabeticosNoCont from "../components/api/reportes/alfabeticos/AlfebeticosNoCont";
 import AlfabeticosTransferencias from "../components/api/reportes/alfabeticos/AlfabeticosTransferencias";
 import AlfabeticosTestamento from "../components/api/reportes/alfabeticos/AlfabeticosTestamento";
+import PlantillasMain from "../components/api/plantillas/PlantillasMain";
 
 const routes = createBrowserRouter([
     {
@@ -296,7 +297,13 @@ const routes = createBrowserRouter([
                 element: 
                 <PrivateRoutes>
                     <ConfiguracionMain />
-                </PrivateRoutes>
+                </PrivateRoutes>,
+                children: [
+                    {
+                        path: "plantillas",
+                        element: <PrivateRoutes><PlantillasMain /></PrivateRoutes>
+                    }
+                ]
             },
             {
                 path: "sisgen",
