@@ -14,44 +14,30 @@ const DigitacionGetProyect = ({ kardex }: Props) => {
 
   const handleOpenDocument = async () => {
     try {
-      const isWindows = /Windows/.test(navigator.userAgent);
-      const mode = isWindows ? 'open' : 'download';
-
-      console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
+      const mode = 'download';
 
       const response = await axios.get(
         `${docsURL}documentos/open-document/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
         {
-          responseType: mode === 'download' ? 'blob' : 'json',
+          responseType: 'blob',
           headers: {
             'Authorization': `Bearer ${access}`,
           }
         }
       );
 
-      if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
-        // Windows: Open in Word using the secure backend URL
-        console.log('Opening document in Word:', response.data.url);
-        console.log('response data', response.data);
-
-        const wordUrl = `ms-word:ofe|u|${response.data.url}`;
-        console.log('whole command', wordUrl);
-        window.open(wordUrl, '_blank');
-        return;
-      } else {
-        // Download mode (iOS, Mac, Linux, or fallback)
-        const blob = new Blob([response.data], {
-          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        });
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = `__PROY__${kardex.kardex}.docx`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-      }
+      // Force download on every OS to avoid Windows auto-open issues.
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      });
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `__PROY__${kardex.kardex}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
 
     } catch (error) {
       console.error('Error opening Word document:', error);
