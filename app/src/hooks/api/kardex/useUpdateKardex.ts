@@ -17,14 +17,17 @@ const useUpdateKardex = ({ kardexId }: Props): UseMutationResult<Kardex, Error, 
 
     return useMutation({
         mutationFn: (data: UpdateKardexData) => kardexService.update(data.kardex, data.access),
-        onSuccess: (data) => {
-            console.log('data res', data);
+        onSuccess: (updatedKardex) => {
+            // Keep the currently open kardex in sync immediately (e.g. fktemplate in Digitacion tab).
+            queryClient.setQueryData(['kardex', kardexId], updatedKardex);
+
+            // Refresh single and list kardex queries regardless of page/filter.
             queryClient.invalidateQueries({ queryKey: ['kardex', kardexId] });
-            queryClient.invalidateQueries({ queryKey: ["contratantes by kardex",data.kardex] })
-            queryClient.invalidateQueries({ queryKey: ['kardex list', "1", data?.idtipkar] })
-            
-            // queryClient.invalidateQueries({ queryKey: ['kardex'] });
-            // queryClient.invalidateQueries({ queryKey: ['kardex', data.idkardex] });
+            queryClient.invalidateQueries({ queryKey: ['kardex list'] });
+
+            // Refresh dependent data keyed by kardex code.
+            queryClient.invalidateQueries({ queryKey: ["contratantes by kardex", updatedKardex.kardex] });
+            queryClient.invalidateQueries({ queryKey: ["documents by kardex", `${updatedKardex.kardex}`] });
         },
         onError: (error) => {
             console.error("Error updating Kardex:", error);
