@@ -23,15 +23,12 @@ const AbrirDocumento = ({ name, url, params }: Props) => {
     const handleOpenDocument = async () => {
         setIsLoading(true);
       try {
-        const isWindows = /Windows/.test(navigator.userAgent);
-        const mode = isWindows ? 'open' : 'download';
-  
-        console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
-  
+        const mode = 'download';
+
         const response = await axios.get(
           `${docsURL}extraprotocolares/${url}/`,
           {
-            responseType: mode === 'download' ? 'blob' : 'json',
+            responseType: 'blob',
             headers: {
               'Authorization': `JWT ${access}`,
             },
@@ -41,31 +38,19 @@ const AbrirDocumento = ({ name, url, params }: Props) => {
             }
           }
         );
-  
-        if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
-          // Windows: Open in Word using the secure backend URL
-          console.log('Opening document in Word:', response.data.url);
-          console.log('response data', response.data);
-  
-          const wordUrl = `ms-word:ofe|u|${response.data.url}`;
-          console.log('whole command', wordUrl);
-          window.open(wordUrl, '_blank');
-          return;
-        } else {
-          // Download mode (iOS, Mac, Linux, or fallback)
-          const blob = new Blob([response.data], {
-            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          });
-          const blobUrl = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = name;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-        }
-  
+
+        const blob = new Blob([response.data], {
+          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        });
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+
       } catch (error) {
         const status = (error as any)?.status ?? (error as any)?.response?.status;
         
@@ -91,7 +76,7 @@ const AbrirDocumento = ({ name, url, params }: Props) => {
             <FileText className="text-xl text-slate-50"/>
         )}
         <p className="text-xs">
-            {isLoading ? 'Abriendo...' : 'Ver Doc'}
+            {isLoading ? 'Descargando...' : 'Ver Doc'}
         </p>
     </div>
     <TopModal

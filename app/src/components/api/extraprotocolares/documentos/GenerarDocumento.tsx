@@ -33,15 +33,12 @@ const GenerarDocumento = ({ name, url, params }: Props) => {
         setIsLoading(true);
         
         try {
-          const isWindows = /Windows/.test(navigator.userAgent);
-          const mode = isWindows ? 'open' : 'download';
-  
-          console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
-          
+          const mode = 'download';
+
           const response = await axios.get(
             `${docsURL}extraprotocolares/${url}/`,
             {
-              responseType: mode === 'download' ? 'blob' : 'json',
+              responseType: 'blob',
               headers: {
                 'Authorization': `JWT ${access}`,
               },
@@ -51,30 +48,21 @@ const GenerarDocumento = ({ name, url, params }: Props) => {
               }
             }
           );
-  
-          if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
-            // Windows: Open in Word using the secure backend URL
-            const wordUrl = `ms-word:ofe|u|${response.data.url}`;
-            window.open(wordUrl, '_blank');
-            showNotification('success', 'Documento abierto en Word exitosamente');
-            return;
-          } else {
-            // Download mode (iOS, Mac, Linux, or fallback)
-            const blob = new Blob([response.data], {
-              type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            });
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            
-            link.download = name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-            showNotification('success', 'Documento descargado exitosamente');
-          }
-  
+
+          const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          });
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+
+          link.download = name;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+          showNotification('success', 'Documento descargado exitosamente');
+
         } catch (error) {
           const status = (error as any)?.status ?? (error as any)?.response?.status;
         

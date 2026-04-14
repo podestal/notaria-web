@@ -55,15 +55,10 @@ const ExtraProtocolaresHeader = ({
         setLoadingWord(true);
         
         try {
-          const isWindows = /Windows/.test(navigator.userAgent);
-          const mode = isWindows ? 'open' : 'download';
-  
-          console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
-          
           const response = await axios.get(
             `${apiURL}${url}/`,
             {
-              responseType: mode === 'download' ? 'blob' : 'json',
+              responseType: 'blob',
               headers: {
                 'Authorization': `JWT ${access}`,
               },
@@ -73,28 +68,20 @@ const ExtraProtocolaresHeader = ({
               }
             }
           );
-  
-          if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
-            // Windows: Open in Word using the secure backend URL
-            const wordUrl = `ms-word:ofe|u|${response.data.url}`;
-            window.open(wordUrl, '_blank');
-            return;
-          } else {
-            // Download mode (iOS, Mac, Linux, or fallback)
-            const blob = new Blob([response.data], {
-              type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            });
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            
-            link.download = name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-          }
-  
+
+          const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          });
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+
+          link.download = name;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+
         } catch (error) {
           console.log('error', error)
         
@@ -109,15 +96,10 @@ const ExtraProtocolaresHeader = ({
       setLoadingExcel(true);
       
       try {
-        const isWindows = /Windows/.test(navigator.userAgent);
-        const mode = isWindows ? 'open' : 'download';
-
-        console.log(`OS: ${isWindows ? 'Windows' : 'Other'}, Mode: ${mode}`);
-        
         const response = await axios.get(
           `${apiURL}${url}/`,
           {
-            responseType: mode === 'download' ? 'blob' : 'json',
+            responseType: 'blob',
             headers: {
               'Authorization': `JWT ${access}`,
             },
@@ -128,26 +110,18 @@ const ExtraProtocolaresHeader = ({
           }
         );
 
-        if (mode === 'open' && response.data.mode === 'open' && response.data.url) {
-          // Windows: Open in Excel using the secure backend URL
-          const excelUrl = `ms-excel:ofe|u|${response.data.url}`;
-          window.open(excelUrl, '_blank');
-          return;
-        } else {
-          // Download mode (iOS, Mac, Linux, or fallback)
-          const blob = new Blob([response.data], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          });
-          const blobUrl = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          
-          link.download = `${name}.xlsx`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
-        }
+        const blob = new Blob([response.data], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+
+        link.download = `${name}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
 
       } catch (error) {
         console.log('error', error)
