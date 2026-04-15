@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: notaria-web-prod
+    restart: unless-stopped
+    ports:
+      - "5173:80"
