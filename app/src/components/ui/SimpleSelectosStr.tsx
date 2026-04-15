@@ -39,9 +39,7 @@ const SimpleSelectorStr = ({
     const [value, setValue] = useState<string>(defaultValue ?? '');
 
     useEffect(() => {
-        if (defaultValue) {
-            setValue(defaultValue);
-        }
+        setValue(defaultValue ?? '');
     }, [defaultValue]);
 
   return (
@@ -54,6 +52,7 @@ const SimpleSelectorStr = ({
                 // defaultValue={value ? value?.toString() : '0'}
                 value={value ? value?.toString() : '0'}
                 onChange={(e) => {
+                    setValue(e.target.value ? e.target.value : '');
                     setError?.('');
                     setter(e.target.value ? e.target.value : '');
                 }}

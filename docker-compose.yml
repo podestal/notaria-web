@@ -1,5 +1,6 @@
 services:
   app:
+    image: notaria-web-dev:latest
     build:
       context: .
       dockerfile: Dockerfile

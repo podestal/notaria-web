@@ -70,6 +70,22 @@ const PatrimonialForm = ({
     const [selectedTipoDeActoError, setSelectedTipoDeActoError] = useState('');
     const [importeTransaccionError, setImporteTransaccionError] = useState('');
 
+    const resetFormValues = () => {
+        setFormaDePagoSelected(isDonation ? '4' : '');
+        setOportunidadSelected(isDonation ? '10' : '');
+        setSelectedTipoDeActo('');
+        setImporteTransaccion('');
+        setMonedaSelected(1);
+        setSelectedDate(undefined);
+        setExhibiompSelected('Si');
+        setTipoDeCambio('');
+
+        setFormaDePagoError('');
+        setOportunidadError('');
+        setSelectedTipoDeActoError('');
+        setImporteTransaccionError('');
+    }
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -130,6 +146,7 @@ const PatrimonialForm = ({
                 setShow(true);
                 setType('success');
                 setCurrentPatrimonial(res)
+                resetFormValues()
                 
             },
             onError: err => {

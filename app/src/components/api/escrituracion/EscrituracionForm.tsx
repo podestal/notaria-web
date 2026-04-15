@@ -109,6 +109,77 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         })
     }
 
+    const handleClearEscrituracion = () => {
+        if (loading) return
+
+        setLoading(true)
+
+        updateKardex.mutate({
+            kardex: {
+                idtipkar: kardex.idtipkar,
+                fechaingreso:kardex.fechaingreso,
+                referencia: kardex.referencia || '',
+                codactos: kardex.codactos,
+                idusuario: kardex.idusuario,
+                responsable: kardex.responsable,
+                retenido: 0,
+                desistido: 0,
+                autorizado: 0,
+                idrecogio: 0,
+                pagado: 0,
+                visita: 0,
+                idnotario: 1,
+                contrato: kardex.contrato,
+                numescritura: '',
+                numminuta: '',
+                fktemplate: kardex.fktemplate,
+                papelini: '',
+                papelfin: '',
+                folioini: '',
+                foliofin: '',
+                fechaescritura: '',
+                txa_minuta: '',
+                numinstrmento: '',
+                papeltrasladoini: '',
+                papeltrasladofin: '',
+                estado_sisgen: 0,
+                fechaminuta: '',
+                nc: '',
+            },
+            access
+        }, {
+            onSuccess: () => {
+                setNumMinuta('')
+                setNumEscritura('')
+                setFechaMinuta(undefined)
+                setNumActa('')
+                setFolioIni('')
+                setFolioFin('')
+                setSerieNotarialIni('')
+                setSerieNotarialFin('')
+                setFechaActa('')
+                setTomo('')
+                setRegistro('')
+                setPapelTraslNotarialIni('')
+                setPapelTraslNotarialFin('')
+                setErrorNumActa('')
+                setErrorFechaActa('')
+
+                setMessage('Datos de escrituracion borrados correctamente')
+                setShow(true)
+                setType('success')
+            },
+            onError: (err) => {
+                setMessage(err.message)
+                setShow(true)
+                setType('error')
+            },
+            onSettled: () => {
+                setLoading(false)
+            }
+        })
+    }
+
     const generateDate = () => {
         const currentDate = moment().format('DD/MM/YYYY');
         setFechaActa(currentDate);
@@ -288,14 +359,22 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     </button>
                     </div>
                 </div>
-                <button
-
-                    className={`mt-8 bg-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-white text-xs px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 `}
-                    disabled={loading}
-                >
-                    {loading ? <Loader2 className="animate-spin text-white text-xs w-4 h-4" /> : 'Guardar'}
-                    
-                </button>
+                <div className="mt-8 flex items-center justify-center gap-3">
+                    <button
+                        type="button"
+                        onClick={handleClearEscrituracion}
+                        className={`bg-red-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-white text-xs px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300`}
+                        disabled={loading}
+                    >
+                        Borrar
+                    </button>
+                    <button
+                        className={`bg-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-white text-xs px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 `}
+                        disabled={loading}
+                    >
+                        {loading ? <Loader2 className="animate-spin text-white text-xs w-4 h-4" /> : 'Guardar'}
+                    </button>
+                </div>
             </div>
 
     </form>
