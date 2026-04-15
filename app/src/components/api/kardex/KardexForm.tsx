@@ -2,7 +2,7 @@ import { FileText } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Calendar from "../../ui/Calendar"
 import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
@@ -74,6 +74,11 @@ const KardexForm = ({
     const [recepcion, setRecepcion] = useState<string>(kardex?.recepcion || user?.idusuario.toString() || '0')
 
     const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
+    const kardexWithSelectedTemplate = kardex ? { ...kardex, fktemplate: selectedTemplate } : null
+
+    useEffect(() => {
+        setSelectedTemplate(kardex?.fktemplate || 0)
+    }, [kardex?.fktemplate])
 
     const [kardexId, setKardexId] = useState(kardex?.idkardex || 0)
     const [doneCreate, setDoneCreate] = useState(false);
@@ -480,8 +485,8 @@ const KardexForm = ({
             tabs={[
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
-                { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardex} /> },
-                { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardex} /> },
+                { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardexWithSelectedTemplate || kardex} /> },
+                { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardexWithSelectedTemplate || kardex} /> },
             ]}
         /> 
         : 
@@ -490,8 +495,8 @@ const KardexForm = ({
                 // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
                 { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
-                { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardex} /> },
-                { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardex} /> },
+                { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardexWithSelectedTemplate || kardex} /> },
+                { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardexWithSelectedTemplate || kardex} /> },
                 { id: 'uifp', label: 'UIF/PDT Participa', content: <ParticipaMain kardex={kardex}/> },
             ]}
         />}
