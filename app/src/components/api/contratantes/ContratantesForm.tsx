@@ -110,7 +110,7 @@ const ContratantesForm = ({
             setRazonSocial('')
             setDomFiscal('')
         }
-    }, [cliente1])
+    }, [cliente1, cliente2])
 
     const handleCreateContratante = (e: React.FormEvent) => {
         e.preventDefault()

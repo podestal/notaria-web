@@ -18,6 +18,8 @@ const useUpdateCliente2 = ({ clienteId, kardex }: Props): UseMutationResult<Clie
         mutationFn: (data: UpdateCliente2Data) => clienteService.update(data.cliente, data.access),
         onSuccess: res => {
             console.log('Cliente2 updated successfully', res);
+            queryClient.setQueryData(['clientes2', clienteId], res)
+            queryClient.invalidateQueries({ queryKey: ['clientes2', clienteId] })
             queryClient.invalidateQueries({ queryKey: ['contratantes by kardex', kardex] })
         },
         onError: (error) => {
