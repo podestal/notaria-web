@@ -12,6 +12,7 @@ import { TriangleAlert } from "lucide-react"
 import { UpdateDetalleMedioDePagoData } from "../../../hooks/api/detalleMedioDePago/useUpdateDetalleMedioDePago"
 import Calendar from "../../ui/Calendar"
 import moment from "moment"
+import useGetDetalleMedioDePagoByPatrimonial from "../../../hooks/api/detalleMedioDePago/useGetDetalleMedioDePagoByPatrimonial"
 
 interface Props {
     patrimonial: Patrimonial
@@ -24,6 +25,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const { data: detalleMediosDePago } = useGetDetalleMedioDePagoByPatrimonial({ access, itemmp: patrimonial.itemmp })
 
     const [medioPago, setMedioPago] = useState(detalleMedioDePago ? detalleMedioDePago.codmepag : 0)
     const [importe, setImporte] = useState( detalleMedioDePago ? detalleMedioDePago.importemp.toString() : "")
@@ -31,7 +33,12 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
     const [moneda, setMoneda] = useState(detalleMedioDePago ? parseInt(detalleMedioDePago.idmon) : 0)
     const [documentos, setDocumentos] = useState( detalleMedioDePago ? detalleMedioDePago.documentos : "")
     const [fechaOperacion, setFechaOperacion] = useState( detalleMedioDePago ? moment(detalleMedioDePago.foperacion, 'DD/MM/YYYY').toDate() : moment().toDate())
-    const notExceedImport = patrimonial.importetrans - patrimonial.medios_pago_sum
+    const totalImporte = Number(patrimonial.importetrans) || 0
+    const totalMediosPago = detalleMediosDePago
+        ? detalleMediosDePago.reduce((sum, detail) => sum + (Number(detail.importemp) || 0), 0)
+        : patrimonial.medios_pago_sum
+    const detalleActualImporte = detalleMedioDePago ? (Number(detalleMedioDePago.importemp) || 0) : 0
+    const notExceedImport = totalImporte - totalMediosPago + detalleActualImporte
 
     const [loading, setLoading] = useState(false)
 
@@ -130,7 +137,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
         <>{console.log('patrimonial', patrimonial)}</>
        <div className="flex items-center justify-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-1 rounded-md mb-4">
         <TriangleAlert />
-        <p>Recuerde que su importe no puede exceder los {MONEDAS.find(moneda => patrimonial.idmon === moneda.idmon)?.simbolo || ''} {patrimonial.importetrans - patrimonial.medios_pago_sum}</p>
+        <p>Recuerde que su importe no puede exceder los {MONEDAS.find(moneda => patrimonial.idmon === moneda.idmon)?.simbolo || ''} {notExceedImport}</p>
        </div>
         <div className="grid grid-cols-2 gap-8 my-4">
             <SimpleSelector 
