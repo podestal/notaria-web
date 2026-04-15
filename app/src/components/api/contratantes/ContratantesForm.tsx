@@ -50,6 +50,18 @@ const ContratantesForm = ({
     selectedTipoPersona,
  }: Props) => {
 
+    const parseCondicion = (condicion?: string) =>
+        (condicion || '')
+            .split('/')
+            .map(item => item.trim())
+            .filter(Boolean)
+
+    const serializeCondicion = (actos: string[]) => {
+        const normalized = actos.map(item => item.trim()).filter(Boolean)
+        if (normalized.length === 0) return ''
+        return `${normalized.join('/')}/`
+    }
+
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [openRepForm, setOpenRepForm] = useState(false)
     const [razonSocial, setRazonSocial] = useState(cliente1 ? cliente1.razonsocial : '')
@@ -61,7 +73,9 @@ const ContratantesForm = ({
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
     const [representanteCreated, setRepresentanteCreated] = useState(false)
     const [selectedRepresentation, setSelectedRepresentation] = useState('0')
-    const [selectedActos, setSelectedActos] = useState<string[]>(contratante ? contratante.condicion.split('/') : [])
+    const [selectedActos, setSelectedActos] = useState<string[]>(
+        contratante ? parseCondicion(contratante.condicion) : []
+    )
     const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : true)
     const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : true)
     const [isLoading, setIsLoading] = useState(false)
@@ -168,7 +182,7 @@ const ContratantesForm = ({
         }
 
         setIsLoading(true)
-        const joinedActos = selectedActos.join('/')
+        const joinedActos = serializeCondicion(selectedActos)
 
         createContratante && createContratante.mutate({
             access: '',

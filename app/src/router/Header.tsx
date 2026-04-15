@@ -204,32 +204,8 @@ const Header = ({ kardexTypes }: Props) => {
     <div className='flex justify-center items-center h-[138px] bg-black px-20'>
         <div className='text-white mt-4 mr-4 text-right'>
             <p className='italic text-lg mb-2'>Bienvenido..!</p>
-            <div className='flex justify-end items-center gap-2'>
-                <p className='text-sm mb-2'>Usuario</p>
-                <img src={usuario} alt="" className='w-[27px] h-[27px] mb-2' />
-            </div>
-            <div className='flex justify-end items-center gap-2 hover:opacity-80 cursor-pointer'>
-                <p className='text-xs mb-1 hover:text-yellow-400 hover:underlin'>Cambiar Contraseña</p>
-                <img src={llave} alt="" className='w-[23px] h-[23px]' />
-            </div>
             <Logout />
         </div>
-    </div>
-    <div className='w-full  bg-gradient-to-b from-sky-950 to-slate-950 py-2'>
-        <ul className='w-[60%] px-6 flex justify-between items-center mx-auto text-amber-500'>
-            <li className='italic'>Colegio de Notarios de Lima</li>
-            <div className='flex justify-center items-center gap-2 hover:opacity-80 cursor-pointer'>
-                <img src={house} className='w-[22px]' alt="" />
-                <li className='underline italic'>Predios</li>
-            </div>
-            <div className='flex justify-center items-center gap-2 hover:opacity-80 cursor-pointer'>
-                <img src={people} className='w-[22px]' alt="" />
-                <li className='underline italic'>NOTARIA</li>
-            </div>
-            
-            <li className='underline italic hover:opacity-80 cursor-pointer'>Mis Errores PDT</li>
-            <li className='text-sm text-slate-50'>{currentDate}, {currentDay} de {currentMonth} del {currentYear}</li>
-        </ul>
     </div>
     <div className="h-[35px] bg-slate-950 w-full">
       <ul className="w-[65%] px-8 pt-4 text-neutral-400 text-xs font-semibold mx-auto bg-gradient-to-b from-neutral-600 to-gray-950 h-[90px] rounded-full">
