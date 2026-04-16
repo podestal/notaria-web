@@ -10,6 +10,8 @@ interface Props {
 
 const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props) => {
 
+  console.log('contratantes from participa', contratantes)
+  console.log('detalleActo from participa', detalleActo)
   return (
     <>
     {contratantes.length > 0 ? 

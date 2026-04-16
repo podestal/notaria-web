@@ -16,7 +16,8 @@ const useCreatePatrimonial = ({ kardex }: Props): UseMutationResult<Patrimonial,
 
     return useMutation({
         mutationFn: ({ patrimonial, access }) => patrimonialService.post(patrimonial, access),
-        onSuccess: () => {
+        onSuccess: (data) => {
+            console.log("Patrimonial created successfully:", data)
             queryClient.invalidateQueries({ queryKey: ['patrimonial by kardex', kardex] })
         },
     })

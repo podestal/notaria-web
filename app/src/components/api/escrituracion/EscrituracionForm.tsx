@@ -57,6 +57,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         setLoading(true)
 
         const fechaMinutaStr = fechaMinuta ? moment(fechaMinuta).format('YYYY-MM-DD') : ''
+        const fechaEscrituraStr = fechaActa
 
         updateKardex.mutate({
             kardex: {
@@ -81,7 +82,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 papelfin: serieNotarialFin,
                 folioini: follioIni,
                 foliofin: folioFin,
-                fechaescritura: fechaMinutaStr,
+                fechaescritura: fechaEscrituraStr,
                 txa_minuta: tomo,
                 numinstrmento: registro,
                 papeltrasladoini: papelTraslNotarialIni,
