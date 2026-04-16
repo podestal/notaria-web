@@ -102,6 +102,8 @@ const ClientesForm = ({
     const [conyuge, setConyuge] = useState(cliente1 ? cliente1.conyuge || '' : '')
     const [conyugeMarried, setConyugeMarried] = useState(false)
     const [openChangeConyuge, setOpenChangeConyuge] = useState(false)
+    const [openReniecResponse, setOpenReniecResponse] = useState(false)
+    const [reniecResponse, setReniecResponse] = useState('')
     
     const [gender, setGender] = useState(cliente1 ? sexOptions.find( option => option.label[0] === cliente1.sexo)?.value : 0)
     const [nationality, setNationality] = useState<{ id: string; label: string } | null>(() => {
@@ -605,10 +607,17 @@ const ClientesForm = ({
         axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${dni}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
         ).then(response => {
             console.log('response', response.data)
+            const nombres = String(response.data?.resultado?.nombres || '').trim().split(/\s+/).filter(Boolean)
+            const primerNombre = nombres[0] || ''
+            const segundoNombre = nombres.slice(1).join(' ')
+
             setApepat(response.data.resultado.apellido_paterno || '')
             setApemat(response.data.resultado.apellido_materno || '')
-            setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
+            setPrinom(primerNombre)
+            setSegnom(segundoNombre)
             setBirthdate(response.data.resultado.fecha_nacimiento || '')
+            setReniecResponse(JSON.stringify(response.data, null, 2))
+            setOpenReniecResponse(true)
             if (response.data.resultado.genero === 'M') {
                 setGender(1) // Masculino
             }
