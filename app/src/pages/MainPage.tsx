@@ -11,12 +11,13 @@ const MainPage = () => {
   const setKardexTypes = useKardexTypesStore(s => s.setKardexTypes)
   const { data: kardexTypes, isLoading, isError, error, isSuccess } = useGetTipoKardexList()
   const { type, message, reset, show } = useNotificationsStore()
+  const visibleKardexTypes = (kardexTypes || []).filter(kardexType => kardexType.idtipkar <= 5)
 
   useEffect(() => {
     if (isSuccess) {
-      setKardexTypes(kardexTypes)
+      setKardexTypes(visibleKardexTypes)
     }
-  }, [kardexTypes, isSuccess, setKardexTypes])
+  }, [visibleKardexTypes, isSuccess, setKardexTypes])
 
   useEffect(() => {
 
@@ -29,7 +30,7 @@ const MainPage = () => {
   return (
     <>
     <Header 
-      kardexTypes={kardexTypes}
+      kardexTypes={visibleKardexTypes}
     />
     {show && 
     <NotificationCard 

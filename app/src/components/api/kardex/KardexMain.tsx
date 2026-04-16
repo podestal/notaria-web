@@ -8,11 +8,11 @@ import useGetKardexList from "../../../hooks/api/kardex/useGetKardexList"
 import useAuthStore from "../../../store/useAuthStore"
 
 const kardexTypes: Record<number, string> = {
-    1: 'KAR',
-    2: 'NCT',
-    3: 'ACT',
-    4: 'GAM',
-    5: 'TES',
+    1: import.meta.env.VITE_KARDEX_PREFIX_1 || 'KAR',
+    2: import.meta.env.VITE_KARDEX_PREFIX_2 || 'NCT',
+    3: import.meta.env.VITE_KARDEX_PREFIX_3 || 'ACT',
+    4: import.meta.env.VITE_KARDEX_PREFIX_4 || 'GAM',
+    5: import.meta.env.VITE_KARDEX_PREFIX_5 || 'TES',
 }
 
 const KardexMain = () => {
