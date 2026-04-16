@@ -53,6 +53,8 @@ const sexOptions = [
     { value: 2, label: 'Femenino' },
 ]
 
+const DEFAULT_NACIONALIDAD_ID = '177'
+
 const ClientesForm = ({ 
     dni, 
     setShowContratanteForm, 
@@ -115,6 +117,15 @@ const ClientesForm = ({
               label: match.descripcion,
             };
           }
+        }
+        const defaultNationality = nacionalidades.find(
+            nacionalidad => nacionalidad.idnacionalidad === parseInt(DEFAULT_NACIONALIDAD_ID)
+        )
+        if (defaultNationality) {
+            return {
+                id: DEFAULT_NACIONALIDAD_ID,
+                label: defaultNationality.descripcion,
+            }
         }
         return null;
       })
