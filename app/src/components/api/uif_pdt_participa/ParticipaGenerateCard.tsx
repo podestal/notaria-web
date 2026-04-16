@@ -27,6 +27,14 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
     useEffect(() => {
         setPorcentaje(contratante.porcentaje || '')
     }, [contratante.porcentaje])
+
+    useEffect(() => {
+        setLocalMonto(contratante.monto || '')
+    }, [contratante.monto])
+
+    useEffect(() => {
+        setOrigenDeFondos(getTitleCase(contratante.ofondo || '') || '')
+    }, [contratante.ofondo])
     
     // Updated regex to properly handle decimal points
     const isValidPercentage = (value: string): boolean => {

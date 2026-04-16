@@ -99,8 +99,18 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
               }}
               styles={{
                 caption: { color: 'black' },
+                caption_label: { color: 'black' },
+                dropdown: { color: 'black', backgroundColor: 'white' },
+                dropdown_root: { color: 'black' },
+                dropdowns: { color: 'black' },
                 head: { color: 'black' },
+                head_cell: { color: 'black' },
                 cell: { color: 'black' },
+                day: { color: 'black' },
+                day_button: { color: 'black' },
+                button_next: { color: 'black' },
+                button_previous: { color: 'black' },
+                nav: { color: 'black' },
               }}
               className="!text-black"
             />

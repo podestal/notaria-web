@@ -11,12 +11,12 @@ interface Props {
 
 const DetalleMediosDePagoCard = ({ detalleMedioDePago, patrimonial }: Props) => {
   return (
-    <div className='grid grid-cols-8 gap-4 text-black text-xs p-2'>
-        <p>{detalleMedioDePago.kardex}</p>
-        <p className='col-span-2'>{MEDIOS_PAGO.find(medioPago => detalleMedioDePago.codmepag === medioPago.codmepag)?.desmpagos || 'N/A'}</p>
-        <p className='col-span-2'>{BANCOS.find(banco => detalleMedioDePago.idbancos === banco.idbancos)?.desbanco || 'N/A'}</p>
-        <p>{detalleMedioDePago.importemp}</p>
-        <p>{detalleMedioDePago.foperacion}</p>
+    <div className='grid grid-cols-8 gap-4 !text-black text-xs p-2'>
+        <p className='!text-black'>{detalleMedioDePago.kardex}</p>
+        <p className='col-span-2 !text-black'>{MEDIOS_PAGO.find(medioPago => detalleMedioDePago.codmepag === medioPago.codmepag)?.desmpagos || 'N/A'}</p>
+        <p className='col-span-2 !text-black'>{BANCOS.find(banco => detalleMedioDePago.idbancos === banco.idbancos)?.desbanco || 'N/A'}</p>
+        <p className='!text-black'>{detalleMedioDePago.importemp}</p>
+        <p className='!text-black'>{detalleMedioDePago.foperacion}</p>
         <div className="flex items-center justify-start gap-6">
             <UpdateDetalleMediosDePago 
               patrimonial={patrimonial}
