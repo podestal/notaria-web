@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 
 const styles = {
   notificationAnimation: `
@@ -8,7 +9,7 @@ const styles = {
     }
     @keyframes slideOut {
       0% { transform: translateX(0); opacity: 1; }
-      100% { transform: translateX(-100%); opacity: 0; }
+      100% { transform: translateX(100%); opacity: 0; }
     }
     .slide-in {
       animation: slideIn 0.5s ease forwards;
@@ -27,12 +28,16 @@ interface Props {
 
 const NotificationCard = ({ type, message, reset }: Props) => {
   const [animateOut, setAnimateOut] = useState(false);
+  const isSuccess = type === "success";
+  const isError = type === "error";
+  const title = isSuccess ? "Operacion exitosa" : isError ? "Ocurrio un problema" : "Notificacion";
+  const Icon = isSuccess ? CheckCircle2 : isError ? AlertCircle : Info;
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimateOut(true);
       setTimeout(() => reset(), 500);
-    }, 2000);
+    }, 3200);
 
     return () => clearTimeout(timer);
   }, [reset]);
@@ -42,11 +47,17 @@ const NotificationCard = ({ type, message, reset }: Props) => {
       <style dangerouslySetInnerHTML={{ __html: styles.notificationAnimation }} />
 
       <div
-        className={`fixed top-10 right-4 px-6 py-3 z-60 rounded-lg shadow-lg flex items-center space-x-3
+        className={`fixed top-8 right-4 z-60 w-[360px] max-w-[calc(100vw-2rem)] rounded-xl border px-4 py-3 shadow-xl backdrop-blur-sm
         ${animateOut ? "slide-out" : "slide-in"} 
-        ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
+        ${isSuccess ? "border-emerald-200 bg-emerald-50/95 text-emerald-900" : isError ? "border-rose-200 bg-rose-50/95 text-rose-900" : "border-slate-200 bg-white/95 text-slate-900"}`}
       >
-        <span className="font-medium">{message}</span>
+        <div className="flex items-start gap-3">
+          <Icon className={`${isSuccess ? "text-emerald-600" : isError ? "text-rose-600" : "text-slate-600"} mt-0.5 h-5 w-5 shrink-0`} />
+          <div>
+            <p className="text-sm font-semibold leading-5">{title}</p>
+            <p className="text-sm opacity-90 leading-5">{message}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
