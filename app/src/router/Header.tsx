@@ -1,11 +1,5 @@
-import headerImg from '../assets/imgs/header.png'
-import notariaLogo from '../assets/imgs/logo-notaria-rodriguez-zea-juliaca-2.png'
-import usuario from '../assets/icons/usuario.png'
-import llave from '../assets/icons/llave.png'
 import moment from 'moment'
 import { daysInSpanish, monthsInSpanish } from '../utils/datesInSpanish'
-import house from '../assets/icons/casa.png'
-import people from '../assets/icons/people.ico'
 import { useState } from 'react'
 import Logout from '../components/auth/Logout'
 import { Tipokardex } from '../services/api/tipokardexService'
@@ -47,6 +41,8 @@ const Header = ({ kardexTypes }: Props) => {
     const [openDropdown, setOpenDropdown] = useState<number | null>(null);
     const [openSubDropdown, setOpenSubDropdown] = useState<number | null>(null);
     const user = useUserInfoStore( s => s.user)
+    const notariaName = import.meta.env.VITE_NOTARIA_NAME || 'Sin nombre'
+    const welcomeName = user?.username || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Usuario'
 
     const navigate = useNavigate()
 
@@ -200,15 +196,26 @@ const Header = ({ kardexTypes }: Props) => {
 
 
   return (
-    <div>
-    <div className='flex justify-center items-center h-[138px] bg-black px-20'>
-        <div className='text-white mt-4 mr-4 text-right'>
-            <p className='italic text-lg mb-2'>Bienvenido..!</p>
+    <div className="bg-slate-950 text-slate-100 shadow-md">
+    <div className='mx-auto flex w-[95%] max-w-[1280px] items-center justify-between py-3'>
+        <div className='flex items-center'>
+            <div className='rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-2 shadow-lg'>
+              <p className='text-[10px] uppercase tracking-[0.18em] text-sky-300'>Notaría</p>
+              <p className='text-base font-semibold leading-5 text-white'>
+                {notariaName}
+              </p>
+            </div>
+        </div>
+        <div className='flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-2 shadow-lg'>
+            <div className='text-right'>
+              <p className='text-[11px] text-slate-400'>{getTitleCase(currentDate)} {currentDay} de {getTitleCase(currentMonth)} del {currentYear}</p>
+              <p className='text-sm font-semibold text-white'>Bienvenido, {welcomeName}</p>
+            </div>
             <Logout />
         </div>
     </div>
-    <div className="h-[35px] bg-slate-950 w-full">
-      <ul className="w-[65%] px-8 pt-4 text-neutral-400 text-xs font-semibold mx-auto bg-gradient-to-b from-neutral-600 to-gray-950 h-[90px] rounded-full">
+    <div className="w-full border-t border-slate-800 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900">
+      <ul className="mx-auto flex w-[95%] max-w-[1280px] items-center justify-between gap-1 px-2 text-[11px] font-semibold text-slate-300">
         <div className="flex justify-between items-center w-full">
           {menuItems.map((item, index) => (
             <div
@@ -219,13 +226,13 @@ const Header = ({ kardexTypes }: Props) => {
               // onClick={() => navigate(`/app/${item.label.toLowerCase()}`)}
             >
               {/* Main Item */}
-              <li className="cursor-pointer hover:text-slate-50 px-4 py-2">
+              <li className="cursor-pointer rounded-md px-3 py-3 transition-colors duration-150 hover:bg-slate-800 hover:text-white hover:shadow-inner">
                 {item.label}
               </li>
 
               {/* Dropdown Menu */}
               {openDropdown === index && (
-                <div className="absolute z-100 left-0 w-60 bg-gradient-to-b from-neutral-600 to-gray-950 text-neutral-400 rounded-md shadow-lg">
+                <div className="absolute z-100 left-0 w-60 rounded-md border border-slate-700 bg-slate-900 text-slate-300 shadow-xl">
                   <ul>
                     {item.options.map((option, idx) => (
                     <div
@@ -245,19 +252,19 @@ const Header = ({ kardexTypes }: Props) => {
                         })
                           }}
                       >
-                        <li className="px-4 py-2 hover:bg-sky-500 hover:text-slate-50 cursor-pointer w-full border-b border-neutral-600 flex justify-between">
+                        <li className="flex w-full cursor-pointer justify-between border-b border-slate-700 px-4 py-2 text-xs transition-colors duration-150 hover:bg-sky-600 hover:text-white">
                           {getTitleCase(option.name)}
                           {option.subOptions && <span>▶</span>}
                         </li>
 
                         {/* Third Layer Dropdown */}
                         {openSubDropdown === idx && option.subOptions && (
-                          <div className="absolute left-full top-0 w-40 bg-gradient-to-b from-neutral-600 to-gray-950 text-neutral-400 rounded-md shadow-lg">
+                          <div className="absolute left-full top-0 w-44 rounded-md border border-slate-700 bg-slate-900 text-slate-300 shadow-xl">
                             <ul>
                               {option.subOptions.map((subOption, subIdx) => (
                                 <li
                                   key={subIdx}
-                                  className="px-4 py-2 hover:bg-sky-500 hover:text-slate-50 cursor-pointer w-full border-b border-neutral-600"
+                                  className="w-full cursor-pointer border-b border-slate-700 px-4 py-2 text-xs transition-colors duration-150 hover:bg-sky-600 hover:text-white"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     console.log('subOption', subOption)

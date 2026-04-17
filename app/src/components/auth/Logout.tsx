@@ -13,12 +13,14 @@ const Logout = () => {
     }
 
   return (
-    <div 
+    <button
+        type="button"
         onClick={handleLogout}
-        className='flex justify-end items-center gap-2 cursor-pointer'>
-        <p className='text-xs hover:text-gray-200 hover:underline'>Cerrar Sesión</p>
-        <img src={salir} alt="" className='w-[23px] h-[23px] hover:opacity-80' />
-    </div>
+        className='inline-flex items-center justify-center gap-2 rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-100 transition-colors duration-200 hover:border-slate-400 hover:bg-slate-700'
+    >
+        <span>Cerrar sesión</span>
+        <img src={salir} alt="Cerrar sesión" className='h-4 w-4 opacity-90' />
+    </button>
   )
 }
 
