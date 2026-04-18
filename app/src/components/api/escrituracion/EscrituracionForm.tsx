@@ -8,7 +8,9 @@ import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import moment from "moment"
 import Calendar from "../../ui/Calendar"
-import { Loader2 } from "lucide-react"
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react"
+import { useCreateNotarizationReservation } from "../../../hooks/signatum/useCreateNotarizationReservation"
+import type { NotarizationReservation } from "../../../services/signatum/notarizationReservationService"
 
 interface Props {
     kardex: Kardex
@@ -16,11 +18,120 @@ interface Props {
 }
 
 
+const formatReservationDateForInput = (value: string | undefined): string => {
+    if (!value) return ''
+    const trimmed = value.trim()
+    const parsed = moment(trimmed, [moment.ISO_8601, 'YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ss.SSSZ'], true)
+    if (parsed.isValid()) return parsed.format('DD/MM/YYYY')
+    if (trimmed.includes('/')) return trimmed.slice(0, 10)
+    return trimmed
+}
+
+const parseReservationDateToCalendar = (value: string | undefined): Date | undefined => {
+    if (!value) return undefined
+    const m = moment(value.trim(), [moment.ISO_8601, 'YYYY-MM-DD'], true)
+    return m.isValid() ? m.toDate() : undefined
+}
+
+const VTA_SUFFIX = ' VTA'
+
+const parseFolioSerieToken = (raw: string) => {
+    const t = raw.trim()
+    if (!t) return null
+    const hasVta = /\s+VTA\s*$/i.test(t)
+    const core = t.replace(/\s+VTA\s*$/i, '').trim()
+    const digits = core.match(/^(\d+)$/)
+    if (!digits) return null
+    return { n: parseInt(digits[1], 10), width: digits[1].length, hasVta }
+}
+
+const incrementFolioSerieValue = (value: string): string => {
+    const p = parseFolioSerieToken(value)
+    if (!p || Number.isNaN(p.n)) return value
+    const pad = (x: number) => String(x).padStart(p.width, '0')
+    if (p.hasVta) return pad(p.n + 1)
+    return `${pad(p.n)}${VTA_SUFFIX}`
+}
+
+const decrementFolioSerieValue = (value: string): string => {
+    const p = parseFolioSerieToken(value)
+    if (!p || Number.isNaN(p.n)) return value
+    const pad = (x: number) => String(Math.max(0, x)).padStart(p.width, '0')
+    if (p.hasVta) return pad(p.n)
+    const prev = p.n - 1
+    if (prev < 0) return value
+    return `${pad(prev)}${VTA_SUFFIX}`
+}
+
+const formatKardexFechaForDateInput = (value: string | undefined): string => {
+    if (!value) return ''
+    const m = moment(value.trim(), [moment.ISO_8601, 'YYYY-MM-DD', 'DD/MM/YYYY'], true)
+    if (m.isValid()) return m.format('DD/MM/YYYY')
+    if (value.includes('/')) return value.trim().slice(0, 10)
+    return value.trim()
+}
+
+const FolioSerieIncDec = ({ onInc, onDec }: { onInc: () => void; onDec: () => void }) => (
+    <div className="flex shrink-0 flex-col gap-0.5 self-center rounded-md border border-slate-300 bg-slate-50 p-0.5 shadow-sm">
+        <button
+            type="button"
+            aria-label="Incrementar"
+            onClick={onInc}
+            className="rounded p-1 text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900"
+        >
+            <ChevronUp className="h-4 w-4" />
+        </button>
+        <button
+            type="button"
+            aria-label="Decrementar"
+            onClick={onDec}
+            className="rounded p-1 text-slate-700 transition-colors hover:bg-slate-200 hover:text-slate-900"
+        >
+            <ChevronDown className="h-4 w-4" />
+        </button>
+    </div>
+)
+
+const applyReservationToForm = (
+    data: NotarizationReservation,
+    idtipkar: number,
+    setters: {
+        setNumEscritura: (v: string) => void
+        setNumActa: (v: string) => void
+        setFolioIni: (v: string) => void
+        setFolioFin: (v: string) => void
+        setSerieNotarialIni: (v: string) => void
+        setSerieNotarialFin: (v: string) => void
+        setFechaActa: (v: string) => void
+        setFechaEscritura?: (v: string) => void
+        setFechaMinuta: (v: Date | undefined) => void
+    }
+) => {
+    const { setNumEscritura, setNumActa, setFolioIni, setFolioFin, setSerieNotarialIni, setSerieNotarialFin, setFechaActa, setFechaEscritura, setFechaMinuta } =
+        setters
+    if (data.num_escritura != null && data.num_escritura !== '') {
+        setNumEscritura(String(data.num_escritura))
+        if (idtipkar === 3) setNumActa(String(data.num_escritura))
+    }
+    if (data.folio_ini != null && data.folio_ini !== '') setFolioIni(String(data.folio_ini))
+    if (data.folio_fin != null && data.folio_fin !== '') setFolioFin(String(data.folio_fin))
+    if (data.papel_ini != null && data.papel_ini !== '') setSerieNotarialIni(String(data.papel_ini))
+    if (data.papel_fin != null && data.papel_fin !== '') setSerieNotarialFin(String(data.papel_fin))
+    if (data.fecha_escritura) {
+        const fe = formatReservationDateForInput(data.fecha_escritura)
+        setFechaActa(fe)
+        setFechaEscritura?.(fe)
+    }
+    const minutaSource = data.fecha_conclusion || data.fecha_escritura
+    const minutaDate = parseReservationDateToCalendar(minutaSource)
+    if (minutaDate) setFechaMinuta(minutaDate)
+}
+
 const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
-    console.log('kardex', kardex);
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const createNotarizationReservation = useCreateNotarizationReservation()
 
     const [numMinuta, setNumMinuta] = useState(kardex.numminuta || '')
     const [numEscritura, setNumEscritura] = useState(kardex.numescritura || '')
@@ -30,7 +141,11 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const [folioFin, setFolioFin] = useState(kardex.foliofin || '')
     const [serieNotarialIni, setSerieNotarialIni] = useState(kardex.papelini || '')
     const [serieNotarialFin, setSerieNotarialFin] = useState(kardex.papelfin || '')
-    const [fechaActa, setFechaActa] = useState(kardex.fechaescritura || '')
+    const fmtEsc = formatKardexFechaForDateInput(kardex.fechaescritura)
+    const [fechaEscritura, setFechaEscritura] = useState(() =>
+        kardex.idtipkar === 1 || kardex.idtipkar === 5 ? fmtEsc : ''
+    )
+    const [fechaActa, setFechaActa] = useState(() => fmtEsc)
 
     const [tomo, setTomo] = useState(kardex.txa_minuta || '')
     const [registro, setRegistro] = useState(kardex.numinstrmento || '')
@@ -39,25 +154,34 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const [papelTraslNotarialFin, setPapelTraslNotarialFin] = useState(kardex.papeltrasladofin || '')
 
     const [loading, setLoading] = useState(false)
+    const [signatumReservationId, setSignatumReservationId] = useState<number | undefined>(undefined)
 
 
     // ERRORS
     const [errorNumActa, setErrorNumActa] = useState('')
     const [errorFechaActa, setErrorFechaActa] = useState('')
+    const [errorFechaEscritura, setErrorFechaEscritura] = useState('')
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         console.log('Submitting EscrituracionForm with values:');
 
 
-        if (!fechaActa) {
-            setErrorFechaActa('La fecha de acta es requerida')
+        const isTip15 = kardex.idtipkar === 1 || kardex.idtipkar === 5
+        if (isTip15) {
+            if (!fechaEscritura.trim()) {
+                setErrorFechaEscritura('La fecha de escritura es requerida')
+                setErrorFechaActa('')
+                return
+            }
+        } else if (!fechaActa.trim()) {
+            setErrorFechaActa('La fecha es requerida')
             return
         }
         setLoading(true)
 
         const fechaMinutaStr = fechaMinuta ? moment(fechaMinuta).format('YYYY-MM-DD') : ''
-        const fechaEscrituraStr = fechaActa
+        const fechaEscrituraStr = isTip15 ? fechaEscritura.trim() : fechaActa.trim()
 
         updateKardex.mutate({
             kardex: {
@@ -91,7 +215,8 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 fechaminuta: fechaMinutaStr,
                 nc: '',
             },
-            access
+            access,
+            signatumReservationId
         }, {
             onSuccess: (res) => {
                 console.log('Escrituración actualizada:', res);
@@ -158,6 +283,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 setFolioFin('')
                 setSerieNotarialIni('')
                 setSerieNotarialFin('')
+                setFechaEscritura('')
                 setFechaActa('')
                 setTomo('')
                 setRegistro('')
@@ -165,6 +291,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 setPapelTraslNotarialFin('')
                 setErrorNumActa('')
                 setErrorFechaActa('')
+                setErrorFechaEscritura('')
 
                 setMessage('Datos de escrituracion borrados correctamente')
                 setShow(true)
@@ -181,9 +308,50 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         })
     }
 
-    const generateDate = () => {
-        const currentDate = moment().format('DD/MM/YYYY');
-        setFechaActa(currentDate);
+    const handleFetchNotarizationReservation = () => {
+        if (!access) {
+            setMessage('No hay sesión activa')
+            setShow(true)
+            setType('error')
+            return
+        }
+        createNotarizationReservation.mutate(
+            {
+                access,
+                notarizationReservation: {
+                    kardex: kardex.kardex,
+                    idtipkar: kardex.idtipkar,
+                },
+            },
+            {
+                onSuccess: (data) => {
+                    setSignatumReservationId(data.id)
+                    applyReservationToForm(data, kardex.idtipkar, {
+                        setNumMinuta,
+                        setNumEscritura,
+                        setNumActa,
+                        setFolioIni,
+                        setFolioFin,
+                        setSerieNotarialIni,
+                        setSerieNotarialFin,
+                        setFechaActa,
+                        setFechaEscritura,
+                        setFechaMinuta,
+                    })
+                    setErrorFechaActa('')
+                    setErrorFechaEscritura('')
+                    setErrorNumActa('')
+                    setMessage('Datos de reserva cargados correctamente')
+                    setShow(true)
+                    setType('success')
+                },
+                onError: (err) => {
+                    setMessage(err.message || 'No se pudo obtener la reserva de notarización')
+                    setShow(true)
+                    setType('error')
+                },
+            }
+        )
     }
 
   return (
@@ -209,13 +377,21 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
-                    <div className="grid grid-cols-3 items-center gap-2">
-                        <p className="pl-2 block text-xs font-semibold text-slate-700">Fecha de escritura</p>
-                        <Calendar
-                            selectedDate={fechaMinuta}
-                            setSelectedDate={setFechaMinuta}   
-                        />
-                    </div>
+                    <DateInput
+                        label="Fecha de escritura"
+                        value={fechaEscritura}
+                        setValue={(v) => {
+                            setFechaEscritura(v)
+                            setFechaActa(v)
+                            setErrorFechaEscritura('')
+                            setErrorFechaActa('')
+                        }}
+                        horizontal
+                        required
+                        error={errorFechaEscritura}
+                        setError={setErrorFechaEscritura}
+                    />
+                    <div />
                 </div>
                 </>
                 }
@@ -283,33 +459,64 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 </>
                 }
                 <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput 
-                        setValue={setFolioIni}
-                        value={follioIni}
-                        horizontal
-                        label="N° de Folio del"
-                    />
-                    <SimpleInput 
-                        setValue={setFolioFin}
-                        value={folioFin}
-                        horizontal
-                        label="Al"
-                    />
+                    <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                            <SimpleInput
+                                setValue={setFolioIni}
+                                value={follioIni}
+                                horizontal
+                                label="N° de Folio del"
+                            />
+                        </div>
+                        <FolioSerieIncDec
+                            onInc={() => setFolioIni(incrementFolioSerieValue(follioIni))}
+                            onDec={() => setFolioIni(decrementFolioSerieValue(follioIni))}
+                        />
+                    </div>
+                    <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                            <SimpleInput
+                                setValue={setFolioFin}
+                                value={folioFin}
+                                horizontal
+                                label="Al"
+                            />
+                        </div>
+                        <FolioSerieIncDec
+                            onInc={() => setFolioFin(incrementFolioSerieValue(folioFin))}
+                            onDec={() => setFolioFin(decrementFolioSerieValue(folioFin))}
+                        />
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput 
-                        setValue={setSerieNotarialIni}
-                        value={serieNotarialIni}
-                        horizontal
-                        label="Serie Notarial del"
-                    />
-                    <SimpleInput 
-
-                        setValue={setSerieNotarialFin}
-                        value={serieNotarialFin}
-                        horizontal
-                        label="Al"
-                    />
+                    <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                            <SimpleInput
+                                setValue={setSerieNotarialIni}
+                                value={serieNotarialIni}
+                                horizontal
+                                label="Serie Notarial del"
+                            />
+                        </div>
+                        <FolioSerieIncDec
+                            onInc={() => setSerieNotarialIni(incrementFolioSerieValue(serieNotarialIni))}
+                            onDec={() => setSerieNotarialIni(decrementFolioSerieValue(serieNotarialIni))}
+                        />
+                    </div>
+                    <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                            <SimpleInput
+                                setValue={setSerieNotarialFin}
+                                value={serieNotarialFin}
+                                horizontal
+                                label="Al"
+                            />
+                        </div>
+                        <FolioSerieIncDec
+                            onInc={() => setSerieNotarialFin(incrementFolioSerieValue(serieNotarialFin))}
+                            onDec={() => setSerieNotarialFin(decrementFolioSerieValue(serieNotarialFin))}
+                        />
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput 
@@ -340,23 +547,51 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
-                    <DateInput 
-                        setValue={setFechaActa}
-                        value={fechaActa}
+                    <DateInput
+                        setValue={
+                            kardex.idtipkar === 1 || kardex.idtipkar === 5
+                                ? (v) => {
+                                      setFechaEscritura(v)
+                                      setFechaActa(v)
+                                      setErrorFechaEscritura('')
+                                      setErrorFechaActa('')
+                                  }
+                                : (v) => {
+                                      setFechaActa(v)
+                                      setErrorFechaActa('')
+                                  }
+                        }
+                        value={
+                            kardex.idtipkar === 1 || kardex.idtipkar === 5
+                                ? fechaEscritura
+                                : fechaActa
+                        }
                         horizontal
                         label="Fecha"
                         required
-                        error={errorFechaActa}
-                        setError={setErrorFechaActa}
+                        error={
+                            kardex.idtipkar === 1 || kardex.idtipkar === 5
+                                ? errorFechaEscritura
+                                : errorFechaActa
+                        }
+                        setError={
+                            kardex.idtipkar === 1 || kardex.idtipkar === 5
+                                ? setErrorFechaEscritura
+                                : setErrorFechaActa
+                        }
                     />
                     <div className="flex items-center justify-start">
                     <button
-                        className="gap-1 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors cursor-pointer flex flex-col my-4 justify-center items-center"
+                        className={`gap-1 px-3 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors flex items-center justify-center min-w-[120px] my-4 ${createNotarizationReservation.isPending ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}
                         type="button"
-                        onClick={generateDate}
+                        onClick={handleFetchNotarizationReservation}
+                        disabled={createNotarizationReservation.isPending}
                     >
-                        {/* <Newspaper /> */}
-                        <p className="text-xs">Generar</p>
+                        {createNotarizationReservation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <p className="text-xs font-semibold">Obtener datos</p>
+                        )}
                     </button>
                     </div>
                 </div>

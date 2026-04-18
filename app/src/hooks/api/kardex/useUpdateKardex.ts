@@ -4,19 +4,25 @@ import { CreateUpdateKardex, Kardex, getSingleKardexService } from "../../../ser
 export interface UpdateKardexData {
     kardex: CreateUpdateKardex;
     access: string;
+    signatumReservationId?: number;
 }
 
 interface Props {
     kardexId: number;
-
+    signatumReservationId?: number;
 }
 
-const useUpdateKardex = ({ kardexId }: Props): UseMutationResult<Kardex, Error, UpdateKardexData> => {
+const useUpdateKardex = ({ kardexId, signatumReservationId }: Props): UseMutationResult<Kardex, Error, UpdateKardexData> => {
     const queryClient = useQueryClient();
     const kardexService = getSingleKardexService({ id: kardexId })
-
     return useMutation({
-        mutationFn: (data: UpdateKardexData) => kardexService.update(data.kardex, data.access),
+        mutationFn: (data: UpdateKardexData) => {
+            const reservationId = data.signatumReservationId ?? signatumReservationId
+            const params = reservationId
+                ? { signatum_reservation_id: reservationId.toString() }
+                : undefined
+            return kardexService.update(data.kardex, data.access, params)
+        },
         onSuccess: (updatedKardex) => {
             // Keep the currently open kardex in sync immediately (e.g. fktemplate in Digitacion tab).
             queryClient.setQueryData(['kardex', kardexId], updatedKardex);
@@ -31,7 +37,7 @@ const useUpdateKardex = ({ kardexId }: Props): UseMutationResult<Kardex, Error, 
         },
         onError: (error) => {
             console.error("Error updating Kardex:", error);
-        }
+        }   
     });
 };
 
