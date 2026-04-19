@@ -1,22 +1,38 @@
-import { FileText, Download } from "lucide-react"
+import { useState } from "react"
+import { Download, FileText, Loader2 } from "lucide-react"
 import type { Template } from "../../../services/api/templatesService"
-
-const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? ""
-
-const resolveDownloadHref = (t: Template): string => {
-    const u = t.urltemplate?.trim() ?? ""
-    if (!u) return "#"
-    if (u.startsWith("http://") || u.startsWith("https://")) return u
-    return `${apiBase}${u.startsWith("/") ? "" : "/"}${u}`
-}
+import { downloadTemplateDocument } from "../../../services/api/templateDocumentDownload"
+import useAuthStore from "../../../store/useAuthStore"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 
 interface Props {
     template: Template
 }
 
 const PlantillaCard = ({ template }: Props) => {
-    const href = resolveDownloadHref(template)
-    const disabled = !template.urltemplate?.trim()
+    const access = useAuthStore((s) => s.access_token) || ""
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    const [downloading, setDownloading] = useState(false)
+
+    const handleDownload = async () => {
+        if (!access) {
+            setMessage("No hay sesión activa")
+            setShow(true)
+            setType("error")
+            return
+        }
+        setDownloading(true)
+        try {
+            await downloadTemplateDocument(access, template.pktemplate, template.filename)
+        } catch (e) {
+            const msg = e instanceof Error ? e.message : "No se pudo descargar la plantilla"
+            setMessage(msg)
+            setShow(true)
+            setType("error")
+        } finally {
+            setDownloading(false)
+        }
+    }
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md">
@@ -26,22 +42,23 @@ const PlantillaCard = ({ template }: Props) => {
                     {template.nametemplate || "Sin nombre"}
                 </span>
             </div>
-            <a
-                href={disabled ? undefined : href}
-                download={template.filename || undefined}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-disabled={disabled}
-                className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors sm:text-sm ${
-                    disabled
-                        ? "cursor-not-allowed border border-slate-200 bg-slate-100 text-slate-400 pointer-events-none"
-                        : "border border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
+            <button
+                type="button"
+                disabled={downloading}
+                onClick={handleDownload}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors sm:text-sm ${
+                    downloading
+                        ? "cursor-wait border-slate-200 bg-slate-100 text-slate-500"
+                        : "border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
                 }`}
-                onClick={(e) => disabled && e.preventDefault()}
             >
-                <Download className="h-4 w-4" aria-hidden />
-                Descargar
-            </a>
+                {downloading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                    <Download className="h-4 w-4" aria-hidden />
+                )}
+                {downloading ? "Descargando…" : "Descargar"}
+            </button>
         </div>
     )
 }
