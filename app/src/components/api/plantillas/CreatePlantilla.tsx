@@ -1,9 +1,11 @@
 import PlantillaForm from "./PlantillaForm"
 
-const CreatePlantilla = () => {
-  return (
-    <PlantillaForm />
-  )
+interface Props {
+  onCreated?: () => void
+}
+
+const CreatePlantilla = ({ onCreated }: Props) => {
+  return <PlantillaForm onCreated={onCreated} />
 }
 
 export default CreatePlantilla

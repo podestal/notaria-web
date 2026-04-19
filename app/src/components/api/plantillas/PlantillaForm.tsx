@@ -9,7 +9,11 @@ import useKardexTypesStore from '../../../hooks/store/useKardexTypesStore'
 import getTitleCase from '../../../utils/getTitleCase'
 import { TipoActo } from '../../../services/api/tipoActosService'
 
-const PlantillaForm = () => {
+interface PlantillaFormProps {
+  onCreated?: () => void
+}
+
+const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
   const access = useAuthStore(s => s.access_token) || ''
   const { setMessage, setShow, setType } = useNotificationsStore()
   const { kardexTypes } = useKardexTypesStore()
@@ -104,6 +108,7 @@ const PlantillaForm = () => {
           setSelectedActo(null)
           setSearchText('')
           setDocument(null)
+          onCreated?.()
         },
         onError: (error: any) => {
           setType('error')
@@ -117,7 +122,7 @@ const PlantillaForm = () => {
   const isLoading = createTemplate.isPending
 
   return (
-    <div className="mx-auto p-8">
+    <div className="mx-auto max-w-4xl p-4 sm:p-6">
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
