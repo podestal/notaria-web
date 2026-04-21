@@ -23,10 +23,10 @@ const styles = {
 interface Props {
   type: string;
   message: string;
-  reset: () => void;
+  onClose: () => void;
 }
 
-const NotificationCard = ({ type, message, reset }: Props) => {
+const NotificationCard = ({ type, message, onClose }: Props) => {
   const [animateOut, setAnimateOut] = useState(false);
   const isSuccess = type === "success";
   const isError = type === "error";
@@ -36,18 +36,18 @@ const NotificationCard = ({ type, message, reset }: Props) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimateOut(true);
-      setTimeout(() => reset(), 500);
+      setTimeout(() => onClose(), 500);
     }, 3200);
 
     return () => clearTimeout(timer);
-  }, [reset]);
+  }, [onClose]);
 
   return (
     <div>
       <style dangerouslySetInnerHTML={{ __html: styles.notificationAnimation }} />
 
       <div
-        className={`fixed top-8 right-4 z-60 w-[360px] max-w-[calc(100vw-2rem)] rounded-xl border px-4 py-3 shadow-xl backdrop-blur-sm
+        className={`w-[360px] max-w-[calc(100vw-2rem)] rounded-xl border px-4 py-3 shadow-xl backdrop-blur-sm
         ${animateOut ? "slide-out" : "slide-in"} 
         ${isSuccess ? "border-emerald-200 bg-emerald-50/95 text-emerald-900" : isError ? "border-rose-200 bg-rose-50/95 text-rose-900" : "border-slate-200 bg-white/95 text-slate-900"}`}
       >

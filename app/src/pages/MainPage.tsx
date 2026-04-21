@@ -10,7 +10,7 @@ const MainPage = () => {
 
   const setKardexTypes = useKardexTypesStore(s => s.setKardexTypes)
   const { data: kardexTypes, isLoading, isError, error, isSuccess } = useGetTipoKardexList()
-  const { type, message, reset, show } = useNotificationsStore()
+  const { notifications, removeNotification } = useNotificationsStore()
   const visibleKardexTypes = (kardexTypes || []).filter(kardexType => kardexType.idtipkar <= 5)
 
   useEffect(() => {
@@ -18,10 +18,6 @@ const MainPage = () => {
       setKardexTypes(visibleKardexTypes)
     }
   }, [visibleKardexTypes, isSuccess, setKardexTypes])
-
-  useEffect(() => {
-
-  })
 
   if (isLoading) return <p>Un momento</p>
   if (isError) return <p>Error: {error.message}</p>
@@ -32,12 +28,19 @@ const MainPage = () => {
     <Header 
       kardexTypes={visibleKardexTypes}
     />
-    {show && 
-    <NotificationCard 
-        type={type}
-        message={message}
-        reset={reset}
-    />}
+    {notifications.length > 0 && (
+      <div className="fixed right-4 top-8 z-60 flex flex-col gap-3 pointer-events-none">
+        {[...notifications].reverse().map((n) => (
+          <div key={n.id} className="pointer-events-auto">
+            <NotificationCard
+              type={n.type}
+              message={n.message}
+              onClose={() => removeNotification(n.id)}
+            />
+          </div>
+        ))}
+      </div>
+    )}
     {/* <KardexMain 
 
     /> */}
