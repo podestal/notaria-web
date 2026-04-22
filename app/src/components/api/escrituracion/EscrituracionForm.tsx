@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Kardex } from "../../../services/api/kardexService"
 import DateInput from "../../ui/DateInput"
 import SimpleInput from "../../ui/SimpleInput"
@@ -56,6 +56,32 @@ const decrementFolioSerieValue = (value: string): string => {
     return `${pad(prev)}${VTA_SUFFIX}`
 }
 
+const compareFolioSerieToken = (a: string, b: string): number | null => {
+    const pa = parseFolioSerieToken(a)
+    const pb = parseFolioSerieToken(b)
+    if (!pa || !pb) return null
+    if (pa.n !== pb.n) return pa.n - pb.n
+    if (pa.hasVta === pb.hasVta) return 0
+    return pa.hasVta ? 1 : -1
+}
+
+const decrementFolioSerieValueWithMin = (value: string, minValue: string): string => {
+    const next = decrementFolioSerieValue(value)
+    const cmp = compareFolioSerieToken(next, minValue)
+    if (cmp == null) return next
+    return cmp < 0 ? minValue : next
+}
+
+const getFolioSeriePageCount = (from: string, to: string): number => {
+    const pf = parseFolioSerieToken(from)
+    const pt = parseFolioSerieToken(to)
+    if (!pf || !pt) return 0
+    const startPos = pf.n * 2 + (pf.hasVta ? 1 : 0)
+    const endPos = pt.n * 2 + (pt.hasVta ? 1 : 0)
+    if (endPos < startPos) return 0
+    return endPos - startPos + 1
+}
+
 const formatKardexFechaForDateInput = (value: string | undefined): string => {
     if (!value) return ''
     const m = moment(value.trim(), [moment.ISO_8601, 'YYYY-MM-DD', 'DD/MM/YYYY'], true)
@@ -94,6 +120,7 @@ const applyReservationToForm = (
     data: NotarizationReservation,
     idtipkar: number,
     setters: {
+        setNumMinuta: (v: string) => void
         setNumEscritura: (v: string) => void
         setNumActa: (v: string) => void
         setFolioIni: (v: string) => void
@@ -159,6 +186,9 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const [errorFechaActa, setErrorFechaActa] = useState('')
     const [errorFechaEscritura, setErrorFechaEscritura] = useState('')
     const [errorFechaMinuta, setErrorFechaMinuta] = useState('')
+    const folioPageCount = useMemo(() => getFolioSeriePageCount(follioIni, folioFin), [follioIni, folioFin])
+    const seriePageCount = useMemo(() => getFolioSeriePageCount(serieNotarialIni, serieNotarialFin), [serieNotarialIni, serieNotarialFin])
+    const exceedsPageLimit = folioPageCount > 10 || seriePageCount > 10
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -359,6 +389,11 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center items-center gap-6 w-full my-6">
             <div className=" w-[80%]">
+                {exceedsPageLimit && (
+                    <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+                        Recuerde: más de 10 páginas es una cantidad alta. Verifique cuidadosamente el rango antes de guardar.
+                    </div>
+                )}
                 {(kardex.idtipkar === 1 || kardex.idtipkar === 5) && 
                 <>
                 <div className="grid grid-cols-2 gap-8 my-4">
@@ -491,7 +526,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         </div>
                         <FolioSerieIncDec
                             onInc={() => setFolioFin(incrementFolioSerieValue(folioFin))}
-                            onDec={() => setFolioFin(decrementFolioSerieValue(folioFin))}
+                            onDec={() => setFolioFin(decrementFolioSerieValueWithMin(folioFin, follioIni))}
                         />
                     </div>
                 </div>
@@ -514,7 +549,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         </div>
                         <FolioSerieIncDec
                             onInc={() => setSerieNotarialFin(incrementFolioSerieValue(serieNotarialFin))}
-                            onDec={() => setSerieNotarialFin(decrementFolioSerieValue(serieNotarialFin))}
+                            onDec={() => setSerieNotarialFin(decrementFolioSerieValueWithMin(serieNotarialFin, serieNotarialIni))}
                         />
                     </div>
                 </div>
