@@ -55,8 +55,13 @@ const SolicitanteLookup = ({
             } else {
                 axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${solicitanteDocument}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
                 ).then(response => {
-                    console.log('response', response.data)
-                    setSolicitanteName(`${response.data.resultado.nombres.split(' ')[0]} ${response.data.resultado.apellido_paterno} ${response.data.resultado.apellido_materno}`)
+                    const res = response.data?.resultado ?? response.data?.data?.resultado
+                    const nombreCompleto = String(res?.nombre_completo ?? '').trim()
+                    const nombres = String(res?.nombres ?? '').trim()
+                    const apepat = String(res?.apellido_paterno ?? '').trim()
+                    const apemat = String(res?.apellido_materno ?? '').trim()
+                    const armado = [nombres, apepat, apemat].filter(Boolean).join(' ')
+                    setSolicitanteName(nombreCompleto || armado)
                 }).catch(error => {
                     console.error('Error al consultar RENIEC:', error)
                 });
