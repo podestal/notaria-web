@@ -10,6 +10,7 @@ interface Props {
   options: Option[];
   selected: Option | null;
   setSelected: React.Dispatch<React.SetStateAction<Option | null>>;
+  onInputChange?: (value: string) => void;
   placeholder?: string;
   required?: boolean;
   defaultValue?: string;
@@ -26,6 +27,7 @@ const SearchableDropdownInput: React.FC<Props> = ({
   options,
   selected,
   setSelected,
+  onInputChange,
   placeholder,
   required,
   defaultValue,
@@ -40,8 +42,9 @@ const SearchableDropdownInput: React.FC<Props> = ({
   useEffect(() => {
     if (selected) {
       setInputValue(selected.label);
+      onInputChange?.(selected.label);
     }
-  }, [selected]);
+  }, [selected, onInputChange]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -83,7 +86,9 @@ const SearchableDropdownInput: React.FC<Props> = ({
             setError?.('');
           }}
           onChange={(e) => {
-            setInputValue(e.target.value);
+            const nextValue = e.target.value;
+            setInputValue(nextValue);
+            onInputChange?.(nextValue);
             setOpen(true);
             setError?.('');
           }}

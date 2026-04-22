@@ -133,29 +133,51 @@ const ClientesForm = ({
     const [resident, setResident] = useState(1)
 
     const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(() => {
-        if (cliente1 && cliente1.idubigeo) {
-          const match = profesiones.find(profesion => profesion.idprofesion === cliente1.idprofesion);
-          if (match) {
+        const detalleProf = (cliente1?.detaprofesion || '').trim()
+        if (detalleProf) {
+            const match = profesiones.find(
+                profesion => profesion.desprofesion.trim().toLowerCase() === detalleProf.toLowerCase()
+            )
             return {
-              id: (match.idprofesion).toString(),
-              label: match.desprofesion,
-            };
-          }
+                id: match ? (match.idprofesion).toString() : (cliente1?.idprofesion ? cliente1.idprofesion.toString() : '0'),
+                label: detalleProf,
+            }
         }
-        return null;
-      })
+        if (cliente1?.idprofesion) {
+            const match = profesiones.find(profesion => profesion.idprofesion === cliente1.idprofesion)
+            if (match) {
+                return {
+                    id: (match.idprofesion).toString(),
+                    label: match.desprofesion,
+                }
+            }
+        }
+        return null
+    })
     const [cargo, setCargo] = useState<{ id: string; label: string } | null>(() => {
-        if (cliente1 && cliente1.idubigeo) {
-          const match = cargos.find(cargo => cargo.idcargoprofe === cliente1.idcargoprofe);
-          if (match) {
+        const detalleCargo = (cliente1?.profocupa || '').trim()
+        if (detalleCargo) {
+            const match = cargos.find(
+                c => c.descripcrapro.trim().toLowerCase() === detalleCargo.toLowerCase()
+            )
             return {
-              id: (match.idcargoprofe).toString(),
-              label: match.descripcrapro,
-            };
-          }
+                id: match ? (match.idcargoprofe).toString() : (cliente1?.idcargoprofe ? cliente1.idcargoprofe.toString() : '0'),
+                label: detalleCargo,
+            }
         }
-        return null;
-      })
+        if (cliente1?.idcargoprofe) {
+            const match = cargos.find(c => c.idcargoprofe === cliente1.idcargoprofe)
+            if (match) {
+                return {
+                    id: (match.idcargoprofe).toString(),
+                    label: match.descripcrapro,
+                }
+            }
+        }
+        return null
+    })
+    const [profesionInput, setProfesionInput] = useState(() => (cliente1?.detaprofesion || profesion?.label || '').trim())
+    const [cargoInput, setCargoInput] = useState(() => (cliente1?.profocupa || cargo?.label || '').trim())
 
     const [celphone, setCellphone] = useState('')
     const [officePhone, setOfficePhone] = useState('')
@@ -348,6 +370,22 @@ const ClientesForm = ({
                 return
             }
 
+            const profesionText = profesionInput.trim() || profesion.label.trim()
+            const cargoText = cargoInput.trim() || cargo.label.trim()
+            const matchedProfesion = profesiones.find(
+                p => p.desprofesion.trim().toLowerCase() === profesionText.toLowerCase()
+            )
+            const matchedCargo = cargos.find(
+                c => c.descripcrapro.trim().toLowerCase() === cargoText.toLowerCase()
+            )
+            const selectedProfesionId = Number.parseInt(profesion.id, 10)
+            const profesionId = matchedProfesion
+                ? matchedProfesion.idprofesion
+                : 0
+            const cargoId = matchedCargo
+                ? matchedCargo.idcargoprofe
+                : 0
+
             if (conyugeMarried) {
                 setOpenChangeConyuge(true)
                 return
@@ -374,9 +412,10 @@ const ClientesForm = ({
                     telfijo: fixedPhone,
                     telcel: celphone,
                     telofi: officePhone,
-                    idcargoprofe: parseInt(cargo.id),
-                    idprofesion: parseInt(profesion.id),
-                    detaprofesion: profesion.label,
+                    idcargoprofe: cargoId,
+                    idprofesion: Number.isNaN(selectedProfesionId) ? profesionId : selectedProfesionId,
+                    detaprofesion: profesionText,
+                    profocupa: cargoText,
                     cumpclie: birthdate,
                     razonsocial: razonSocial,
                     domfiscal: domFiscal,
@@ -432,9 +471,10 @@ const ClientesForm = ({
                     telfijo: fixedPhone,
                     telcel: celphone,
                     telofi: officePhone,
-                    idcargoprofe: parseInt(cargo.id),
-                    idprofesion: parseInt(profesion.id),
-                    detaprofesion: profesion.label,
+                    idcargoprofe: cargoId,
+                    idprofesion: profesionId,
+                    detaprofesion: profesionText,
+                    profocupa: cargoText,
                     cumpclie: birthdate,
                     razonsocial: razonSocial,
                     domfiscal: domFiscal,
@@ -810,6 +850,7 @@ const ClientesForm = ({
                     options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
                     selected={profesion}
                     setSelected={setProfesion}
+                    onInputChange={setProfesionInput}
                     placeholder="Buscar Profesión"
                     required
                     error={profesionError}
@@ -823,6 +864,7 @@ const ClientesForm = ({
                         .map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
                     selected={cargo}
                     setSelected={setCargo}
+                    onInputChange={setCargoInput}
                     placeholder="Buscar Cargo"
                     required
                     error={cargoError}

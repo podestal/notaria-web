@@ -6,7 +6,7 @@ import DateInput from '../../ui/DateInput'
 import SimpleSelector from '../../ui/SimpleSelector'
 import { UseMutationResult } from '@tanstack/react-query'
 import { UpdateCliente2Data } from '../../../hooks/api/cliente2/useUpdateCliente2'
-import { Cliente2 } from '../../../services/api/clienteService'
+import getCliente2Service, { Cliente2 } from '../../../services/api/clienteService'
 import { Ubigeo } from '../../../services/api/ubigeoService'
 import { Cargo } from '../../../services/api/cargosService'
 import { Profesion } from '../../../services/api/profesionesService'
@@ -62,6 +62,28 @@ const Cliente2Form = ({
         const { setMessage, setShow, setType } = useNotificationsStore()
         const access = useAuthStore(s => s.access_token) || ''
 
+        const syncCliente2ProfesionTexto = async (
+            cliente2Id: string | undefined,
+            profesionId: number,
+            profesionText: string,
+            cargoId: number,
+            cargoText: string
+        ) => {
+            if (!cliente2Id) return
+            const cliente2Service = getCliente2Service({ clienteId: cliente2Id })
+            await cliente2Service.update(
+                {
+                    idprofesion: profesionId,
+                    detaprofesion: profesionText,
+                    profesion_plantilla: profesionText,
+                    natper: profesionText,
+                    idcargoprofe: cargoId,
+                    profocupa: cargoText,
+                } as any,
+                access
+            )
+        }
+
         const [apepat, setApepat] = useState(cliente2 ? cliente2.apepat : '')
         const [apemat, setApemat] = useState( cliente2 ? cliente2.apemat : '')
         const [prinom, setPrinom] = useState(cliente2 ? cliente2.prinom : '')
@@ -101,29 +123,51 @@ const Cliente2Form = ({
         const [resident, setResident] = useState(1)
     
         const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(() => {
-            if (cliente2 && cliente2.idubigeo) {
-              const match = profesiones.find(profesion => profesion.idprofesion === cliente2.idprofesion);
-              if (match) {
+            const detalleProf = (cliente2?.detaprofesion || '').trim()
+            if (detalleProf) {
+                const match = profesiones.find(
+                    profesion => profesion.desprofesion.trim().toLowerCase() === detalleProf.toLowerCase()
+                )
                 return {
-                  id: (match.idprofesion).toString(),
-                  label: match.desprofesion,
-                };
-              }
+                    id: match ? match.idprofesion.toString() : (cliente2?.idprofesion ? cliente2.idprofesion.toString() : '0'),
+                    label: detalleProf,
+                }
             }
-            return null;
+            if (cliente2?.idprofesion) {
+                const match = profesiones.find(profesion => profesion.idprofesion === cliente2.idprofesion)
+                if (match) {
+                    return {
+                        id: (match.idprofesion).toString(),
+                        label: match.desprofesion,
+                    }
+                }
+            }
+            return null
           })
         const [cargo, setCargo] = useState<{ id: string; label: string } | null>(() => {
-            if (cliente2 && cliente2.idubigeo) {
-              const match = cargos.find(cargo => cargo.idcargoprofe === cliente2.idcargoprofe);
-              if (match) {
+            const detalleCargo = (cliente2?.profocupa || '').trim()
+            if (detalleCargo) {
+                const match = cargos.find(
+                    c => c.descripcrapro.trim().toLowerCase() === detalleCargo.toLowerCase()
+                )
                 return {
-                  id: (match.idcargoprofe).toString(),
-                  label: match.descripcrapro,
-                };
-              }
+                    id: match ? match.idcargoprofe.toString() : (cliente2?.idcargoprofe ? cliente2.idcargoprofe.toString() : '0'),
+                    label: detalleCargo,
+                }
             }
-            return null;
+            if (cliente2?.idcargoprofe) {
+                const match = cargos.find(c => c.idcargoprofe === cliente2.idcargoprofe)
+                if (match) {
+                    return {
+                        id: (match.idcargoprofe).toString(),
+                        label: match.descripcrapro,
+                    }
+                }
+            }
+            return null
           })
+        const [profesionInput, setProfesionInput] = useState(() => (cliente2?.detaprofesion || profesion?.label || '').trim())
+        const [cargoInput, setCargoInput] = useState(() => (cliente2?.profocupa || cargo?.label || '').trim())
     
         const [celphone, setCellphone] = useState('')
         const [officePhone, setOfficePhone] = useState('')
@@ -281,7 +325,10 @@ const Cliente2Form = ({
                     return  
                 }
         
-                if (profesion === null) {
+                const profesionText = (profesionInput.trim() || profesion?.label?.trim() || '')
+                const cargoText = (cargoInput.trim() || cargo?.label?.trim() || '')
+
+                if (!profesionText) {
                     setProfesionError('Profesión es requerida')
                     setType('error')
                     setMessage('Profesión es requerida')
@@ -289,13 +336,29 @@ const Cliente2Form = ({
                     return
                 }
         
-                if (cargo === null) {
+                if (!cargoText) {
                     setCargoError('Cargo es requerido')
                     setType('error')
                     setMessage('Cargo es requerido')
                     setShow(true)
                     return
                 }
+                const matchedProfesion = profesiones.find(
+                    p => p.desprofesion.trim().toLowerCase() === profesionText.toLowerCase()
+                )
+                const matchedCargo = cargos.find(
+                    c => c.descripcrapro.trim().toLowerCase() === cargoText.toLowerCase()
+                )
+                const profesionIdFromSelected = profesion?.id ? Number.parseInt(profesion.id, 10) : Number.NaN
+                const profesionId = matchedProfesion
+                    ? matchedProfesion.idprofesion
+                    : !Number.isNaN(profesionIdFromSelected)
+                        ? profesionIdFromSelected
+                            : 0
+                const cargoId = matchedCargo
+                    ? matchedCargo.idcargoprofe
+                    : (cargo?.id ? Number.parseInt(cargo.id, 10) || 0 : 0)
+                const profesionIdForCustomText = matchedProfesion ? profesionId : 0
         
                 updateCliente2.mutate({
                     access,
@@ -318,9 +381,9 @@ const Cliente2Form = ({
                         telfijo: fixedPhone,
                         telcel: celphone,
                         telofi: officePhone,
-                        idcargoprofe: parseInt(cargo.id),
-                        idprofesion: parseInt(profesion.id),
-                        detaprofesion: profesion.label,
+                        idcargoprofe: cargoId,
+                        idprofesion: profesionIdForCustomText,
+                        detaprofesion: profesionText,
                         cumpclie: birthdate,
                         razonsocial: razonSocial,
                         domfiscal: domFiscal,
@@ -331,17 +394,28 @@ const Cliente2Form = ({
                         contacempresa: contacEmpresa,
                         ubigeo_plantilla: '',
                         fechaconstitu: fechaConstitucion,
-                        profesion_plantilla: '',
+                        profesion_plantilla: profesionText,
                         tipocli: selectedTipoPersona === 1 ? 'N' : 'J',
                         residente: resident === 1 ? '1' : '0',
                         fechaing: '',
                         dirfer: '',
-                        profocupa: '',
+                        profocupa: cargoText,
                         conyuge: '',
-                        natper: '',
+                        natper: profesionText,
                     }
                 }, {
-                    onSuccess: (data) => {
+                    onSuccess: async (data) => {
+                        try {
+                            await syncCliente2ProfesionTexto(
+                                data?.idcontratante || cliente2?.idcontratante,
+                                profesionIdForCustomText,
+                                profesionText,
+                                cargoId,
+                                cargoText
+                            )
+                        } catch (syncError) {
+                            console.error('No se pudo sincronizar profesión/cargo en cliente:', syncError)
+                        }
                         console.log('Cliente actualizado:', data)
                         setType('success')
                         setMessage('Cliente actualizado exitosamente')
@@ -603,6 +677,7 @@ const Cliente2Form = ({
                     options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
                     selected={profesion}
                     setSelected={setProfesion}
+                    onInputChange={setProfesionInput}
                     placeholder="Buscar Profesión"
                     required
                     error={profesionError}
@@ -616,6 +691,7 @@ const Cliente2Form = ({
                         .map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
                     selected={cargo}
                     setSelected={setCargo}
+                    onInputChange={setCargoInput}
                     placeholder="Buscar Cargo"
                     required
                     error={cargoError}
