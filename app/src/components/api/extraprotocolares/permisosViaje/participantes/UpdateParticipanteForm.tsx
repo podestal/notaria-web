@@ -22,6 +22,7 @@ const UpdateParticipanteForm = ({ contratanteViaje, setOpen, updateContratante }
 
     const [documento, setDocumento] = useState(contratanteViaje?.c_codcontrat || '');
     const [nombres, setNombres] = useState(contratanteViaje?.c_descontrat || '');
+    const [edad, setEdad] = useState(contratanteViaje?.edad || '');
     const [firma, setFirma] = useState(contratanteViaje?.c_fircontrat?.toLocaleLowerCase() || '0');
     const [condicion, setCondicion] = useState(contratanteViaje?.c_condicontrat || '0');
 
@@ -34,7 +35,7 @@ const UpdateParticipanteForm = ({ contratanteViaje, setOpen, updateContratante }
                     c_descontrat: nombres,
                     c_fircontrat: firma,
                     c_condicontrat: condicion,
-                    edad: contratanteViaje.edad, 
+                    edad: edad, 
                     condi_edad: contratanteViaje.condi_edad, 
                     codi_testigo: contratanteViaje.codi_testigo, 
                     tip_incapacidad: contratanteViaje.tip_incapacidad, 
@@ -89,6 +90,14 @@ const UpdateParticipanteForm = ({ contratanteViaje, setOpen, updateContratante }
                 defaultValue={condicion}
                 setter={setCondicion}
                 label="Condición"
+            />
+        </div>
+        <div className="grid grid-cols-2 gap-4 my-4">
+            <SimpleInput
+                label="Edad"
+                value={edad}
+                setValue={setEdad}
+                horizontal
             />
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">

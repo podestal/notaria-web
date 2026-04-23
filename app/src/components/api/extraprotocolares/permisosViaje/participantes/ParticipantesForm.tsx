@@ -13,6 +13,14 @@ import { ESTADO_CIVIL } from "../../../../../data/clienteData";
 import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput";
 import SimpleSelector from "../../../../ui/SimpleSelector";
 
+const normalizeGenero = (value?: string): string => {
+    if (!value) return '';
+    const normalized = value.trim().toUpperCase();
+    if (normalized === 'M' || normalized === 'MASCULINO') return 'M';
+    if (normalized === 'F' || normalized === 'FEMENINO') return 'F';
+    return '';
+}
+
 interface Props {
     contratanteViaje?: ViajeContratante;
     createContratante?: UseMutationResult<ViajeContratante, Error, CreateContratanteData>
@@ -48,6 +56,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
     // Contratante Viaje
     const [selectedCondicion, setSelectedCondicion] = useState(contratanteViaje ? contratanteViaje.c_condicontrat : '');
     const [firma, setFirma] = useState(contratanteViaje ? contratanteViaje.c_fircontrat : '');
+    const [edad, setEdad] = useState(contratanteViaje ? contratanteViaje.edad : '');
     const [appePaterno, setAppePaterno] = useState(contratanteInfo.apePaterno || '');
     const [appeMaterno, setAppeMaterno] = useState(contratanteInfo.apeMaterno || '');
     const [priNombre, setPriNombre] = useState(contratanteInfo.priNombre || '');
@@ -66,7 +75,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         return null;
       })
     const [estadoCivil, setEstadoCivil] = useState(contratanteInfo.estadoCivil ? contratanteInfo.estadoCivil : 0);
-    const [genero, setGenero] = useState(contratanteInfo.genero || '');
+    const [genero, setGenero] = useState(normalizeGenero(contratanteInfo.genero));
     const [selectedNacionalidad, setSelectedNacionalidad] = useState<{ id: string; label: string } | null>(() => {
         if (contratanteInfo.nacionalidad) {
           const match = nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad);
@@ -92,15 +101,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                 ? ESTADO_CIVIL.find(estado => estado.value === contratanteInfo.estadoCivil)?.value || 0
                 : 0
         );
-        setGenero(
-            contratanteInfo && contratanteInfo.genero
-                ? contratanteInfo.genero === 'M'
-                    ? 'Masculino'
-                    : contratanteInfo.genero === 'F'
-                        ? 'Femenino'
-                        : ''
-                : ''
-        );
+        setGenero(normalizeGenero(contratanteInfo?.genero));
         setSelectedNacionalidad(
             contratanteInfo && contratanteInfo.nacionalidad
                 ? (() => {
@@ -146,7 +147,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                     c_descontrat: `${appePaterno} ${appeMaterno}, ${priNombre} ${segNombre}`,
                     c_fircontrat: firma,
                     c_condicontrat: selectedCondicion,
-                    edad: '', // Set as needed
+                    edad: edad,
                     condi_edad: '', // Set as needed
                     codi_testigo: '', // Set as needed
                     tip_incapacidad: '', // Set as needed
@@ -269,10 +270,22 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                     defaultValue={estadoCivil}
                     setter={setEstadoCivil}
                 />
-                <SimpleInput 
+                <SimpleSelectorStr
                     label="Género"
-                    value={genero}
-                    setValue={setGenero}
+                    options={[
+                        { value: '', label: 'Seleccionar género' },
+                        { value: 'M', label: 'Masculino' },
+                        { value: 'F', label: 'Femenino' }
+                    ]}
+                    defaultValue={genero}
+                    setter={setGenero}
+                />
+            </div>
+            <div className="grid grid-cols-2 gap-4 my-4">
+                <SimpleInput
+                    label="Edad"
+                    value={edad}
+                    setValue={setEdad}
                     horizontal
                 />
             </div>
