@@ -14,6 +14,28 @@ export interface ViajeContratante {
     codi_podera: string;
     partida_e: string;
     sede_regis: string;
+    tipper?: string;
+    idtipdoc?: number;
+    numdoc?: string;
+    apepat?: string;
+    apemat?: string;
+    prinom?: string;
+    segnom?: string;
+    nombre?: string;
+    direccion?: string;
+    idubigeo?: string;
+    idestcivil?: number | null;
+    sexo?: string;
+    nacionalidad?: string;
+    email?: string;
+    telfijo?: string;
+    telcel?: string;
+    telofi?: string;
+    idprofesion?: number | null;
+    idcargoprofe?: number | null;
+    detaprofesion?: string | null;
+    cumpclie?: string;
+    resedente?: string;
 }
 
 export type CreateUpdateViajeContratante = Omit<ViajeContratante, 'id_contratante'>;

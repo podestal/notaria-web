@@ -118,6 +118,7 @@ const NuevoClienteForm = ({
             }
             return null;
           })
+        const [profesionInput, setProfesionInput] = useState(() => (profesion?.label || '').trim())
         const [cargo, setCargo] = useState<{ id: string; label: string } | null>(() => {
             if (selectedTipoPersona === 1) {
               const match = cargos.find(cargo => cargo.idcargoprofe === 0);
@@ -306,6 +307,8 @@ const NuevoClienteForm = ({
                 setShow(true)
                 return
             }
+            const profesionText = profesionInput.trim() || profesion.label.trim()
+            const nombreCompleto = `${apepat} ${apemat}, ${prinom} ${segnom}`.replace(/\s+/g, ' ').trim()
             createCliente && createCliente.mutate({
                 access,
                 cliente: {
@@ -314,7 +317,7 @@ const NuevoClienteForm = ({
                     apemat,
                     prinom,
                     segnom,
-                    nombre,
+                    nombre: nombreCompleto,
                     direccion,
                     idubigeo: ubigeo.id,
                     resedente: resident === 1 ? '1' : '0',
@@ -329,7 +332,8 @@ const NuevoClienteForm = ({
                     telofi: officePhone,
                     idcargoprofe: parseInt(cargo.id),
                     idprofesion: parseInt(profesion.id),
-                    detaprofesion: profesion.label,
+                    detaprofesion: profesionText,
+                    profocupa: cargo.label,
                     cumpclie: birthdate,
                     razonsocial: razonSocial,
                     domfiscal: domFiscal,
@@ -339,6 +343,7 @@ const NuevoClienteForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
+                    conyuge: '',
                 }
             }, {
                 onSuccess: (data) => {
@@ -639,6 +644,7 @@ const NuevoClienteForm = ({
                     options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
                     selected={profesion}
                     setSelected={setProfesion}
+                    onInputChange={setProfesionInput}
                     placeholder="Buscar Profesión"
                     required
                     error={profesionError}

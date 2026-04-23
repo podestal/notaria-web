@@ -15,13 +15,29 @@ interface Props {
         estadoCivil: number;
         genero: string;
         nacionalidad: string;
+        email: string;
+        telfijo: string;
+        telcel: string;
+        telofi: string;
+        idprofesion: number;
+        idcargoprofe: number;
+        detaprofesion: string;
+        cumpclie: string;
+        resedente: string;
     }>>
+    onClienteNotFound: (prefill: {
+        apePaterno: string;
+        apeMaterno: string;
+        priNombre: string;
+        segNombre: string;
+        genero: string;
+    }) => void
     setDocument: React.Dispatch<React.SetStateAction<string>>
     document: string
     participantesDocs: string[]
 }
 
-const PreParticipanteForm = ({ setContratanteInfo, setDocument, document, participantesDocs }: Props) => {
+const PreParticipanteForm = ({ setContratanteInfo, onClienteNotFound, setDocument, document, participantesDocs }: Props) => {
     
     const access = useAuthStore(s => s.access_token) || ''
     const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(1);
@@ -48,7 +64,16 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document, partic
             ubigeo: null,
             estadoCivil: 0,
             genero: '',
-            nacionalidad: ''
+            nacionalidad: '',
+            email: '',
+            telfijo: '',
+            telcel: '',
+            telofi: '',
+            idprofesion: 0,
+            idcargoprofe: 0,
+            detaprofesion: '',
+            cumpclie: '',
+            resedente: '1',
         })
     
         axios.get(
@@ -70,10 +95,26 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document, partic
                     ubigeo: response.data.idubigeo,
                     estadoCivil: response.data.idestcivil,
                     genero: response.data.sexo,
-                    nacionalidad: response.data.nacionalidad
+                    nacionalidad: response.data.nacionalidad,
+                    email: response.data.email || '',
+                    telfijo: response.data.telfijo || '',
+                    telcel: response.data.telcel || '',
+                    telofi: response.data.telofi || '',
+                    idprofesion: response.data.idprofesion || 0,
+                    idcargoprofe: response.data.idcargoprofe || 0,
+                    detaprofesion: response.data.detaprofesion || '',
+                    cumpclie: response.data.cumpclie || '',
+                    resedente: response.data.resedente || '1',
                 });
             } else {
-                console.log('Cliente no encontrado, buscando en RENIEC')
+                console.log('Cliente no encontrado, abriendo formulario de cliente')
+                onClienteNotFound({
+                    apePaterno: '',
+                    apeMaterno: '',
+                    priNombre: '',
+                    segNombre: '',
+                    genero: '',
+                })
                 handleReniec(document)
             }
         }).catch(error => {
@@ -89,20 +130,35 @@ const PreParticipanteForm = ({ setContratanteInfo, setDocument, document, partic
         axios.get(`${import.meta.env.VITE_PERUDEVS_DNI_URL}document=${dni}&key=${import.meta.env.VITE_PERUDEVS_TOKEN}`
         ).then(response => {
             console.log('response', response.data)
-            setContratanteInfo({
-                apePaterno: response.data.resultado.apellido_paterno || '',
-                apeMaterno: response.data.resultado.apellido_materno || '',
-                priNombre: response.data.resultado.nombres.split(' ')[0] || '',
-                segNombre: response.data.resultado.nombres.split(' ')[1] || '',
-                genero: response.data.resultado.genero,
-                nacionalidad: '',
-                direccion: '',
-                ubigeo: null,
-                estadoCivil: 0
+            const resultado = response?.data?.resultado
+            if (!resultado) {
+                onClienteNotFound({
+                    apePaterno: '',
+                    apeMaterno: '',
+                    priNombre: '',
+                    segNombre: '',
+                    genero: '',
+                })
+                return
+            }
+            const nombres = String(resultado.nombres || '').trim().split(/\s+/).filter(Boolean)
+            onClienteNotFound({
+                apePaterno: resultado.apellido_paterno || '',
+                apeMaterno: resultado.apellido_materno || '',
+                priNombre: nombres[0] || '',
+                segNombre: nombres.length > 1 ? nombres.slice(1).join(' ') : '',
+                genero: resultado.genero || '',
             })
 
         }).catch(error => {
             console.error('Error al consultar RENIEC:', error)
+            onClienteNotFound({
+                apePaterno: '',
+                apeMaterno: '',
+                priNombre: '',
+                segNombre: '',
+                genero: '',
+            })
         });
 
         

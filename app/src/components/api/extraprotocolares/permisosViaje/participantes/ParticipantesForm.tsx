@@ -9,6 +9,7 @@ import useAuthStore from "../../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
 import { Ubigeo } from "../../../../../services/api/ubigeoService";
 import { Nacionalidad } from "../../../../../services/api/nacionalidadesService";
+import { Profesion } from "../../../../../services/api/profesionesService";
 import { ESTADO_CIVIL } from "../../../../../data/clienteData";
 import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput";
 import SimpleSelector from "../../../../ui/SimpleSelector";
@@ -28,6 +29,7 @@ interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
     ubigeos: Ubigeo[]
     nacionalidades: Nacionalidad[]
+    profesiones: Profesion[]
     setDocument: React.Dispatch<React.SetStateAction<string>>
     contratanteInfo: {
         apePaterno: string;
@@ -39,12 +41,21 @@ interface Props {
         estadoCivil: number;
         genero: string;
         nacionalidad: string;
+        email: string;
+        telfijo: string;
+        telcel: string;
+        telofi: string;
+        idprofesion: number;
+        idcargoprofe: number;
+        detaprofesion: string;
+        cumpclie: string;
+        resedente: string;
     }
     setContratanteInfo: React.Dispatch<React.SetStateAction<any>>
     document: string
 }
 
-const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, contratanteInfo, document, setContratanteInfo, setDocument }: Props) => {
+const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOpen, ubigeos, nacionalidades, profesiones, contratanteInfo, document, setContratanteInfo, setDocument }: Props) => {
 
     // console.log('contratanteInfo ->',contratanteInfo);
     
@@ -76,6 +87,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
       })
     const [estadoCivil, setEstadoCivil] = useState(contratanteInfo.estadoCivil ? contratanteInfo.estadoCivil : 0);
     const [genero, setGenero] = useState(normalizeGenero(contratanteInfo.genero));
+    const [profesionDescripcion, setProfesionDescripcion] = useState((contratanteInfo.detaprofesion || '').trim());
     const [selectedNacionalidad, setSelectedNacionalidad] = useState<{ id: string; label: string } | null>(() => {
         if (contratanteInfo.nacionalidad) {
           const match = nacionalidades.find(nacionalidad => (nacionalidad.idnacionalidad).toString() === contratanteInfo.nacionalidad);
@@ -102,6 +114,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                 : 0
         );
         setGenero(normalizeGenero(contratanteInfo?.genero));
+        setProfesionDescripcion((contratanteInfo.detaprofesion || '').trim());
         setSelectedNacionalidad(
             contratanteInfo && contratanteInfo.nacionalidad
                 ? (() => {
@@ -140,11 +153,19 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         
 
         if (createContratante) {
-            createContratante.mutate({
+            const nombreCompleto = `${appePaterno} ${appeMaterno}, ${priNombre} ${segNombre}`.replace(/\s+/g, ' ').trim();
+            const profesionText = profesionDescripcion.trim() || (contratanteInfo.detaprofesion || '').trim();
+            const matchedProfesion = profesiones.find(
+                profesion => profesion.desprofesion.trim().toLowerCase() === profesionText.toLowerCase()
+            );
+            const idprofesion = matchedProfesion
+                ? matchedProfesion.idprofesion
+                : contratanteInfo.idprofesion || 0;
+            const payload = {
                 contratante: {
                     id_viaje: idViaje, // This will be set by the backend
                     c_codcontrat: document, // This can be generated or set as needed
-                    c_descontrat: `${appePaterno} ${appeMaterno}, ${priNombre} ${segNombre}`,
+                    c_descontrat: nombreCompleto,
                     c_fircontrat: firma,
                     c_condicontrat: selectedCondicion,
                     edad: edad,
@@ -153,10 +174,35 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                     tip_incapacidad: '', // Set as needed
                     codi_podera: '', // Set as needed
                     partida_e: '', // Set as needed
-                    sede_regis: '' // Set as needed
+                    sede_regis: '', // Set as needed
+                    // Cliente-like payload for backend mapping
+                    tipper: 'N',
+                    idtipdoc: 1,
+                    numdoc: document,
+                    apepat: appePaterno,
+                    apemat: appeMaterno,
+                    prinom: priNombre,
+                    segnom: segNombre,
+                    nombre: nombreCompleto,
+                    direccion: direccion,
+                    idubigeo: selectedUbigeo?.id || (contratanteInfo.ubigeo || ''),
+                    idestcivil: estadoCivil || null,
+                    sexo: genero || '',
+                    nacionalidad: selectedNacionalidad?.id || contratanteInfo.nacionalidad || '',
+                    email: contratanteInfo.email || '',
+                    telfijo: contratanteInfo.telfijo || '',
+                    telcel: contratanteInfo.telcel || '',
+                    telofi: contratanteInfo.telofi || '',
+                    idprofesion,
+                    idcargoprofe: contratanteInfo.idcargoprofe || 0,
+                    detaprofesion: profesionText,
+                    cumpclie: contratanteInfo.cumpclie || '',
+                    resedente: contratanteInfo.resedente || '1',
                 },
                 access
-            }, {
+            };
+            console.log('[PermisoViaje] payload createContratante', payload);
+            createContratante.mutate(payload, {
                 onSuccess: (res) => {
                     setMessage('Contratante creado exitosamente');
                     setShow(true);
@@ -173,7 +219,16 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                         ubigeo: null,
                         estadoCivil: 0,
                         genero: '',
-                        nacionalidad: ''
+                        nacionalidad: '',
+                        email: '',
+                        telfijo: '',
+                        telcel: '',
+                        telofi: '',
+                        idprofesion: 0,
+                        idcargoprofe: 0,
+                        detaprofesion: '',
+                        cumpclie: '',
+                        resedente: '1',
                     })
                     setDocument('')
                 },
@@ -286,6 +341,12 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                     label="Edad"
                     value={edad}
                     setValue={setEdad}
+                    horizontal
+                />
+                <SimpleInput
+                    label="Descripción Profesión"
+                    value={profesionDescripcion}
+                    setValue={setProfesionDescripcion}
                     horizontal
                 />
             </div>
