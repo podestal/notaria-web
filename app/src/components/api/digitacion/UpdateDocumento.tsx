@@ -17,6 +17,31 @@ const UpdateDocumento = ({ kardex }: Props) => {
     const { setMessage, setShow, setType } = useNotificationsStore();
     const access = useAuthStore((s) => s.access_token) || ''
 
+    const handleDownloadUpdatedDocument = async () => {
+        const mode = 'download';
+        const response = await axios.get(
+            `${docsURL}documentos/open-document/?template_id=${kardex.fktemplate}&kardex=${kardex.kardex}&mode=${mode}`,
+            {
+                responseType: 'blob',
+                headers: {
+                    'Authorization': `JWT ${access}`,
+                }
+            }
+        );
+
+        const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        });
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `__PROY__${kardex.kardex}.docx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+    };
+
     const handleUpdate = () => {
         setIsLoading(true);
         const formData = new FormData();
@@ -31,14 +56,24 @@ const UpdateDocumento = ({ kardex }: Props) => {
                 'Authorization': `JWT ${access}`,
             }
         }
-        ).then(() => {
+        ).then(async () => {
                 setType('success');
                 setMessage('Documento actualizado correctamente');
                 setShow(true);
+                try {
+                    await handleDownloadUpdatedDocument();
+                } catch (downloadError) {
+                    console.error('Error al descargar el documento actualizado:', downloadError);
+                }
             }).catch((error) => {
                 console.error('Error al actualizar el documento:', error);
                 setType('error');
-                setMessage(error.response.data.message);
+                const backendMessage =
+                    error?.response?.data?.message ||
+                    error?.response?.data?.detail ||
+                    error?.message ||
+                    'Error al actualizar el documento';
+                setMessage(backendMessage);
                 setShow(true);
             }).finally(() => {
                 setIsLoading(false);
