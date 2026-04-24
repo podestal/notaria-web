@@ -13,6 +13,7 @@ import { Profesion } from "../../../../../services/api/profesionesService";
 import { ESTADO_CIVIL } from "../../../../../data/clienteData";
 import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput";
 import SimpleSelector from "../../../../ui/SimpleSelector";
+import calculateAge from "../../../../../utils/calculateAge";
 
 const normalizeGenero = (value?: string): string => {
     if (!value) return '';
@@ -115,6 +116,10 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
         );
         setGenero(normalizeGenero(contratanteInfo?.genero));
         setProfesionDescripcion((contratanteInfo.detaprofesion || '').trim());
+        const suggestedAge = calculateAge(contratanteInfo.cumpclie || '');
+        if (suggestedAge !== null) {
+            setEdad(suggestedAge.toString());
+        }
         setSelectedNacionalidad(
             contratanteInfo && contratanteInfo.nacionalidad
                 ? (() => {
@@ -315,6 +320,7 @@ const ParticipantesForm = ({ contratanteViaje, createContratante, idViaje, setOp
                     selected={selectedUbigeo}
                     setSelected={setSelectedUbigeo}
                     placeholder="Buscar Ubigeo"
+                    
                 />
             </div>
                
