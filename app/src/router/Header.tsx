@@ -42,6 +42,7 @@ const Header = ({ kardexTypes }: Props) => {
     const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
     const user = useUserInfoStore( s => s.user)
     const notariaName = import.meta.env.VITE_NOTARIA_NAME || 'Sin nombre'
+    const notariaLogo = "https://pub-298b15d30a4a4c8b8bfd457d07eef0ec.r2.dev/gonzales-caceres/logo.jpeg"
     const welcomeName = user?.username || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Usuario'
 
     const navigate = useNavigate()
@@ -215,9 +216,17 @@ const Header = ({ kardexTypes }: Props) => {
     <aside className="fixed left-0 top-0 z-40 h-screen w-56 border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
       <div className="flex h-full flex-col">
         <div className="border-b border-slate-800 p-4">
-          <div className="rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shadow-lg">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-sky-300">Notaría</p>
-            <p className="text-base font-semibold leading-5 text-white">{notariaName}</p>
+          <div className="rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shadow-lg flex items-center gap-2 justify-center">
+            <img
+              src={notariaLogo}
+              alt="Logo Notaria"
+              className="mb-2 h-8 w-8 rounded-md border border-amber-300/50 object-cover shadow-sm"
+              loading="lazy"
+            />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-sky-300">Notaría</p>
+              <p className="text-base font-semibold leading-5 text-white">{notariaName}</p>
+            </div>
           </div>
           <div className="mt-3 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-3 shadow-lg">
             <p className="text-[11px] text-slate-400">
