@@ -41,51 +41,52 @@ const KardexFilters = ({
   return (
     <form 
         onSubmit={handleSubmit}
-        className="w-full bg-slate-50/70 px-6 py-5 border-b border-slate-200">
-        <p className="mb-4 text-sm font-semibold text-slate-700">Búsqueda por:</p>
-        <div className="grid grid-cols-9 gap-4 text-xs">
-            <div className="flex items-center justify-center gap-2 col-span-2">
-                <p className="text-slate-600">Nº Kardex:</p>
+        className="w-full border-b border-slate-200 bg-slate-50/70 px-6 py-3">
+        <p className="mb-2 text-xs font-semibold text-slate-700">Búsqueda por:</p>
+        <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-2">
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-1.5">
+                <p className="min-w-20 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Nº Kardex</p>
                 <input 
                     value={correlative}
                     onChange={(e) => {
                         setCorrelative(e.target.value)
                     }}
                     type="text" 
-                    className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
+                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200" />
             </div>
-            <div className="flex items-center justify-center gap-2 col-span-2">
-                <p className="text-slate-600">Nro Doc:</p>
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-1.5">
+                <p className="min-w-20 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Nro Doc</p>
                 <input 
                     value={document}
                     onChange={(e) => {
                         setDocument(e.target.value)
                     }}
                     type="text" 
-                    className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
+                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200" />
             </div>
-            <div className="flex items-center justify-center gap-2 col-span-2">
-                <p className="text-slate-600">Nombre:</p>
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-1.5">
+                <p className="min-w-20 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Nombre</p>
                 <input 
                     value={name}
                     onChange={(e) => {
                         setName(e.target.value)
                     }}
                     type="text" 
-                    className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
+                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200" />
             </div>
-            <div className="flex items-center justify-center gap-2 col-span-2">
-                <p className="text-slate-600">Nº Escr/Act:</p>
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2 py-1.5">
+                <p className="min-w-20 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Nº Escr/Act</p>
                 <input 
                     value={numescritura}
                     onChange={(e) => {
                         setNumescritura(e.target.value)
                     }}
-                    type="text" className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
+                    type="text"
+                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200" />
             </div>
             <button 
                 disabled={loading} 
-                className="bg-sky-600 px-3 py-2 transition duration-300 text-xs font-semibold text-white border border-sky-700 cursor-pointer hover:bg-sky-700 rounded-md disabled:opacity-60 disabled:cursor-not-allowed shadow-sm">
+                className="ml-auto rounded-lg border border-sky-700 bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition duration-300 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2">
                 {loading ? 'Buscando...' : 'Buscar'}
             </button>
         </div>
