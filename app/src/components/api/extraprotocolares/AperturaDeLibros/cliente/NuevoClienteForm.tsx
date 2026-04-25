@@ -465,7 +465,9 @@ const NuevoClienteForm = ({
             console.log('response', response.data)
             setApepat(response.data.resultado.apellido_paterno || '')
             setApemat(response.data.resultado.apellido_materno || '')
-            setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
+            const nombres = String(response.data.resultado.nombres || '').trim().split(/\s+/).filter(Boolean)
+            setPrinom(nombres[0] || '')
+            setSegnom(nombres.length > 1 ? nombres.slice(1).join(' ') : '')
             setBirthdate(response.data.resultado.fecha_nacimiento || '')
             if (response.data.resultado.genero === 'M') {
                 setGender(1) // Masculino
