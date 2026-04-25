@@ -15,7 +15,7 @@ const TopModal = ({ isOpen, onClose, children, deepth }: TopModalProps) => {
         <>
           {/* Overlay */}
           <motion.div
-            className={`fixed inset-0 bg-black/40 ${deepth ? `z-${deepth}` : 'z-40'}`}
+            className={`fixed inset-y-0 right-0 left-56 bg-black/40 ${deepth ? `z-${deepth}` : 'z-40'}`}
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -24,7 +24,7 @@ const TopModal = ({ isOpen, onClose, children, deepth }: TopModalProps) => {
 
           {/* Modal container */}
           <motion.div
-            className="fixed top-20 left-0 right-0 z-50 mx-auto max-w-5xl w-full bg-white rounded-b-2xl shadow-lg overflow-y-auto max-h-screen p-6"
+            className="fixed top-20 right-0 left-56 z-50 mx-auto w-full max-w-5xl rounded-b-2xl bg-white p-6 shadow-lg max-h-screen overflow-y-auto"
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}

@@ -23,7 +23,7 @@ const TopModalWithTabs = ({ isOpen, onClose, tabs }: TopModalWithTabsProps) => {
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-0 bg-black/40 z-40"
+            className="fixed inset-y-0 right-0 left-56 bg-black/40 z-40"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -32,7 +32,7 @@ const TopModalWithTabs = ({ isOpen, onClose, tabs }: TopModalWithTabsProps) => {
 
           {/* Modal Container */}
           <motion.div
-            className="fixed top-20 left-0 right-0 z-50 mx-auto max-w-6xl w-full bg-white rounded-b-2xl shadow-lg overflow-hidden"
+            className="fixed top-20 right-0 left-56 z-50 mx-auto w-full max-w-6xl overflow-hidden rounded-b-2xl bg-white shadow-lg"
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}
