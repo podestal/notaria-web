@@ -52,7 +52,7 @@ const Login = () => {
                 clearTokens()
                 setTokens(jwtData.access, jwtData.refresh)
                 setUserId(decoded.user_id)
-                navigate('/app')
+                navigate('/app/protocolares')
             },
             onError: (err) => {
                 console.error('Login error:', err);

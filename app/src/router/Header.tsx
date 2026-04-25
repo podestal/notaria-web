@@ -70,13 +70,13 @@ const Header = ({ kardexTypes }: Props) => {
     }
 
     const menuItems: MenuItem[] = [
-      { label: "PROTOCOLARES", options: 
+      { label: "Protocolares", options: 
           [
             ...kardexTypes?.map((kardexType) => ({ name: kardexType.nomtipkar, docType: kardexType.idtipkar })),
             { name: "Protestos" }
           ],
       },
-        { label: "EXTRAPROTOCOLARES", options: 
+        { label: "Extraprotocolares", options: 
             [   
               // {name: "Certificación de Firmas", path: "/app/extraprotocolares/certificacionFirmas"},
                 {name: "Cert. Autorización de viaje", path: "/app/extraprotocolares/permisosViaje"},
@@ -89,7 +89,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Cambio de Características", path: "/app/extraprotocolares/cambioCaracteristicas"},
                 {name: "Busqueda Avanzada", path: "/app/extraprotocolares/busquedaAvanzada"}
             ]},
-        { label: "REPORTES", options: 
+        { label: "Reportes", options: 
             [   {name: "Indices Cronologicos", 
                   path: "/app/reportes/cronologicos",
                   subOptions: [
@@ -145,7 +145,7 @@ const Header = ({ kardexTypes }: Props) => {
                   path: "/app/reportes/cronologicos-pasado",
                 },
             ]},
-        { label: "CAJA", options:
+        { label: "Caja", options:
             [   {name: "Egresos", 
                   subOptions: [
                     {name: "Generar Egresos", path: "/app/caja/generar-egresos"}, 
@@ -161,11 +161,11 @@ const Header = ({ kardexTypes }: Props) => {
                     {name: "Cancelados", path: "/app/caja/cancelados"}
                   ]}
             ]},
-        { label: "USUARIOS", options:
+        { label: "Usuarios", options:
             [   {name: "Mantenimiento"},
                 {name: "Permisos"}
             ]},
-        { label: "HERRAMIENTAS", options:
+        { label: "Herramientas", options:
             [   {name: "Tipos de Acto"},    
                 {name: "Mantenimiento de Abogados"},
                 {name: "Mantenimiento de Presentante"},
@@ -188,7 +188,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Tipo de Cambio"},
                 {name: "Series Iniciales"}
             ]},
-        { label: "CONFIGURACION", options:
+        { label: "Configuracion", options:
             [   {name: "Datos del Notario"},
                 {name: "Edición de Datos"},
                 {name: "Registrar Servidor"},
@@ -198,7 +198,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Activar Errores Usuarios"},
                 {name: "Plantillas", path: "/app/configuracion/plantillas"}
             ]},
-        { label: "SISGEN", options:
+        { label: "Sisgen", options:
             [   {name: "SISGEN", path: "/app/sisgen"}
             ]},
         
@@ -285,7 +285,6 @@ const Header = ({ kardexTypes }: Props) => {
 
         <div className="border-t border-slate-800 p-4">
           <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/95 px-3 py-2">
-            {/* <p className="text-xs font-semibold text-slate-200">Cerrar sesión</p> */}
             <Logout />
           </div>
         </div>
