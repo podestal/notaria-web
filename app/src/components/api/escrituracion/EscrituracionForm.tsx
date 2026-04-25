@@ -10,6 +10,11 @@ import moment from "moment"
 import { ChevronDown, ChevronUp, Loader2 } from "lucide-react"
 import { useCreateNotarizationReservation } from "../../../hooks/signatum/useCreateNotarizationReservation"
 import type { NotarizationReservation } from "../../../services/signatum/notarizationReservationService"
+import useGetSeriesNotariales from "../../../hooks/signatum/useGetSeriesNotariales"
+import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
+import getTitleCase from "../../../utils/getTitleCase"
+import TopModal from "../../ui/TopModal"
+import SerieNotarialMain from "./serieNotarial/SerieNotarialMani"
 
 interface Props {
     kardex: Kardex
@@ -154,8 +159,10 @@ const applyReservationToForm = (
 const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+    const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createNotarizationReservation = useCreateNotarizationReservation()
+    const { data: seriesNotariales } = useGetSeriesNotariales({ access })
 
     const [numMinuta, setNumMinuta] = useState(kardex.numminuta || '')
     const [numEscritura, setNumEscritura] = useState(kardex.numescritura || '')
@@ -179,6 +186,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
     const [loading, setLoading] = useState(false)
     const [signatumReservationId, setSignatumReservationId] = useState<number | undefined>(undefined)
+    const [openSerieNotarial, setOpenSerieNotarial] = useState(false)
 
 
     // ERRORS
@@ -189,6 +197,21 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const folioPageCount = useMemo(() => getFolioSeriePageCount(follioIni, folioFin), [follioIni, folioFin])
     const seriePageCount = useMemo(() => getFolioSeriePageCount(serieNotarialIni, serieNotarialFin), [serieNotarialIni, serieNotarialFin])
     const exceedsPageLimit = folioPageCount > 10 || seriePageCount > 10
+    const kardexTypeLabel = useMemo(() => {
+        const match = kardexTypes.find(type => type.idtipkar === kardex.idtipkar)
+        return match ? getTitleCase(match.nomtipkar) : `tipo ${kardex.idtipkar}`
+    }, [kardex.idtipkar, kardexTypes])
+    const activeSeriesForCurrentType = useMemo(
+        () => (seriesNotariales || []).filter(serie => serie.activo && serie.idtipkar === kardex.idtipkar),
+        [kardex.idtipkar, seriesNotariales]
+    )
+    const noActiveSeriesForCurrentType = activeSeriesForCurrentType.length === 0
+    const lowActiveSeriesForCurrentType = useMemo(
+        () =>
+            !noActiveSeriesForCurrentType &&
+            activeSeriesForCurrentType.some(serie => getFolioSeriePageCount(serie.papel_ini, serie.papel_fin) > 0 && getFolioSeriePageCount(serie.papel_ini, serie.papel_fin) <= 20),
+        [activeSeriesForCurrentType, noActiveSeriesForCurrentType]
+    )
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -389,6 +412,26 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center items-center gap-6 w-full my-6">
             <div className=" w-[80%]">
+                {noActiveSeriesForCurrentType && (
+                    <div className="mb-4 rounded-md border border-slate-300 bg-slate-100 px-4 py-3 text-xs text-slate-700">
+                        No hay series notariales activas para {kardexTypeLabel}.
+                    </div>
+                )}
+                {lowActiveSeriesForCurrentType && (
+                    <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+                        Series notariales bajas para {kardexTypeLabel}: hay rangos activos con 20 paginas o menos.
+                    </div>
+                )}
+                <div className="mb-4 flex items-center justify-end">
+                    <button
+                        type="button"
+                        onClick={() => setOpenSerieNotarial(true)}
+                        className="group inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50/80 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm transition-all hover:-translate-y-px hover:border-indigo-300 hover:bg-indigo-100 cursor-pointer"
+                    >
+                        <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 transition-transform group-hover:scale-125" />
+                        Gestionar serie notarial
+                    </button>
+                </div>
                 {exceedsPageLimit && (
                     <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
                         Recuerde: más de 10 páginas es una cantidad alta. Verifique cuidadosamente el rango antes de guardar.
@@ -615,19 +658,19 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                                 : setErrorFechaActa
                         }
                     />
-                    <div className="flex items-center justify-start">
-                    <button
-                        className={`gap-1 px-3 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors flex items-center justify-center min-w-[120px] my-4 ${createNotarizationReservation.isPending ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}
-                        type="button"
-                        onClick={handleFetchNotarizationReservation}
-                        disabled={createNotarizationReservation.isPending}
-                    >
-                        {createNotarizationReservation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <p className="text-xs font-semibold">Obtener datos</p>
-                        )}
-                    </button>
+                    <div className="flex items-center justify-start gap-2">
+                        <button
+                            className={`gap-1 px-3 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors flex items-center justify-center min-w-[120px] my-4 ${createNotarizationReservation.isPending ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}
+                            type="button"
+                            onClick={handleFetchNotarizationReservation}
+                            disabled={createNotarizationReservation.isPending}
+                        >
+                            {createNotarizationReservation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <p className="text-xs font-semibold">Obtener datos</p>
+                            )}
+                        </button>
                     </div>
                 </div>
                 <div className="mt-8 flex items-center justify-center gap-3">
@@ -647,6 +690,10 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     </button>
                 </div>
             </div>
+
+            <TopModal isOpen={openSerieNotarial} onClose={() => setOpenSerieNotarial(false)}>
+                <SerieNotarialMain />
+            </TopModal>
 
     </form>
   )
