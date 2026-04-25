@@ -43,7 +43,7 @@ const KardexMain = () => {
     if (isSuccess)
 
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
+    <div className="mx-auto w-[92%] max-w-[1400px] bg-white rounded-2xl shadow-sm border border-slate-200 text-black mt-4 mb-4 overflow-hidden">
         {bodyRender !== 0 
         ?
         <>

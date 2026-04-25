@@ -18,9 +18,9 @@ const CreateKardex = () => {
     <div>
         <button 
             onClick={() => setOpen(true)}
-            className="hover:opacity-80 cursor-pointer flex items-center justify-center gap-2">
-            <span className="font-bold text-2xl text-green-600">+</span>
-            <span className="border-b-2 border-amber-500 pb-1">Nuevo</span>
+            className="cursor-pointer flex items-center justify-center gap-2 rounded-lg bg-emerald-500/15 px-3 py-2 border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/25 transition">
+            <span className="font-bold text-lg leading-none">+</span>
+            <span className="text-xs font-semibold">Nuevo</span>
         </button>
     </div>
     <TopModal

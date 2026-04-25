@@ -41,51 +41,51 @@ const KardexFilters = ({
   return (
     <form 
         onSubmit={handleSubmit}
-        className="w-full flex-col justify-between items-center py-4 px-2 mb-6 border-b-2 border-dashed border-slate-950">
-        <p className="mb-4">Busqueda por:</p>
-        <div className="grid grid-cols-9 gap-8 text-xs">
+        className="w-full bg-slate-50/70 px-6 py-5 border-b border-slate-200">
+        <p className="mb-4 text-sm font-semibold text-slate-700">Búsqueda por:</p>
+        <div className="grid grid-cols-9 gap-4 text-xs">
             <div className="flex items-center justify-center gap-2 col-span-2">
-                <p>Nº Kardex:</p>
+                <p className="text-slate-600">Nº Kardex:</p>
                 <input 
                     value={correlative}
                     onChange={(e) => {
                         setCorrelative(e.target.value)
                     }}
                     type="text" 
-                    className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
+                    className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
             </div>
             <div className="flex items-center justify-center gap-2 col-span-2">
-                <p>Nro Doc:</p>
+                <p className="text-slate-600">Nro Doc:</p>
                 <input 
                     value={document}
                     onChange={(e) => {
                         setDocument(e.target.value)
                     }}
                     type="text" 
-                    className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
+                    className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
             </div>
             <div className="flex items-center justify-center gap-2 col-span-2">
-                <p>Nombre:</p>
+                <p className="text-slate-600">Nombre:</p>
                 <input 
                     value={name}
                     onChange={(e) => {
                         setName(e.target.value)
                     }}
                     type="text" 
-                    className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
+                    className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
             </div>
             <div className="flex items-center justify-center gap-2 col-span-2">
-                <p>Nº Escr/Act:</p>
+                <p className="text-slate-600">Nº Escr/Act:</p>
                 <input 
                     value={numescritura}
                     onChange={(e) => {
                         setNumescritura(e.target.value)
                     }}
-                    type="text" className="bg-white text-slate-700 border border-slate-300 rounded-md p-1" />
+                    type="text" className="bg-white text-slate-700 border border-slate-300 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-300" />
             </div>
             <button 
                 disabled={loading} 
-                className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">
+                className="bg-sky-600 px-3 py-2 transition duration-300 text-xs font-semibold text-white border border-sky-700 cursor-pointer hover:bg-sky-700 rounded-md disabled:opacity-60 disabled:cursor-not-allowed shadow-sm">
                 {loading ? 'Buscando...' : 'Buscar'}
             </button>
         </div>

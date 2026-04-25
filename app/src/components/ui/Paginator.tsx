@@ -33,11 +33,11 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
 
   return (
     itemsCount > 0 && (
-      <div className='flex items-center justify-center px-4 py-3 sm:px-6 gap-10 mt-10'>
-        <p className='text-sm text-gray-500'>{`${page} de ${totalPages}`}</p>
+      <div className='flex flex-wrap items-center justify-center gap-4 border-t border-slate-200 bg-slate-50/80 px-4 py-4 sm:px-6'>
+        <p className='rounded-md bg-white px-3 py-1 text-xs font-semibold text-slate-600 border border-slate-200'>{`${page} de ${totalPages}`}</p>
         <button
           type='button'
-          className='cursor-pointer text-gray-500 hover:text-gray-700'
+          className='cursor-pointer rounded-md border border-slate-300 bg-white p-2 text-slate-600 transition hover:border-sky-400 hover:text-sky-600 disabled:opacity-40 disabled:cursor-not-allowed'
           onClick={() => {
             setPage(prev => Math.max(1, prev - 1))
             refetch?.()
@@ -47,17 +47,17 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
           <ArrowBigLeft />
         </button>
 
-        <div>
+        <div className='flex flex-wrap items-center justify-center gap-1'>
           {visiblePages.map(p => (
             <button
               type='button'
               key={p}
               onClick={() => setPage(p)}
-              className={`mx-1 cursor-pointer rounded-md transition duration-300 border border-gray-300 ${
+              className={`cursor-pointer rounded-md transition duration-200 border ${
                 page === p
-                  ? 'bg-blue-600 text-slate-50 hover:bg-blue-500'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
-              } px-4 py-2 text-sm font-medium`}
+                  ? 'bg-sky-600 border-sky-700 text-white shadow-sm'
+                  : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
+              } px-3 py-1.5 text-xs font-semibold`}
             >
               {p}
             </button>
@@ -66,7 +66,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
 
         <button
           type='button'
-          className='cursor-pointer text-gray-500 hover:text-gray-700'
+          className='cursor-pointer rounded-md border border-slate-300 bg-white p-2 text-slate-600 transition hover:border-sky-400 hover:text-sky-600 disabled:opacity-40 disabled:cursor-not-allowed'
           onClick={() => {
             setPage(prev => Math.min(totalPages, prev + 1))
             refetch?.()
