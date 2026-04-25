@@ -38,8 +38,8 @@ const Header = ({ kardexTypes }: Props) => {
     const currentMonth = monthsInSpanish[moment().format('MMMM').toLocaleLowerCase()]
     const currentYear = moment().format('YYYY')
 
-    const [openDropdown, setOpenDropdown] = useState<number | null>(null);
-    const [openSubDropdown, setOpenSubDropdown] = useState<number | null>(null);
+    const [openDropdown, setOpenDropdown] = useState<number | null>(0);
+    const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
     const user = useUserInfoStore( s => s.user)
     const notariaName = import.meta.env.VITE_NOTARIA_NAME || 'Sin nombre'
     const welcomeName = user?.username || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Usuario'
@@ -52,6 +52,22 @@ const Header = ({ kardexTypes }: Props) => {
     const setCorrelative = useCorrelativeStore(s => s.setCorrelative)
 
     const setKardexFilter = useKardexFiltersStore(s => s.setKardexFilter)
+
+    const handleOptionClick = (item: MenuItem, option: MenuOptions) => {
+      navigate(`/app/${item.label.toLowerCase()}`)
+      setCorrelative('')
+      if (option.docType) setBodyRender(option.docType)
+      if (option.path) navigate(option.path)
+      setKardexFilter({ type: '', value: '' })
+    }
+
+    const handleSubOptionClick = (option: MenuOptions, subOption: SubOption) => {
+      if (!subOption.path) return
+      navigate(subOption.path)
+      setCorrelative('')
+      if (option.docType) setBodyRender(option.docType)
+      setKardexFilter({ type: '', value: '' })
+    }
 
     const menuItems: MenuItem[] = [
       { label: "PROTOCOLARES", options: 
@@ -196,109 +212,85 @@ const Header = ({ kardexTypes }: Props) => {
 
 
   return (
-    <div className="bg-slate-950 text-slate-100 shadow-md">
-    <div className='mx-auto flex w-[95%] max-w-[1280px] items-center justify-between py-3'>
-        <div className='flex items-center'>
-            <div className='rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-2 shadow-lg'>
-              <p className='text-[10px] uppercase tracking-[0.18em] text-sky-300'>Notaría</p>
-              <p className='text-base font-semibold leading-5 text-white'>
-                {notariaName}
-              </p>
-            </div>
+    <aside className="fixed left-0 top-0 z-40 h-screen w-56 border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
+      <div className="flex h-full flex-col">
+        <div className="border-b border-slate-800 p-4">
+          <div className="rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shadow-lg">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-sky-300">Notaría</p>
+            <p className="text-base font-semibold leading-5 text-white">{notariaName}</p>
+          </div>
+          <div className="mt-3 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-3 shadow-lg">
+            <p className="text-[11px] text-slate-400">
+              {getTitleCase(currentDate)} {currentDay} de {getTitleCase(currentMonth)} del {currentYear}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-white">Bienvenido, {welcomeName}</p>
+          </div>
         </div>
-        <div className='flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-2 shadow-lg'>
-            <div className='text-right'>
-              <p className='text-[11px] text-slate-400'>{getTitleCase(currentDate)} {currentDay} de {getTitleCase(currentMonth)} del {currentYear}</p>
-              <p className='text-sm font-semibold text-white'>Bienvenido, {welcomeName}</p>
-            </div>
-            <Logout />
-        </div>
-    </div>
-    <div className="w-full border-t border-slate-800 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900">
-      <ul className="mx-auto flex w-[95%] max-w-[1280px] items-center justify-between gap-1 px-2 text-[11px] font-semibold text-slate-300">
-        <div className="flex justify-between items-center w-full">
+
+        <div className="flex-1 overflow-y-auto px-3 py-3">
           {menuItems.map((item, index) => (
-            <div
-              key={index}
-              className="relative"
-              onMouseEnter={() => setOpenDropdown(index)}
-              onMouseLeave={() => setOpenDropdown(null)}
-              // onClick={() => navigate(`/app/${item.label.toLowerCase()}`)}
-            >
-              {/* Main Item */}
-              <li className="cursor-pointer rounded-md px-3 py-3 transition-colors duration-150 hover:bg-slate-800 hover:text-white hover:shadow-inner">
-                {item.label}
-              </li>
+            <div key={item.label} className="mb-2">
+              <button
+                type="button"
+                onClick={() => setOpenDropdown(openDropdown === index ? null : index)}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
+              >
+                <span>{item.label}</span>
+                <span className="text-[10px]">{openDropdown === index ? '▼' : '▶'}</span>
+              </button>
 
-              {/* Dropdown Menu */}
               {openDropdown === index && (
-                <div className="absolute z-100 left-0 w-60 rounded-md border border-slate-700 bg-slate-900 text-slate-300 shadow-xl">
-                  <ul>
-                    {item.options.map((option, idx) => (
-                    <div
-                        key={idx}
-                        className="relative"
-                        onMouseEnter={() => option.subOptions && setOpenSubDropdown(idx)}
-                        onMouseLeave={() => setOpenSubDropdown(null)}
-                        onClick={() => {
-                          console.log('option', option)
-                          navigate(`/app/${item.label.toLowerCase()}`)
-                          setCorrelative('')
-                          option.docType && setBodyRender(option.docType)
-                          option.path && navigate(option.path)
-                          setKardexFilter({
-                            type: '',
-                            value: ''
-                        })
+                <ul className="mt-1 space-y-1 border-l border-slate-800 pl-2">
+                  {item.options.map((option, idx) => {
+                    const subKey = `${index}-${idx}`
+                    return (
+                      <li key={`${item.label}-${option.name}-${idx}`}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (option.subOptions) {
+                              setOpenSubDropdown(openSubDropdown === subKey ? null : subKey)
+                              return
+                            }
+                            handleOptionClick(item, option)
                           }}
-                      >
-                        <li className="flex w-full cursor-pointer justify-between border-b border-slate-700 px-4 py-2 text-xs transition-colors duration-150 hover:bg-sky-600 hover:text-white">
-                          {getTitleCase(option.name)}
-                          {option.subOptions && <span>▶</span>}
-                        </li>
-
-                        {/* Third Layer Dropdown */}
-                        {openSubDropdown === idx && option.subOptions && (
-                          <div className="absolute left-full top-0 w-44 rounded-md border border-slate-700 bg-slate-900 text-slate-300 shadow-xl">
-                            <ul>
-                              {option.subOptions.map((subOption, subIdx) => (
-                                <li
-                                  key={subIdx}
-                                  className="w-full cursor-pointer border-b border-slate-700 px-4 py-2 text-xs transition-colors duration-150 hover:bg-sky-600 hover:text-white"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    console.log('subOption', subOption)
-                                    navigate(`${subOption.path}`)
-                                    setCorrelative('')
-                                    option.docType && setBodyRender(option.docType)
-                                    setKardexFilter({
-                                      type: '',
-                                      value: ''
-                                    })
-                                  }}
+                          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white"
+                        >
+                          <span>{getTitleCase(option.name)}</span>
+                          {option.subOptions && <span className="text-[10px]">{openSubDropdown === subKey ? '▼' : '▶'}</span>}
+                        </button>
+                        {option.subOptions && openSubDropdown === subKey && (
+                          <ul className="mt-1 space-y-1 border-l border-slate-800 pl-3">
+                            {option.subOptions.map((subOption, subIdx) => (
+                              <li key={`${subKey}-${subOption.name}-${subIdx}`}>
+                                <button
+                                  type="button"
+                                  className="w-full rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white"
+                                  onClick={() => handleSubOptionClick(option, subOption)}
                                 >
                                   {subOption.name}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
                         )}
-                      </div>
-                    ))}
-                  </ul>
-                </div>
+                      </li>
+                    )
+                  })}
+                </ul>
               )}
             </div>
           ))}
         </div>
 
-        {/* SISGEN - No Dropdown */}
-        {/* <li className="cursor-pointer hover:text-slate-50 mt-3 px-4" onClick={() => navigate(`/app/sisgen`)}>SISGEN</li> */}
-      </ul>
-    </div>
-
-
-    </div>
+        <div className="border-t border-slate-800 p-4">
+          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/95 px-3 py-2">
+            {/* <p className="text-xs font-semibold text-slate-200">Cerrar sesión</p> */}
+            <Logout />
+          </div>
+        </div>
+      </div>
+    </aside>
   )
 }
 

@@ -24,28 +24,27 @@ const MainPage = () => {
   if (isSuccess) 
 
   return (
-    <>
-    <Header 
-      kardexTypes={visibleKardexTypes}
-    />
-    {notifications.length > 0 && (
-      <div className="fixed right-4 top-8 z-60 flex flex-col gap-3 pointer-events-none">
-        {[...notifications].reverse().map((n) => (
-          <div key={n.id} className="pointer-events-auto">
-            <NotificationCard
-              type={n.type}
-              message={n.message}
-              onClose={() => removeNotification(n.id)}
-            />
+    <div className="min-h-screen bg-slate-100">
+      <Header 
+        kardexTypes={visibleKardexTypes}
+      />
+      <main className="ml-56 min-w-0">
+        {notifications.length > 0 && (
+          <div className="fixed right-4 top-8 z-60 flex flex-col gap-3 pointer-events-none">
+            {[...notifications].reverse().map((n) => (
+              <div key={n.id} className="pointer-events-auto">
+                <NotificationCard
+                  type={n.type}
+                  message={n.message}
+                  onClose={() => removeNotification(n.id)}
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    )}
-    {/* <KardexMain 
-
-    /> */}
-    <Outlet />
-    </>
+        )}
+        <Outlet />
+      </main>
+    </div>
   )
 }
 
