@@ -54,6 +54,7 @@ import AlfabeticosNoCont from "../components/api/reportes/alfabeticos/Alfebetico
 import AlfabeticosTransferencias from "../components/api/reportes/alfabeticos/AlfabeticosTransferencias";
 import AlfabeticosTestamento from "../components/api/reportes/alfabeticos/AlfabeticosTestamento";
 import PlantillasMain from "../components/api/plantillas/PlantillasMain";
+import ConfiNotarioMain from "../components/api/confinotario/ConfiNotarioMain";
 
 const routes = createBrowserRouter([
     {
@@ -299,6 +300,10 @@ const routes = createBrowserRouter([
                     <ConfiguracionMain />
                 </PrivateRoutes>,
                 children: [
+                    {
+                        path: "configuracion-notario",
+                        element: <PrivateRoutes><ConfiNotarioMain /></PrivateRoutes>
+                    },
                     {
                         path: "plantillas",
                         element: <PrivateRoutes><PlantillasMain /></PrivateRoutes>

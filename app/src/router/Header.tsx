@@ -190,7 +190,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Series Iniciales"}
             ]},
         { label: "Configuracion", options:
-            [   {name: "Datos del Notario"},
+            [   {name: "Datos del Notario", path: "/app/configuracion/configuracion-notario"},
                 {name: "Edición de Datos"},
                 {name: "Registrar Servidor"},
                 {name: "Editar Servidor"},
