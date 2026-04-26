@@ -146,58 +146,58 @@ const Header = ({ kardexTypes }: Props) => {
                   path: "/app/reportes/cronologicos-pasado",
                 },
             ]},
-        { label: "Caja", options:
-            [   {name: "Egresos", 
-                  subOptions: [
-                    {name: "Generar Egresos", path: "/app/caja/generar-egresos"}, 
-                    {name: "Edición de Egresos", path: "/app/caja/edicion-egresos"}, 
-                    {name: "Reporte de Egresos", path: "/app/caja/reporte-egresos"}
-                  ]},
-                {name: "Emisión de Comprobantes"},
-                {name: "Edición de Comprobantes"},
-                {name: "Cancelación de Comprobantes"},
-                {name: "Reporte de Comprobantes Emitidos"},
-                {name: "Reporte de Comprobantes" ,subOptions: [
-                    {name: "Pendiente de Pago", path: "/app/caja/pendiente-pago"}, 
-                    {name: "Cancelados", path: "/app/caja/cancelados"}
-                  ]}
-            ]},
-        { label: "Usuarios", options:
-            [   {name: "Mantenimiento"},
-                {name: "Permisos"}
-            ]},
-        { label: "Herramientas", options:
-            [   {name: "Tipos de Acto"},    
-                {name: "Mantenimiento de Abogados"},
-                {name: "Mantenimiento de Presentante"},
-                {name: "Gestor de Planillas"},
-                {name: "Mantenimiento de Condiciones"},
-                {name: "Mantenimiento de Clientes"},
-                {name: "Mantenimiento de Impedidos"},
-                {name: "Mantenimiento de Sellos de Cartas"},
-                {name: "Mantenimiento de Ayuda de Protestos"},
-                {name: "Mant.de Contenido Poderes"},
-                {name: "Mantenimiento de Servicios"},
-                {name: "Asignación de Kardex"},
-                {name: "Asignación de Viajes"},
-                {name: "Asignación de Poderes"},
-                {name: "Asignación de Cartas Notariales"},
-                {name: "Asignación de Libros"},
-                {name: "Asignación de Certif. de Supervivencia"},
-                {name: "Asignación de Certificado Domiciliario"},
-                {name: "Asignación de Cambio de Caracteris."},
-                {name: "Tipo de Cambio"},
-                {name: "Series Iniciales"}
-            ]},
+        // { label: "Caja", options:
+        //     [   {name: "Egresos", 
+        //           subOptions: [
+        //             {name: "Generar Egresos", path: "/app/caja/generar-egresos"}, 
+        //             {name: "Edición de Egresos", path: "/app/caja/edicion-egresos"}, 
+        //             {name: "Reporte de Egresos", path: "/app/caja/reporte-egresos"}
+        //           ]},
+        //         {name: "Emisión de Comprobantes"},
+        //         {name: "Edición de Comprobantes"},
+        //         {name: "Cancelación de Comprobantes"},
+        //         {name: "Reporte de Comprobantes Emitidos"},
+        //         {name: "Reporte de Comprobantes" ,subOptions: [
+        //             {name: "Pendiente de Pago", path: "/app/caja/pendiente-pago"}, 
+        //             {name: "Cancelados", path: "/app/caja/cancelados"}
+        //           ]}
+        //     ]},
+        // { label: "Usuarios", options:
+        //     [   {name: "Mantenimiento"},
+        //         {name: "Permisos"}
+        //     ]},
+        // { label: "Herramientas", options:
+        //     [   {name: "Tipos de Acto"},    
+        //         {name: "Mantenimiento de Abogados"},
+        //         {name: "Mantenimiento de Presentante"},
+        //         {name: "Gestor de Planillas"},
+        //         {name: "Mantenimiento de Condiciones"},
+        //         {name: "Mantenimiento de Clientes"},
+        //         {name: "Mantenimiento de Impedidos"},
+        //         {name: "Mantenimiento de Sellos de Cartas"},
+        //         {name: "Mantenimiento de Ayuda de Protestos"},
+        //         {name: "Mant.de Contenido Poderes"},
+        //         {name: "Mantenimiento de Servicios"},
+        //         {name: "Asignación de Kardex"},
+        //         {name: "Asignación de Viajes"},
+        //         {name: "Asignación de Poderes"},
+        //         {name: "Asignación de Cartas Notariales"},
+        //         {name: "Asignación de Libros"},
+        //         {name: "Asignación de Certif. de Supervivencia"},
+        //         {name: "Asignación de Certificado Domiciliario"},
+        //         {name: "Asignación de Cambio de Caracteris."},
+        //         {name: "Tipo de Cambio"},
+        //         {name: "Series Iniciales"}
+        //     ]},
         { label: "Configuracion", options:
             [   {name: "Datos del Notario", path: "/app/configuracion/configuracion-notario"},
-                {name: "Edición de Datos"},
-                {name: "Registrar Servidor"},
-                {name: "Editar Servidor"},
-                {name: "Backup Servidor"},
-                {name: "Configurar SISNOT"},
-                {name: "Activar Errores Usuarios"},
-                {name: "Plantillas", path: "/app/configuracion/plantillas"}
+                // {name: "Edición de Datos"},
+                // {name: "Registrar Servidor"},
+                // {name: "Editar Servidor"},
+                // {name: "Backup Servidor"},
+                // {name: "Configurar SISNOT"},
+                // {name: "Activar Errores Usuarios"},
+                {name: "Plantillas", path: "/app/configuracion/plantillas"},
             ]},
         { label: "Sisgen", options:
             [   {name: "SISGEN", path: "/app/sisgen"}
