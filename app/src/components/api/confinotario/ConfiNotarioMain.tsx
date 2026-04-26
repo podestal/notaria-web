@@ -201,7 +201,7 @@ const ConfiNotarioMain = () => {
           <button
             type="submit"
             disabled={updateConfinotario.isPending || isInvalid}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-px hover:bg-blue-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
           >
             {updateConfinotario.isPending ? (
               <>
