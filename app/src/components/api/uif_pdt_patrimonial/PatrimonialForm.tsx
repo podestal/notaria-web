@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr";
 import { MONEDAS, FORMAS_PAGO, OPPORTUNIDADES_PAGO } from "../../../data/patrimonialData"
 import SimpleInput from "../../ui/SimpleInput";
@@ -70,6 +70,19 @@ const PatrimonialForm = ({
     const [selectedTipoDeActoError, setSelectedTipoDeActoError] = useState('');
     const [importeTransaccionError, setImporteTransaccionError] = useState('');
 
+    const isActo038 = useMemo(() => {
+        const normalized = String(selectedTipoDeActo || '').trim()
+        return normalized === '038' || normalized === '38'
+    }, [selectedTipoDeActo])
+
+    useEffect(() => {
+        if (!isActo038) return
+        setFormaDePagoSelected('5')  // NO APLICA
+        setOportunidadSelected('10') // VACIO
+        setImporteTransaccion('0.0')
+        setMonedaSelected(0)
+    }, [isActo038])
+
     const resetFormValues = () => {
         setFormaDePagoSelected(isDonation ? '4' : '');
         setOportunidadSelected(isDonation ? '10' : '');
@@ -116,23 +129,28 @@ const PatrimonialForm = ({
             return;
         }
 
+        const fpagoFinal = isActo038 ? '5' : formaDePagoSelected
+        const oportunidadFinal = isActo038 ? '10' : oportunidadSelected
+        const importeFinal = isActo038 ? '0.0' : inporteTransaccion
+        const monedaFinal = isActo038 ? 0 : monedaSelected
+
         // after validation
         createPatrimonial && createPatrimonial.mutate({
             access,
             patrimonial: {
-                itemmp: 'xxxxxx',
+                itemmp: '',
                 kardex: kardex.kardex,
                 idtipoacto: selectedTipoDeActo,
                 nminuta: moment(selectedDate).format('DD/MM/YYYY'),
-                idmon: monedaSelected,
+                idmon: monedaFinal,
                 tipocambio: tipoDeCambio,
-                importetrans: inporteTransaccion,
+                importetrans: importeFinal,
                 exhibiomp: exhibiompSelected,
                 presgistral: '',
                 nregistral: '',
                 idsedereg: '0',  // sede regional add
-                fpago: formaDePagoSelected,
-                idoppago: oportunidadSelected,
+                fpago: fpagoFinal,
+                idoppago: oportunidadFinal,
                 ofondos: '',
                 item: 0,
             }
@@ -165,15 +183,15 @@ const PatrimonialForm = ({
                     kardex: kardex.kardex,
                     idtipoacto: selectedTipoDeActo,
                     nminuta: moment(selectedDate).format('DD/MM/YYYY'),
-                    idmon: monedaSelected,
+                    idmon: monedaFinal,
                     tipocambio: tipoDeCambio,
-                    importetrans: inporteTransaccion,
+                    importetrans: importeFinal,
                     exhibiomp: exhibiompSelected,
                     presgistral: patrimonial.presgistral,
                     nregistral: patrimonial.nregistral,
                     idsedereg: '0',  // sede regional add
-                    fpago: formaDePagoSelected,
-                    idoppago: oportunidadSelected,
+                    fpago: fpagoFinal,
+                    idoppago: oportunidadFinal,
                     ofondos: '',
                     item: patrimonial.item
                 }
@@ -221,7 +239,7 @@ const PatrimonialForm = ({
                 error={formaDePagoError}
                 setError={setFormaDePagoError}
                 required
-                disabled={isDonation}
+                disabled={isDonation || isActo038}
             />
             <SimpleSelectorStr 
                 options={[{ value: 'S', label: 'Seleccione' }, ...OPPORTUNIDADES_PAGO.map((oportunidad) => ({
@@ -234,7 +252,7 @@ const PatrimonialForm = ({
                 error={oportunidadError}
                 setError={setOportunidadError}
                 required
-                disabled={isDonation}
+                disabled={isDonation || isActo038}
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -265,6 +283,7 @@ const PatrimonialForm = ({
                 error={importeTransaccionError}
                 setError={setImporteTransaccionError}
                 required
+                disabled={isActo038}
             />
             <SimpleSelector 
                 options={MONEDAS.map((moneda) => ({
@@ -274,6 +293,7 @@ const PatrimonialForm = ({
                 defaultValue={monedaSelected}
                 setter={setMonedaSelected}
                 label="Moneda"
+                disabled={isActo038}
             />
         </div>
         <div className="grid grid-cols-2 gap-4">

@@ -119,7 +119,12 @@ const ConfiNotarioMain = () => {
           setShow(true)
         },
         onError: (err) => {
-          setMessage(err.message || "No se pudo actualizar la configuracion del notario")
+          const backendMessage =
+            (err as any)?.response?.data?.detail ||
+            (err as any)?.response?.data?.message ||
+            err.message ||
+            "No se pudo actualizar la configuracion del notario"
+          setMessage(backendMessage)
           setType("error")
           setShow(true)
         },

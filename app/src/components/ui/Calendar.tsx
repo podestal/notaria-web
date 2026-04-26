@@ -62,7 +62,6 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
 
   return (
     <div className="relative my-auto w-56">
-      <>{console.log(selectedDate)}</>
       <p
         className="flex justify-center items-center gap-6 cursor-pointer text-center bg-white border-neutral-400 border-2 rounded-lg w-full text-xs px-2 py-2 focus:border-blue-700 focus:outline-none"
         onClick={() => setOpen(true)}
@@ -79,7 +78,14 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
-            className="absolute top-0 right-10 transform -translate-x-[-10%] z-50 p-4 bg-white text-black rounded-xl shadow-lg"
+            className="absolute top-0 right-10 z-50 -translate-x-[-10%] rounded-xl bg-white p-4 text-black shadow-lg"
+            style={
+              {
+                // Force deterministic DayPicker colors regardless of parent theme.
+                ["--rdp-accent-color" as string]: "#2563eb",
+                ["--rdp-accent-background-color" as string]: "#dbeafe",
+              } as React.CSSProperties
+            }
           >
             <DayPicker
               mode="single"
@@ -108,11 +114,14 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
                 cell: { color: 'black' },
                 day: { color: 'black' },
                 day_button: { color: 'black' },
+                selected: { color: '#ffffff', backgroundColor: '#2563eb' },
+                today: { color: '#0f172a', fontWeight: 700 },
+                outside: { color: '#64748b' },
                 button_next: { color: 'black' },
                 button_previous: { color: 'black' },
                 nav: { color: 'black' },
               }}
-              className="!text-black"
+              className="!text-black [&_.rdp-day_button]:!text-slate-900 [&_.rdp-selected_.rdp-day_button]:!text-white"
             />
           </motion.div>
         )}
