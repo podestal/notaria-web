@@ -11,6 +11,7 @@ const MainPage = () => {
   const setKardexTypes = useKardexTypesStore(s => s.setKardexTypes)
   const { data: kardexTypes, isLoading, isError, error, isSuccess } = useGetTipoKardexList()
   const { notifications, removeNotification } = useNotificationsStore()
+  const isTestApp = import.meta.env.MODE === 'test'
   const visibleKardexTypes = (kardexTypes || []).filter(kardexType => kardexType.idtipkar <= 5)
 
   useEffect(() => {
@@ -29,6 +30,11 @@ const MainPage = () => {
         kardexTypes={visibleKardexTypes}
       />
       <main className="ml-56 min-h-screen min-w-0 bg-slate-100">
+        {isTestApp && (
+          <div className="sticky top-0 z-50 border-b border-amber-300 bg-amber-100/95 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-900 backdrop-blur">
+            ENTORNO DE PRUEBAS: Esta aplicación es de test y no corresponde al sistema real de producción.
+          </div>
+        )}
         {notifications.length > 0 && (
           <div className="fixed right-4 top-8 z-60 flex flex-col gap-3 pointer-events-none">
             {[...notifications].reverse().map((n) => (
