@@ -1,4 +1,4 @@
-import { MessageCircleQuestionIcon, Save } from "lucide-react";
+import { ClipboardList, MessageCircleQuestionIcon, Save } from "lucide-react";
 import { useState } from "react";
 import SimpleInput from "../../../ui/SimpleInput";
 import { IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas";
@@ -38,7 +38,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const { setMessage, setShow, setType } = useNotificationsStore()
     const user = useGetUserInfo(s => s.user);
     const [openSellos, setOpenSellos] = useState(false);
-
+    const [openRecepcionContenido, setOpenRecepcionContenido] = useState(false);
 
     const [numCarta, setNumCarta] = useState(carta?.num_carta || '');
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
@@ -85,6 +85,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const [cartaId, setCartaId] = useState(carta?.id_carta || 0);
 
     const [doneCreate, setDoneCreate] = useState(false);
+    const cartaGuardada = Boolean(carta) || doneCreate;
     const updateCartaNotarialInternal = useUpdateIngresoCarta({ ingresoCartasId: cartaId })
 
 
@@ -234,10 +235,28 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
   return (
     <>
         <div>
-        <h2 className="text-lg font-semibold text-center mb-8">Formulario Cartas Notariales</h2>
+        <div className="mb-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2">
+            <span className="min-w-0" aria-hidden />
+            <h2 className="text-center text-lg font-semibold text-slate-800">
+                Formulario Cartas Notariales
+            </h2>
+            <div className="flex min-w-0 justify-end">
+                {cartaGuardada && (
+                    <button
+                        type="button"
+                        onClick={() => setOpenRecepcionContenido(true)}
+                        className="cursor-pointer inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-100"
+                    >
+                        <ClipboardList className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+                        <span className="truncate">Recepción y contenido</span>
+                    </button>
+                )}
+            </div>
+        </div>
         {/* <>{console.log('permisoViaje', permisoViaje)}</> */}
         <div className="grid grid-cols-8 gap-2">
             <button 
+                type="button"
                 onClick={handleSave}
                 className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
                 {!loading && <Save className="text-xl"/>}
@@ -409,37 +428,45 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                 setter={setFirma}
             />
         </div>
-        <div className="flex gap-4 justify-center items-center my-4">
-            <p className="pl-2 text-xs font-semibold text-slate-700">Recepción</p>
-            <textarea
-                value={recepcion}
-                onChange={(e) => setRecepcion(e.target.value)}
-                placeholder="Contenido de la carta"
-                className="w-full h-32 p-2 border border-slate-300 rounded"
-            />
-        </div>
-        <div className="flex gap-4 justify-center items-center my-4">
-            <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-end gap-2">
-                    <p className="text-xs font-semibold text-slate-700">Contenido</p>
-                    <button
-                        onClick={() => setOpenSellos(true)}
-                    >
-                        <MessageCircleQuestionIcon className="w-4 h-4 text-blue-600 hover:text-blue-500 cursor-pointer transition-all duration-300" />
-                    </button>
-                </div>
-                <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                    <p className="text-xs">Actualizar</p>
-                </div>
-            </div>
-            <textarea
-                value={contenido}
-                onChange={(e) => setContenido(e.target.value)}
-                placeholder="Contenido de la carta"
-                className="w-full h-32 p-2 border border-slate-300 rounded"
-            />
-        </div>
     </div>
+    <TopModal
+        isOpen={openRecepcionContenido}
+        onClose={() => setOpenRecepcionContenido(false)}
+    >
+        <div className="max-h-[80vh] overflow-y-auto p-2">
+            <h3 className="mb-4 text-center text-base font-semibold text-slate-800">
+                Recepción y contenido
+            </h3>
+            <div className="mb-4 flex gap-4">
+                <p className="shrink-0 pl-2 text-xs font-semibold text-slate-700">Recepción</p>
+                <textarea
+                    value={recepcion}
+                    onChange={(e) => setRecepcion(e.target.value)}
+                    placeholder="Recepción"
+                    className="h-32 w-full rounded border border-slate-300 p-2"
+                />
+            </div>
+            <div className="flex gap-4">
+                <div className="flex shrink-0 flex-col gap-2">
+                    <div className="flex items-center justify-end gap-2">
+                        <p className="text-xs font-semibold text-slate-700">Contenido</p>
+                        <button type="button" onClick={() => setOpenSellos(true)}>
+                            <MessageCircleQuestionIcon className="h-4 w-4 cursor-pointer text-blue-600 transition-all duration-300 hover:text-blue-500" />
+                        </button>
+                    </div>
+                    <div className="mb-4 flex w-full cursor-pointer items-center justify-between gap-1 rounded-lg bg-blue-200 px-4 py-2 text-blue-600 hover:opacity-85">
+                        <p className="text-xs">Actualizar</p>
+                    </div>
+                </div>
+                <textarea
+                    value={contenido}
+                    onChange={(e) => setContenido(e.target.value)}
+                    placeholder="Contenido de la carta"
+                    className="h-32 w-full rounded border border-slate-300 p-2"
+                />
+            </div>
+        </div>
+    </TopModal>
     <TopModal
         isOpen={openSellos}
         onClose={() => setOpenSellos(false)}
