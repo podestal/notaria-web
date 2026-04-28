@@ -1,5 +1,5 @@
 import { ClipboardList, MessageCircleQuestionIcon, Save } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SimpleInput from "../../../ui/SimpleInput";
 import { IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas";
 import moment from "moment";
@@ -29,6 +29,18 @@ interface Props {
     usuarios: Usuario[]
     createIngresoCarta?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
     updateCartaNotarial?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
+}
+
+/** If the API/DB stored Python `str(bytes)`, the value looks like `b'Juan Pérez'`. Decode for display; the real fix is server-side `.decode()`. */
+function unwrapPythonBytesString(raw: string | undefined): string {
+    const s = (raw ?? "").trim();
+    if (s.startsWith("b'") && s.endsWith("'") && s.length > 3) {
+        return s.slice(2, -1).replace(/\\'/g, "'").replace(/\\\\/g, "\\");
+    }
+    if (s.startsWith('b"') && s.endsWith('"') && s.length > 3) {
+        return s.slice(2, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\");
+    }
+    return s;
 }
 
 const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, updateCartaNotarial }: Props) => {
@@ -85,9 +97,25 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const [cartaId, setCartaId] = useState(carta?.id_carta || 0);
 
     const [doneCreate, setDoneCreate] = useState(false);
+    const [encargadoIdPersistido, setEncargadoIdPersistido] = useState(() =>
+        carta != null ? String(carta.id_encargado ?? "") : ""
+    );
+    const [encargadoDesPersistido, setEncargadoDesPersistido] = useState(() =>
+        unwrapPythonBytesString(carta?.des_encargado ?? "")
+    );
+
     const cartaGuardada = Boolean(carta) || doneCreate;
     const updateCartaNotarialInternal = useUpdateIngresoCarta({ ingresoCartasId: cartaId })
 
+    useEffect(() => {
+        if (carta == null) return;
+        setEncargadoIdPersistido(String(carta.id_encargado ?? ""));
+        setEncargadoDesPersistido(unwrapPythonBytesString(carta.des_encargado ?? ""));
+    }, [carta]);
+
+    const nombreUsuarioCreador = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+    const idEncargadoFromStore =
+        user?.idusuario != null && user.idusuario > 0 ? String(user.idusuario) : "";
 
     const handleSave = () => {
         setLoading(true);
@@ -112,8 +140,9 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     recepcion,
                     conte_carta: contenido,
                     costo: '0.00', // Assuming costo is not provided in the form
-                    id_encargado: `${user?.first_name} ${user?.last_name}`,
-                    des_encargado: 'Encargado de la carta',
+                    id_encargado: idEncargadoFromStore,
+                    des_encargado:
+                        unwrapPythonBytesString(nombreUsuarioCreador) || nombreUsuarioCreador,
                     nom_regogio: '',
                     doc_recogio: '',
                     fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
@@ -128,6 +157,19 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     setShowDocs(true);
                     setCartaId(res.id_carta);
                     setNumCarta(res.num_carta);
+                    setEncargadoIdPersistido(
+                        res.id_encargado != null && String(res.id_encargado).trim() !== ""
+                            ? String(res.id_encargado)
+                            : idEncargadoFromStore
+                    );
+                    setEncargadoDesPersistido(
+                        (() => {
+                            const raw = res.des_encargado?.trim()
+                                ? res.des_encargado
+                                : nombreUsuarioCreador;
+                            return unwrapPythonBytesString(raw) || raw;
+                        })()
+                    );
                     setDoneCreate(true);
                 },
                 onError: (error) => {
@@ -162,8 +204,12 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     recepcion,
                     conte_carta: contenido,
                     costo: '0.00', // Assuming costo is not provided in the form
-                    id_encargado: responsible,
-                    des_encargado: 'Encargado de la carta',
+                    id_encargado: carta != null ? String(carta.id_encargado ?? "") : idEncargadoFromStore,
+                    des_encargado:
+                        carta != null
+                            ? unwrapPythonBytesString(carta.des_encargado ?? "") ||
+                              (carta.des_encargado ?? "")
+                            : nombreUsuarioCreador,
                     nom_regogio: '',
                     doc_recogio: '',
                     fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
@@ -207,8 +253,11 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                     recepcion,
                     conte_carta: contenido,
                     costo: '0.00', // Assuming costo is not provided in the form
-                    id_encargado: responsible,
-                    des_encargado: 'Encargado de la carta',
+                    id_encargado: encargadoIdPersistido || idEncargadoFromStore,
+                    des_encargado:
+                        unwrapPythonBytesString(encargadoDesPersistido || "") ||
+                        encargadoDesPersistido ||
+                        nombreUsuarioCreador,
                     nom_regogio: '',
                     doc_recogio: '',
                     fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
@@ -294,7 +343,11 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
             />
             <SimpleInput 
                 label="Responsable"
-                value={carta?.id_encargado || `${user?.first_name} ${user?.last_name}`.trim()}
+                value={
+                    unwrapPythonBytesString(carta?.des_encargado) ||
+                    unwrapPythonBytesString(encargadoDesPersistido) ||
+                    nombreUsuarioCreador
+                }
                 setValue={() => {}}
                 horizontal
                 disabled
@@ -412,12 +465,12 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
             </div>
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
-            <SimpleSelectorStr
+            {/* <SimpleSelectorStr
                 label="Responsable"
-                options={usuarios.map(user => ({ value: user.loginusuario, label: `${user.prinom} ${user.apepat}` }))}
+                options={usuarios.map((u) => ({ value: u.loginusuario, label: `${u.prinom} ${u.apepat}`.trim() }))}
                 defaultValue={responsible}
                 setter={setResponsible}
-            />
+            /> */}
             <SimpleSelectorStr
                 label="Firma"
                 options={[
