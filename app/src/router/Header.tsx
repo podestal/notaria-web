@@ -197,6 +197,7 @@ const Header = ({ kardexTypes }: Props) => {
                 // {name: "Backup Servidor"},
                 // {name: "Configurar SISNOT"},
                 // {name: "Activar Errores Usuarios"},
+                {name: "Crear Usuario", path: "/app/configuracion/create-user"},
                 {name: "Plantillas", path: "/app/configuracion/plantillas"},
             ]},
         { label: "Sisgen", options:
@@ -209,7 +210,10 @@ const Header = ({ kardexTypes }: Props) => {
     //   { label: "USUARIOS", options: ["Mantenimiento", "Permisos"] },
     //   { label: "HERRAMIENTAS", options: ["Tipos de Acto", "Mantenimiento de Abogados", "Mantenimiento de Presentante", "Gestor de Planillas", "Mantenimiento de Condiciones", "Mantenimiento de Clientes", "Mantenimiento de Impedidos", "Mantenimiento de Sellos de Cartas", "Mantenimiento de Ayuda de Protestos", "Mant.de Contenido Poderes", "Mantenimiento de Servicios", "Asignación de Kardex", "Asignación de Viajes", "Asignación de Poderes", "Asignación de Cartas Notariales", "Asignación de Libros", "Asignación de Certif. de Supervivencia", "Asignación de Certificado Domiciliario", "Asignación de Cambio de Caracteris.", "Tipo de Cambio", "Series Iniciales"] },
     //   { label: "CONFIGURACION", options: ["Datos del Notario", "Edición de Datos", "Registrar Servidor", "Editar Servidor", "Backup Servidor", "Configurar SISNOT", "Activar Errores Usuarios"] },
-    ];
+    ].filter((item) => {
+      if (item.label !== "Configuracion") return true;
+      return Number(user?.is_superuser) !== 0;
+    });
 
 
   return (

@@ -7,6 +7,8 @@ export interface User {
     notary: boolean;
     first_name: string;
     last_name: string;
+    is_staff: number;
+    is_superuser: number;
 }
 
 export default new AuthClient<User>('/users/me/');
