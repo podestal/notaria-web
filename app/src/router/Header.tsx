@@ -198,6 +198,7 @@ const Header = ({ kardexTypes }: Props) => {
                 // {name: "Configurar SISNOT"},
                 // {name: "Activar Errores Usuarios"},
                 {name: "Crear Usuario", path: "/app/configuracion/create-user"},
+                {name: "Abogados Manager", path: "/app/configuracion/abogados-manager"},
                 {name: "Plantillas", path: "/app/configuracion/plantillas"},
             ]},
         { label: "Sisgen", options:

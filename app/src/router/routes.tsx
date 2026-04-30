@@ -56,6 +56,7 @@ import AlfabeticosTestamento from "../components/api/reportes/alfabeticos/Alfabe
 import PlantillasMain from "../components/api/plantillas/PlantillasMain";
 import ConfiNotarioMain from "../components/api/confinotario/ConfiNotarioMain";
 import CreateUser from "../components/auth/CreateUser";
+import AbogadosMain from "../components/api/configuracion/abogadosManager/AbogadosMain";
 
 const routes = createBrowserRouter([
     {
@@ -308,6 +309,10 @@ const routes = createBrowserRouter([
                     {
                         path: "create-user",
                         element: <PrivateRoutes><CreateUser /></PrivateRoutes>
+                    },
+                    {
+                        path: "abogados-manager",
+                        element: <PrivateRoutes><AbogadosMain /></PrivateRoutes>
                     },
                     {
                         path: "plantillas",
