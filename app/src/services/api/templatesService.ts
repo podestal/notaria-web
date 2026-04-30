@@ -21,11 +21,15 @@ export interface TemplatePage {
 
 
 interface Props {
+    pktemplate?: number
     by_actos?: boolean
 }
 
-const getTemplateService = ({ by_actos }: Props) => {
+const getTemplateService = ({ by_actos, pktemplate }: Props) => {
     let url = '/templates/'
+    if (pktemplate) {
+        url = `/templates/${pktemplate}/`
+    }
     if (by_actos) {
         url = '/templates/by_actos/'
     }
