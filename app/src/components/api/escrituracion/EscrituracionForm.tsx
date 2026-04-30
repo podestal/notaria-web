@@ -452,7 +452,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         horizontal
                         label="N° de Escritura"
                         required
-                        disabled
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
@@ -489,7 +488,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         horizontal
                         label="N° instrumento"
                         required
-                        disabled
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
@@ -518,7 +516,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         required
                         error={errorNumActa}
                         setError={setErrorNumActa}
-                        disabled
                     />
                 </div>}
                 {kardex.idtipkar === 4 && 
@@ -530,7 +527,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         value={numEscritura}
                         horizontal
                         label="N° Acta"
-                        disabled
                         required
                     />
                 </div>
@@ -556,7 +552,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         value={follioIni}
                         horizontal
                         label="N° de Folio del"
-                        disabled
                     />
                     <div className="flex items-center gap-1.5">
                         <div className="min-w-0 flex-1">
@@ -579,7 +574,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         value={serieNotarialIni}
                         horizontal
                         label="Serie Notarial del"
-                        disabled
                     />
                     <div className="flex items-center gap-1.5">
                         <div className="min-w-0 flex-1">
