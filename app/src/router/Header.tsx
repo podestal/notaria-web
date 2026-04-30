@@ -213,7 +213,7 @@ const Header = ({ kardexTypes }: Props) => {
     //   { label: "CONFIGURACION", options: ["Datos del Notario", "Edición de Datos", "Registrar Servidor", "Editar Servidor", "Backup Servidor", "Configurar SISNOT", "Activar Errores Usuarios"] },
     ].filter((item) => {
       if (item.label !== "Configuracion") return true;
-      return Number(user?.is_superuser) !== 0;
+      return Number(user?.is_superuser) !== 0 || Number(user?.is_staff) !== 0;
     });
 
 

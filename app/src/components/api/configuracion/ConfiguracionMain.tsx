@@ -3,9 +3,10 @@ import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 
 const ConfiguracionMain = () => {
   const user = useUserInfoStore((s) => s.user)
-  const isSuperuser = Number(user?.is_superuser) !== 0
+  const canAccessConfiguracion =
+    Number(user?.is_superuser) !== 0 || Number(user?.is_staff) !== 0
 
-  if (!isSuperuser) {
+  if (!canAccessConfiguracion) {
     return <Navigate to="/app/protocolares" replace />
   }
 
