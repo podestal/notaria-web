@@ -1,10 +1,13 @@
 import axios from "axios"
+import { attachAxiosAuthRefreshInterceptor } from "../http/attachAxiosAuthRefreshInterceptor"
 
 const URL = import.meta.env.VITE_AUTH_URL;
 
 const axiosInstance = axios.create({
     baseURL: URL, 
 });
+
+attachAxiosAuthRefreshInterceptor(axiosInstance)
 
 class AuthClient<ResponseType, RequestType = ResponseType> {
     endpoint: string

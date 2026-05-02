@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance } from "axios"
+import { attachAxiosAuthRefreshInterceptor } from "../http/attachAxiosAuthRefreshInterceptor"
 
 const rawBase = (import.meta.env.VITE_API_URL as string | undefined) ?? ""
 const baseURL = rawBase.replace(/\/$/, "")
@@ -10,6 +11,8 @@ export const templateFileAxios: AxiosInstance = axios.create({
     baseURL: baseURL || undefined,
     withCredentials: true,
 })
+
+attachAxiosAuthRefreshInterceptor(templateFileAxios)
 
 const parseFilenameFromContentDisposition = (header: string | undefined): string | null => {
     if (!header) return null

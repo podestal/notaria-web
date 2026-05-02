@@ -1,4 +1,5 @@
 import axios from "axios"
+import { attachAxiosAuthRefreshInterceptor } from "../http/attachAxiosAuthRefreshInterceptor"
 
 const URL = import.meta.env.VITE_DOC_URL
 
@@ -7,6 +8,8 @@ const axiosInstance = axios.create({
     baseURL: URL,
     withCredentials: true,
 })
+
+attachAxiosAuthRefreshInterceptor(axiosInstance)
 
 class DocClient<ResponseType, RequestType = ResponseType> {
     endpoint: string
