@@ -11,7 +11,7 @@ import SimpleSelector from "../../../../ui/SimpleSelector"
 import axios from "axios"
 import useCreateCliente from "../../../../../hooks/api/cliente/useCreateCliente"
 import useAuthStore from "../../../../../store/useAuthStore"
-
+import { mapToGeneroMF } from "./generoUtils"
 
 interface Props {
     ubigeos: Ubigeo[]
@@ -279,7 +279,7 @@ const NuevoClienteForm = ({
                 setDomicilio(data.direccion)
                 setDistrito(data.idubigeo)
                 setEstadoCivil(data.idestcivil ?? 0)
-                setGenero(data.sexo ?? '')
+                setGenero(mapToGeneroMF(data.sexo))
                 setProfesion(data.detaprofesion || selectedProfesion?.label || '')
                 setOpen(false)
             },

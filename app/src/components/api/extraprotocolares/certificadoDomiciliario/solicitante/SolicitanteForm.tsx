@@ -6,6 +6,7 @@ import { ESTADO_CIVIL } from "../../../../../data/clienteData";
 import SimpleSelector from "../../../../ui/SimpleSelector";
 import SearchableDropdownInput from "../../../../ui/SearchableDropdownInput";
 import { Profesion } from "../../../../../services/api/profesionesService";
+import { mapToGeneroMF } from "./generoUtils";
 
 interface Props {
     solicitante: string;
@@ -131,13 +132,20 @@ const SolicitanteForm = ({solicitante, setSolicitante, domicilio, setDomicilio, 
             }}
             defaultValue={estadoCivilValue}
         />
-        <SimpleInput 
-            label="Género"
-            value={genero === 'M' ? 'Masculino' : genero === 'F' ? 'Femenino' : ''}
-            setValue={setGenero}
-            horizontal
-            fullWidth
-        />
+        <div className="grid grid-cols-3 items-center gap-2 w-full">
+            <p className="pl-2 block text-xs font-semibold text-slate-700">Género</p>
+            <div className="flex items-center gap-1 w-full col-span-2">
+                <select
+                    className="flex-1 bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    value={mapToGeneroMF(genero)}
+                    onChange={(e) => setGenero(e.target.value)}
+                >
+                    <option value="">Seleccionar género</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                </select>
+            </div>
+        </div>
     </div>
   )
 }

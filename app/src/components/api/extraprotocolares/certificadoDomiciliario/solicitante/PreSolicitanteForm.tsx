@@ -4,6 +4,7 @@ import SimpleSelector from "../../../../ui/SimpleSelector";
 import SimpleInput from "../../../../ui/SimpleInput";
 import axios from "axios";
 import useAuthStore from "../../../../../store/useAuthStore";
+import { mapToGeneroMF } from "./generoUtils";
 
 interface Props {
     setSolicitante: React.Dispatch<React.SetStateAction<string>>;
@@ -56,7 +57,7 @@ const PreSolicitanteForm = ({
                 setDistrito(response.data.idubigeo);
                 setProfesion(response.data.idprofesion);
                 setEstadoCivil(response.data.idestcivil);
-                setGenero(response.data.sexo);
+                setGenero(mapToGeneroMF(response.data.sexo));
             } else {
                 console.log('Cliente no encontrado, creando nuevo cliente')
                 setIsOpen(true);

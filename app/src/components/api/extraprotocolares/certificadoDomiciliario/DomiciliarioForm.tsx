@@ -17,6 +17,7 @@ import useNotificationsStore from "../../../../hooks/store/useNotificationsStore
 import useUserInfoStore from "../../../../hooks/store/useGetUserInfo";
 import { CreateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useCreateDomiciliario";
 import useUpdateDomiciliario, { UpdateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/domiciliario/useUpdateDomiciliario";
+import { mapToGeneroMF } from "./solicitante/generoUtils";
 
 interface Props {
     domiciliario?: Domiciliario;
@@ -47,7 +48,7 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
     const [distrito, setDistrito] = useState(domiciliario?.distrito_solic || '');
     const [profesion, setProfesion] = useState(domiciliario?.detprofesionc || '');
     const [estadoCivil, setEstadoCivil] = useState(domiciliario?.idestcivil || 0);
-    const [genero, setGenero] = useState(domiciliario?.sexo || '');
+    const [genero, setGenero] = useState<string>(() => mapToGeneroMF(domiciliario?.sexo));
 
     const [motivo, setMotivo] = useState(domiciliario?.motivo_solic || '');
     const [fechaOcupacion, setFechaOcupacion] = useState(domiciliario?.fecha_ocupa ? moment(domiciliario.fecha_ocupa).format('DD/MM/YYYY') : moment().format('DD/MM/YYYY'));
