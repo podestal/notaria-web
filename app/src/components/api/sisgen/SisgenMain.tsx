@@ -1,15 +1,23 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import KardexFormTabs from "../kardex/KardexFormTabs"
 import SisgenBody from "./SisgenBody"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
+import useUserInfoStore from "../../../hooks/store/useGetUserInfo";
 
 
 const SisgenMain = () => {
+  const user = useUserInfoStore((s) => s.user);
+  const isSuperuser = Number(user?.is_superuser) !== 0;
 
   const [sisgenDocs, setSisgenDocs] = useState<SISGENDocument[]>([]);
   const [itemsCount, setItemsCount] = useState(0);
   const [page, setPage] = useState(1);
   const [noDocsMessage, setNoDocsMessage] = useState('')
+
+  if (!isSuperuser) {
+    return <Navigate to="/app/protocolares" replace />;
+  }
 
   const extraFunction = () => {
     setSisgenDocs([]);
