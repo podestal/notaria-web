@@ -331,9 +331,13 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
             <SimpleSelectorStr 
                 label="Recibo empresa"
                 options={[
+                    // {label: 'Seleccione una opción', value: ''},
+                    // {label: 'SEDA JULIACA S.A.', value: 'SEDA JULIACA S.A.'}, 
+                    // {label: 'ELECTRO PUNO S.A.A', value: 'ELECTRO PUNO S.A.A'}
                     {label: 'Seleccione una opción', value: ''},
-                    {label: 'SEDA JULIACA S.A.', value: 'SEDA JULIACA S.A.'}, 
-                    {label: 'ELECTRO PUNO S.A.A', value: 'ELECTRO PUNO S.A.A'}
+                    {label: 'SEDAPAL', value: 'SEDAPAL'},
+                    {label: 'SEAL', value: 'SEAL'},
+                    {label: 'Otros', value: 'OTROS'},
                 ]}
                 setter={setReciboEmpresa}
                 defaultValue={reciboEmpresa}
