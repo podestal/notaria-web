@@ -15,6 +15,8 @@ const tiposParaFiltro = (list: Tipokardex[]): Tipokardex[] =>
 const formatActoLabel = (acto: TipoActo) =>
     `${acto.desacto}${acto.actosunat ? ` · Sunat: ${acto.actosunat}` : ""}${acto.actouif ? ` · UIF: ${acto.actouif}` : ""}`
 
+export type PlantillasTabVariant = "protocolares" | "extraprotocolares"
+
 interface Props {
     codeActs: string
     fkType: string
@@ -22,6 +24,7 @@ interface Props {
     setCodeActs: (value: string) => void
     setFkType: (value: string) => void
     setNameTemplate: (value: string) => void
+    variant?: PlantillasTabVariant
 }
 
 const PlantillaFilter = ({
@@ -31,12 +34,17 @@ const PlantillaFilter = ({
     setCodeActs,
     setFkType,
     setNameTemplate,
+    variant = "protocolares",
 }: Props) => {
+    const isExtraprotocolares = variant === "extraprotocolares"
     const access = useAuthStore((s) => s.access_token) || ""
     const { data: tiposKardexRaw = [] } = useGetTipoKardexList()
     const tiposKardex = useMemo(() => tiposParaFiltro(tiposKardexRaw), [tiposKardexRaw])
 
-    const { data: tipoActos = [], isLoading, isError } = useGetTipoActo({ access })
+    const { data: tipoActos = [], isLoading, isError } = useGetTipoActo({
+        access,
+        enabled: !isExtraprotocolares,
+    })
 
     const actosFiltrados = useMemo(
         () => tipoActos.filter((a) => !fkType || String(a.idtipkar) === fkType),
@@ -55,10 +63,10 @@ const PlantillaFilter = ({
     }, [codeActs, actosFiltrados])
 
     useEffect(() => {
-        if (isLoading || !codeActs) return
+        if (isExtraprotocolares || isLoading || !codeActs) return
         const ok = actosFiltrados.some((a) => a.idtipoacto === codeActs)
         if (!ok) setCodeActs("")
-    }, [actosFiltrados, codeActs, setCodeActs, isLoading])
+    }, [isExtraprotocolares, actosFiltrados, codeActs, setCodeActs, isLoading])
 
     const handleTipokarClick = (id: number) => {
         setFkType(fkType === String(id) ? "" : String(id))
@@ -71,8 +79,8 @@ const PlantillaFilter = ({
 
     const limpiar = () => {
         setNameTemplate("")
-        setFkType("")
         setCodeActs("")
+        if (!isExtraprotocolares) setFkType("")
     }
 
     return (
@@ -80,7 +88,9 @@ const PlantillaFilter = ({
             <div className="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h2 className="text-sm font-semibold tracking-tight text-slate-800">Filtrar plantillas</h2>
-                    <p className="text-xs text-slate-500">Nombre, tipo de kardex y acto</p>
+                    <p className="text-xs text-slate-500">
+                        {isExtraprotocolares ? "Buscar por nombre" : "Nombre, tipo de kardex y acto"}
+                    </p>
                 </div>
                 <button
                     type="button"
@@ -91,7 +101,7 @@ const PlantillaFilter = ({
                 </button>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+            <div className={`grid gap-6 ${isExtraprotocolares ? "" : "lg:grid-cols-2 lg:gap-8"}`}>
                 <div className="flex flex-col gap-2">
                     <label htmlFor="plantilla-filter-name" className="text-xs font-semibold text-slate-700">
                         Nombre de plantilla
@@ -106,51 +116,55 @@ const PlantillaFilter = ({
                     />
                 </div>
 
-                <div className="flex flex-col gap-2">
-                    <span className="text-xs font-semibold text-slate-700">Tipo kardex</span>
-                    <div className="flex flex-wrap gap-2" role="group" aria-label="Tipo kardex">
-                        {tiposKardex.map((t) => {
-                            const active = fkType === String(t.idtipkar)
-                            return (
-                                <button
-                                    key={t.idtipkar}
-                                    type="button"
-                                    onClick={() => handleTipokarClick(t.idtipkar)}
-                                    aria-pressed={active}
-                                    title={`Tipo kardex ${t.idtipkar}`}
-                                    className={`max-w-[11rem] cursor-pointer rounded-lg border px-2.5 py-2 text-center text-xs leading-snug transition-colors sm:text-sm ${
-                                        active
-                                            ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/25 ring-2 ring-blue-600 ring-offset-2 hover:bg-blue-700"
-                                            : "bg-white hover:border-blue-700 hover:bg-blue-700 hover:text-white"
-                                    }`}
-                                >
-                                    {getTitleCase(t.nomtipkar)}
-                                </button>
-                            )
-                        })}
+                {!isExtraprotocolares && (
+                    <div className="flex flex-col gap-2">
+                        <span className="text-xs font-semibold text-slate-700">Tipo kardex</span>
+                        <div className="flex flex-wrap gap-2" role="group" aria-label="Tipo kardex">
+                            {tiposKardex.map((t) => {
+                                const active = fkType === String(t.idtipkar)
+                                return (
+                                    <button
+                                        key={t.idtipkar}
+                                        type="button"
+                                        onClick={() => handleTipokarClick(t.idtipkar)}
+                                        aria-pressed={active}
+                                        title={`Tipo kardex ${t.idtipkar}`}
+                                        className={`max-w-[11rem] cursor-pointer rounded-lg border px-2.5 py-2 text-center text-xs leading-snug transition-colors sm:text-sm ${
+                                            active
+                                                ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/25 ring-2 ring-blue-600 ring-offset-2 hover:bg-blue-700"
+                                                : "bg-white hover:border-blue-700 hover:bg-blue-700 hover:text-white"
+                                        }`}
+                                    >
+                                        {getTitleCase(t.nomtipkar)}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                        <p className="text-[11px] text-slate-500">
+                            Un solo tipo a la vez. Vuelve a pulsar el mismo para quitar.
+                        </p>
                     </div>
-                    <p className="text-[11px] text-slate-500">Un solo tipo a la vez. Vuelve a pulsar el mismo para quitar.</p>
-                </div>
+                )}
             </div>
-            <div className="flex min-w-0 flex-col gap-2 lg:col-span-1">
+            {!isExtraprotocolares && (
+                <div className="mt-6 flex min-w-0 flex-col gap-2">
                     <span className="text-xs font-semibold text-slate-700">Acto</span>
-                    {isLoading && (
-                        <p className="text-xs text-slate-500">Cargando actos…</p>
-                    )}
-                    {isError && (
-                        <p className="text-xs text-red-600">No se pudieron cargar los actos.</p>
-                    )}
+                    {isLoading && <p className="text-xs text-slate-500">Cargando actos…</p>}
+                    {isError && <p className="text-xs text-red-600">No se pudieron cargar los actos.</p>}
                     {!isLoading && !isError && (
                         <div className="-my-2">
                             <SearchableDropdownInput
                                 options={dropdownOptions}
                                 selected={selectedActo}
                                 setSelected={setSelectedActo}
-                                placeholder={fkType ? "Buscar acto…" : "Elija tipo kardex o busque acto…"}
+                                placeholder={
+                                    fkType ? "Buscar acto…" : "Elija tipo kardex o busque acto…"
+                                }
                             />
                         </div>
                     )}
                 </div>
+            )}
         </section>
     )
 }

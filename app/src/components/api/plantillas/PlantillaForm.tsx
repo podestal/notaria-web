@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FileText, Upload, X, Loader2, ChevronDown } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import useCreateTemplate from '../../../hooks/api/templates/useCreateTemplate'
@@ -9,18 +9,25 @@ import useKardexTypesStore from '../../../hooks/store/useKardexTypesStore'
 import getTitleCase from '../../../utils/getTitleCase'
 import { TipoActo } from '../../../services/api/tipoActosService'
 
+const EXTRAPROTOCOLARES_CODE_ACTS = '9999'
+const EXTRAPROTOCOLARES_CONTRACT = 'Extraprotocolares'
+
 interface PlantillaFormProps {
   onCreated?: () => void
+  lockedFktypekardex?: number
 }
 
-const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
+const PlantillaForm = ({ onCreated, lockedFktypekardex }: PlantillaFormProps) => {
   const access = useAuthStore(s => s.access_token) || ''
   const { setMessage, setShow, setType } = useNotificationsStore()
   const { kardexTypes } = useKardexTypesStore()
   const createTemplate = useCreateTemplate()
 
+  const initialKardexType =
+    lockedFktypekardex ?? kardexTypes[0]?.idtipkar ?? 0
+
   const [nametemplate, setNametemplate] = useState('')
-  const [selectedKardexType, setSelectedKardexType] = useState<number>(kardexTypes[0]?.idtipkar ?? 0)
+  const [selectedKardexType, setSelectedKardexType] = useState<number>(initialKardexType)
   const [selectedActo, setSelectedActo] = useState<TipoActo | null>(null)
   const [searchText, setSearchText] = useState('')
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -32,6 +39,12 @@ const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
   const [actosError, setActosError] = useState('')
   const [documentError, setDocumentError] = useState('')
 
+  const isKardexLocked = lockedFktypekardex != null && lockedFktypekardex > 0
+
+  useEffect(() => {
+    if (isKardexLocked) setSelectedKardexType(lockedFktypekardex!)
+  }, [isKardexLocked, lockedFktypekardex])
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -41,7 +54,10 @@ const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
     label: getTitleCase(kt.nomtipkar),
   }))
 
-  const { data: tipoActos, isLoading: isLoadingActos } = useGetTipoActo({ access })
+  const { data: tipoActos, isLoading: isLoadingActos } = useGetTipoActo({
+    access,
+    enabled: !isKardexLocked,
+  })
 
   const filteredOptions = (tipoActos ?? [])
     .filter(acto => acto.idtipkar === selectedKardexType)
@@ -63,6 +79,10 @@ const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
   const validateForm = () => {
     let valid = true
     if (!nametemplate.trim()) { setNameError('El nombre es obligatorio'); valid = false }
+    if (isKardexLocked) {
+      if (!document) { setDocumentError('Debe adjuntar un documento'); valid = false }
+      return valid
+    }
     if (!selectedKardexType) { setTypeError('Seleccione un tipo de kardex'); valid = false }
     if (!selectedActo) { setActosError('Seleccione un acto'); valid = false }
     if (!document) { setDocumentError('Debe adjuntar un documento'); valid = false }
@@ -87,24 +107,36 @@ const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validateForm() || !document || !selectedActo) return
+    if (!validateForm() || !document) return
+    if (!isKardexLocked && !selectedActo) return
+
+    const payload = isKardexLocked
+      ? {
+          access,
+          nametemplate,
+          fktypekardex: lockedFktypekardex!,
+          codeacts: EXTRAPROTOCOLARES_CODE_ACTS,
+          contract: EXTRAPROTOCOLARES_CONTRACT,
+          document,
+        }
+      : {
+          access,
+          nametemplate,
+          fktypekardex: selectedKardexType,
+          codeacts: selectedActo!.idtipoacto,
+          contract: selectedActo!.desacto,
+          document,
+        }
 
     createTemplate.mutate(
-      {
-        access,
-        nametemplate,
-        fktypekardex: selectedKardexType,
-        codeacts: selectedActo.idtipoacto,
-        contract: selectedActo.desacto,
-        document,
-      },
+      payload,
       {
         onSuccess: () => {
           setType('success')
           setMessage('Plantilla creada correctamente')
           setShow(true)
           setNametemplate('')
-          setSelectedKardexType(kardexTypes[0]?.idtipkar ?? 0)
+          setSelectedKardexType(lockedFktypekardex ?? kardexTypes[0]?.idtipkar ?? 0)
           setSelectedActo(null)
           setSearchText('')
           setDocument(null)
@@ -131,14 +163,18 @@ const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
         </div>
         <div>
           <h2 className="text-sm font-semibold text-slate-800">Nueva Plantilla</h2>
-          <p className="text-xs text-slate-400 mt-0.5">Completa los campos y adjunta el documento Word</p>
+          <p className="text-xs text-slate-400 mt-0.5">
+            {isKardexLocked
+              ? 'Indique el nombre y adjunte el documento Word'
+              : 'Completa los campos y adjunta el documento Word'}
+          </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-7">
 
-        {/* Row 1: Name + Tipo Kardex */}
-        <div className="grid grid-cols-2 gap-6">
+        {/* Row 1: Name (+ Tipo Kardex solo protocolares) */}
+        <div className={`grid gap-6 ${isKardexLocked ? 'grid-cols-1' : 'grid-cols-2'}`}>
           <div className="flex flex-col gap-1.5">
             <label className="pl-1 text-xs font-semibold text-slate-600">
               Nombre de la plantilla <span className="text-red-500">*</span>
@@ -154,31 +190,34 @@ const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
             {nameError && <p className="text-xs text-red-500 px-1">{nameError}</p>}
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="pl-1 text-xs font-semibold text-slate-600">
-              Tipo de Kardex <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={selectedKardexType}
-              onChange={(e) => {
-                setSelectedKardexType(Number(e.target.value))
-                setTypeError('')
-                setSelectedActo(null)
-                setSearchText('')
-                setDropdownOpen(false)
-              }}
-              className={`w-full bg-white text-slate-700 border rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2
-                ${typeError ? 'border-red-400 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-300'}`}
-            >
-              {kardexOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-            {typeError && <p className="text-xs text-red-500 px-1">{typeError}</p>}
-          </div>
+          {!isKardexLocked && (
+            <div className="flex flex-col gap-1.5">
+              <label className="pl-1 text-xs font-semibold text-slate-600">
+                Tipo de Kardex <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={selectedKardexType}
+                onChange={(e) => {
+                  setSelectedKardexType(Number(e.target.value))
+                  setTypeError('')
+                  setSelectedActo(null)
+                  setSearchText('')
+                  setDropdownOpen(false)
+                }}
+                className={`w-full bg-white text-slate-700 border rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2
+                  ${typeError ? 'border-red-400 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-300'}`}
+              >
+                {kardexOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {typeError && <p className="text-xs text-red-500 px-1">{typeError}</p>}
+            </div>
+          )}
         </div>
 
-        {/* Acto Section */}
+        {/* Acto (solo protocolares) */}
+        {!isKardexLocked && (
         <div className="flex flex-col gap-2">
           <label className="pl-1 text-xs font-semibold text-slate-600">
             Acto <span className="text-red-500">*</span>
@@ -270,6 +309,7 @@ const PlantillaForm = ({ onCreated }: PlantillaFormProps) => {
             <p className="text-xs text-red-500 px-1">{actosError}</p>
           )}
         </div>
+        )}
 
         {/* File Upload */}
         <div className="flex flex-col gap-2">

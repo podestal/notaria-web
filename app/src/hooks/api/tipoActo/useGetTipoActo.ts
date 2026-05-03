@@ -3,14 +3,17 @@ import getTipoActosService, { TipoActo } from "../../../services/api/tipoActosSe
 
 interface Props {
     access: string
+    /** When false, the query does not run (e.g. screens that do not need actos). */
+    enabled?: boolean
 }
 
-const useGetTipoActo = ({ access }: Props): UseQueryResult<TipoActo[]> => {
+const useGetTipoActo = ({ access, enabled = true }: Props): UseQueryResult<TipoActo[]> => {
     const tipoActosService = getTipoActosService({  })
     return useQuery({
         queryKey: ['tipoActos'],
         queryFn: () => tipoActosService.get(access),
         refetchOnWindowFocus: false,
+        enabled: enabled && !!access,
     })
 }
 
