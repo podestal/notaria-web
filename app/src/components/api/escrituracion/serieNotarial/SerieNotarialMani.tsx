@@ -18,7 +18,10 @@ const SerieNotarialMain = () => {
   const [activo, setActivo] = useState(true)
 
   const createSerieNotarial = useCreateSerieNotarial()
-  const { data: series, isLoading: loadingSeries } = useGetSeriesNotariales({ access })
+  const { data: series, isLoading: loadingSeries } = useGetSeriesNotariales({
+    access,
+    idtipkar: currentTipoKardex,
+  })
 
   const canSubmit = useMemo(
     () => Boolean(access && papelIni.trim() && papelFin.trim()),

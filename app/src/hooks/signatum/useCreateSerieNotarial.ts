@@ -20,8 +20,11 @@ const useCreateSerieNotarial = (): UseMutationResult<
   return useMutation({
     mutationFn: (data: CreateSerieNotarialData) =>
       serieNotarialService.post(data.serieNotarial, data.access),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["signatum", "series-notariales"] })
+    onSuccess: (_data, variables) => {
+      const idtipkar = variables.serieNotarial.idtipkar
+      void queryClient.invalidateQueries({
+        queryKey: ["signatum", "series-notariales", idtipkar],
+      })
     },
     onError: (error) => {
       console.error("Error creating serie notarial:", error)

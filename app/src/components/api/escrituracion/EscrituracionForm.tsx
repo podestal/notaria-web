@@ -162,7 +162,10 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createNotarizationReservation = useCreateNotarizationReservation()
-    const { data: seriesNotariales } = useGetSeriesNotariales({ access })
+    const { data: seriesNotariales } = useGetSeriesNotariales({
+        access,
+        idtipkar: kardex.idtipkar,
+    })
 
     const [numMinuta, setNumMinuta] = useState(kardex.numminuta || '')
     const [numEscritura, setNumEscritura] = useState(kardex.numescritura || '')
