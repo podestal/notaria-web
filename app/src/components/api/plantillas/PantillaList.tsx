@@ -10,9 +10,10 @@ interface Props {
     nameTemplate: string
     page: number
     setPage: Dispatch<SetStateAction<number>>
+    hideDelete?: boolean
 }
 
-const PantillaList = ({ codeActs, fkType, nameTemplate, page, setPage }: Props) => {
+const PantillaList = ({ codeActs, fkType, nameTemplate, page, setPage, hideDelete = false }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { data, isLoading, isError, error } = useGetTemplates({
         access,
@@ -44,7 +45,7 @@ const PantillaList = ({ codeActs, fkType, nameTemplate, page, setPage }: Props) 
                 <ul className="space-y-3">
                     {results.map((template) => (
                         <li key={template.pktemplate}>
-                            <PlantillaCard template={template} />
+                            <PlantillaCard template={template} hideDelete={hideDelete} />
                         </li>
                     ))}
                 </ul>

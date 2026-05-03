@@ -90,6 +90,7 @@ const PlantillasMain = () => {
           nameTemplate={nameTemplate}
           page={page}
           setPage={setPage}
+          hideDelete={tab === "extraprotocolares"}
         />
       </div>
 

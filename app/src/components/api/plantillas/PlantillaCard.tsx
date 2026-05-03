@@ -9,9 +9,11 @@ import TopModal from "../../ui/TopModal"
 
 interface Props {
     template: Template
+    /** Oculta eliminar (p. ej. pestaña extraprotocolares). */
+    hideDelete?: boolean
 }
 
-const PlantillaCard = ({ template }: Props) => {
+const PlantillaCard = ({ template, hideDelete = false }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [downloading, setDownloading] = useState(false)
@@ -73,67 +75,75 @@ const PlantillaCard = ({ template }: Props) => {
                     {template.nametemplate || "Sin nombre"}
                 </span>
             </div>
-            <div className="flex items-center gap-2">
-                <button
-                    type="button"
-                    disabled={deleteTemplate.isPending}
-                    onClick={() => setOpenDeleteModal(true)}
-                    className={`inline-flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors sm:text-sm ${
-                        deleteTemplate.isPending
-                            ? "cursor-wait border-slate-200 bg-slate-100 text-slate-500"
-                            : "border-rose-600 bg-rose-600 text-white hover:bg-rose-700"
-                    }`}
-                >
-                    {deleteTemplate.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                    ) : (
-                        <Trash2 className="h-4 w-4" aria-hidden />
-                    )}
-                    {deleteTemplate.isPending ? "Eliminando..." : "Eliminar"}
-                </button>
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 sm:gap-2.5">
+                {!hideDelete && (
+                    <button
+                        type="button"
+                        disabled={deleteTemplate.isPending}
+                        onClick={() => setOpenDeleteModal(true)}
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 sm:text-sm ${
+                            deleteTemplate.isPending
+                                ? "cursor-wait border-slate-200 bg-slate-50 text-slate-400"
+                                : "border-slate-200/90 bg-white text-slate-600 shadow-sm hover:border-rose-200 hover:bg-rose-50/90 hover:text-rose-700 focus-visible:ring-rose-400/50 active:scale-[0.98]"
+                        }`}
+                    >
+                        {deleteTemplate.isPending ? (
+                            <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+                        ) : (
+                            <Trash2 className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+                        )}
+                        {deleteTemplate.isPending ? "Eliminando…" : "Eliminar"}
+                    </button>
+                )}
                 <button
                     type="button"
                     disabled={downloading}
                     onClick={handleDownload}
-                    className={`inline-flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors sm:text-sm ${
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 sm:text-sm ${
                         downloading
-                            ? "cursor-wait border-slate-200 bg-slate-100 text-slate-500"
-                            : "border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
+                            ? "cursor-wait bg-slate-100 text-slate-400 shadow-none ring-1 ring-slate-200"
+                            : "bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-blue-600/25 ring-1 ring-blue-500/30 hover:from-blue-500 hover:to-blue-600 hover:shadow-lg hover:shadow-blue-600/35 focus-visible:ring-blue-400 active:scale-[0.98]"
                     }`}
                 >
                     {downloading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
                     ) : (
-                        <Download className="h-4 w-4" aria-hidden />
+                        <Download className="h-4 w-4 shrink-0" aria-hidden />
                     )}
                     {downloading ? "Descargando…" : "Descargar"}
                 </button>
             </div>
-            <TopModal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-                <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
-                    <p className="text-sm text-rose-700">
-                        Desea eliminar la plantilla{" "}
-                        <span className="font-semibold">{template.nametemplate || "Sin nombre"}</span>?
-                    </p>
-                    <div className="mt-3 flex justify-end gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setOpenDeleteModal(false)}
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleDelete}
-                            disabled={deleteTemplate.isPending}
-                            className="rounded-lg border border-rose-700 bg-rose-600 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            {deleteTemplate.isPending ? "Eliminando..." : "Eliminar"}
-                        </button>
+            {!hideDelete && (
+                <TopModal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+                    <div className="rounded-xl border border-rose-100 bg-gradient-to-b from-rose-50 to-white p-5 shadow-sm">
+                        <p className="text-sm leading-relaxed text-rose-900/90">
+                            ¿Eliminar la plantilla{" "}
+                            <span className="font-semibold text-rose-950">{template.nametemplate || "Sin nombre"}</span>
+                            ?
+                        </p>
+                        <div className="mt-5 flex flex-wrap justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setOpenDeleteModal(false)}
+                                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                disabled={deleteTemplate.isPending}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-700/90 bg-gradient-to-b from-rose-600 to-rose-700 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-rose-600/20 transition-all hover:from-rose-500 hover:to-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 disabled:cursor-not-allowed disabled:opacity-55"
+                            >
+                                {deleteTemplate.isPending ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                                ) : null}
+                                {deleteTemplate.isPending ? "Eliminando…" : "Eliminar"}
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </TopModal>
+                </TopModal>
+            )}
         </div>
     )
 }
