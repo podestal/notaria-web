@@ -87,6 +87,25 @@ const getFolioSeriePageCount = (from: string, to: string): number => {
     return endPos - startPos + 1
 }
 
+/** Última página permitida del rango: `papel_fin` en cara VTA (ej. "10015 VTA"). */
+const maxSerieTokenFromPapelFin = (papelFin: string): string | null => {
+    const p = parseFolioSerieToken(papelFin.trim())
+    if (!p || Number.isNaN(p.n)) return null
+    const pad = (n: number) => String(n).padStart(p.width, "0")
+    return `${pad(p.n)}${VTA_SUFFIX}`
+}
+
+const exceedsSerieNotarialCeiling = (value: string, ceiling: string | null): boolean => {
+    if (!ceiling || !value.trim()) return false
+    const cmp = compareFolioSerieToken(value.trim(), ceiling)
+    return cmp != null && cmp > 0
+}
+
+const clampSerieNotarialToCeiling = (value: string, ceiling: string | null): string => {
+    if (!ceiling || !value.trim()) return value
+    return exceedsSerieNotarialCeiling(value, ceiling) ? ceiling : value
+}
+
 const formatKardexFechaForDateInput = (value: string | undefined): string => {
     if (!value) return ''
     const m = moment(value.trim(), [moment.ISO_8601, 'YYYY-MM-DD', 'DD/MM/YYYY'], true)
@@ -216,6 +235,51 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         [activeSeriesForCurrentType, noActiveSeriesForCurrentType]
     )
 
+    /** Última serie activa (más reciente por `created_at` o `id`) — su `papel_fin` define el tope en VTA. */
+    const lastActiveSerieNotarial = useMemo(() => {
+        const list = activeSeriesForCurrentType
+        if (!list.length) return null
+        return [...list].sort((a, b) => {
+            const tb = b.created_at ? new Date(b.created_at).getTime() : 0
+            const ta = a.created_at ? new Date(a.created_at).getTime() : 0
+            if (tb !== ta) return tb - ta
+            return (b.id ?? 0) - (a.id ?? 0)
+        })[0]
+    }, [activeSeriesForCurrentType])
+
+    const serieNotarialCeiling = useMemo(
+        () =>
+            lastActiveSerieNotarial?.papel_fin
+                ? maxSerieTokenFromPapelFin(lastActiveSerieNotarial.papel_fin)
+                : null,
+        [lastActiveSerieNotarial]
+    )
+
+    const notifySerieNotarialLimit = () => {
+        if (!serieNotarialCeiling) return
+        setMessage(`En serie notarial no puede ir más allá de ${serieNotarialCeiling.trim()}.`)
+        setType("error")
+        setShow(true)
+    }
+
+    const setSerieNotarialIniGuarded = (v: string) => {
+        if (serieNotarialCeiling && exceedsSerieNotarialCeiling(v, serieNotarialCeiling)) {
+            setSerieNotarialIni(serieNotarialCeiling)
+            notifySerieNotarialLimit()
+            return
+        }
+        setSerieNotarialIni(v)
+    }
+
+    const setSerieNotarialFinGuarded = (v: string) => {
+        if (serieNotarialCeiling && exceedsSerieNotarialCeiling(v, serieNotarialCeiling)) {
+            setSerieNotarialFin(serieNotarialCeiling)
+            notifySerieNotarialLimit()
+            return
+        }
+        setSerieNotarialFin(v)
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         console.log('Submitting EscrituracionForm with values:');
@@ -232,6 +296,16 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             setErrorFechaActa('La fecha es requerida')
             return
         }
+
+        if (
+            serieNotarialCeiling &&
+            (exceedsSerieNotarialCeiling(serieNotarialIni, serieNotarialCeiling) ||
+                exceedsSerieNotarialCeiling(serieNotarialFin, serieNotarialCeiling))
+        ) {
+            notifySerieNotarialLimit()
+            return
+        }
+
         setLoading(true)
 
         const fechaMinutaStr = dateInputToApiYmd(fechaMinuta)
@@ -393,6 +467,10 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         setFechaEscritura,
                         setFechaMinuta,
                     })
+                    if (serieNotarialCeiling) {
+                        setSerieNotarialIni((prev) => clampSerieNotarialToCeiling(prev, serieNotarialCeiling))
+                        setSerieNotarialFin((prev) => clampSerieNotarialToCeiling(prev, serieNotarialCeiling))
+                    }
                     setErrorFechaActa('')
                     setErrorFechaEscritura('')
                     setErrorFechaMinuta('')
@@ -573,7 +651,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 </div>
                 <div className="grid grid-cols-2 gap-8 my-4">
                     <SimpleInput
-                        setValue={setSerieNotarialIni}
+                        setValue={setSerieNotarialIniGuarded}
                         value={serieNotarialIni}
                         horizontal
                         label="Serie Notarial del"
@@ -581,14 +659,21 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     <div className="flex items-center gap-1.5">
                         <div className="min-w-0 flex-1">
                             <SimpleInput
-                                setValue={setSerieNotarialFin}
+                                setValue={setSerieNotarialFinGuarded}
                                 value={serieNotarialFin}
                                 horizontal
                                 label="Al"
                             />
                         </div>
                         <FolioSerieIncDec
-                            onInc={() => setSerieNotarialFin(incrementFolioSerieValue(serieNotarialFin))}
+                            onInc={() => {
+                                const next = incrementFolioSerieValue(serieNotarialFin)
+                                if (serieNotarialCeiling && exceedsSerieNotarialCeiling(next, serieNotarialCeiling)) {
+                                    notifySerieNotarialLimit()
+                                    return
+                                }
+                                setSerieNotarialFin(next)
+                            }}
                             onDec={() => setSerieNotarialFin(decrementFolioSerieValueWithMin(serieNotarialFin, serieNotarialIni))}
                         />
                     </div>
