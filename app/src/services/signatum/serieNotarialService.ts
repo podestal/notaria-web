@@ -16,3 +16,12 @@ export const serieNotarialService = new APIClient<SerieNotarial[], CreateSerieNo
   "series-notariales/"
 )
 
+export const updateSerieNotarial = (
+  access: string,
+  id: number,
+  body: Partial<Pick<SerieNotarial, "activo" | "nombre" | "papel_ini" | "papel_fin">>
+): Promise<SerieNotarial> => {
+  const client = new APIClient<SerieNotarial, typeof body>(`series-notariales/${id}/`)
+  return client.update(body, access)
+}
+

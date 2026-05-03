@@ -498,11 +498,11 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         No hay series notariales activas para {kardexTypeLabel}.
                     </div>
                 )}
-                {lowActiveSeriesForCurrentType && (
+                {/* {lowActiveSeriesForCurrentType && (
                     <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
                         Series notariales bajas para {kardexTypeLabel}: hay rangos activos con 20 paginas o menos.
                     </div>
-                )}
+                )} */}
                 <div className="mb-4 flex items-center justify-end">
                     <button
                         type="button"
