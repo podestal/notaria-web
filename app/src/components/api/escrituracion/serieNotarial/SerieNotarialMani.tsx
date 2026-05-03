@@ -8,14 +8,12 @@ import useUserInfoStore from "../../../../hooks/store/useGetUserInfo"
 import type { SerieNotarial } from "../../../../services/signatum/serieNotarialService"
 import { Loader2 } from "lucide-react"
 import useBodyRenderStore from "../../../../hooks/store/bodyRenderStore"
-
-/** Valor numérico del papel (solo dígitos) para validar rango. */
-const parsePapelNumerico = (raw: string): number | null => {
-  const m = raw.trim().match(/^(\d+)$/)
-  if (!m) return null
-  const n = parseInt(m[1], 10)
-  return Number.isFinite(n) ? n : null
-}
+import {
+  compareSerieNotarial,
+  isValidSerieNotarialFormat,
+  normalizeSerieNotarialWhitespace,
+  sanitizeSerieNotarialInput,
+} from "../../../../utils/serieNotarialFormat"
 
 const SerieNotarialMain = () => {
   const access = useAuthStore((s) => s.access_token) || ""
@@ -51,22 +49,30 @@ const SerieNotarialMain = () => {
     [series, currentTipoKardex]
   )
 
-  const papelRangoValido = useMemo(() => {
+  const papelFormatoValido = useMemo(() => {
     const ini = papelIni.trim()
     const fin = papelFin.trim()
+    if (ini && !isValidSerieNotarialFormat(ini)) return false
+    if (fin && !isValidSerieNotarialFormat(fin)) return false
+    return true
+  }, [papelIni, papelFin])
+
+  const papelRangoValido = useMemo(() => {
+    const ini = normalizeSerieNotarialWhitespace(papelIni)
+    const fin = normalizeSerieNotarialWhitespace(papelFin)
     if (!ini || !fin) return true
-    const nIni = parsePapelNumerico(ini)
-    const nFin = parsePapelNumerico(fin)
-    if (nIni == null || nFin == null) return false
-    return nIni <= nFin
+    if (!isValidSerieNotarialFormat(ini) || !isValidSerieNotarialFormat(fin)) return false
+    const cmp = compareSerieNotarial(ini, fin)
+    return cmp != null && cmp <= 0
   }, [papelIni, papelFin])
 
   const canSubmit = useMemo(
     () =>
       Boolean(access && papelIni.trim() && papelFin.trim()) &&
       !hasActiveSerie &&
+      papelFormatoValido &&
       papelRangoValido,
-    [access, papelIni, papelFin, hasActiveSerie, papelRangoValido]
+    [access, papelIni, papelFin, hasActiveSerie, papelFormatoValido, papelRangoValido]
   )
 
   const handleCreateSerie = () => {
@@ -93,15 +99,18 @@ const SerieNotarialMain = () => {
       return
     }
 
-    const nIni = parsePapelNumerico(papelIni)
-    const nFin = parsePapelNumerico(papelFin)
-    if (nIni == null || nFin == null) {
-      setMessage("Papel inicial y final deben ser valores numéricos (solo dígitos).")
+    const iniN = normalizeSerieNotarialWhitespace(papelIni)
+    const finN = normalizeSerieNotarialWhitespace(papelFin)
+    if (!isValidSerieNotarialFormat(iniN) || !isValidSerieNotarialFormat(finN)) {
+      setMessage(
+        'Formato inválido: use solo números o números seguidos de " VTA" (ej.: 10100 o 10100 VTA). No se permiten otros caracteres.'
+      )
       setType("error")
       setShow(true)
       return
     }
-    if (nIni > nFin) {
+    const cmp = compareSerieNotarial(iniN, finN)
+    if (cmp == null || cmp > 0) {
       setMessage("El papel inicial no puede ser mayor que el papel final.")
       setType("error")
       setShow(true)
@@ -114,8 +123,8 @@ const SerieNotarialMain = () => {
         serieNotarial: {
           idtipkar: currentTipoKardex,
           nombre: nombre.trim(),
-          papel_ini: papelIni.trim(),
-          papel_fin: papelFin.trim(),
+          papel_ini: iniN,
+          papel_fin: finN,
           activo,
         },
       },
@@ -206,8 +215,8 @@ const SerieNotarialMain = () => {
               </label>
               <input
                 value={papelIni}
-                onChange={(e) => setPapelIni(e.target.value)}
-                placeholder="000120"
+                onChange={(e) => setPapelIni(sanitizeSerieNotarialInput(e.target.value))}
+                placeholder="10100 o 10100 VTA"
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
               />
             </div>
@@ -217,16 +226,20 @@ const SerieNotarialMain = () => {
               </label>
               <input
                 value={papelFin}
-                onChange={(e) => setPapelFin(e.target.value)}
-                placeholder="000160"
+                onChange={(e) => setPapelFin(sanitizeSerieNotarialInput(e.target.value))}
+                placeholder="10100 o 10100 VTA"
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
               />
             </div>
           </div>
-          {papelIni.trim() && papelFin.trim() && !papelRangoValido && (
+          {(papelIni.trim() || papelFin.trim()) && !papelFormatoValido && (
             <p className="text-xs text-red-600">
-              El papel inicial no puede ser mayor que el papel final. Use solo dígitos en ambos campos.
+              Formato: solo números, o números seguidos de un espacio y la sigla VTA al final (ej.: 10100, 10100
+              VTA). No letras ni símbolos adicionales.
             </p>
+          )}
+          {papelIni.trim() && papelFin.trim() && papelFormatoValido && !papelRangoValido && (
+            <p className="text-xs text-red-600">El papel inicial no puede ser mayor que el papel final.</p>
           )}
 
           {/* <div className="pt-2">

@@ -13,6 +13,13 @@ import type { NotarizationReservation } from "../../../services/signatum/notariz
 import useGetSeriesNotariales from "../../../hooks/signatum/useGetSeriesNotariales"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import getTitleCase from "../../../utils/getTitleCase"
+import {
+    compareSerieNotarial,
+    isValidSerieNotarialFormat,
+    parseSerieNotarialToken,
+    sanitizeSerieNotarialInput,
+    SERIE_NOTARIAL_VTA_SUFFIX,
+} from "../../../utils/serieNotarialFormat"
 import TopModal from "../../ui/TopModal"
 import SerieNotarialMain from "./serieNotarial/SerieNotarialMani"
 
@@ -31,55 +38,34 @@ const formatReservationDateForInput = (value: string | undefined): string => {
     return trimmed
 }
 
-const VTA_SUFFIX = ' VTA'
-
-const parseFolioSerieToken = (raw: string) => {
-    const t = raw.trim()
-    if (!t) return null
-    const hasVta = /\s+VTA\s*$/i.test(t)
-    const core = t.replace(/\s+VTA\s*$/i, '').trim()
-    const digits = core.match(/^(\d+)$/)
-    if (!digits) return null
-    return { n: parseInt(digits[1], 10), width: digits[1].length, hasVta }
-}
-
 const incrementFolioSerieValue = (value: string): string => {
-    const p = parseFolioSerieToken(value)
+    const p = parseSerieNotarialToken(value)
     if (!p || Number.isNaN(p.n)) return value
-    const pad = (x: number) => String(x).padStart(p.width, '0')
+    const pad = (x: number) => String(x).padStart(p.width, "0")
     if (p.hasVta) return pad(p.n + 1)
-    return `${pad(p.n)}${VTA_SUFFIX}`
+    return `${pad(p.n)}${SERIE_NOTARIAL_VTA_SUFFIX}`
 }
 
 const decrementFolioSerieValue = (value: string): string => {
-    const p = parseFolioSerieToken(value)
+    const p = parseSerieNotarialToken(value)
     if (!p || Number.isNaN(p.n)) return value
-    const pad = (x: number) => String(Math.max(0, x)).padStart(p.width, '0')
+    const pad = (x: number) => String(Math.max(0, x)).padStart(p.width, "0")
     if (p.hasVta) return pad(p.n)
     const prev = p.n - 1
     if (prev < 0) return value
-    return `${pad(prev)}${VTA_SUFFIX}`
-}
-
-const compareFolioSerieToken = (a: string, b: string): number | null => {
-    const pa = parseFolioSerieToken(a)
-    const pb = parseFolioSerieToken(b)
-    if (!pa || !pb) return null
-    if (pa.n !== pb.n) return pa.n - pb.n
-    if (pa.hasVta === pb.hasVta) return 0
-    return pa.hasVta ? 1 : -1
+    return `${pad(prev)}${SERIE_NOTARIAL_VTA_SUFFIX}`
 }
 
 const decrementFolioSerieValueWithMin = (value: string, minValue: string): string => {
     const next = decrementFolioSerieValue(value)
-    const cmp = compareFolioSerieToken(next, minValue)
+    const cmp = compareSerieNotarial(next, minValue)
     if (cmp == null) return next
     return cmp < 0 ? minValue : next
 }
 
 const getFolioSeriePageCount = (from: string, to: string): number => {
-    const pf = parseFolioSerieToken(from)
-    const pt = parseFolioSerieToken(to)
+    const pf = parseSerieNotarialToken(from)
+    const pt = parseSerieNotarialToken(to)
     if (!pf || !pt) return 0
     const startPos = pf.n * 2 + (pf.hasVta ? 1 : 0)
     const endPos = pt.n * 2 + (pt.hasVta ? 1 : 0)
@@ -89,15 +75,15 @@ const getFolioSeriePageCount = (from: string, to: string): number => {
 
 /** Última página permitida del rango: `papel_fin` en cara VTA (ej. "10015 VTA"). */
 const maxSerieTokenFromPapelFin = (papelFin: string): string | null => {
-    const p = parseFolioSerieToken(papelFin.trim())
+    const p = parseSerieNotarialToken(papelFin.trim())
     if (!p || Number.isNaN(p.n)) return null
     const pad = (n: number) => String(n).padStart(p.width, "0")
-    return `${pad(p.n)}${VTA_SUFFIX}`
+    return `${pad(p.n)}${SERIE_NOTARIAL_VTA_SUFFIX}`
 }
 
 const exceedsSerieNotarialCeiling = (value: string, ceiling: string | null): boolean => {
     if (!ceiling || !value.trim()) return false
-    const cmp = compareFolioSerieToken(value.trim(), ceiling)
+    const cmp = compareSerieNotarial(value.trim(), ceiling)
     return cmp != null && cmp > 0
 }
 
@@ -263,21 +249,23 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     }
 
     const setSerieNotarialIniGuarded = (v: string) => {
-        if (serieNotarialCeiling && exceedsSerieNotarialCeiling(v, serieNotarialCeiling)) {
+        const cleaned = sanitizeSerieNotarialInput(v)
+        if (serieNotarialCeiling && exceedsSerieNotarialCeiling(cleaned, serieNotarialCeiling)) {
             setSerieNotarialIni(serieNotarialCeiling)
             notifySerieNotarialLimit()
             return
         }
-        setSerieNotarialIni(v)
+        setSerieNotarialIni(cleaned)
     }
 
     const setSerieNotarialFinGuarded = (v: string) => {
-        if (serieNotarialCeiling && exceedsSerieNotarialCeiling(v, serieNotarialCeiling)) {
+        const cleaned = sanitizeSerieNotarialInput(v)
+        if (serieNotarialCeiling && exceedsSerieNotarialCeiling(cleaned, serieNotarialCeiling)) {
             setSerieNotarialFin(serieNotarialCeiling)
             notifySerieNotarialLimit()
             return
         }
-        setSerieNotarialFin(v)
+        setSerieNotarialFin(cleaned)
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -303,6 +291,17 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 exceedsSerieNotarialCeiling(serieNotarialFin, serieNotarialCeiling))
         ) {
             notifySerieNotarialLimit()
+            return
+        }
+
+        const snIni = serieNotarialIni.trim()
+        const snFin = serieNotarialFin.trim()
+        if ((snIni && !isValidSerieNotarialFormat(snIni)) || (snFin && !isValidSerieNotarialFormat(snFin))) {
+            setMessage(
+                'Serie notarial: solo números o números seguidos de " VTA" (ej.: 10100 o 10100 VTA). No use otros caracteres.'
+            )
+            setType("error")
+            setShow(true)
             return
         }
 
