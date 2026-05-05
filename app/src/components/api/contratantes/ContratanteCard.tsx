@@ -35,6 +35,7 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
     const updateContratante = useUpdateContratante({
         kardex: contratante.kardex,
         contratanteId: contratante.idcontratante,
+        idkardex: kardex.idkardex,
     })
     const { setMessage, setShow, setType } = useNotificationsStore()
 
@@ -145,6 +146,7 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
                     idtipoacto={kardex.codactos}
                     idtipkar={kardex.idtipkar}
                     kardex={kardex.kardex}
+                    idkardex={kardex.idkardex}
                     contratante={contratante}
                 />
             </div>

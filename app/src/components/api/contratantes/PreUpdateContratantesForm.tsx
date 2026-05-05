@@ -10,14 +10,26 @@ interface Props {
     idtipoacto: string
     idtipkar: number
     kardex: string
+    idkardex?: number
     contratante: Contratante
     setCloseUpdateContratante: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PreUpdateContratantesForm = ({ idtipkar, idtipoacto, kardex, contratante, setCloseUpdateContratante }: Props) => {
+const PreUpdateContratantesForm = ({
+    idtipkar,
+    idtipoacto,
+    kardex,
+    idkardex,
+    contratante,
+    setCloseUpdateContratante,
+}: Props) => {
 
     const access = useAuthStore((state) => state.access_token) || ''
-    const updateContratante = useUpdateContratante({ kardex, contratanteId: contratante.idcontratante })
+    const updateContratante = useUpdateContratante({
+        kardex,
+        contratanteId: contratante.idcontratante,
+        idkardex,
+    })
     const [showContratanteForm, setShowContratanteForm] = useState(true)
     const [showClienteForm, setShowClienteForm] = useState(false)
 

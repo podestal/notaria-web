@@ -8,12 +8,11 @@ interface Props {
     idtipoacto: string
     idtipkar: number
     kardex: string
+    idkardex?: number
     contratante: Contratante
 }
 
-const UpdateContratante = ({ idtipoacto, idtipkar, kardex, contratante }: Props) => {
-
-    console.log('idtipoacto', idtipoacto)
+const UpdateContratante = ({ idtipoacto, idtipkar, kardex, idkardex, contratante }: Props) => {
     const [open, setOpen] = useState(false)
 
   return (
@@ -35,6 +34,7 @@ const UpdateContratante = ({ idtipoacto, idtipkar, kardex, contratante }: Props)
             idtipoacto={idtipoacto}
             idtipkar={idtipkar}
             kardex={kardex}
+            idkardex={idkardex}
             contratante={contratante}
             setCloseUpdateContratante={setOpen}
         />
