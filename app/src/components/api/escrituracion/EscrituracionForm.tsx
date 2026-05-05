@@ -22,6 +22,7 @@ import {
 } from "../../../utils/serieNotarialFormat"
 import TopModal from "../../ui/TopModal"
 import SerieNotarialMain from "./serieNotarial/SerieNotarialMani"
+import FechaConclusionGate from "./FechaConclusionGate"
 
 interface Props {
     kardex: Kardex
@@ -512,11 +513,13 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                         Gestionar serie notarial
                     </button>
                 </div>
+                <FechaConclusionGate kardex={kardex} />
                 {exceedsPageLimit && (
                     <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
                         Recuerde: más de 10 páginas es una cantidad alta. Verifique cuidadosamente el rango antes de guardar.
                     </div>
                 )}
+                
                 {(kardex.idtipkar === 1 || kardex.idtipkar === 5) && 
                 <>
                 <div className="grid grid-cols-2 gap-8 my-4">
