@@ -52,7 +52,7 @@ const PreSolicitanteForm = ({
         ).then(response => {
             if (response.data.idcliente) {
                 console.log('Cliente encontrado:', response.data);
-                setSolicitante(response.data.nombre);
+                setSolicitante(`${response.data.prinom} ${response.data.segnom} ${response.data.apepat} ${response.data.apemat}`);
                 setDomicilio(response.data.direccion);
                 setDistrito(response.data.idubigeo);
                 setProfesion(response.data.idprofesion);
