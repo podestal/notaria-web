@@ -55,7 +55,11 @@ const PreSolicitanteForm = ({
                 setSolicitante(`${response.data.prinom} ${response.data.segnom} ${response.data.apepat} ${response.data.apemat}`);
                 setDomicilio(response.data.direccion);
                 setDistrito(response.data.idubigeo);
-                setProfesion(response.data.idprofesion);
+                setProfesion(
+                    response.data.detaprofesion ||
+                    response.data.profesionc ||
+                    (response.data.idprofesion != null ? String(response.data.idprofesion) : '')
+                );
                 setEstadoCivil(response.data.idestcivil);
                 setGenero(mapToGeneroMF(response.data.sexo));
             } else {

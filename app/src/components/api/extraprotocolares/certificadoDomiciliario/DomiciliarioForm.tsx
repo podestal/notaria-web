@@ -23,9 +23,10 @@ interface Props {
     domiciliario?: Domiciliario;
     createDomiciliario?: UseMutationResult<Domiciliario, Error, CreateDomiciliarioData>
     updateDomiciliario?: UseMutationResult<Domiciliario, Error, UpdateDomiciliarioData>
+    onRequestCloseForm?: () => void
 }
 
-const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario }: Props) => {
+const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario, onRequestCloseForm }: Props) => {
 
     const [loading, setLoading] = useState(false);
     const user = useUserInfoStore(s => s.user)
@@ -290,6 +291,7 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
             setSelectedTipoDocumento={setSelectedTipoDocumento}
             document={document}
             setDocument={setDocument}
+            onRequestCloseForm={onRequestCloseForm}
         />
         <div className="w-[80%] flex justify-center items-start flex-col gap-4 my-4">
             <SimpleInput

@@ -35,6 +35,7 @@ const DomiciliarioCard = ({ domiciliario, readyOnly }: Props) => {
         <UpdateDomiciliario 
             updateDomiciliario={updateDomiciliario}
             domiciliario={domiciliario}
+            onRequestCloseForm={() => setOpen(false)}
         />
     </TopModal>
     </>

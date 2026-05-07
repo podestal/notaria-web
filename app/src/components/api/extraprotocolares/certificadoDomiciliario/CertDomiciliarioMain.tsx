@@ -72,7 +72,7 @@ const CertDomiciliarioMain = () => {
         isOpen={open}
         onClose={() => setOpen(false)}
       >
-        <CreateDomiciliario />
+        <CreateDomiciliario onRequestCloseForm={() => setOpen(false)} />
       </TopModal>
     </>
   )

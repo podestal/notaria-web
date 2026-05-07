@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore"
 import { Profesion } from "../../../../../services/api/profesionesService"
 import { Ubigeo } from "../../../../../services/api/ubigeoService"
@@ -47,6 +47,15 @@ const sexOptions = [
     { value: 2, label: 'Femenino' },
 ]
 
+const formatNaturalFullName = (rawName: string | undefined): string => {
+    if (!rawName) return ''
+    const clean = rawName.trim()
+    if (!clean) return ''
+    if (!clean.includes(',')) return clean
+    const [lastNames, firstNames] = clean.split(',').map((part) => part.trim())
+    return [firstNames, lastNames].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+}
+
 
 const NuevoClienteForm = ({
     ubigeos,
@@ -85,6 +94,7 @@ const NuevoClienteForm = ({
     const [resident, setResident] = useState(1)
 
     const [selectedProfesion, setSelectedProfesion] = useState<{ id: string; label: string } | null>(null);
+    const [profesionText, setProfesionText] = useState('')
     const [cargo, setCargo] = useState<{ id: string; label: string } | null>(null);
 
     const [celphone, setCellphone] = useState('')
@@ -106,6 +116,25 @@ const NuevoClienteForm = ({
     const [cargoError, setCargoError] = useState('')
 
     const createCliente = useCreateCliente()
+
+    const resolveProfesionId = (): number => {
+        const typed = profesionText.trim().toLowerCase()
+        const match = profesiones.find((p) => p.desprofesion.trim().toLowerCase() === typed)
+        if (match) return match.idprofesion
+        const parsed = Number(selectedProfesion?.id || 0)
+        return Number.isFinite(parsed) ? parsed : 0
+    }
+
+    const handleProfesionInputChange = useCallback((value: string) => {
+        setProfesionText(value)
+        setProfesionError('')
+    }, [])
+
+    const handleSelectProfesion = useCallback((next: { id: string; label: string } | null) => {
+        setSelectedProfesion(next)
+        setProfesionText(next?.label || '')
+        setProfesionError('')
+    }, [])
 
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -217,7 +246,7 @@ const NuevoClienteForm = ({
             return  
         }
     
-        if (selectedProfesion === null) {
+        if (!profesionText.trim()) {
             setProfesionError('Profesión es requerida')
             setType('error')
             setMessage('Profesión es requerida')
@@ -257,8 +286,8 @@ const NuevoClienteForm = ({
                 telcel: celphone,
                 telofi: officePhone,
                 idcargoprofe: parseInt(cargo.id),
-                idprofesion: parseInt(selectedProfesion?.id),
-                detaprofesion: selectedProfesion?.label,
+                idprofesion: resolveProfesionId(),
+                detaprofesion: profesionText.trim(),
                 cumpclie: birthdate,
                 razonsocial: '',
                 domfiscal: '',
@@ -275,12 +304,19 @@ const NuevoClienteForm = ({
                 setType('success')
                 setMessage('Cliente creado exitosamente')
                 setShow(true)
-                setSolicitante(data.nombre)
+                setSolicitante(
+                    formatNaturalFullName(data.nombre) ||
+                    [data.prinom, data.segnom, data.apepat, data.apemat]
+                        .filter(Boolean)
+                        .join(' ')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                )
                 setDomicilio(data.direccion)
                 setDistrito(data.idubigeo)
                 setEstadoCivil(data.idestcivil ?? 0)
                 setGenero(mapToGeneroMF(data.sexo))
-                setProfesion(data.detaprofesion || selectedProfesion?.label || '')
+                setProfesion(data.detaprofesion || profesionText.trim())
                 setOpen(false)
             },
             onError: (error) => {
@@ -303,7 +339,10 @@ const NuevoClienteForm = ({
             console.log('response', response.data)
             setApepat(response.data.resultado.apellido_paterno || '')
             setApemat(response.data.resultado.apellido_materno || '')
-            setPrinom(response.data.resultado.nombres.split(' ')[0] || '')
+            const rawNames = (response.data.resultado.nombres || '').trim()
+            const nameParts = rawNames ? rawNames.split(/\s+/) : []
+            setPrinom(nameParts[0] || '')
+            setSegnom(nameParts.slice(1).join(' '))
             setBirthdate(response.data.resultado.fecha_nacimiento || '')
             // setDireccion('Avis Luz y Fuerza D-8')
             if (response.data.resultado.genero === 'M') {
@@ -459,7 +498,8 @@ const NuevoClienteForm = ({
                 <SearchableDropdownInput
                     options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
                     selected={selectedProfesion}
-                    setSelected={setSelectedProfesion}
+                    setSelected={handleSelectProfesion}
+                    onInputChange={handleProfesionInputChange}
                     placeholder="Buscar Profesión"
                     required
                     error={profesionError}
@@ -474,6 +514,7 @@ const NuevoClienteForm = ({
                     selected={cargo}
                     setSelected={setCargo}
                     placeholder="Buscar Cargo"
+                    
                     required
                     error={cargoError}
                     setError={setCargoError}

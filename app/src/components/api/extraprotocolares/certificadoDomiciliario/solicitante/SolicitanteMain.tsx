@@ -26,6 +26,7 @@ interface Props {
     setSelectedTipoDocumento: React.Dispatch<React.SetStateAction<number>>;
     document: string;
     setDocument: React.Dispatch<React.SetStateAction<string>>;
+    onRequestCloseForm?: () => void;
 }
 const SolicitanteMain = ({
     solicitante,
@@ -43,8 +44,14 @@ const SolicitanteMain = ({
     selectedTipoDocumento,
     setSelectedTipoDocumento,
     document,
-    setDocument
+    setDocument,
+    onRequestCloseForm,
 }: Props) => {
+    const handleCloseNuevoCliente = () => {
+        setIsOpen(false);
+        onRequestCloseForm?.();
+    };
+
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -95,7 +102,7 @@ const SolicitanteMain = ({
         />
         <TopModal 
             isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
+            onClose={handleCloseNuevoCliente}
         >
             <NuevoClienteForm 
                 ubigeos={ubigeos}

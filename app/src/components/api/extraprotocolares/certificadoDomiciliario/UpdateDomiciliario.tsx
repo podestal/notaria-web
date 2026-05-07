@@ -6,13 +6,15 @@ import { UpdateDomiciliarioData } from "../../../../hooks/api/extraprotocolares/
 interface Props {
     domiciliario: Domiciliario;
     updateDomiciliario: UseMutationResult<Domiciliario, Error, UpdateDomiciliarioData>;
+    onRequestCloseForm?: () => void;
 }
 
-const UpdateDomiciliario = ({ domiciliario, updateDomiciliario }: Props) => {
+const UpdateDomiciliario = ({ domiciliario, updateDomiciliario, onRequestCloseForm }: Props) => {
   return (
     <DomiciliarioForm 
         domiciliario={domiciliario}
         updateDomiciliario={updateDomiciliario}
+        onRequestCloseForm={onRequestCloseForm}
     />
   )
 }
