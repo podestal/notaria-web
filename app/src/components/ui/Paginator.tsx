@@ -55,7 +55,7 @@ const Paginator = ({ page, setPage, itemsCount, itemsPerPage=10, refetch }: Prop
               onClick={() => setPage(p)}
               className={`cursor-pointer rounded-md transition duration-200 border ${
                 page === p
-                  ? 'bg-sky-600 border-sky-700 text-white shadow-sm'
+                  ? 'bg-blue-600 border-blue-700 text-white shadow-sm'
                   : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
               } px-3 py-1.5 text-xs font-semibold`}
             >
