@@ -379,12 +379,13 @@ const ClientesForm = ({
                 c => c.descripcrapro.trim().toLowerCase() === cargoText.toLowerCase()
             )
             const selectedProfesionId = Number.parseInt(profesion.id, 10)
+            const selectedCargoId = Number.parseInt(cargo.id, 10)
             const profesionId = matchedProfesion
                 ? matchedProfesion.idprofesion
-                : 0
+                : (Number.isNaN(selectedProfesionId) ? 0 : selectedProfesionId)
             const cargoId = matchedCargo
                 ? matchedCargo.idcargoprofe
-                : 0
+                : (Number.isNaN(selectedCargoId) ? 0 : selectedCargoId)
 
             if (conyugeMarried) {
                 setOpenChangeConyuge(true)
@@ -472,7 +473,7 @@ const ClientesForm = ({
                     telcel: celphone,
                     telofi: officePhone,
                     idcargoprofe: cargoId,
-                    idprofesion: profesionId,
+                    idprofesion: Number.isNaN(selectedProfesionId) ? profesionId : selectedProfesionId,
                     detaprofesion: profesionText,
                     profocupa: cargoText,
                     cumpclie: birthdate,

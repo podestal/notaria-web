@@ -6,7 +6,7 @@ import DateInput from '../../ui/DateInput'
 import SimpleSelector from '../../ui/SimpleSelector'
 import { UseMutationResult } from '@tanstack/react-query'
 import { UpdateCliente2Data } from '../../../hooks/api/cliente2/useUpdateCliente2'
-import getCliente2Service, { Cliente2 } from '../../../services/api/clienteService'
+import { Cliente2 } from '../../../services/api/clienteService'
 import { Ubigeo } from '../../../services/api/ubigeoService'
 import { Cargo } from '../../../services/api/cargosService'
 import { Profesion } from '../../../services/api/profesionesService'
@@ -44,6 +44,24 @@ const sexOptions = [
     { value: 2, label: 'Femenino' },
 ]
 
+const normalizeForCompare = (value: unknown): string => {
+    if (value === null || value === undefined) return ''
+    return String(value).trim()
+}
+
+const getChangedFields = <T extends Record<string, any>>(next: T, prev?: Record<string, any> | null): Partial<T> => {
+    if (!prev) return next
+    const changed: Partial<T> = {}
+    Object.keys(next).forEach((key) => {
+        const nextVal = next[key]
+        const prevVal = prev[key]
+        if (normalizeForCompare(nextVal) !== normalizeForCompare(prevVal)) {
+            changed[key as keyof T] = nextVal
+        }
+    })
+    return changed
+}
+
 const Cliente2Form = ({ 
     dni, 
     setShowContratanteForm, 
@@ -61,28 +79,6 @@ const Cliente2Form = ({
 
         const { setMessage, setShow, setType } = useNotificationsStore()
         const access = useAuthStore(s => s.access_token) || ''
-
-        const syncCliente2ProfesionTexto = async (
-            cliente2Id: string | undefined,
-            profesionId: number,
-            profesionText: string,
-            cargoId: number,
-            cargoText: string
-        ) => {
-            if (!cliente2Id) return
-            const cliente2Service = getCliente2Service({ clienteId: cliente2Id })
-            await cliente2Service.update(
-                {
-                    idprofesion: profesionId,
-                    detaprofesion: profesionText,
-                    profesion_plantilla: profesionText,
-                    natper: profesionText,
-                    idcargoprofe: cargoId,
-                    profocupa: cargoText,
-                } as any,
-                access
-            )
-        }
 
         const [apepat, setApepat] = useState(cliente2 ? cliente2.apepat : '')
         const [apemat, setApemat] = useState( cliente2 ? cliente2.apemat : '')
@@ -103,7 +99,7 @@ const Cliente2Form = ({
             return null;
           });
           
-        const [naturalFrom, setNaturalFrom] = useState('')
+        const [naturalFrom, setNaturalFrom] = useState(cliente2 ? (cliente2.natper || '') : '')
     
         const [civilStatus, setCivilStatus] = useState(cliente2 ? civilStatusOptions.find( option => option.value === cliente2.idestcivil)?.value : 0)
         const [gender, setGender] = useState(cliente2 ? sexOptions.find( option => option.label[0] === cliente2.sexo)?.value : 0)
@@ -169,10 +165,10 @@ const Cliente2Form = ({
         const [profesionInput, setProfesionInput] = useState(() => (cliente2?.detaprofesion || profesion?.label || '').trim())
         const [cargoInput, setCargoInput] = useState(() => (cliente2?.profocupa || cargo?.label || '').trim())
     
-        const [celphone, setCellphone] = useState('')
-        const [officePhone, setOfficePhone] = useState('')
-        const [fixedPhone, setFixedPhone] = useState('')
-        const [email, setEmail] = useState('')
+        const [celphone, setCellphone] = useState(cliente2 ? cliente2.telcel || '' : '')
+        const [officePhone, setOfficePhone] = useState(cliente2 ? cliente2.telofi || '' : '')
+        const [fixedPhone, setFixedPhone] = useState(cliente2 ? cliente2.telfijo || '' : '')
+        const [email, setEmail] = useState(cliente2 ? cliente2.email || '' : '')
     
         // Error handling states
         const [apepatError, setApepatError] = useState('')
@@ -241,7 +237,7 @@ const Cliente2Form = ({
                     return
                 }
         
-                setNombre(`${apepat} ${apemat}, ${prinom} ${segnom}`)
+                const nombreNatural = `${apepat} ${apemat}, ${prinom} ${segnom}`.trim()
         
                 if (!direccion) {
                     setDireccionError('Dirección es requerida')
@@ -350,72 +346,78 @@ const Cliente2Form = ({
                     c => c.descripcrapro.trim().toLowerCase() === cargoText.toLowerCase()
                 )
                 const profesionIdFromSelected = profesion?.id ? Number.parseInt(profesion.id, 10) : Number.NaN
-                const profesionId = matchedProfesion
+                const cargoIdFromSelected = cargo?.id ? Number.parseInt(cargo.id, 10) : Number.NaN
+                const cargoId = matchedCargo
+                    ? matchedCargo.idcargoprofe
+                    : !Number.isNaN(cargoIdFromSelected)
+                        ? cargoIdFromSelected
+                        : (cliente2?.idcargoprofe || 0)
+                // Keep selected/matched profession ID even when the text is edited.
+                const profesionIdForCustomText = matchedProfesion
                     ? matchedProfesion.idprofesion
                     : !Number.isNaN(profesionIdFromSelected)
                         ? profesionIdFromSelected
-                            : 0
-                const cargoId = matchedCargo
-                    ? matchedCargo.idcargoprofe
-                    : (cargo?.id ? Number.parseInt(cargo.id, 10) || 0 : 0)
-                const profesionIdForCustomText = matchedProfesion ? profesionId : 0
+                        : (cliente2?.idprofesion || 0)
         
+                const fullPayload = {
+                    tipper: 'N',
+                    apepat,
+                    apemat,
+                    prinom,
+                    segnom,
+                    nombre: nombreNatural,
+                    direccion,
+                    idubigeo: ubigeo.id,
+                    resedent: resident === 1 ? '1' : '0',
+                    idtipdoc: 1,
+                    numdoc: dni,
+                    email,
+                    nacionalidad: nationality.id,
+                    idestcivil: civilStatus,
+                    sexo: gender === 1 ? 'M' : 'F',
+                    telfijo: fixedPhone,
+                    telcel: celphone,
+                    telofi: officePhone,
+                    idcargoprofe: cargoId,
+                    idprofesion: profesionIdForCustomText,
+                    detaprofesion: profesionText,
+                    cumpclie: birthdate,
+                    razonsocial: '',
+                    domfiscal: '',
+                    idsedereg: 0,
+                    numpartida: '',
+                    telempresa: '',
+                    actmunicipal: '',
+                    contacempresa: '',
+                    ubigeo_plantilla: '',
+                    fechaconstitu: '',
+                    profesion_plantilla: profesionText,
+                    tipocli: 'N',
+                    residente: resident === 1 ? '1' : '0',
+                    fechaing: '',
+                    dirfer: '',
+                    profocupa: cargoText,
+                    conyuge: '',
+                    natper: naturalFrom,
+                }
+
+                const changedPayload = getChangedFields(fullPayload, cliente2 || undefined)
+                // Backend expects profession id to persist even when only the label changes.
+                changedPayload.idprofesion = profesionIdForCustomText
+                // Same rule for cargo: keep selected cargo id while profocupa text changes.
+                changedPayload.idcargoprofe = cargoId
+                if (Object.keys(changedPayload).length === 0) {
+                    setType('success')
+                    setMessage('No hay cambios para guardar')
+                    setShow(true)
+                    return
+                }
+
                 updateCliente2.mutate({
                     access,
-                    cliente: {
-                        tipper: 'N',
-                        apepat,
-                        apemat,
-                        prinom,
-                        segnom,
-                        nombre,
-                        direccion,
-                        idubigeo: ubigeo.id,
-                        resedent: resident === 1 ? '1' : '0',
-                        idtipdoc: 1,
-                        numdoc: dni,
-                        email,
-                        nacionalidad: nationality.id,
-                        idestcivil: civilStatus,
-                        sexo: gender === 1 ? 'M' : 'F',
-                        telfijo: fixedPhone,
-                        telcel: celphone,
-                        telofi: officePhone,
-                        idcargoprofe: cargoId,
-                        idprofesion: profesionIdForCustomText,
-                        detaprofesion: profesionText,
-                        cumpclie: birthdate,
-                        razonsocial: razonSocial,
-                        domfiscal: domFiscal,
-                        idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
-                        numpartida: numeroPartida,
-                        telempresa: teleEmpresa,
-                        actmunicipal: ciiu,
-                        contacempresa: contacEmpresa,
-                        ubigeo_plantilla: '',
-                        fechaconstitu: fechaConstitucion,
-                        profesion_plantilla: profesionText,
-                        tipocli: selectedTipoPersona === 1 ? 'N' : 'J',
-                        residente: resident === 1 ? '1' : '0',
-                        fechaing: '',
-                        dirfer: '',
-                        profocupa: cargoText,
-                        conyuge: '',
-                        natper: profesionText,
-                    }
+                    cliente: changedPayload as any
                 }, {
-                    onSuccess: async (data) => {
-                        try {
-                            await syncCliente2ProfesionTexto(
-                                data?.idcontratante || cliente2?.idcontratante,
-                                profesionIdForCustomText,
-                                profesionText,
-                                cargoId,
-                                cargoText
-                            )
-                        } catch (syncError) {
-                            console.error('No se pudo sincronizar profesión/cargo en cliente:', syncError)
-                        }
+                    onSuccess: (data) => {
                         console.log('Cliente actualizado:', data)
                         setType('success')
                         setMessage('Cliente actualizado exitosamente')
@@ -470,49 +472,59 @@ const Cliente2Form = ({
                     setShow(true)
                     return
                 }
+                const fullPayload = {
+                    tipper: 'J',
+                    apepat,
+                    apemat,
+                    prinom,
+                    segnom,
+                    nombre,
+                    direccion,
+                    idubigeo: ubigeo.id,
+                    resedent: resident === 1 ? '1' : '0',
+                    idtipdoc: 1,
+                    numdoc: dni,
+                    email,
+                    nacionalidad: '',
+                    idestcivil: civilStatus,
+                    sexo: '',
+                    telfijo: fixedPhone,
+                    telcel: celphone,
+                    telofi: officePhone,
+                    idcargoprofe: 0,
+                    idprofesion: 0,
+                    detaprofesion: '',
+                    cumpclie: birthdate,
+                    razonsocial: razonSocial,
+                    domfiscal: domFiscal,
+                    idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
+                    numpartida: numeroPartida,
+                    telempresa: teleEmpresa,
+                    actmunicipal: ciiu,
+                    contacempresa: contacEmpresa,
+                    ubigeo_plantilla: '',
+                    fechaconstitu: fechaConstitucion,
+                    profesion_plantilla: '',
+                    tipocli: 'J',
+                    residente: resident === 1 ? '1' : '0',
+                    fechaing: '',
+                    dirfer: '',
+                    profocupa: '',
+                    conyuge: '',
+                    natper: '',
+                }
+
+                const changedPayload = getChangedFields(fullPayload, cliente2 || undefined)
+                if (Object.keys(changedPayload).length === 0) {
+                    setType('success')
+                    setMessage('No hay cambios para guardar')
+                    setShow(true)
+                    return
+                }
+
                 updateCliente2.mutate({
                     access,
-                    cliente: {
-                        tipper: 'J',
-                        apepat,
-                        apemat,
-                        prinom,
-                        segnom,
-                        nombre,
-                        direccion,
-                        idubigeo: ubigeo.id,
-                        resedent: resident === 1 ? '1' : '0',
-                        idtipdoc: 1,
-                        numdoc: dni,
-                        email,
-                        nacionalidad: '',
-                        idestcivil: civilStatus,
-                        sexo: '',
-                        telfijo: fixedPhone,
-                        telcel: celphone,
-                        telofi: officePhone,
-                        idcargoprofe: 0,
-                        idprofesion: 0,
-                        detaprofesion: '',
-                        cumpclie: birthdate,
-                        razonsocial: razonSocial,
-                        domfiscal: domFiscal,
-                        idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
-                        numpartida: numeroPartida,
-                        telempresa: teleEmpresa,
-                        actmunicipal: ciiu,
-                        contacempresa: contacEmpresa,
-                        ubigeo_plantilla: '',
-                        fechaconstitu: fechaConstitucion,
-                        profesion_plantilla: '',
-                        tipocli: 'J',
-                        residente: resident === 1 ? '1' : '0',
-                        fechaing: '',
-                        dirfer: '',
-                        profocupa: '',
-                        conyuge: '',
-                        natper: '',
-                    }
+                    cliente: changedPayload as any
                 }, {
                     onSuccess: (data) => {
                         console.log('Cliente actualizado:', data)
