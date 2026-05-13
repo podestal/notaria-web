@@ -57,6 +57,7 @@ import PlantillasMain from "../components/api/plantillas/PlantillasMain";
 import ConfiNotarioMain from "../components/api/confinotario/ConfiNotarioMain";
 import CreateUser from "../components/auth/CreateUser";
 import AbogadosMain from "../components/api/configuracion/abogadosManager/AbogadosMain";
+import ActoCondicionMain from "../components/api/actoCondicion/ActoCondicionMain";
 
 const routes = createBrowserRouter([
     {
@@ -305,6 +306,10 @@ const routes = createBrowserRouter([
                     {
                         path: "configuracion-notario",
                         element: <PrivateRoutes><ConfiNotarioMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "acto-condicion",
+                        element: <PrivateRoutes><ActoCondicionMain /></PrivateRoutes>
                     },
                     {
                         path: "create-user",

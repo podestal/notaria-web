@@ -197,6 +197,7 @@ const Header = ({ kardexTypes }: Props) => {
                 // {name: "Backup Servidor"},
                 // {name: "Configurar SISNOT"},
                 // {name: "Activar Errores Usuarios"},
+                {name: "Acto Condicion", path: "/app/configuracion/acto-condicion"},
                 {name: "Crear Usuario", path: "/app/configuracion/create-user"},
                 {name: "Abogados Manager", path: "/app/configuracion/abogados-manager"},
                 {name: "Plantillas", path: "/app/configuracion/plantillas"},
