@@ -39,4 +39,9 @@ const getActoCondicionService = ({ byTipoActo }: Props) => {
     return new APIClient<ActoCondicion>(url)
 }
 
+/** POST crear condición en la colección principal. */
+export const getActoCondicionWriteClient = () => {
+    return new APIClient<ActoCondicion, ActoCondicion>("/actocondicion/")
+}
+
 export default getActoCondicionService

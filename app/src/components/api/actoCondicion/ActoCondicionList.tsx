@@ -1,9 +1,12 @@
-import type { Dispatch, SetStateAction } from "react"
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react"
+import type { Acto } from "../../../services/api/extraprotocolares/actoService"
 import useAuthStore from "../../../store/useAuthStore"
+import useGetTipoKardexList from "../../../hooks/api/tipoKardex/useGetTipoKardexList"
 import useGetActosPage from "../../../hooks/api/acto/useGetActosPage"
 import Paginator from "../../ui/Paginator"
 import ActoCondicionTable from "./ActoCondicionTable"
 import ActoCondicionCard from "./ActoCondicionCard"
+import ActoDetalleModal from "./ActoDetalleModal"
 
 interface Props {
     desacto: string
@@ -15,6 +18,10 @@ interface Props {
 
 const ActoCondicionList = ({ desacto, idtipoacto, idtipkar, page, setPage }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const [selectedActo, setSelectedActo] = useState<Acto | null>(null)
+    const { data: tiposKardexRaw } = useGetTipoKardexList()
+    const tiposKardex = useMemo(() => (Array.isArray(tiposKardexRaw) ? tiposKardexRaw : []), [tiposKardexRaw])
+
     const { data, isLoading, isError, error } = useGetActosPage({
         access,
         desacto,
@@ -42,12 +49,12 @@ const ActoCondicionList = ({ desacto, idtipoacto, idtipkar, page, setPage }: Pro
             {!isLoading && results.length > 0 && (
                 <>
                     <div className="hidden md:block">
-                        <ActoCondicionTable actos={results} />
+                        <ActoCondicionTable actos={results} tiposKardex={tiposKardex} onSelectActo={setSelectedActo} />
                     </div>
                     <ul className="space-y-3 md:hidden">
                         {results.map((acto, index) => (
                             <li key={`${acto.idtipoacto}-${acto.idtipkar}-${index}`}>
-                                <ActoCondicionCard acto={acto} />
+                                <ActoCondicionCard acto={acto} tiposKardex={tiposKardex} onSelectActo={setSelectedActo} />
                             </li>
                         ))}
                     </ul>
@@ -55,6 +62,13 @@ const ActoCondicionList = ({ desacto, idtipoacto, idtipkar, page, setPage }: Pro
             )}
 
             {!isLoading && !isError && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} itemsPerPage={10} />}
+
+            <ActoDetalleModal
+                acto={selectedActo}
+                isOpen={selectedActo !== null}
+                onClose={() => setSelectedActo(null)}
+                onActoUpdated={(a) => setSelectedActo(a)}
+            />
         </div>
     )
 }

@@ -38,3 +38,14 @@ export interface ActoPage {
 export const getActoService = () => {
     return new APIClient<ActoPage>('/tiposdeacto/')
 }
+
+/** POST crear tipo de acto (el servidor puede asignar `idtipoacto`). */
+export const getActoCreateClient = () => {
+    return new APIClient<Acto, Partial<Acto>>("/tiposdeacto/")
+}
+
+/** PATCH actualizar por `idtipoacto` (clave en URL). */
+export const getActoDetailClient = (idtipoacto: string) => {
+    const id = encodeURIComponent(idtipoacto.trim())
+    return new APIClient<Acto, Partial<Acto>>(`/tiposdeacto/${id}/`)
+}
