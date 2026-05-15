@@ -13,7 +13,7 @@ import APIClient from "./apiClient"
 // parte_generacion = models.CharField(max_length=1, blank=True, null=True)
 
 export interface ActoCondicion {
-    idcondicion: string;
+    idcondicion: string | number;
     idtipoacto: string;
     condicion: string;
     parte?: string;
@@ -24,6 +24,11 @@ export interface ActoCondicion {
     condicionsisgen?: string;
     codconsisgen?: string;
     parte_generacion?: string;
+}
+
+/** Alta: `idcondicion` lo asigna el backend. */
+export type CreateActoCondicionPayload = Omit<ActoCondicion, "idcondicion"> & {
+    idcondicion?: string;
 }
 
 interface Props {
@@ -41,7 +46,15 @@ const getActoCondicionService = ({ byTipoActo }: Props) => {
 
 /** POST crear condición en la colección principal. */
 export const getActoCondicionWriteClient = () => {
-    return new APIClient<ActoCondicion, ActoCondicion>("/actocondicion/")
+    return new APIClient<ActoCondicion, CreateActoCondicionPayload>("/actocondicion/")
+}
+
+export type UpdateActoCondicionPayload = Partial<Omit<ActoCondicion, "idcondicion">>
+
+/** PATCH / DELETE por `idcondicion` (clave primaria). */
+export const getActoCondicionDetailClient = (idcondicion: string | number) => {
+    const id = encodeURIComponent(String(idcondicion ?? "").trim())
+    return new APIClient<ActoCondicion, UpdateActoCondicionPayload>(`/actocondicion/${id}/`)
 }
 
 export default getActoCondicionService

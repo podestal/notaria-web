@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient, type UseMutationResult } from "@tanstack/react-query"
-import type { ActoCondicion } from "../../../services/api/actoCondicionService"
+import type { ActoCondicion, CreateActoCondicionPayload } from "../../../services/api/actoCondicionService"
 import { getActoCondicionWriteClient } from "../../../services/api/actoCondicionService"
 
 export interface CreateActoCondicionVariables {
     access: string
-    body: ActoCondicion
+    body: CreateActoCondicionPayload
 }
 
 const useCreateActoCondicion = (): UseMutationResult<ActoCondicion, Error, CreateActoCondicionVariables> => {
