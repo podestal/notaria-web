@@ -8,6 +8,7 @@ import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
+import { getUsuarioDisplayName } from "../../../services/api/usuariosService"
 import useGetAbogados from "../../../hooks/api/abogados/useGetAbogados"
 import { CreateKardexData } from "../../../hooks/api/kardex/useCreateKardex"
 import { Kardex } from "../../../services/api/kardexService"
@@ -289,7 +290,7 @@ const KardexForm = ({
         if (kardex && responsableId != null && responsableId > 0) {
             const saved = usuarios.find((u) => u.idusuario === responsableId)
             if (saved) {
-                setResponsible({ id: String(saved.idusuario), label: getTitleCase(saved.loginusuario) })
+                setResponsible({ id: String(saved.idusuario), label: getTitleCase(getUsuarioDisplayName(saved)) })
             }
             return
         }
@@ -298,7 +299,7 @@ const KardexForm = ({
             const current = usuarios.find((u) => u.idusuario === user.idusuario)
             setResponsible(
                 current
-                    ? { id: String(current.idusuario), label: getTitleCase(current.loginusuario) }
+                    ? { id: String(current.idusuario), label: getTitleCase(getUsuarioDisplayName(current)) }
                     : { id: String(user.idusuario), label: user.username }
             )
         }
@@ -420,9 +421,9 @@ const KardexForm = ({
                         </p>
                     ) : (
                         <SearchableDropdownInput
-                            options={usuarios.map((user) => ({
-                                id: String(user.idusuario),
-                                label: getTitleCase(user.loginusuario),
+                            options={usuarios.map((u) => ({
+                                id: String(u.idusuario),
+                                label: getTitleCase(getUsuarioDisplayName(u)),
                             }))}
                             selected={responsible}
                             setSelected={setResponsible}
@@ -432,7 +433,7 @@ const KardexForm = ({
                 </div>
                 <div className="flex justify-center items-center gap-4">
                     <SimpleSelectorStr 
-                        options={[{ value: '0', label: 'Seleccionar Usuario' }, ...usuarios.map(user => ({ value: String(user.idusuario), label: getTitleCase(user.loginusuario) }))]}
+                        options={[{ value: '0', label: 'Seleccionar Usuario' }, ...usuarios.map((u) => ({ value: String(u.idusuario), label: getTitleCase(getUsuarioDisplayName(u)) }))]}
                         setter={setRecepcion}
                         defaultValue={recepcion}
                         label="Recepción"

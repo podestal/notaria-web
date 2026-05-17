@@ -10,7 +10,7 @@ import SimpleSelector from "../../../ui/SimpleSelector";
 import SearchableDropdownInput from "../../../ui/SearchableDropdownInput";
 import { Ubigeo } from "../../../../services/api/ubigeoService";
 import TimePicker from "../../../ui/TimePicker";
-import { Usuario } from "../../../../services/api/usuariosService";
+import { getUsuarioDisplayName, Usuario } from "../../../../services/api/usuariosService";
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 import { CreateIngresoCartaData } from "../../../../hooks/api/extraprotocolares/ingresoCartas/useCreateIngresoCarta";
 import { UseMutationResult } from "@tanstack/react-query";
@@ -467,7 +467,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
         <div className="grid grid-cols-2 gap-4 my-4">
             {/* <SimpleSelectorStr
                 label="Responsable"
-                options={usuarios.map((u) => ({ value: u.loginusuario, label: `${u.prinom} ${u.apepat}`.trim() }))}
+                options={usuarios.map((u) => ({ value: u.username, label: getUsuarioDisplayName(u) }))}
                 defaultValue={responsible}
                 setter={setResponsible}
             /> */}
