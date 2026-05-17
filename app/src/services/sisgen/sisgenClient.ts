@@ -1,5 +1,6 @@
 import axios from "axios"
 import { attachAxiosAuthRefreshInterceptor } from "../http/attachAxiosAuthRefreshInterceptor"
+import { attachAxiosAuthRequestInterceptor } from "../http/attachAxiosAuthRequestInterceptor"
 
 const URL = import.meta.env.VITE_SISGEN_URL
 
@@ -9,6 +10,7 @@ const axiosInstance = axios.create({
     withCredentials: true,
 })
 
+attachAxiosAuthRequestInterceptor(axiosInstance)
 attachAxiosAuthRefreshInterceptor(axiosInstance)
 
 class SisgenClient<ResponseType, RequestType = ResponseType> {

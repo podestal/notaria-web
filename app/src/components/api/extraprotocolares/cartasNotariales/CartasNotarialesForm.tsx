@@ -1,7 +1,7 @@
 import { ClipboardList, MessageCircleQuestionIcon, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import SimpleInput from "../../../ui/SimpleInput";
-import { IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas";
+import { CreateUpdateIngresoCartas, IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas";
 import moment from "moment";
 import Calendar from "../../../ui/Calendar";
 
@@ -11,6 +11,7 @@ import SearchableDropdownInput from "../../../ui/SearchableDropdownInput";
 import { Ubigeo } from "../../../../services/api/ubigeoService";
 import TimePicker from "../../../ui/TimePicker";
 import { getUsuarioDisplayName, Usuario } from "../../../../services/api/usuariosService";
+import { unwrapPythonBytesString } from "../../../../utils/pythonBytesString";
 import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 import { CreateIngresoCartaData } from "../../../../hooks/api/extraprotocolares/ingresoCartas/useCreateIngresoCarta";
 import { UseMutationResult } from "@tanstack/react-query";
@@ -31,21 +32,10 @@ interface Props {
     updateCartaNotarial?: UseMutationResult<IngresoCartas, Error, CreateIngresoCartaData>
 }
 
-/** If the API/DB stored Python `str(bytes)`, the value looks like `b'Juan Pérez'`. Decode for display; the real fix is server-side `.decode()`. */
-function unwrapPythonBytesString(raw: string | undefined): string {
-    const s = (raw ?? "").trim();
-    if (s.startsWith("b'") && s.endsWith("'") && s.length > 3) {
-        return s.slice(2, -1).replace(/\\'/g, "'").replace(/\\\\/g, "\\");
-    }
-    if (s.startsWith('b"') && s.endsWith('"') && s.length > 3) {
-        return s.slice(2, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\");
-    }
-    return s;
-}
-
 const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, updateCartaNotarial }: Props) => {
 
     const [loading, setLoading] = useState(false);
+    const [savingRecepcion, setSavingRecepcion] = useState(false);
     const access = useAuthStore(s => s.access_token) || '';
     const { setMessage, setShow, setType } = useNotificationsStore()
     const user = useGetUserInfo(s => s.user);
@@ -107,15 +97,102 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     const cartaGuardada = Boolean(carta) || doneCreate;
     const updateCartaNotarialInternal = useUpdateIngresoCarta({ ingresoCartasId: cartaId })
 
+    const nombreUsuarioCreador = user ? getUsuarioDisplayName(user) : "";
+    const idEncargadoFromStore =
+        user?.idusuario != null && user.idusuario > 0 ? String(user.idusuario) : "";
+
+    const resolveDesEncargado = (raw: string | undefined | null, encargadoId?: string): string => {
+        const decoded = unwrapPythonBytesString(raw)
+        if (decoded) return decoded
+        const id = (encargadoId ?? "").trim()
+        if (id && usuarios?.length) {
+            const match = usuarios.find((u) => String(u.idusuario) === id)
+            if (match) return getUsuarioDisplayName(match)
+        }
+        return nombreUsuarioCreador
+    }
+
+    const responsableDisplay = resolveDesEncargado(
+        carta?.des_encargado ?? encargadoDesPersistido,
+        encargadoIdPersistido || idEncargadoFromStore
+    )
+
     useEffect(() => {
         if (carta == null) return;
         setEncargadoIdPersistido(String(carta.id_encargado ?? ""));
-        setEncargadoDesPersistido(unwrapPythonBytesString(carta.des_encargado ?? ""));
-    }, [carta]);
+        setEncargadoDesPersistido(
+            resolveDesEncargado(carta.des_encargado, String(carta.id_encargado ?? ""))
+        );
+    }, [carta, usuarios, user]);
 
-    const nombreUsuarioCreador = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
-    const idEncargadoFromStore =
-        user?.idusuario != null && user.idusuario > 0 ? String(user.idusuario) : "";
+    const notify = (type: "success" | "error", message: string) => {
+        setMessage(message)
+        setType(type)
+        setShow(true)
+    }
+
+    const buildIngresoCartaPayload = (): CreateUpdateIngresoCartas => ({
+        fec_ingreso: moment(fechaIngreso).format("DD/MM/YYYY"),
+        id_remitente: documento,
+        telf_remitente: telefono,
+        nom_remitente: remitente,
+        dir_remitente: direccion,
+        dni_destinatario: documentoDest,
+        nom_destinatario: destinatario,
+        dir_destinatario: direccionDest,
+        zona_destinatario: ubigeo?.id || "",
+        fec_entrega: moment(fechaDiligencia).format("DD/MM/YYYY"),
+        hora_entrega: horaDiligencia || "",
+        emple_entrega: responsible,
+        firmo: firma,
+        recepcion,
+        conte_carta: contenido,
+        costo: "0.00",
+        id_encargado:
+            carta != null
+                ? String(carta.id_encargado ?? "")
+                : encargadoIdPersistido || idEncargadoFromStore,
+        des_encargado: resolveDesEncargado(
+            carta?.des_encargado ?? encargadoDesPersistido,
+            carta != null ? String(carta.id_encargado ?? "") : encargadoIdPersistido || idEncargadoFromStore
+        ),
+        nom_regogio: "",
+        doc_recogio: "",
+        fec_recogio: moment(fechaIngreso).format("DD/MM/YYYY"),
+        fact_recogio: "0.00",
+    })
+
+    const handleUpdateRecepcionContenido = () => {
+        if (!cartaGuardada || cartaId <= 0) {
+            notify("error", "Guarde la carta antes de actualizar recepción y contenido.")
+            return
+        }
+        if (!access) {
+            notify("error", "Debe iniciar sesión.")
+            return
+        }
+
+        const updateMutation = updateCartaNotarial ?? updateCartaNotarialInternal
+        setSavingRecepcion(true)
+        updateMutation.mutate(
+            { access, ingresoCarta: buildIngresoCartaPayload() },
+            {
+                onSuccess: () => {
+                    notify("success", "Recepción y contenido actualizados correctamente.")
+                    setOpenRecepcionContenido(false)
+                },
+                onError: (error: Error) => {
+                    notify(
+                        "error",
+                        error instanceof Error
+                            ? error.message
+                            : "No se pudo actualizar recepción y contenido."
+                    )
+                },
+                onSettled: () => setSavingRecepcion(false),
+            }
+        )
+    }
 
     const handleSave = () => {
         setLoading(true);
@@ -124,36 +201,13 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
             createIngresoCarta.mutate({
                 access,
                 ingresoCarta: {
-                    fec_ingreso: moment(fechaIngreso).format('DD/MM/YYYY'),
-                    id_remitente: documento,
-                    telf_remitente: telefono,
-                    nom_remitente: remitente,
-                    dir_remitente: direccion,
-                    dni_destinatario: documentoDest,
-                    nom_destinatario: destinatario,
-                    dir_destinatario: direccionDest,
-                    zona_destinatario: ubigeo?.id || '',
-                    fec_entrega: moment(fechaDiligencia).format('DD/MM/YYYY'),
-                    hora_entrega: horaDiligencia || '',
-                    emple_entrega: responsible,
-                    firmo: firma,
-                    recepcion,
-                    conte_carta: contenido,
-                    costo: '0.00', // Assuming costo is not provided in the form
+                    ...buildIngresoCartaPayload(),
                     id_encargado: idEncargadoFromStore,
-                    des_encargado:
-                        unwrapPythonBytesString(nombreUsuarioCreador) || nombreUsuarioCreador,
-                    nom_regogio: '',
-                    doc_recogio: '',
-                    fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
-                    fact_recogio: '0.00',
-                }
+                    des_encargado: nombreUsuarioCreador,
+                },
             }, {
                 onSuccess: res => {
-                    // Optionally reset the form or show a success message
-                    setMessage('Carta guardada exitosamente');
-                    setShow(true);
-                    setType('success');
+                    notify("success", "Carta guardada exitosamente");
                     setShowDocs(true);
                     setCartaId(res.id_carta);
                     setNumCarta(res.num_carta);
@@ -163,20 +217,16 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                             : idEncargadoFromStore
                     );
                     setEncargadoDesPersistido(
-                        (() => {
-                            const raw = res.des_encargado?.trim()
-                                ? res.des_encargado
-                                : nombreUsuarioCreador;
-                            return unwrapPythonBytesString(raw) || raw;
-                        })()
+                        resolveDesEncargado(
+                            res.des_encargado,
+                            res.id_encargado != null ? String(res.id_encargado) : idEncargadoFromStore
+                        )
                     );
                     setDoneCreate(true);
                 },
                 onError: (error) => {
                     console.error("Error creating carta:", error);
-                    setMessage('Error al guardar la carta');
-                    setShow(true);
-                    setType('error');
+                    notify("error", "Error al guardar la carta");
                 },
                 onSettled: () => {
                     setLoading(false);
@@ -187,45 +237,14 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
         if (updateCartaNotarial) {
             updateCartaNotarial.mutate({
                 access,
-                ingresoCarta: {
-                    fec_ingreso: moment(fechaIngreso).format('DD/MM/YYYY'),
-                    id_remitente: documento,
-                    telf_remitente: telefono,
-                    nom_remitente: remitente,
-                    dir_remitente: direccion,
-                    dni_destinatario: documentoDest,
-                    nom_destinatario: destinatario,
-                    dir_destinatario: direccionDest,
-                    zona_destinatario: ubigeo?.id || '',
-                    fec_entrega: moment(fechaDiligencia).format('DD/MM/YYYY'),
-                    hora_entrega: horaDiligencia || '',
-                    emple_entrega: responsible,
-                    firmo: firma,
-                    recepcion,
-                    conte_carta: contenido,
-                    costo: '0.00', // Assuming costo is not provided in the form
-                    id_encargado: carta != null ? String(carta.id_encargado ?? "") : idEncargadoFromStore,
-                    des_encargado:
-                        carta != null
-                            ? unwrapPythonBytesString(carta.des_encargado ?? "") ||
-                              (carta.des_encargado ?? "")
-                            : nombreUsuarioCreador,
-                    nom_regogio: '',
-                    doc_recogio: '',
-                    fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
-                    fact_recogio: '0.00',
-                }
+                ingresoCarta: buildIngresoCartaPayload(),
             }, {
                 onSuccess: () => {
-                    setMessage('Carta actualizada exitosamente');
-                    setShow(true);
-                    setType('success');
+                    notify("success", "Carta actualizada exitosamente");
                 },
                 onError: (error) => {
                     console.error("Error updating carta:", error);
-                    setMessage('Error al actualizar la carta');
-                    setShow(true);
-                    setType('error');
+                    notify("error", "Error al actualizar la carta");
                 },
                 onSettled: () => {
                     setLoading(false);
@@ -236,43 +255,13 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
         if (!carta && doneCreate) {
             updateCartaNotarialInternal.mutate({
                 access,
-                ingresoCarta: {
-                    fec_ingreso: moment(fechaIngreso).format('DD/MM/YYYY'),
-                    id_remitente: documento,
-                    telf_remitente: telefono,
-                    nom_remitente: remitente,
-                    dir_remitente: direccion,
-                    dni_destinatario: documentoDest,
-                    nom_destinatario: destinatario,
-                    dir_destinatario: direccionDest,
-                    zona_destinatario: ubigeo?.id || '',
-                    fec_entrega: moment(fechaDiligencia).format('DD/MM/YYYY'),
-                    hora_entrega: horaDiligencia || '',
-                    emple_entrega: responsible,
-                    firmo: firma,
-                    recepcion,
-                    conte_carta: contenido,
-                    costo: '0.00', // Assuming costo is not provided in the form
-                    id_encargado: encargadoIdPersistido || idEncargadoFromStore,
-                    des_encargado:
-                        unwrapPythonBytesString(encargadoDesPersistido || "") ||
-                        encargadoDesPersistido ||
-                        nombreUsuarioCreador,
-                    nom_regogio: '',
-                    doc_recogio: '',
-                    fec_recogio: moment(fechaIngreso).format('DD/MM/YYYY'), // Assuming this is the same as fec_ingreso
-                    fact_recogio: '0.00',
-                }
+                ingresoCarta: buildIngresoCartaPayload(),
             }, {
                 onSuccess: () => {
-                    setMessage('Carta actualizada exitosamente');
-                    setShow(true);
-                    setType('success');
+                    notify("success", "Carta actualizada exitosamente");
                 },
                 onError: () => {
-                    setMessage('Error al actualizar la carta');
-                    setShow(true);
-                    setType('error');
+                    notify("error", "Error al actualizar la carta");
                 },
                 onSettled: () => {
                     setLoading(false);
@@ -343,11 +332,7 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
             />
             <SimpleInput 
                 label="Responsable"
-                value={
-                    unwrapPythonBytesString(carta?.des_encargado) ||
-                    unwrapPythonBytesString(encargadoDesPersistido) ||
-                    nombreUsuarioCreador
-                }
+                value={responsableDisplay}
                 setValue={() => {}}
                 horizontal
                 disabled
@@ -507,9 +492,14 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                             <MessageCircleQuestionIcon className="h-4 w-4 cursor-pointer text-blue-600 transition-all duration-300 hover:text-blue-500" />
                         </button>
                     </div>
-                    <div className="mb-4 flex w-full cursor-pointer items-center justify-between gap-1 rounded-lg bg-blue-200 px-4 py-2 text-blue-600 hover:opacity-85">
-                        <p className="text-xs">Actualizar</p>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={handleUpdateRecepcionContenido}
+                        disabled={savingRecepcion}
+                        className="mb-4 flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-blue-200 px-4 py-2 text-xs font-medium text-blue-600 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        {savingRecepcion ? "Guardando…" : "Actualizar"}
+                    </button>
                 </div>
                 <textarea
                     value={contenido}

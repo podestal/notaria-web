@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from "axios"
 import { attachAxiosAuthRefreshInterceptor } from "../http/attachAxiosAuthRefreshInterceptor"
+import { attachAxiosAuthRequestInterceptor } from "../http/attachAxiosAuthRequestInterceptor"
 
 const rawBase = (import.meta.env.VITE_API_URL as string | undefined) ?? ""
 const baseURL = rawBase.replace(/\/$/, "")
@@ -12,6 +13,7 @@ export const templateFileAxios: AxiosInstance = axios.create({
     withCredentials: true,
 })
 
+attachAxiosAuthRequestInterceptor(templateFileAxios)
 attachAxiosAuthRefreshInterceptor(templateFileAxios)
 
 const parseFilenameFromContentDisposition = (header: string | undefined): string | null => {

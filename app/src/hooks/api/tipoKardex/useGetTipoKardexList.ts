@@ -1,5 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query"
 import getTipokardexService, { type Tipokardex } from "../../../services/api/tipokardexService"
+import useAuthStore from "../../../store/useAuthStore"
 
 /** API may return an array, null, or a paginated envelope — always normalize to an array. */
 function normalizeTipokardexList(raw: unknown): Tipokardex[] {
@@ -13,12 +14,14 @@ function normalizeTipokardexList(raw: unknown): Tipokardex[] {
 }
 
 const useGetTipoKardexList = (): UseQueryResult<Tipokardex[], Error> => {
+    const access = useAuthStore((s) => s.access_token) || ""
     const tipoKardexService = getTipokardexService()
 
     return useQuery({
-        queryKey: ["tipoKardex list"],
-        queryFn: () => tipoKardexService.get(),
+        queryKey: ["tipoKardex list", access],
+        queryFn: () => tipoKardexService.get(access),
         select: (data) => normalizeTipokardexList(data),
+        enabled: Boolean(access),
     })
 }
 
