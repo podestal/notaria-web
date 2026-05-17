@@ -70,7 +70,7 @@ const KardexForm = ({
     // const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
     const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
-    const [responsible, setResponsible] = useState<{ id: string; label: string } | null>({ id: user?.idusuario.toString() || '0', label: user?.username || '' }) 
+    const [responsible, setResponsible] = useState<{ id: string; label: string } | null>(null)
     const [recepcion, setRecepcion] = useState<string>(kardex?.recepcion || user?.idusuario.toString() || '0')
 
     const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
@@ -83,6 +83,7 @@ const KardexForm = ({
     const [kardexId, setKardexId] = useState(kardex?.idkardex || 0)
     const [doneCreate, setDoneCreate] = useState(false);
     const updateKardexInternal = useUpdateKardex({ kardexId })
+    const responsableLocked = doneCreate || Boolean(kardex?.idkardex)
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -281,6 +282,28 @@ const KardexForm = ({
     const { data: abogados, isLoading: isLoadingAbogados, isError: isErrorAbogados, error: errorAbogados, isSuccess: isSuccessAbogados } = useGetAbogados({ access })
     const { data: templates, isSuccess: isSuccessTemplates } = useGetTemplatesByActos({ access, codactos: contratos.join('') })
 
+    useEffect(() => {
+        if (!isSuccessUsuarios || !usuarios?.length) return
+
+        const responsableId = kardex?.responsable ?? kardex?.idusuario
+        if (kardex && responsableId != null && responsableId > 0) {
+            const saved = usuarios.find((u) => u.idusuario === responsableId)
+            if (saved) {
+                setResponsible({ id: String(saved.idusuario), label: getTitleCase(saved.loginusuario) })
+            }
+            return
+        }
+
+        if (!kardex && user?.idusuario) {
+            const current = usuarios.find((u) => u.idusuario === user.idusuario)
+            setResponsible(
+                current
+                    ? { id: String(current.idusuario), label: getTitleCase(current.loginusuario) }
+                    : { id: String(user.idusuario), label: user.username }
+            )
+        }
+    }, [kardex?.idkardex, kardex?.responsable, kardex?.idusuario, usuarios, isSuccessUsuarios, user, kardex])
+
     if (isLoading || isLoadingUsuarios || isLoadingAbogados) return <p className="text-sm animate-pulse text-center my-10">Cargando ....</p>
     if (isError) return <p className="text-center my-8">Error: {error.message}</p>
     if (isErrorUsuarios) return <p className="text-center my-8">Error: {errorUsuarios.message}</p>
@@ -391,12 +414,21 @@ const KardexForm = ({
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-center items-center gap-4">
                     <p className="text-md font-bold py-2">Responsable</p>
-                    <SearchableDropdownInput 
-                        options={usuarios.map(user => ({ id: String(user.idusuario), label: getTitleCase(user.loginusuario) }))}
-                        selected={responsible}
-                        setSelected={setResponsible}
-                        placeholder="Buscar responsable..."
-                    />
+                    {responsableLocked ? (
+                        <p className="min-h-[2.625rem] flex-1 rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-800">
+                            {responsible?.label || "—"}
+                        </p>
+                    ) : (
+                        <SearchableDropdownInput
+                            options={usuarios.map((user) => ({
+                                id: String(user.idusuario),
+                                label: getTitleCase(user.loginusuario),
+                            }))}
+                            selected={responsible}
+                            setSelected={setResponsible}
+                            placeholder="Buscar responsable..."
+                        />
+                    )}
                 </div>
                 <div className="flex justify-center items-center gap-4">
                     <SimpleSelectorStr 
