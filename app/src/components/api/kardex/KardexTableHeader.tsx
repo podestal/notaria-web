@@ -11,13 +11,12 @@ const headerItems = [
     "Registro",
     "Tomo",
     "Usuario",
-    "Escaneo"
 ]
 
 const KardexTableHeader = () => {
 
   return (
-    <div className="grid grid-cols-13 items-center gap-2 border-b border-slate-200 bg-gradient-to-r from-slate-700 via-slate-700 to-slate-800 px-3 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-100 shadow-sm">
+    <div className="grid grid-cols-12 items-center gap-2 border-b border-slate-200 bg-gradient-to-r from-slate-700 via-slate-700 to-slate-800 px-3 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-100 shadow-sm">
       {headerItems.map((item, index) => (
         <p
           key={index}

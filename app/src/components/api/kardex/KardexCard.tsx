@@ -22,7 +22,7 @@ const KardexCard = ({ kardex, readyOnly }: Props) => {
     <>
     <div 
         key={kardex.idkardex}
-        className="grid grid-cols-13 text-[10px] text-center my-4 gap-2"
+        className="grid grid-cols-12 text-[10px] text-center my-4 gap-2"
     >
         <h2 
             onClick={() => {
@@ -42,7 +42,6 @@ const KardexCard = ({ kardex, readyOnly }: Props) => {
         <p>{kardex.numinstrmento}</p>
         <p>{kardex.txa_minuta}</p>
         <p>{getTitleCase(kardex.usuario)}</p>
-        <p>Escaneo ...</p>
     </div>
     <TopModal
         isOpen={open}
