@@ -1,6 +1,10 @@
 import axios from "axios"
 import { useState } from "react";
 import useAuthStore from "../../../store/useAuthStore";
+import {
+    parseFecInscForDisplay,
+    parseThreeDigitIntForDisplay,
+} from "./vehicleFormShared"
 
 interface Props {
     plate: string
@@ -57,11 +61,11 @@ const VehicleLooker = ({
             setSerie(response.data.numserie || '');
             setCarroceria(response.data.carroceria || '');
             setMotor(response.data.motor || '');
-            setCilindros(response.data.numcil || '');
+            setCilindros(parseThreeDigitIntForDisplay(response.data.numcil));
             setAnioFabricacion(response.data.anofab || '');
-            setRuedas(response.data.numrueda || '');
+            setRuedas(parseThreeDigitIntForDisplay(response.data.numrueda));
             setCombustible(response.data.combustible || '');
-            setFechaInscripcion(response.data.fecinsc || '');
+            setFechaInscripcion(parseFecInscForDisplay(response.data.fecinsc));
             setPartidaRegistral(response.data.pregistral || '');
             setClase(response.data.clase || '');
             console.log('response.data.idsedereg ', response.data.idsedereg )

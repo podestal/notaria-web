@@ -1,6 +1,15 @@
 import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
+import DateInput from "../../ui/DateInput"
 import VehicleLooker from "./VehicleLooker"
+import {
+    formatFecInscForApi,
+    formatThreeDigitIntForApi,
+    isValidFecInsc,
+    parseFecInscForDisplay,
+    parseThreeDigitIntForDisplay,
+    sanitizeThreeDigitIntInput,
+} from "./vehicleFormShared"
 import { CreateVehicularData } from "../../../hooks/api/vehiculares/useCreateVehicular"
 import { Vehicle } from "../../../services/api/vehicleService"
 import { UseMutationResult } from "@tanstack/react-query"
@@ -33,19 +42,47 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
     const [clase, setClase] = useState( vehicle ? vehicle.clase : '');
     const [motor, setMotor] = useState( vehicle ? vehicle.motor : '');
     const [marca, setMarca] = useState( vehicle ? vehicle.marca : '');
-    const [cilindros, setCilindros] = useState(vehicle ? vehicle.numcil : '');
+    const [cilindros, setCilindros] = useState(() => parseThreeDigitIntForDisplay(vehicle?.numcil));
     const [anioFabricacion, setAnioFabricacion] = useState( vehicle ? vehicle.anofab : '');
     const [numeroSerie, setNumeroSerie] = useState( vehicle ? vehicle.numserie : '');
     const [modelo, setModelo] = useState(vehicle ? vehicle.modelo : '');
-    const [ruedas, setRuedas] = useState(vehicle ? vehicle.numrueda : '');
+    const [ruedas, setRuedas] = useState(() => parseThreeDigitIntForDisplay(vehicle?.numrueda));
     const [combustible, setCombustible] = useState( vehicle ? vehicle.combustible : '');
-    const [fechaInscripcion, setFechaInscripcion] = useState( vehicle ? vehicle.fecinsc : '');
+    const [fechaInscripcion, setFechaInscripcion] = useState(() => parseFecInscForDisplay(vehicle?.fecinsc));
     const [partidaRegistral, setPartidaRegistral] = useState( vehicle ? vehicle.pregistral : '');
     const [selectedSedesRegistral, setSelectedSedesRegistral] = useState(vehicle ? vehicle.idsedereg : '0'); 
 
     // ERROR HANDLING
     const [plateError, setPlateError] = useState('')
     const [motorError, setMotorError] = useState('')
+    const [fechaInscripcionError, setFechaInscripcionError] = useState('')
+
+    const setCilindrosSafe = (value: string) => setCilindros(sanitizeThreeDigitIntInput(value))
+    const setRuedasSafe = (value: string) => setRuedas(sanitizeThreeDigitIntInput(value))
+
+    const buildVehiclePayload = () => ({
+        kardex,
+        idtipacto: idtipoacto,
+        idplaca: plateId,
+        numplaca: plate,
+        clase,
+        marca,
+        anofab: anioFabricacion,
+        modelo,
+        combustible,
+        carroceria,
+        fecinsc: formatFecInscForApi(fechaInscripcion),
+        color,
+        motor,
+        numcil: formatThreeDigitIntForApi(cilindros),
+        numserie: numeroSerie,
+        numrueda: formatThreeDigitIntForApi(ruedas),
+        idmon: "1",
+        precio: "0",
+        codmepag: "1",
+        pregistral: partidaRegistral,
+        idsedereg: selectedSedesRegistral,
+    })
 
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,33 +100,17 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
             return
         }
 
+        if (!isValidFecInsc(fechaInscripcion)) {
+            setFechaInscripcionError('Use el formato DD/MM/YYYY')
+            return
+        }
+        setFechaInscripcionError('')
+
         setLoading(true)
 
         createVehicle && createVehicle.mutate({
-            vehicle: {
-                kardex, // This should be set based on your application logic
-                idtipacto: idtipoacto, // Default value for type, adjust as needed
-                idplaca: plateId,
-                numplaca: plate,
-                clase,
-                marca,
-                anofab: anioFabricacion,
-                modelo,
-                combustible,
-                carroceria,
-                fecinsc: fechaInscripcion,
-                color,
-                motor,
-                numcil: cilindros,
-                numserie: numeroSerie,
-                numrueda: ruedas,
-                idmon: '1', // Assuming a default value for currency
-                precio: '0', // Assuming a default value for price
-                codmepag: '1', // Assuming a default value for payment method
-                pregistral: partidaRegistral, 
-                idsedereg: selectedSedesRegistral, // Assuming a default value for registry office
-            },
-            access 
+            vehicle: buildVehiclePayload(),
+            access,
         }, {
             onSuccess: () => {
                 setMessage('Vehículo creado correctamente')
@@ -126,29 +147,7 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
 
         updateVehicular && updateVehicular.mutate({
             access,
-            vehicle: {
-                kardex, // This should be set based on your application logic
-                idtipacto: idtipoacto, // Default value for type, adjust as needed
-                idplaca: plateId,
-                numplaca: plate,
-                clase,
-                marca,
-                anofab: anioFabricacion,
-                modelo,
-                combustible,
-                carroceria,
-                fecinsc: fechaInscripcion,
-                color,
-                motor,
-                numcil: cilindros,
-                numserie: numeroSerie,
-                numrueda: ruedas,
-                idmon: '1', // Assuming a default value for currency
-                precio: '0', // Assuming a default value for price
-                codmepag: '1', // Assuming a default value for payment method
-                pregistral: partidaRegistral, 
-                idsedereg: selectedSedesRegistral, // Assuming a default value for registry office
-            }
+            vehicle: buildVehiclePayload(),
         }, {
             onSuccess: () => {
                 setMessage('Vehículo actualizado correctamente')
@@ -217,9 +216,9 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
                 setSerie={setNumeroSerie}
                 setCarroceria={setCarroceria}
                 setMotor={setMotor}
-                setCilindros={setCilindros}
+                setCilindros={setCilindrosSafe}
                 setAnioFabricacion={setAnioFabricacion}
-                setRuedas={setRuedas}
+                setRuedas={setRuedasSafe}
                 setCombustible={setCombustible}
                 setFechaInscripcion={setFechaInscripcion}
                 setPartidaRegistral={setPartidaRegistral}
@@ -262,11 +261,12 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
                 label="Marca"
                 horizontal
             />
-            <SimpleInput 
+            <SimpleInput
                 value={cilindros}
-                setValue={setCilindros}
+                setValue={setCilindrosSafe}
                 label="Cilindros"
                 horizontal
+                type="text"
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -290,11 +290,12 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
                 label="Modelo"
                 horizontal
             />
-            <SimpleInput 
+            <SimpleInput
                 value={ruedas}
-                setValue={setRuedas}
+                setValue={setRuedasSafe}
                 label="Ruedas"
                 horizontal
+                type="text"
             />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -304,9 +305,11 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
                 label="Combustible"
                 horizontal
             />
-            <SimpleInput 
+            <DateInput
                 value={fechaInscripcion}
                 setValue={setFechaInscripcion}
+                setError={setFechaInscripcionError}
+                error={fechaInscripcionError}
                 label="Fecha de inscripción"
                 horizontal
             />
