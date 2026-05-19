@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Pencil } from "lucide-react";
 import { ViajeContratante } from "../../../../../services/api/extraprotocolares/viajeContratanteService";
 import SimpleInput from "../../../../ui/SimpleInput";
 import SimpleSelectorStr from "../../../../ui/SimpleSelectosStr";
@@ -10,29 +11,39 @@ import { UpdateContratanteData } from "../../../../../hooks/api/extraprotocolare
 
 interface Props {
     contratanteViaje: ViajeContratante;
+    documento: string;
+    nombres: string;
+    onEditCliente: () => void;
+    loadingCliente?: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
     updateContratante: UseMutationResult<ViajeContratante, Error, UpdateContratanteData>
 }
 
-const UpdateParticipanteForm = ({ contratanteViaje, setOpen, updateContratante }: Props) => {
+const UpdateParticipanteForm = ({
+    contratanteViaje,
+    documento,
+    nombres,
+    onEditCliente,
+    loadingCliente = false,
+    setOpen,
+    updateContratante,
+}: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const access = useAuthStore(s => s.access_token) || "";
     const [loading, setLoading] = useState(false);
 
-    const [documento, setDocumento] = useState(contratanteViaje?.c_codcontrat || '');
-    const [nombres, setNombres] = useState(contratanteViaje?.c_descontrat || '');
     const [edad, setEdad] = useState(contratanteViaje?.edad || '');
-    const [firma, setFirma] = useState(contratanteViaje?.c_fircontrat?.toLocaleLowerCase() || '0');
-    const [condicion, setCondicion] = useState(contratanteViaje?.c_condicontrat || '0');
+    const [firma, setFirma] = useState(contratanteViaje?.c_fircontrat?.toLowerCase() || '');
+    const [condicion, setCondicion] = useState(contratanteViaje?.c_condicontrat || '');
 
     const handleUpdate = () => {
         setLoading(true);
         updateContratante.mutate({
             contratante: {
-                    id_viaje: contratanteViaje.id_viaje, 
-                    c_codcontrat: documento, 
-                    c_descontrat: nombres,
+                    id_viaje: contratanteViaje.id_viaje,
+                    c_codcontrat: contratanteViaje.c_codcontrat,
+                    c_descontrat: contratanteViaje.c_descontrat,
                     c_fircontrat: firma,
                     c_condicontrat: condicion,
                     edad: edad, 
@@ -69,16 +80,40 @@ const UpdateParticipanteForm = ({ contratanteViaje, setOpen, updateContratante }
             <SimpleInput 
                 label="Documento"
                 value={documento}
-                setValue={setDocumento}
+                setValue={() => {}}
                 horizontal
+                disabled
             />
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
-            <SimpleInput 
+            <SimpleInput
                 label="Nombres y Apellidos"
                 value={nombres}
-                setValue={setNombres}
+                setValue={() => {}}
+                disabled
                 horizontal
+                suffix={
+                    <button
+                        type="button"
+                        onClick={onEditCliente}
+                        disabled={loadingCliente || !documento}
+                        title="Editar cliente"
+                        className={`shrink-0 p-0.5 ${
+                            loadingCliente || !documento
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'cursor-pointer'
+                        }`}
+                    >
+                        <Pencil
+                            size={18}
+                            className={
+                                loadingCliente || !documento
+                                    ? 'text-slate-400'
+                                    : 'text-blue-500 hover:text-blue-400'
+                            }
+                        />
+                    </button>
+                }
             />
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">

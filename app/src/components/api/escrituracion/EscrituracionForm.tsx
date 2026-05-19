@@ -327,7 +327,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 visita: 0,
                 idnotario: 1,
                 contrato: kardex.contrato, 
-                numescritura: numActa || numEscritura,
+                numescritura: kardex.idtipkar === 3 ? numActa : numEscritura,
                 numminuta: numMinuta,
                 fktemplate: kardex.fktemplate,
                 papelini: serieNotarialIni,

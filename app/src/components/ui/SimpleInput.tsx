@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { ReactNode } from 'react';
 
 interface SimpleInputProps {
   label?: string;
@@ -10,7 +11,8 @@ interface SimpleInputProps {
   required?: boolean;
   fullWidth?: boolean;
   disabled?: boolean;
-  type?: string
+  type?: string;
+  suffix?: ReactNode;
 }
 
 const shakeAnimation = {
@@ -28,7 +30,8 @@ const SimpleInput = ({
   required = false,
   fullWidth = false,
   disabled,
-  type = 'text'
+  type = 'text',
+  suffix,
 }: SimpleInputProps) => {
   return (
     <div
@@ -66,7 +69,8 @@ const SimpleInput = ({
                     ${disabled ? 'cursor-not-allowed' : ''}`}
                 />
                 {required && <span className="text-red-500">*</span>}
-                </div>
+                {suffix}
+            </div>
             {error && (
                 <motion.div
                     className="text-xs text-red-500 mt-1 px-2"
