@@ -14,6 +14,14 @@ import useAuthStore from "../../../../../store/useAuthStore"
 import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore"
 import axios from "axios"
 
+export interface NuevoClienteNaturalInitial {
+    apepat?: string
+    apemat?: string
+    prinom?: string
+    segnom?: string
+    sexo?: string
+}
+
 interface Props {
     selectedTipoPersona: number
     ubigeos: Ubigeo[]
@@ -29,6 +37,8 @@ interface Props {
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
     document: string
     setDocument: React.Dispatch<React.SetStateAction<string>>
+    initialNatural?: NuevoClienteNaturalInitial
+    onCreated?: () => void
 }
 
 const civilStatusOptions = [
@@ -61,17 +71,26 @@ const NuevoClienteForm = ({
     setDomicilioFiscal,
     document,
     setDocument,
+    initialNatural,
+    onCreated,
 }: Props) => {
+
+        const initialGender = (() => {
+            const sexo = (initialNatural?.sexo || '').trim().toUpperCase()
+            if (sexo === 'M' || sexo === 'MASCULINO') return 1
+            if (sexo === 'F' || sexo === 'FEMENINO') return 2
+            return 0
+        })()
 
         const { setMessage, setType, setShow } = useNotificationsStore()
         const access = useAuthStore(s => s.access_token) || ''
         const createCliente = useCreateCliente()
 
         // NATURAL PERSON
-        const [apepat, setApepat] = useState('')
-        const [apemat, setApemat] = useState('')
-        const [prinom, setPrinom] = useState('')
-        const [segnom, setSegnom] = useState('')
+        const [apepat, setApepat] = useState(initialNatural?.apepat || '')
+        const [apemat, setApemat] = useState(initialNatural?.apemat || '')
+        const [prinom, setPrinom] = useState(initialNatural?.prinom || '')
+        const [segnom, setSegnom] = useState(initialNatural?.segnom || '')
         const [direccion, setDireccion] = useState('')
         const [nombre, setNombre] = useState('')
         const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(() => {
@@ -90,7 +109,7 @@ const NuevoClienteForm = ({
         const [naturalFrom, setNaturalFrom] = useState('')
     
         const [civilStatus, setCivilStatus] = useState(0)
-        const [gender, setGender] = useState(0)
+        const [gender, setGender] = useState(initialGender)
         const [nationality, setNationality] = useState<{ id: string; label: string } | null>(() => {
             if (selectedTipoPersona === 1) {
               const match = nacionalidades.find(nacionalidad => nacionalidad.idnacionalidad === parseInt('0'));
@@ -356,6 +375,7 @@ const NuevoClienteForm = ({
                     setPrimerNombre(prinom)
                     setSegundoNombre(segnom)
                     setDireccionNatural(direccion)
+                    onCreated?.()
                 },
                 onError: (error) => {
                     console.error('Error al crear cliente:', error)

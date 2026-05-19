@@ -11,40 +11,44 @@ import useGetCargos from "../../../../../hooks/api/cargos/useGetCargos";
 import PreParticipanteForm from "./PreParticipanteForm";
 import useAuthStore from "../../../../../store/useAuthStore";
 import NuevoClienteForm from "../../AperturaDeLibros/cliente/NuevoClienteForm";
+import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
 
 interface Props {
     viajeId: number;
     participantesDocs: string[];
 }
 
+const emptyContratanteInfo = {
+    apePaterno: '',
+    apeMaterno: '',
+    priNombre: '',
+    segNombre: '',
+    direccion: '',
+    ubigeo: '',
+    estadoCivil: '',
+    genero: '',
+    nacionalidad: '',
+    email: '',
+    telfijo: '',
+    telcel: '',
+    telofi: '',
+    idprofesion: 0,
+    idcargoprofe: 0,
+    detaprofesion: '',
+    cumpclie: '',
+    resedente: '1',
+};
+
 const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const [open, setOpen] = useState(false);
     const [openCreateCliente, setOpenCreateCliente] = useState(false);
     const [document, setDocument] = useState('');
     const createContratante = useCreateContratante({ viaje_id: viajeId });
-    const [contratanteInfo, setContratanteInfo] = useState({
-        apePaterno: '',
-        apeMaterno: '',
-        priNombre: '',
-        segNombre: '',
-        direccion: '',
-        ubigeo: '',
-        estadoCivil: '',
-        genero: '',
-        nacionalidad: '',
-        email: '',
-        telfijo: '',
-        telcel: '',
-        telofi: '',
-        idprofesion: 0,
-        idcargoprofe: 0,
-        detaprofesion: '',
-        cumpclie: '',
-        resedente: '1',
-    });
+    const [contratanteInfo, setContratanteInfo] = useState(emptyContratanteInfo);
 
     const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo } = useGetUbigeos({ access })
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError } = useGetNacionalidades({ access })
@@ -91,6 +95,27 @@ const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
         }
     };
 
+    const resetParticipanteForm = () => {
+        setDocument('');
+        setContratanteInfo(emptyContratanteInfo);
+    };
+
+    const closeParticipanteFlow = () => {
+        setOpen(false);
+        setOpenCreateCliente(false);
+        resetParticipanteForm();
+    };
+
+    const handleClienteCreated = async () => {
+        setOpenCreateCliente(false);
+        if (document) {
+            await syncClienteByDni(document);
+        }
+        setMessage('Cliente creado. Revise los datos del participante y guarde.');
+        setType('success');
+        setShow(true);
+    };
+
   return (
     <>
         <div 
@@ -99,9 +124,9 @@ const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
             <File className="text-white text-xl"/>
             <p className="text-xs font-bold">Nuevo</p>
         </div>
-        <TopModal 
-            isOpen={open} 
-            onClose={() => setOpen(false)}
+        <TopModal
+            isOpen={open}
+            onClose={closeParticipanteFlow}
         >
             <div className="p-4">
                 <h2 className="text-2xl font-semibold mb-6 text-center">Nuevo Participante</h2>
@@ -141,9 +166,11 @@ const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
         </TopModal>
         <TopModal
             isOpen={openCreateCliente}
-            onClose={() => setOpenCreateCliente(false)}
+            onClose={closeParticipanteFlow}
+            deepth={50}
         >
             <NuevoClienteForm
+                key={openCreateCliente ? `cliente-${document}` : 'cliente-closed'}
                 selectedTipoPersona={1}
                 ubigeos={ubigeos}
                 nacionalidades={nacionalidades}
@@ -151,6 +178,14 @@ const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
                 cargos={cargos}
                 document={document}
                 setDocument={setDocument}
+                initialNatural={{
+                    apepat: contratanteInfo.apePaterno,
+                    apemat: contratanteInfo.apeMaterno,
+                    prinom: contratanteInfo.priNombre,
+                    segnom: contratanteInfo.segNombre,
+                    sexo: contratanteInfo.genero,
+                }}
+                onCreated={handleClienteCreated}
                 setApellidoPaterno={(value) => {
                     setContratanteInfo(prev => ({ ...prev, apePaterno: value }));
                 }}
@@ -165,10 +200,6 @@ const CreateParticipante = ({ viajeId, participantesDocs }: Props) => {
                 }}
                 setDireccion={(value) => {
                     setContratanteInfo(prev => ({ ...prev, direccion: value }));
-                    setOpenCreateCliente(false);
-                    if (document) {
-                        syncClienteByDni(document);
-                    }
                 }}
                 setRazonSocial={() => {}}
                 setDomicilioFiscal={() => {}}
