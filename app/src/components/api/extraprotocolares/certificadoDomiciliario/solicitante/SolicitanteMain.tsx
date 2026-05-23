@@ -1,5 +1,7 @@
 import { useState } from "react";
+import axios from "axios";
 import useGetNacionalidades from "../../../../../hooks/api/nacionalidades/useGetNacionalidades";
+import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore";
 import useGetProfesiones from "../../../../../hooks/api/profesiones/useGetProfesiones";
 import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos";
 import TopModal from "../../../../ui/TopModal";
@@ -30,6 +32,8 @@ interface Props {
     document: string;
     setDocument: React.Dispatch<React.SetStateAction<string>>;
     onRequestCloseForm?: () => void;
+    /** Saved cert already has solicitante data (edit mode); enables Actualizar without Buscar first */
+    hasExistingSolicitante?: boolean;
 }
 const SolicitanteMain = ({
     solicitante,
@@ -49,6 +53,7 @@ const SolicitanteMain = ({
     document,
     setDocument,
     onRequestCloseForm,
+    hasExistingSolicitante = false,
 }: Props) => {
     const handleCloseNuevoCliente = () => {
         setIsOpen(false);
@@ -57,10 +62,12 @@ const SolicitanteMain = ({
 
     const [isOpen, setIsOpen] = useState(false);
     const [openEditCliente, setOpenEditCliente] = useState(false);
-    const [clienteFound, setClienteFound] = useState(false);
+    const [clienteFound, setClienteFound] = useState(hasExistingSolicitante);
     const [cliente1, setCliente1] = useState<Cliente | null>(null);
+    const [loadingUpdateCliente, setLoadingUpdateCliente] = useState(false);
 
     const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const solicitanteSetters = {
         setSolicitante,
@@ -92,10 +99,47 @@ const SolicitanteMain = ({
         })
     }
 
-    const openClienteEditor = () => {
-        if (!cliente1?.idcliente) return
-        setOpenEditCliente(true)
+    const openClienteEditor = async () => {
+        if (!document.trim()) {
+            setType("error")
+            setMessage("Ingrese el número de documento.")
+            setShow(true)
+            return
+        }
+
+        if (cliente1?.idcliente) {
+            setOpenEditCliente(true)
+            return
+        }
+
+        setLoadingUpdateCliente(true)
+        try {
+            const response = await axios.get(
+                `${import.meta.env.VITE_API_URL}cliente/by_dni/?dni=${document}`,
+                { headers: { Authorization: `JWT ${access}` } }
+            )
+
+            if (!response.data?.idcliente) {
+                setType("error")
+                setMessage("No se encontró el cliente para este documento.")
+                setShow(true)
+                return
+            }
+
+            setCliente1(response.data)
+            setClienteFound(true)
+            setOpenEditCliente(true)
+        } catch {
+            setType("error")
+            setMessage("Error al cargar los datos del cliente.")
+            setShow(true)
+        } finally {
+            setLoadingUpdateCliente(false)
+        }
     }
+
+    const canUpdateCliente =
+        clienteFound && Boolean(document.trim())
 
     const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos({ access })
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades({ access })
@@ -123,9 +167,11 @@ const SolicitanteMain = ({
             setDocument={setDocument}
             setIsOpen={setIsOpen}
             clienteFound={clienteFound}
+            canUpdateCliente={canUpdateCliente}
             onClienteFound={handleClienteFound}
             onClienteCleared={handleClienteCleared}
             onOpenUpdateCliente={openClienteEditor}
+            loadingUpdateCliente={loadingUpdateCliente}
         />
         <SolicitanteForm 
             solicitante={solicitante}

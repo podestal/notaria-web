@@ -24,6 +24,7 @@ interface Props {
     setDocument: React.Dispatch<React.SetStateAction<string>>;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     clienteFound: boolean;
+    canUpdateCliente: boolean;
     onClienteFound: (cliente: Cliente) => void;
     onClienteCleared: () => void;
     onOpenUpdateCliente: () => void;
@@ -48,6 +49,7 @@ const PreSolicitanteForm = ({
     setDocument,
     setIsOpen,
     clienteFound,
+    canUpdateCliente,
     onClienteFound,
     onClienteCleared,
     onOpenUpdateCliente,
@@ -199,7 +201,7 @@ const PreSolicitanteForm = ({
                             </button>
                             <button
                                 type="button"
-                                disabled={!clienteFound || loadingUpdateCliente}
+                                disabled={!canUpdateCliente || loadingUpdateCliente}
                                 onClick={onOpenUpdateCliente}
                                 className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[9.5rem]"
                             >

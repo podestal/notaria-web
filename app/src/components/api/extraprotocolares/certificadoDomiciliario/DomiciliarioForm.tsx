@@ -274,7 +274,11 @@ const DomiciliarioForm = ({ domiciliario, createDomiciliario, updateDomiciliario
             </div>
         </div>
         <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Solicitante</p>
-        <SolicitanteMain 
+        <SolicitanteMain
+            key={domiciliario?.id_domiciliario ?? "new"}
+            hasExistingSolicitante={Boolean(
+                domiciliario?.numdoc_solic?.trim() && domiciliario?.nombre_solic?.trim()
+            )}
             solicitante={solicitante}
             domicilio={domicilio}
             distrito={distrito}
