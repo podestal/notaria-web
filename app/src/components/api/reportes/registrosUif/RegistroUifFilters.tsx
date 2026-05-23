@@ -1,19 +1,18 @@
-import { useState } from "react";
 import Calendar from "../../../ui/Calendar"
 import SingleSelect from "../../../ui/SingleSelect";
 import { Loader } from "lucide-react";
-import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
-import { KardexROPage } from "../../../../services/api/kardexService";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
+import type { UifReportPolicy } from "../../../../services/uif/uifService";
 
 interface Props {
     dateFrom: Date | undefined;
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>
     dateTo: Date | undefined;
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>
-    cronologico: string
-    setCronologico: React.Dispatch<React.SetStateAction<string>>
-    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<KardexROPage, Error>>
+    reportPolicy: UifReportPolicy
+    setReportPolicy: React.Dispatch<React.SetStateAction<UifReportPolicy>>
+    onGenerate: () => void
+    isLoading: boolean
 }
 
 const RegistroUifFilters = ({
@@ -21,17 +20,15 @@ const RegistroUifFilters = ({
     setDateFrom,
     dateTo,
     setDateTo,
-    cronologico,
-    setCronologico,
-    refetch
+    reportPolicy,
+    setReportPolicy,
+    onGenerate,
+    isLoading,
 }: Props) => {
 
-    const [loading, setLoading] = useState(false)
     const { setMessage, setShow, setType } = useNotificationsStore()
 
-
     const handleGenerateRO = () => {
-
         if (!dateFrom || !dateTo) {
             setMessage('Por favor, selecciona una fecha de inicio y fin')
             setShow(true)
@@ -39,10 +36,7 @@ const RegistroUifFilters = ({
             return
         }
 
-        setLoading(true)
-        refetch().finally(() => {
-            setLoading(false)
-        })
+        onGenerate()
     }
 
   return (
@@ -57,26 +51,24 @@ const RegistroUifFilters = ({
                 <p>Fecha Fin</p>
                 <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
             </div>
-            <SingleSelect 
-                options={[{
-                    value: 'cronologico',
-                    label: 'Cronológico'
-                }, {
-                    value: 'alfabetico',
-                    label: 'Alfabético'
-                }]}
-                selected={cronologico}
-                onChange={setCronologico}
+            <SingleSelect
+                options={[
+                    { value: "all", label: "Cronológico" },
+                    { value: "alfabetico", label: "Alfabético" },
+                ]}
+                selected={reportPolicy}
+                onChange={(value) => setReportPolicy(value as UifReportPolicy)}
             />
         </div>
         <div className="flex justify-center items-center">
-            <button 
+            <button
+                type="button"
                 onClick={handleGenerateRO}
-                disabled={loading}
-                className="bg-blue-600 text-white text-xs px-4 py-2 rounded-md w-[100px] mx-auto mt-4 cursor-pointer hover:bg-blue-700 transition-all duration-300"
+                disabled={isLoading}
+                className="bg-blue-600 text-white text-xs px-4 py-2 rounded-md w-[100px] mx-auto mt-4 cursor-pointer hover:bg-blue-700 transition-all duration-300 disabled:opacity-60"
             >
-                {loading ? <Loader className="animate-spin text-center text-xs w-[12px] h-[12px] mx-auto" /> : 'Generar RO'}
-            </button>  
+                {isLoading ? <Loader className="animate-spin text-center text-xs w-[12px] h-[12px] mx-auto" /> : 'Generar RO'}
+            </button>
         </div>
     </div>
   )

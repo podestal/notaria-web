@@ -1,4 +1,5 @@
 import { KardexNoEnvian } from "../../../../../services/api/kardexService"
+import { formatUifPatrimonial } from "../../../../../utils/uifCurrencyFormat"
 
 interface Props {
     kardexNoEnvian: KardexNoEnvian[]
@@ -19,11 +20,17 @@ const ListaKardexNoEnvian = ({
         </div>
         {kardexNoEnvian?.map((kardex) => (
             <div key={kardex.idkardex}>
-                <div className="grid grid-cols-5 text=left gap-4 justify-center items-center text-xs p-2 my-4 mx-6">
+                <div className="grid grid-cols-5 text-left gap-4 justify-center items-center text-xs p-2 my-4 mx-6">
                     <p>{kardex.kardex}</p>
                     <p className="col-span-2">{kardex.act}</p>
                     <p>{kardex.tipo_moneda}</p>
-                    <p>S/.{kardex.patrimonial}</p>
+                    <p>
+                        {formatUifPatrimonial({
+                            patrimonial: kardex.patrimonial,
+                            tipo_moneda: kardex.tipo_moneda,
+                            currency_symbol: kardex.currency_symbol,
+                        })}
+                    </p>
                 </div>
             </div>
         ))}

@@ -1,68 +1,46 @@
 import { FileText, Loader2 } from 'lucide-react'
 import useAuthStore from '../../../../store/useAuthStore'
 import moment from 'moment'
-import axios from 'axios'
 import { useState } from 'react'
+import { downloadUifPlaneReport, type UifReportPolicy } from '../../../../services/uif/uifService'
+import useNotificationsStore from '../../../../hooks/store/useNotificationsStore'
 
 interface Props {
     dateFrom: Date | undefined
     dateTo: Date | undefined
+    reportPolicy: UifReportPolicy
 }
 
-const RegistroUifPlaneText = ({ dateFrom, dateTo }: Props) => {
+const RegistroUifPlaneText = ({ dateFrom, dateTo, reportPolicy }: Props) => {
     const [loading, setLoading] = useState(false)
     const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setShow, setType } = useNotificationsStore()
 
     const handleDownload = async () => {
         if (!dateFrom || !dateTo) {
-            console.error('Date range is required')
+            setMessage('Selecciona fecha de inicio y fin')
+            setShow(true)
+            setType('error')
             return
         }
 
         setLoading(true)
-        
+
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}kardex/uif-report-plane/?initialDate=${moment(dateFrom).format('DD/MM/YYYY')}&finalDate=${moment(dateTo).format('DD/MM/YYYY')}`, 
-                {
-                    headers: {
-                        'Authorization': `JWT ${access}`
-                    },
-                    responseType: 'json' // Change back to json since backend returns JSON
-                }
-            )
-
-            // The response.data should contain your file content
-            console.log('Response data:', response.data);
-            
-            // Extract filename and content from the response
-            const { filename, content } = response.data;
-
-            // Decode the base64 content
-            const fileContent = atob(content);
-            
-            // Create blob from the decoded content
-            const blob = new Blob([fileContent], { type: 'text/plain' })
-            
-            // Create download link
+            const blob = await downloadUifPlaneReport(access, dateFrom, dateTo, reportPolicy)
             const url = window.URL.createObjectURL(blob)
             const link = document.createElement('a')
             link.href = url
-            
-            // Use the filename from the response
-            link.download = filename
-            
-            // Trigger download
+            link.download = `registro_uif_${moment(dateFrom).format('DD-MM-YYYY')}_to_${moment(dateTo).format('DD-MM-YYYY')}.txt`
             document.body.appendChild(link)
             link.click()
-            
-            // Cleanup
             document.body.removeChild(link)
             window.URL.revokeObjectURL(url)
-            
-            console.log('File downloaded successfully')
         } catch (error) {
             console.error('Error downloading file:', error)
+            setMessage('No se pudo descargar el archivo plano')
+            setShow(true)
+            setType('error')
         } finally {
             setLoading(false)
         }
@@ -73,9 +51,9 @@ const RegistroUifPlaneText = ({ dateFrom, dateTo }: Props) => {
             {loading ? (
                 <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
             ) : (
-                <FileText 
+                <FileText
                     onClick={handleDownload}
-                    className="w-4 h-4 text-blue-600 cursor-pointer hover:text-blue-700 transition-all duration-300" 
+                    className="w-4 h-4 text-blue-600 cursor-pointer hover:text-blue-700 transition-all duration-300"
                 />
             )}
         </div>

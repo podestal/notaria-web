@@ -41,10 +41,21 @@ export interface KardexPage {
 export interface KardexError {
     idkardex: number
     kardex: string
+    codacto?: string
     act: string
+    uif_code?: string
     status: string
     error_type: string
     error_description: string
+    fieldNumber?: number
+    rowType?: number
+    codeElement?: number
+    isCorrectable?: number
+    typeOfCorrection?: string
+    categoryCorrect?: string
+    detailsError?: string
+    detailValue?: string
+    idContratante?: string
 }
 
 export interface KardexROValid {
@@ -55,21 +66,39 @@ export interface KardexROValid {
     tipo_cambio: number
     patrimonial: number
     en_dolares: number
-    // Additional fields that might be useful
-    codacto: string
-    uif_code: string
-    fecha_conclusion: string
-    tipo_instrumento: string
+    codacto?: string
+    uif_code?: string
+    fecha_conclusion?: string
+    fechaconclusion?: string
+    tipo_instrumento?: string
+    idtipkar?: number
+    numescritura?: string
+    fechaescritura?: string
+    tipo?: string
+    status?: string
+    umbral?: number
+    currency_symbol?: string
 }
 
 export interface KardexNoEnvian {
     idkardex: number
     kardex: string
     act: string
-    tipo_moneda: string
+    tipo_moneda?: string
+    tipo_cambio?: number
     patrimonial: number
+    en_dolares?: number
     status: string
     reason: string
+    codacto?: string
+    uif_code?: string
+    idtipkar?: number
+    tipo_instrumento?: string
+    numescritura?: string
+    fechaescritura?: string
+    fechaconclusion?: string
+    tipo?: string
+    currency_symbol?: string
 }
 
 export interface KardexRO {

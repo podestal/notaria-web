@@ -2,14 +2,17 @@ import { FileSpreadsheet } from "lucide-react"
 import moment from "moment"
 import RegistroUifPlaneText from "./RegistroUifPlaneText"
 import RegistroUifExcel from "./RegistroUifExcel"
+import type { UifReportPolicy } from "../../../../services/uif/uifService"
 
 // Set Spanish locale
 moment.locale('es')
 
 interface Props {
     count: number
+    totalErrors: number
     dateFrom: Date | undefined
     dateTo: Date | undefined
+    reportPolicy: UifReportPolicy
 }
 
 const spanishMonths = {
@@ -18,7 +21,7 @@ const spanishMonths = {
   8: 'Septiembre', 9: 'Octubre', 10: 'Noviembre', 11: 'Diciembre'
 }
 
-const RegistroUifSummary = ({ count, dateFrom, dateTo }: Props) => {
+const RegistroUifSummary = ({ count, totalErrors, dateFrom, dateTo, reportPolicy }: Props) => {
   const monthName = dateFrom ? spanishMonths[dateFrom.getMonth() as keyof typeof spanishMonths] : ''
   
   return (
@@ -29,6 +32,7 @@ const RegistroUifSummary = ({ count, dateFrom, dateTo }: Props) => {
             <h2>Mes</h2>
             <h2>Fecha</h2>
             <h2>Cantidad de Kardex</h2>
+            <h2>Total de errores</h2>
             <h2>Archivo Plano</h2>
             <h2>Archivo Excel</h2>
         </div>
@@ -36,8 +40,9 @@ const RegistroUifSummary = ({ count, dateFrom, dateTo }: Props) => {
             <h2>{moment(dateFrom).format('DD/MM/YYYY')} - {moment(dateTo).format('DD/MM/YYYY')}</h2>
             <h2>{monthName} - {moment(dateFrom).format('YYYY')}</h2>
             <h2>{count}</h2>
-            <RegistroUifPlaneText dateFrom={dateFrom} dateTo={dateTo} />
-            <RegistroUifExcel dateFrom={dateFrom} dateTo={dateTo} />
+            <h2>{totalErrors}</h2>
+            <RegistroUifPlaneText dateFrom={dateFrom} dateTo={dateTo} reportPolicy={reportPolicy} />
+            <RegistroUifExcel dateFrom={dateFrom} dateTo={dateTo} reportPolicy={reportPolicy} />
         </div>
     </div>
     </>
