@@ -8,6 +8,9 @@ import SolicitanteForm from "./SolicitanteForm"
 import useGetCargos from "../../../../../hooks/api/cargos/useGetCargos";
 import NuevoClienteForm from "./NuevoClienteForm";
 import useAuthStore from "../../../../../store/useAuthStore";
+import UpdateCliente from "../../../clientes/UpdateCliente";
+import type { Cliente } from "../../../../../services/api/cliente1Service";
+import { applyClienteToSolicitante } from "./applyClienteToSolicitante";
 
 interface Props {
     solicitante: string;
@@ -52,10 +55,47 @@ const SolicitanteMain = ({
         onRequestCloseForm?.();
     };
 
-
     const [isOpen, setIsOpen] = useState(false);
+    const [openEditCliente, setOpenEditCliente] = useState(false);
+    const [clienteFound, setClienteFound] = useState(false);
+    const [cliente1, setCliente1] = useState<Cliente | null>(null);
 
     const access = useAuthStore(s => s.access_token) || ''
+
+    const solicitanteSetters = {
+        setSolicitante,
+        setDomicilio,
+        setDistrito,
+        setProfesion,
+        setEstadoCivil,
+        setGenero,
+    }
+
+    const handleClienteFound = (cliente: Cliente) => {
+        setCliente1(cliente)
+        setClienteFound(true)
+    }
+
+    const handleClienteCleared = () => {
+        setClienteFound(false)
+        setCliente1(null)
+    }
+
+    const handleSetCliente1: React.Dispatch<React.SetStateAction<Cliente | null>> = (value) => {
+        setCliente1((prev) => {
+            const next = typeof value === "function" ? value(prev) : value
+            if (next) {
+                applyClienteToSolicitante(next, solicitanteSetters)
+                setClienteFound(true)
+            }
+            return next
+        })
+    }
+
+    const openClienteEditor = () => {
+        if (!cliente1?.idcliente) return
+        setOpenEditCliente(true)
+    }
 
     const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos({ access })
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades({ access })
@@ -82,6 +122,10 @@ const SolicitanteMain = ({
             document={document}
             setDocument={setDocument}
             setIsOpen={setIsOpen}
+            clienteFound={clienteFound}
+            onClienteFound={handleClienteFound}
+            onClienteCleared={handleClienteCleared}
+            onOpenUpdateCliente={openClienteEditor}
         />
         <SolicitanteForm 
             solicitante={solicitante}
@@ -121,6 +165,23 @@ const SolicitanteMain = ({
                 setDocument={setDocument}
                 setOpen={setIsOpen}
             />
+        </TopModal>
+        <TopModal
+            isOpen={openEditCliente}
+            onClose={() => setOpenEditCliente(false)}
+            deepth={50}
+        >
+            {cliente1 && (
+                <UpdateCliente
+                    dni={document}
+                    cliente1={cliente1}
+                    setCliente1={handleSetCliente1}
+                    setShowClienteForm={setOpenEditCliente}
+                    setShowContratanteForm={() => {}}
+                    selectedTipoDocumento={cliente1.idtipdoc ?? selectedTipoDocumento}
+                    selectedTipoPersona={cliente1.tipper === "J" ? 2 : 1}
+                />
+            )}
         </TopModal>
     </>
   )
