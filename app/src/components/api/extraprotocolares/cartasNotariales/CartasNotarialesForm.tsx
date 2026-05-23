@@ -23,6 +23,13 @@ import AbrirDocumento from "../documentos/AbrirDocumento";
 import useUpdateIngresoCarta from "../../../../hooks/api/extraprotocolares/ingresoCartas/useUpdateIngresoCarta";
 import TopModal from "../../../ui/TopModal";
 import SellosMain from "./sellos/SellosMain";
+import {
+    DNI_DOCUMENT_TYPE,
+    sanitizeDniInput,
+    sanitizePhoneInput,
+    validateDniDocument,
+    validatePhone,
+} from "../../../../utils/cartaNotarialInput";
 
 interface Props {
     carta?: IngresoCartas;
@@ -53,13 +60,16 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
 
     const [tipoDocumento, setTipoDocumento] = useState(1);
     const [documento, setDocumento] = useState(carta?.id_remitente || '');
+    const [documentoError, setDocumentoError] = useState('');
     const [telefono, setTelefono] = useState(carta?.telf_remitente || '');
+    const [telefonoError, setTelefonoError] = useState('');
     const [remitente, setRemitente] = useState(carta?.nom_remitente || '');
     const [direccion, setDireccion] = useState(carta?.dir_remitente || '');
 
     // State for Destinatario
     const [tipoDocumentoDest, setTipoDocumentoDest] = useState(1);
     const [documentoDest, setDocumentoDest] = useState(carta?.dni_destinatario || '');
+    const [documentoDestError, setDocumentoDestError] = useState('');
     const [destinatario, setDestinatario] = useState(carta?.nom_destinatario || '');
     const [direccionDest, setDireccionDest] = useState(carta?.dir_destinatario || '');
     const [ubigeo, setUbigeo] = useState<{ id: string; label: string } | null>(() => {
@@ -131,6 +141,73 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
         setShow(true)
     }
 
+    const setDocumentoSafe = (value: string) => {
+        const next =
+            tipoDocumento === DNI_DOCUMENT_TYPE ? sanitizeDniInput(value) : value
+        setDocumento(next)
+        setDocumentoError("")
+    }
+
+    const setTelefonoSafe = (value: string) => {
+        setTelefono(sanitizePhoneInput(value))
+        setTelefonoError("")
+    }
+
+    const setDocumentoDestSafe = (value: string) => {
+        const next =
+            tipoDocumentoDest === DNI_DOCUMENT_TYPE ? sanitizeDniInput(value) : value
+        setDocumentoDest(next)
+        setDocumentoDestError("")
+    }
+
+    const handleTipoDocumentoChange = (value: number) => {
+        setTipoDocumento(value)
+        if (value === DNI_DOCUMENT_TYPE) {
+            setDocumento((prev) => sanitizeDniInput(prev))
+        }
+        setDocumentoError("")
+    }
+
+    const handleTipoDocumentoDestChange = (value: number) => {
+        setTipoDocumentoDest(value)
+        if (value === DNI_DOCUMENT_TYPE) {
+            setDocumentoDest((prev) => sanitizeDniInput(prev))
+        }
+        setDocumentoDestError("")
+    }
+
+    const validateForm = (): boolean => {
+        let valid = true
+
+        if (tipoDocumento === DNI_DOCUMENT_TYPE) {
+            const err = validateDniDocument(documento)
+            if (err) {
+                setDocumentoError(err)
+                valid = false
+            }
+        }
+
+        const phoneErr = validatePhone(telefono)
+        if (phoneErr) {
+            setTelefonoError(phoneErr)
+            valid = false
+        }
+
+        if (tipoDocumentoDest === DNI_DOCUMENT_TYPE) {
+            const err = validateDniDocument(documentoDest)
+            if (err) {
+                setDocumentoDestError(err)
+                valid = false
+            }
+        }
+
+        if (!valid) {
+            notify("error", "Revise los campos marcados en rojo.")
+        }
+
+        return valid
+    }
+
     const buildIngresoCartaPayload = (): CreateUpdateIngresoCartas => ({
         fec_ingreso: moment(fechaIngreso).format("DD/MM/YYYY"),
         id_remitente: documento,
@@ -195,6 +272,8 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
     }
 
     const handleSave = () => {
+        if (!validateForm()) return
+
         setLoading(true);
 
         if (createIngresoCarta && !doneCreate) {
@@ -353,20 +432,24 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                 label="Tipo de Documento"
                 options={ALL_DOCUMENTS_OPTIONS}
                 defaultValue={tipoDocumento}
-                setter={setTipoDocumento}
+                setter={handleTipoDocumentoChange}
             />
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput
                 label="Número de Documento"
                 value={documento}
-                setValue={setDocumento}
+                setValue={setDocumentoSafe}
+                error={documentoError}
+                setError={setDocumentoError}
                 horizontal
             />
             <SimpleInput
                 label="Teléfono"
                 value={telefono}
-                setValue={setTelefono}
+                setValue={setTelefonoSafe}
+                error={telefonoError}
+                setError={setTelefonoError}
                 horizontal
             />
         </div>
@@ -394,14 +477,16 @@ const CartasNotarialesForm = ({ carta, ubigeos, usuarios, createIngresoCarta, up
                 label="Tipo de Documento"
                 options={ALL_DOCUMENTS_OPTIONS}
                 defaultValue={tipoDocumentoDest}
-                setter={setTipoDocumentoDest}
+                setter={handleTipoDocumentoDestChange}
             />
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput
                 label="Número de Documento"
                 value={documentoDest}
-                setValue={setDocumentoDest}
+                setValue={setDocumentoDestSafe}
+                error={documentoDestError}
+                setError={setDocumentoDestError}
                 horizontal
             />
         </div>
