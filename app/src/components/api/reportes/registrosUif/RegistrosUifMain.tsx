@@ -16,20 +16,23 @@ const RegistrosUifMain = () => {
   const [activeTab, setActiveTab] = useState<UifTabId>("errors")
   const [page, setPage] = useState(1)
   const [hasGenerated, setHasGenerated] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const { data: uifData, isLoading, isFetching, isError, error, isSuccess } = useGetUifRegistro({
+  const { data: uifData, isLoading, isFetching, isError, error } = useGetUifRegistro({
     access,
     dateFrom,
     dateTo,
     activeTab,
     page,
     enabled: hasGenerated,
+    refreshKey,
   })
 
   const handleGenerate = useCallback(() => {
     setPage(1)
     setActiveTab("errors")
     setHasGenerated(true)
+    setRefreshKey((k) => k + 1)
   }, [])
 
   const handleTabChange = useCallback((tabId: UifTabId) => {

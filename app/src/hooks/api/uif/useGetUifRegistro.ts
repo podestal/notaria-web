@@ -14,6 +14,8 @@ interface Props {
     activeTab: UifTabId
     page: number
     enabled: boolean
+    /** Bumped on each "Generar RO" so the same filters always trigger a fresh fetch */
+    refreshKey: number
 }
 
 const useGetUifRegistro = ({
@@ -23,14 +25,16 @@ const useGetUifRegistro = ({
     activeTab,
     page,
     enabled,
+    refreshKey,
 }: Props): UseQueryResult<UifRegistroPage, Error> => {
     const dates = buildUifDateParams(dateFrom, dateTo)
     const type = uifTabToErrorsType[activeTab]
 
     return useQuery({
-        queryKey: ["uif-registro", dates?.initialDate, dates?.finalDate, type, page],
+        queryKey: ["uif-registro", dates?.initialDate, dates?.finalDate, type, page, refreshKey],
         queryFn: () => fetchUifRegistro(access, dateFrom!, dateTo!, type, page),
         enabled: enabled && !!dates,
+        staleTime: 0,
     })
 }
 
