@@ -1,6 +1,5 @@
 import { FileText, Loader2 } from 'lucide-react'
 import useAuthStore from '../../../../store/useAuthStore'
-import moment from 'moment'
 import { useState } from 'react'
 import { downloadUifPlaneReport, type UifReportPolicy } from '../../../../services/uif/uifService'
 import useNotificationsStore from '../../../../hooks/store/useNotificationsStore'
@@ -27,11 +26,16 @@ const RegistroUifPlaneText = ({ dateFrom, dateTo, reportPolicy }: Props) => {
         setLoading(true)
 
         try {
-            const blob = await downloadUifPlaneReport(access, dateFrom, dateTo, reportPolicy)
+            const { blob, filename } = await downloadUifPlaneReport(
+                access,
+                dateFrom,
+                dateTo,
+                reportPolicy
+            )
             const url = window.URL.createObjectURL(blob)
             const link = document.createElement('a')
             link.href = url
-            link.download = `registro_uif_${moment(dateFrom).format('DD-MM-YYYY')}_to_${moment(dateTo).format('DD-MM-YYYY')}.txt`
+            link.download = filename
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
