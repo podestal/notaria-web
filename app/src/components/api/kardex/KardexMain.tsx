@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import KardexErrors from "./kardexErrors/KardexErrors"
 import KardexFilters from "./KardexFilters"
@@ -17,6 +18,8 @@ const kardexTypes: Record<number, string> = {
 
 const KardexMain = () => {
 
+    const [searchParams] = useSearchParams()
+    const setBodyRender = useBodyRenderStore(s => s.setBodyRender)
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const [correlative, setCorrelative] = useState(kardexTypes[bodyRender])
     const [name, setName] = useState('')
@@ -25,6 +28,17 @@ const KardexMain = () => {
     const [page, setPage] = useState(1)
     const idtipkar = useBodyRenderStore(s => s.bodyRender)
     const access = useAuthStore(s => s.access_token) || ''
+
+    useEffect(() => {
+        const tipkarParam = searchParams.get('tipkar')
+        if (tipkarParam) {
+            const id = parseInt(tipkarParam, 10)
+            if (!Number.isNaN(id) && id !== bodyRender) {
+                setBodyRender(id)
+                return
+            }
+        }
+    }, [searchParams, bodyRender, setBodyRender])
 
     useEffect(() => {
         setCorrelative(kardexTypes[bodyRender])

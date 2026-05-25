@@ -7,7 +7,7 @@ import useBodyRenderStore from '../hooks/store/bodyRenderStore'
 import useCorrelativeStore from '../hooks/store/useCorrelativeStore'
 import getTitleCase from '../utils/getTitleCase'
 import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
 
 interface SubOption {
@@ -45,8 +45,6 @@ const Header = ({ kardexTypes }: Props) => {
     const notariaLogo = "https://pub-298b15d30a4a4c8b8bfd457d07eef0ec.r2.dev/gonzales-caceres/logo.jpeg"
     const welcomeName = user?.username || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Usuario'
 
-    const navigate = useNavigate()
-
     const setBodyRender = useBodyRenderStore((state) => state.setBodyRender)
 
     // reinitilizes correlative
@@ -54,20 +52,25 @@ const Header = ({ kardexTypes }: Props) => {
 
     const setKardexFilter = useKardexFiltersStore(s => s.setKardexFilter)
 
-    const handleOptionClick = (item: MenuItem, option: MenuOptions) => {
-      navigate(`/app/${item.label.toLowerCase()}`)
+    const resetNavigationState = () => {
       setCorrelative('')
-      if (option.docType) setBodyRender(option.docType)
-      if (option.path) navigate(option.path)
       setKardexFilter({ type: '', value: '' })
     }
 
-    const handleSubOptionClick = (option: MenuOptions, subOption: SubOption) => {
-      if (!subOption.path) return
-      navigate(subOption.path)
-      setCorrelative('')
+    const navLinkClass =
+      'block w-full rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white'
+
+    const resolveOptionTo = (item: MenuItem, option: MenuOptions): string | null => {
+      if (option.path) return option.path
+      if (option.docType && item.label === 'Protocolares') {
+        return `/app/protocolares?tipkar=${option.docType}`
+      }
+      return null
+    }
+
+    const handleNavLinkClick = (option: MenuOptions) => {
+      resetNavigationState()
       if (option.docType) setBodyRender(option.docType)
-      setKardexFilter({ type: '', value: '' })
     }
 
     const menuItems: MenuItem[] = [
@@ -265,31 +268,52 @@ const Header = ({ kardexTypes }: Props) => {
                     const subKey = `${index}-${idx}`
                     return (
                       <li key={`${item.label}-${option.name}-${idx}`}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (option.subOptions) {
+                        {option.subOptions ? (
+                          <button
+                            type="button"
+                            onClick={() =>
                               setOpenSubDropdown(openSubDropdown === subKey ? null : subKey)
-                              return
                             }
-                            handleOptionClick(item, option)
-                          }}
-                          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white"
-                        >
-                          <span>{getTitleCase(option.name)}</span>
-                          {option.subOptions && <span className="text-[10px]">{openSubDropdown === subKey ? '▼' : '▶'}</span>}
-                        </button>
+                            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white"
+                          >
+                            <span>{getTitleCase(option.name)}</span>
+                            <span className="text-[10px]">
+                              {openSubDropdown === subKey ? '▼' : '▶'}
+                            </span>
+                          </button>
+                        ) : resolveOptionTo(item, option) ? (
+                          <Link
+                            to={resolveOptionTo(item, option)!}
+                            className={navLinkClass}
+                            onClick={() => handleNavLinkClick(option)}
+                          >
+                            {getTitleCase(option.name)}
+                          </Link>
+                        ) : (
+                          <span className="block rounded-md px-3 py-2 text-left text-xs text-slate-500">
+                            {getTitleCase(option.name)}
+                          </span>
+                        )}
                         {option.subOptions && openSubDropdown === subKey && (
                           <ul className="mt-1 space-y-1 border-l border-slate-800 pl-3">
                             {option.subOptions.map((subOption, subIdx) => (
                               <li key={`${subKey}-${subOption.name}-${subIdx}`}>
-                                <button
-                                  type="button"
-                                  className="w-full rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white"
-                                  onClick={() => handleSubOptionClick(option, subOption)}
-                                >
-                                  {subOption.name}
-                                </button>
+                                {subOption.path ? (
+                                  <Link
+                                    to={subOption.path}
+                                    className={navLinkClass}
+                                    onClick={() => {
+                                      resetNavigationState()
+                                      if (option.docType) setBodyRender(option.docType)
+                                    }}
+                                  >
+                                    {subOption.name}
+                                  </Link>
+                                ) : (
+                                  <span className="block rounded-md px-3 py-2 text-left text-xs text-slate-500">
+                                    {subOption.name}
+                                  </span>
+                                )}
                               </li>
                             ))}
                           </ul>
