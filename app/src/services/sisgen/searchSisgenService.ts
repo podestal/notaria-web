@@ -40,6 +40,18 @@ export interface SISGENDocument {
         has_errors: boolean;
         errors: string[];
     };
+    sisgen_last_submission?: {
+        exists: boolean;
+        created_at: string;
+        batch_index: number;
+        http_status: number;
+        soap_return_status: string;
+        soap_return_message: string;
+        document_status: string;
+        status_ui: string;
+        errors: string[];
+        has_errors: boolean;
+    };
   }
 
 
