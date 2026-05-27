@@ -22,13 +22,12 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const [showErrors, setShowErrors] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const [isSisgenResponseOpen, setIsSisgenResponseOpen] = useState(false)
-    const [isDisabled, setIsDisabled] = useState(false)
     const sisgenLastSubmission = sisgenDoc.sisgen_last_submission
     const sisgenErrors = sisgenLastSubmission?.errors?.length
       ? sisgenLastSubmission.errors
       : (sisgenDoc.errores || [])
     const sisgenStatus = sisgenLastSubmission?.document_status || sisgenDoc?.estado_sisgen || ''
-    const alreadySent = sisgenLastSubmission?.exists || sisgenDoc.estado_sisgen === "Enviado"
+    const isGuardadoStatus = (sisgenLastSubmission?.document_status || "").trim().toLowerCase() === "guardado"
   
     const handleSend = () => {
       setLoading(true)
@@ -50,7 +49,6 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
           setMessage('Documento enviado correctamente')
           setShow(true)
           setType('success')
-          setIsDisabled(true)
         },
         onError: () => {
           setMessage('Error al enviar el documento')
@@ -98,12 +96,12 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
             className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
             onClick={() => setShowErrors(!showErrors)}
         />}
-        {!alreadySent 
+        {!isGuardadoStatus 
         ? 
         <button 
           onClick={handleSend}
           className="bg-blue-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-pointer hover:bg-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading || isDisabled}
+          disabled={loading}
         >
           {loading ? 'Enviando...' : 'Enviar'}
         </button> 

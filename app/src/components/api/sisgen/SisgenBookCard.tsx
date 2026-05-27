@@ -18,7 +18,6 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
     const access = useAuthStore( s => s.access_token) || ''
 
     const [loading, setLoading] = useState(false)
-    const [isDisabled, setIsDisabled] = useState(false)
     const [showErrors, setShowErrors] = useState(false)
     const [showLibro, setShowLibro] = useState(false)
     const [isSisgenResponseOpen, setIsSisgenResponseOpen] = useState(false)
@@ -27,11 +26,10 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
       ? sisgenLastSubmission.errors
       : (sisgenDoc.errores || [])
     const sisgenStatus = sisgenLastSubmission?.document_status || sisgenDoc.estadoSisgen || ''
-    const alreadySent = sisgenLastSubmission?.exists || sisgenDoc.estadoSisgen?.toLocaleLowerCase() === "enviado"
+    const isGuardadoStatus = (sisgenLastSubmission?.document_status || "").trim().toLowerCase() === "guardado"
 
   const handleSend = () => {
     setLoading(true)
-    setIsDisabled(true)
   }
   return (
     <>
@@ -66,12 +64,12 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
             className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
             onClick={() => setShowErrors(!showErrors)}
         />}
-        {!alreadySent 
+        {!isGuardadoStatus 
         ? 
         <button 
           onClick={handleSend}
           className="bg-blue-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-pointer hover:bg-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading || isDisabled}
+          disabled={loading}
         >
           {loading ? 'Enviando...' : 'Enviar'}
         </button> 
