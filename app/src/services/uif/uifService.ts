@@ -80,6 +80,56 @@ const isUifErrorsApiPage = (data: unknown): data is UifErrorsApiPage => {
     return record.results != null && typeof record.results === "object"
 }
 
+const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
+    !!value && typeof value === "object" && !Array.isArray(value)
+
+const extractUifRegistroResults = (
+    data: unknown,
+    type: UifErrorsType
+): UifErrorsApiPage | null => {
+    // Expected shape: { count, next, previous, results: { ... } }
+    if (isUifErrorsApiPage(data)) return data
+
+    // Legacy/alternate shape: direct results object without pagination wrapper
+    if (isObjectRecord(data)) {
+        const directResults =
+            "lista_errores" in data ||
+            "lista_kardex_ro" in data ||
+            "lista_kardex_no_envian" in data
+        if (directResults) {
+            return {
+                count: 0,
+                next: null,
+                previous: null,
+                results: data as UifErrorsApiPage["results"],
+            }
+        }
+
+        // Alternate shape: { results: [...] } where list depends on `type`
+        if (Array.isArray(data.results)) {
+            const empty = {
+                lista_errores: [],
+                lista_kardex_ro: [],
+                lista_kardex_no_envian: [],
+                summary: emptySummary(),
+                metadata: { processed_at: new Date().toISOString(), list_type: type },
+            }
+            if (type === "errors") empty.lista_errores = data.results as never[]
+            if (type === "ro") empty.lista_kardex_ro = data.results as never[]
+            if (type === "no_envian") empty.lista_kardex_no_envian = data.results as never[]
+            return {
+                count: typeof data.count === "number" ? data.count : data.results.length,
+                next: typeof data.next === "string" || data.next === null ? data.next : null,
+                previous:
+                    typeof data.previous === "string" || data.previous === null ? data.previous : null,
+                results: empty,
+            }
+        }
+    }
+
+    return null
+}
+
 const buildUifErrorsParams = (
     dates: UifDateRangeParams,
     type: UifErrorsType,
@@ -147,11 +197,12 @@ export const fetchUifRegistro = async (
         params: buildUifErrorsParams(dates, type, page),
     })
 
-    if (!isUifErrorsApiPage(data)) {
+    const normalized = extractUifRegistroResults(data, type)
+    if (!normalized) {
         throw new Error(`Respuesta UIF inválida (type=${type})`)
     }
 
-    return mapUifApiPageToRegistro(data, type)
+    return mapUifApiPageToRegistro(normalized, type)
 }
 
 export const downloadUifExcelReport = async (
