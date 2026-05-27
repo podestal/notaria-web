@@ -33,6 +33,20 @@ const exhibiompOptions = [
     { value: 'No', label: 'No' }
 ]
 
+const OPORTUNIDAD_VACIO_ID = "10"
+
+const idOppagoForApi = (id: string) => (id === OPORTUNIDAD_VACIO_ID ? "" : id)
+
+const idOppagoForSelect = (
+    idoppago: string | undefined,
+    isDonation: boolean,
+    hasPatrimonial: boolean
+) => {
+    if (!hasPatrimonial) return isDonation ? OPORTUNIDAD_VACIO_ID : ""
+    if (!idoppago || idoppago === "") return OPORTUNIDAD_VACIO_ID
+    return idoppago
+}
+
 const PatrimonialForm = ({ 
     createPatrimonial, 
     updatePatrimonial,
@@ -50,10 +64,11 @@ const PatrimonialForm = ({
 
     const access = useAuthStore(s => s.access_token) || ''
     const isDonation = kardex?.contrato.includes('DONACION')
-    console.log('isDonation', isDonation);
 
     const [formaDePagoSelected, setFormaDePagoSelected] = useState(patrimonial ? patrimonial.fpago : isDonation ? '4' : '');
-    const [oportunidadSelected, setOportunidadSelected] = useState( patrimonial ? patrimonial.idoppago : isDonation ? '10' : '');
+    const [oportunidadSelected, setOportunidadSelected] = useState(() =>
+        idOppagoForSelect(patrimonial?.idoppago, isDonation, !!patrimonial)
+    )
     const [selectedTipoDeActo, setSelectedTipoDeActo] = useState( patrimonial ? patrimonial.idtipoacto : '');
 
     const [inporteTransaccion, setImporteTransaccion] = useState(patrimonial ? patrimonial.importetrans.toString() : '');
@@ -78,14 +93,14 @@ const PatrimonialForm = ({
     useEffect(() => {
         if (!isActo038) return
         setFormaDePagoSelected('5')  // NO APLICA
-        setOportunidadSelected('10') // VACIO
+        setOportunidadSelected(OPORTUNIDAD_VACIO_ID)
         setImporteTransaccion('0.0')
         setMonedaSelected(0)
     }, [isActo038])
 
     const resetFormValues = () => {
         setFormaDePagoSelected(isDonation ? '4' : '');
-        setOportunidadSelected(isDonation ? '10' : '');
+        setOportunidadSelected(isDonation ? OPORTUNIDAD_VACIO_ID : "");
         setSelectedTipoDeActo('');
         setImporteTransaccion('');
         setMonedaSelected(1);
@@ -107,7 +122,7 @@ const PatrimonialForm = ({
             return;
         }
 
-        if (oportunidadSelected === 'S' || oportunidadSelected === '') {
+        if (!isDonation && !isActo038 && !oportunidadSelected) {
             setOportunidadError('Debe seleccionar una oportunidad de pago');
             return;
         }
@@ -130,7 +145,7 @@ const PatrimonialForm = ({
         }
 
         const fpagoFinal = isActo038 ? '5' : formaDePagoSelected
-        const oportunidadFinal = isActo038 ? '10' : oportunidadSelected
+        const oportunidadFinal = idOppagoForApi(oportunidadSelected)
         const importeFinal = isActo038 ? '0.0' : inporteTransaccion
         const monedaFinal = isActo038 ? 0 : monedaSelected
 
@@ -242,8 +257,8 @@ const PatrimonialForm = ({
                 disabled={isDonation || isActo038}
             />
             <SimpleSelectorStr 
-                options={[{ value: 'S', label: 'Seleccione' }, ...OPPORTUNIDADES_PAGO.map((oportunidad) => ({
-                    value: oportunidad.codoppago,
+                options={[{ value: '', label: 'Seleccione' }, ...OPPORTUNIDADES_PAGO.map((oportunidad) => ({
+                    value: String(oportunidad.idoppago),
                     label: oportunidad.desoppago
                 }))]}
                 defaultValue={oportunidadSelected}
@@ -310,7 +325,6 @@ const PatrimonialForm = ({
                 horizontal
             />}
         </div>
-        <>{console.log('currentPatrimonial', currentPatrimonial)}</>
         <div className="w-full grid grid-cols-3 my-4">
             {currentPatrimonial && 
             <CreateDetalleMediosDePago 
