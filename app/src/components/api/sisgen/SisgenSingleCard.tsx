@@ -8,6 +8,7 @@ import getTitleCase from "../../../utils/getTitleCase"
 import { ChevronDownIcon, ChevronUpIcon, AlertTriangleIcon, UserIcon } from "lucide-react"
 import TopModal from "../../ui/TopModal"
 import PreKardexForm from "../reportes/registrosUif/PreKardexForm"
+import { canSendSisgenDocument, getSisgenDisplayStatus } from "../../../utils/sisgenSendState"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -26,8 +27,8 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const sisgenErrors = sisgenLastSubmission?.errors?.length
       ? sisgenLastSubmission.errors
       : (sisgenDoc.errores || [])
-    const sisgenStatus = sisgenLastSubmission?.document_status || sisgenDoc?.estado_sisgen || ''
-    const isGuardadoStatus = (sisgenLastSubmission?.document_status || "").trim().toLowerCase() === "guardado"
+    const sisgenStatus = getSisgenDisplayStatus(sisgenDoc)
+    const canSend = canSendSisgenDocument(sisgenDoc)
   
     const handleSend = () => {
       setLoading(true)
@@ -96,20 +97,20 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
             className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
             onClick={() => setShowErrors(!showErrors)}
         />}
-        {!isGuardadoStatus 
+        {canSend 
         ? 
         <button 
           onClick={handleSend}
           className="bg-blue-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-pointer hover:bg-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
-          {loading ? 'Enviando...' : 'Enviar'}
+          {loading ? 'Enviando...' : sisgenLastSubmission?.exists ? 'Reenviar' : 'Enviar'}
         </button> 
         :
         <button 
-        // onClick={handleSend}
+        type="button"
         className="bg-green-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-not-allowed "
-        // disabled
+        disabled
       >
         Guardado
       </button>

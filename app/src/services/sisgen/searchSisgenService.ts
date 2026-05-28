@@ -7,6 +7,8 @@ export interface SISGENDocument {
     numescritura: string;
     fechaescritura: string;
     estado_sisgen: string;
+    estado_sisgen_code?: number;
+    sisgen_status?: SisgenDocumentStatus;
     idtipkar: number;
     fechaingreso: string;
     codactos: string;
@@ -40,19 +42,34 @@ export interface SISGENDocument {
         has_errors: boolean;
         errors: string[];
     };
-    sisgen_last_submission?: {
-        exists: boolean;
-        created_at: string;
-        batch_index: number;
-        http_status: number;
-        soap_return_status: string;
-        soap_return_message: string;
-        document_status: string;
-        status_ui: string;
-        errors: string[];
-        has_errors: boolean;
-    };
+    sisgen_last_submission?: SisgenLastSubmission;
   }
+
+export interface SisgenDocumentStatus {
+    estado_sisgen_code: number;
+    estado_sisgen_label: string;
+    status_ui: string;
+    needs_resubmit?: boolean;
+    submission_stale?: boolean;
+    can_send?: boolean;
+    last_submission?: SisgenLastSubmission;
+}
+
+export interface SisgenLastSubmission {
+    exists: boolean;
+    created_at?: string;
+    batch_index?: number;
+    http_status?: number;
+    soap_return_status?: string;
+    soap_return_message?: string;
+    document_status?: string;
+    status_ui?: string;
+    remote_status_ui?: string;
+    errors?: string[];
+    has_errors?: boolean;
+    can_send?: boolean;
+    needs_resubmit?: boolean;
+}
 
 
 export interface Pagination {
