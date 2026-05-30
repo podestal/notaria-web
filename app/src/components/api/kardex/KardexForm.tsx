@@ -35,6 +35,31 @@ import DigitacionMain from "../digitacion/DigitacionMain"
 import EscrituracionMain from "../escrituracion/EscrituracionMain"
 import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
+import { CreateUpdateKardex } from "../../../services/api/kardexService"
+
+/** Escrituración / minuta — managed in other tabs; keep on main form save. */
+const preservedKardexFields = (existing?: Kardex | null): Pick<
+    CreateUpdateKardex,
+    | "numescritura"
+    | "fechaescritura"
+    | "papelini"
+    | "papelfin"
+    | "folioini"
+    | "foliofin"
+    | "numinstrmento"
+    | "txa_minuta"
+    | "numminuta"
+> => ({
+    numescritura: existing?.numescritura ?? "",
+    fechaescritura: existing?.fechaescritura ?? "",
+    papelini: existing?.papelini ?? "",
+    papelfin: existing?.papelfin ?? "",
+    folioini: existing?.folioini ?? "",
+    foliofin: existing?.foliofin ?? "",
+    numinstrmento: existing?.numinstrmento ?? "",
+    txa_minuta: existing?.txa_minuta ?? "",
+    numminuta: existing?.numminuta ?? "",
+})
 
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
@@ -182,19 +207,11 @@ const KardexForm = ({
                     visita: 0,
                     idnotario: 1,
                     contrato: `${formattedContratoDes} / `, 
-                    numescritura: '', 
                     fktemplate: selectedTemplate,
-                    papelini: '',
-                    papelfin: '',
-                    folioini: '',
-                    foliofin: '',
-                    fechaescritura: '',
-                    numinstrmento: '',
-                    txa_minuta: '',
                     recepcion: recepcion,
-                    estado_sisgen: 0,
-                    numminuta: '',
-                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : ''
+                    estado_sisgen: kardex?.estado_sisgen ?? 0,
+                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
+                    ...preservedKardexFields(kardex),
                 },
                 access
             }, {
@@ -238,19 +255,11 @@ const KardexForm = ({
                     visita: 0,
                     idnotario: 1,
                     contrato: `${formattedContratoDes} / `, 
-                    numescritura: '',
                     fktemplate: selectedTemplate,
-                    papelini: kardex.papelini,
-                    papelfin: kardex.papelfin,
-                    folioini: kardex.folioini,
-                    foliofin: kardex.foliofin,
-                    fechaescritura: kardex.fechaescritura,
-                    numinstrmento: kardex.numinstrmento,
-                    txa_minuta: kardex.txa_minuta,
                     recepcion: recepcion,
-                    estado_sisgen: 0,
-                    numminuta: kardex.numminuta,
-                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : ''
+                    estado_sisgen: kardex.estado_sisgen ?? 0,
+                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
+                    ...preservedKardexFields(kardex),
                 },
                 access
             }, {
