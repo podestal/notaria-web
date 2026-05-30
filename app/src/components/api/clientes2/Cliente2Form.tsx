@@ -6,11 +6,11 @@ import DateInput from '../../ui/DateInput'
 import SimpleSelector from '../../ui/SimpleSelector'
 import { UseMutationResult } from '@tanstack/react-query'
 import { UpdateCliente2Data } from '../../../hooks/api/cliente2/useUpdateCliente2'
+import { Cliente2 } from '../../../services/api/clienteService'
 import {
-    Cliente2,
     omitResidenteFieldsForJuridicaPatch,
     residenteForClientePayload,
-} from '../../../services/api/clienteService'
+} from '../../../utils/clienteFormValidation'
 import { Ubigeo } from '../../../services/api/ubigeoService'
 import { Cargo } from '../../../services/api/cargosService'
 import { Profesion } from '../../../services/api/profesionesService'
@@ -18,6 +18,7 @@ import { Nacionalidad } from '../../../services/api/nacionalidadesService'
 import { GIRO_NEGOCIO, SEDES_REGISTRALES } from '../../../data/patrimonialData'
 import SimpleSelectorStr from '../../ui/SimpleSelectosStr'
 import useAuthStore from '../../../store/useAuthStore'
+import { isRequiredTextMissing, isRequiredValueMissing } from '../../../utils/clienteFormValidation'
 
 interface Props {
     dni: string
@@ -108,7 +109,7 @@ const Cliente2Form = ({
         const [civilStatus, setCivilStatus] = useState(cliente2 ? civilStatusOptions.find( option => option.value === cliente2.idestcivil)?.value : 0)
         const [gender, setGender] = useState(cliente2 ? sexOptions.find( option => option.label[0] === cliente2.sexo)?.value : 0)
         const [nationality, setNationality] = useState<{ id: string; label: string } | null>(() => {
-            if (cliente2 && cliente2.idubigeo) {
+            if (cliente2 && cliente2.nacionalidad) {
               const match = nacionalidades.find(nacionalidad => nacionalidad.idnacionalidad === parseInt(cliente2.nacionalidad || '0'));
               if (match) {
                 return {
@@ -211,13 +212,38 @@ const Cliente2Form = ({
         const [teleEmpresa, setTeleEmpresa] = useState(cliente2 ? cliente2.telempresa || '' : '')
         const [ciiu, setCiiu] = useState(cliente2 ? cliente2.actmunicipal || '' : '')
         const [contacEmpresa, setContacEmpresa] = useState(cliente2 ? cliente2.contacempresa || '' : '')
+
+        const [razonSocialError, setRazonSocialError] = useState('')
+        const [domFiscalError, setDomFiscalError] = useState('')
+        const [ciiuError, setCiiuError] = useState('')
+        const [contacEmpresaError, setContacEmpresaError] = useState('')
+
+        const clearFieldErrors = () => {
+            setApepatError('')
+            setApematError('')
+            setPrinomError('')
+            setDireccionError('')
+            setUbigeoError('')
+            setCivilStatusError('')
+            setGenderError('')
+            setNationalityError('')
+            setBirthdateError('')
+            setProfesionError('')
+            setCargoError('')
+            setRazonSocialError('')
+            setDomFiscalError('')
+            setCiiuError('')
+            setContacEmpresaError('')
+        }
         
         const handleSubmit = (e: React.FormEvent) => {
             
             e.preventDefault()
+            clearFieldErrors()
+
             if (selectedTipoPersona === 1) {
 
-                if (!apepat) {
+                if (isRequiredTextMissing(apepat)) {
                     setApepatError('Apellido Paterno es requerido')
                     setType('error')
                     setMessage('Apellido Paterno es requerido')
@@ -225,7 +251,7 @@ const Cliente2Form = ({
                     return
                 }
         
-                if (!prinom) {
+                if (isRequiredTextMissing(prinom)) {
                     setPrinomError('Primer Nombre es requerido')
                     setType('error')
                     setMessage('Primer Nombre es requerido')
@@ -233,7 +259,7 @@ const Cliente2Form = ({
                     return
                 }
         
-                if (!apemat) {
+                if (isRequiredTextMissing(apemat)) {
                     setApematError('Apellido Materno es requerido')
                     setType('error')
                     setMessage('Apellido Materno es requerido')
@@ -243,7 +269,7 @@ const Cliente2Form = ({
         
                 const nombreNatural = `${apepat} ${apemat}, ${prinom} ${segnom}`.trim()
         
-                if (!direccion) {
+                if (isRequiredTextMissing(direccion)) {
                     setDireccionError('Dirección es requerida')
                     setType('error')
                     setMessage('Dirección es requerida')
@@ -283,7 +309,7 @@ const Cliente2Form = ({
                     return
                 }
         
-                if (!birthdate) {
+                if (isRequiredTextMissing(birthdate)) {
                     setBirthdateError('Fecha de Nacimiento es requerida')
                     setType('error')
                     setMessage('Fecha de Nacimiento es requerida')
@@ -442,14 +468,16 @@ const Cliente2Form = ({
             }
             
             if (selectedTipoPersona === 2) {
-                if (!razonSocial) {
+                if (isRequiredTextMissing(razonSocial)) {
+                    setRazonSocialError('Razón Social es requerida')
                     setType('error')
                     setMessage('Razón Social es requerida')
                     setShow(true)
                     return
                 }
     
-                if (!domFiscal) {
+                if (isRequiredTextMissing(domFiscal)) {
+                    setDomFiscalError('Domicilio Fiscal es requerido')
                     setType('error')
                     setMessage('Domicilio Fiscal es requerido')
                     setShow(true)
@@ -457,20 +485,23 @@ const Cliente2Form = ({
                 }
     
                 if (ubigeo === null) {
+                    setUbigeoError('Ubigeo es requerido')
                     setType('error')
                     setMessage('Ubigeo es requerido')
                     setShow(true)
                     return
                 }
     
-                if (!ciiu) {
+                if (isRequiredValueMissing(ciiu)) {
+                    setCiiuError('CIIU es requerido')
                     setType('error')
                     setMessage('CIIU es requerido')
                     setShow(true)
                     return
                 }
     
-                if (!contacEmpresa) {
+                if (isRequiredTextMissing(contacEmpresa)) {
+                    setContacEmpresaError('Objeto social es requerido')
                     setType('error')
                     setMessage('Objeto social es requerido')
                     setShow(true)
@@ -774,6 +805,8 @@ const Cliente2Form = ({
                 horizontal={true}
                 required
                 fullWidth
+                error={razonSocialError}
+                setError={setRazonSocialError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
@@ -784,6 +817,8 @@ const Cliente2Form = ({
                 horizontal={true}
                 required
                 fullWidth
+                error={domFiscalError}
+                setError={setDomFiscalError}
             />
         </div>
         <div className="w-full flex justify-center items-center gap-4 col-span-2">
@@ -841,6 +876,8 @@ const Cliente2Form = ({
                 horizontal={true}
                 defaultValue={ciiu}
                 required
+                error={ciiuError}
+                setError={setCiiuError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
@@ -851,6 +888,8 @@ const Cliente2Form = ({
                 horizontal={true}
                 required
                 fullWidth
+                error={contacEmpresaError}
+                setError={setContacEmpresaError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">

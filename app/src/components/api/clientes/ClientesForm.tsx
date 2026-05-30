@@ -19,6 +19,11 @@ import useAuthStore from "../../../store/useAuthStore"
 import ClienteMarriedMain from "./married/ClienteMarriedMain"
 import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
+import {
+    isRequiredTextMissing,
+    isRequiredValueMissing,
+    residenteForClientePayload,
+} from "../../../utils/clienteFormValidation"
 
 interface Props {
     dni: string
@@ -109,7 +114,7 @@ const ClientesForm = ({
     
     const [gender, setGender] = useState(cliente1 ? sexOptions.find( option => option.label[0] === cliente1.sexo)?.value : 0)
     const [nationality, setNationality] = useState<{ id: string; label: string } | null>(() => {
-        if (cliente1 && cliente1.idubigeo) {
+        if (cliente1 && cliente1.nacionalidad) {
           const match = nacionalidades.find(nacionalidad => nacionalidad.idnacionalidad === parseInt(cliente1.nacionalidad || '0'));
           if (match) {
             return {
@@ -221,8 +226,32 @@ const ClientesForm = ({
     const [teleEmpresa, setTeleEmpresa] = useState(cliente1 ? cliente1.telempresa || '' : '')
     const [ciiu, setCiiu] = useState(cliente1 ? cliente1.actmunicipal || '' : '')
     const [contacEmpresa, setContacEmpresa] = useState(cliente1 ? cliente1.contacempresa || '' : '')
+
+    const [razonSocialError, setRazonSocialError] = useState('')
+    const [domFiscalError, setDomFiscalError] = useState('')
+    const [ciiuError, setCiiuError] = useState('')
+    const [contacEmpresaError, setContacEmpresaError] = useState('')
+
+    const clearFieldErrors = () => {
+        setApepatError('')
+        setApematError('')
+        setPrinomError('')
+        setDireccionError('')
+        setUbigeoError('')
+        setCivilStatusError('')
+        setGenderError('')
+        setNationalityError('')
+        setBirthdateError('')
+        setProfesionError('')
+        setCargoError('')
+        setRazonSocialError('')
+        setDomFiscalError('')
+        setCiiuError('')
+        setContacEmpresaError('')
+    }
     
     const handleSubmit = () => {
+        clearFieldErrors()
 
         if (selectedTipoDocumento === 0) {
             setType('error')
@@ -246,7 +275,7 @@ const ClientesForm = ({
         }
 
         if (selectedTipoPersona === 1) {
-            if (!apepat) {
+            if (isRequiredTextMissing(apepat)) {
                 setApepatError('Apellido Paterno es requerido')
                 setType('error')
                 setMessage('Apellido Paterno es requerido')
@@ -254,7 +283,7 @@ const ClientesForm = ({
                 return
             }
     
-            if (!prinom) {
+            if (isRequiredTextMissing(prinom)) {
                 setPrinomError('Primer Nombre es requerido')
                 setType('error')
                 setMessage('Primer Nombre es requerido')
@@ -262,7 +291,7 @@ const ClientesForm = ({
                 return
             }
     
-            if (!apemat) {
+            if (isRequiredTextMissing(apemat)) {
                 setApematError('Apellido Materno es requerido')
                 setType('error')
                 setMessage('Apellido Materno es requerido')
@@ -272,7 +301,7 @@ const ClientesForm = ({
     
             setNombre(`${apepat} ${apemat}, ${prinom} ${segnom}`)
     
-            if (!direccion) {
+            if (isRequiredTextMissing(direccion)) {
                 setDireccionError('Dirección es requerida')
                 setType('error')
                 setMessage('Dirección es requerida')
@@ -312,7 +341,7 @@ const ClientesForm = ({
                 return
             }
     
-            if (!birthdate) {
+            if (isRequiredTextMissing(birthdate)) {
                 setBirthdateError('Fecha de Nacimiento es requerida')
                 setType('error')
                 setMessage('Fecha de Nacimiento es requerida')
@@ -354,7 +383,10 @@ const ClientesForm = ({
                 return  
             }
     
-            if (profesion === null) {
+            const profesionText = (profesionInput.trim() || profesion?.label?.trim() || '')
+            const cargoText = (cargoInput.trim() || cargo?.label?.trim() || '')
+
+            if (!profesionText) {
                 setProfesionError('Profesión es requerida')
                 setType('error')
                 setMessage('Profesión es requerida')
@@ -362,24 +394,21 @@ const ClientesForm = ({
                 return
             }
     
-            if (cargo === null) {
+            if (!cargoText) {
                 setCargoError('Cargo es requerido')
                 setType('error')
                 setMessage('Cargo es requerido')
                 setShow(true)
                 return
             }
-
-            const profesionText = profesionInput.trim() || profesion.label.trim()
-            const cargoText = cargoInput.trim() || cargo.label.trim()
             const matchedProfesion = profesiones.find(
                 p => p.desprofesion.trim().toLowerCase() === profesionText.toLowerCase()
             )
             const matchedCargo = cargos.find(
                 c => c.descripcrapro.trim().toLowerCase() === cargoText.toLowerCase()
             )
-            const selectedProfesionId = Number.parseInt(profesion.id, 10)
-            const selectedCargoId = Number.parseInt(cargo.id, 10)
+            const selectedProfesionId = profesion?.id ? Number.parseInt(profesion.id, 10) : Number.NaN
+            const selectedCargoId = cargo?.id ? Number.parseInt(cargo.id, 10) : Number.NaN
             const profesionId = matchedProfesion
                 ? matchedProfesion.idprofesion
                 : (Number.isNaN(selectedProfesionId) ? 0 : selectedProfesionId)
@@ -403,7 +432,7 @@ const ClientesForm = ({
                     nombre: `${apepat} ${apemat}, ${prinom} ${segnom}`,
                     direccion,
                     idubigeo: ubigeo.id,
-                    resedente: resident === 1 ? '1' : '0',
+                    residente: residenteForClientePayload(selectedTipoPersona, resident),
                     idtipdoc: selectedTipoDocumento,
                     numdoc: dni,
                     email,
@@ -462,7 +491,7 @@ const ClientesForm = ({
                     nombre: `${apepat} ${apemat}, ${prinom} ${segnom}`,
                     direccion,
                     idubigeo: ubigeo.id,
-                    resedente: resident === 1 ? '1' : '0',
+                    residente: residenteForClientePayload(selectedTipoPersona, resident),
                     idtipdoc: cliente1?.idtipdoc || 1,
                     numdoc: dni,
                     email,
@@ -508,14 +537,16 @@ const ClientesForm = ({
         }
 
         if (selectedTipoPersona === 2) {
-            if (!razonSocial) {
+            if (isRequiredTextMissing(razonSocial)) {
+                setRazonSocialError('Razón Social es requerida')
                 setType('error')
                 setMessage('Razón Social es requerida')
                 setShow(true)
                 return
             }
 
-            if (!domFiscal) {
+            if (isRequiredTextMissing(domFiscal)) {
+                setDomFiscalError('Domicilio Fiscal es requerido')
                 setType('error')
                 setMessage('Domicilio Fiscal es requerido')
                 setShow(true)
@@ -523,20 +554,23 @@ const ClientesForm = ({
             }
 
             if (ubigeo === null) {
+                setUbigeoError('Ubigeo es requerido')
                 setType('error')
                 setMessage('Ubigeo es requerido')
                 setShow(true)
                 return
             }
 
-            if (!ciiu) {
+            if (isRequiredValueMissing(ciiu)) {
+                setCiiuError('CIIU es requerido')
                 setType('error')
                 setMessage('CIIU es requerido')
                 setShow(true)
                 return
             }
 
-            if (!contacEmpresa) {
+            if (isRequiredTextMissing(contacEmpresa)) {
+                setContacEmpresaError('Objeto social es requerido')
                 setType('error')
                 setMessage('Objeto social es requerido')
                 setShow(true)
@@ -554,7 +588,7 @@ const ClientesForm = ({
                     nombre,
                     direccion,
                     idubigeo: ubigeo.id,
-                    resedente: resident === 1 ? '1' : '0',
+                    residente: residenteForClientePayload(selectedTipoPersona, resident),
                     idtipdoc: selectedTipoDocumento,
                     numdoc: dni,
                     email,
@@ -608,7 +642,7 @@ const ClientesForm = ({
                     nombre,
                     direccion,
                     idubigeo: ubigeo.id,
-                    resedente: resident === 1 ? '1' : '0',
+                    residente: residenteForClientePayload(selectedTipoPersona, resident),
                     idtipdoc: cliente1?.idtipdoc || 1,
                     numdoc: dni,
                     email,
@@ -944,6 +978,8 @@ const ClientesForm = ({
                 horizontal={true}
                 required
                 fullWidth
+                error={razonSocialError}
+                setError={setRazonSocialError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
@@ -954,6 +990,8 @@ const ClientesForm = ({
                 horizontal={true}
                 required
                 fullWidth
+                error={domFiscalError}
+                setError={setDomFiscalError}
             />
         </div>
         <div className="w-full flex justify-center items-center gap-4 col-span-2">
@@ -1011,6 +1049,8 @@ const ClientesForm = ({
                 horizontal={true}
                 defaultValue={ciiu}
                 required
+                error={ciiuError}
+                setError={setCiiuError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
@@ -1021,6 +1061,8 @@ const ClientesForm = ({
                 horizontal={true}
                 required
                 fullWidth
+                error={contacEmpresaError}
+                setError={setContacEmpresaError}
             />
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">

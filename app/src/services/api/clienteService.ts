@@ -46,21 +46,10 @@ export interface Cliente2 {
 
 export type CreateUpdateCliente2 = Omit<Cliente2, 'idcliente' | 'idcontratante'>
 
-/** Persona jurídica: residente vacío; natural: 1/0 según selector. */
-export const residenteForClientePayload = (
-    selectedTipoPersona: number,
-    resident: number
-): string => (selectedTipoPersona === 2 ? "" : resident === 1 ? "1" : "0")
-
-/** PATCH jurídica: no enviar residente/resedent (evita sobrescribir con 0). */
-export const omitResidenteFieldsForJuridicaPatch = <T extends Record<string, unknown>>(
-    payload: Partial<T>,
-    selectedTipoPersona: number
-): Partial<T> => {
-    if (selectedTipoPersona !== 2) return payload
-    const { residente: _r, resedent: _e, ...rest } = payload
-    return rest
-}
+export {
+    omitResidenteFieldsForJuridicaPatch,
+    residenteForClientePayload,
+} from '../../utils/clienteFormValidation'
 
 interface Props {
     clienteId?: string
