@@ -87,7 +87,7 @@ export const MEDIOS_PAGO = [
     { codmepag: 96, uif: '02', sunat: '007', desmpagos: 'UIF-CHEQUE (NO EXHIBIO)', cod_sisgen: '096' },
     { codmepag: 98, uif: '05', sunat: '001', desmpagos: 'UIF-DEPOSITO (NO EXHIBIO)', cod_sisgen: '097' },
     { codmepag: 99, uif: '99', sunat: '099', desmpagos: 'UIF-OTROS (NO EXHIBIO)', cod_sisgen: '098' },
-    { codmepag: 100, uif: '99', sunat: '099', desmpagos: 'VACIO', cod_sisgen: '' }
+    { codmepag: 97, uif: '', sunat: '', desmpagos: 'VACIO', cod_sisgen: '' }
 ]  
 
 export const BANCOS = [
