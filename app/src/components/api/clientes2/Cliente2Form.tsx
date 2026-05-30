@@ -191,8 +191,8 @@ const Cliente2Form = ({
         // JURIDICAL PERSON
         const [razonSocial, setRazonSocial] = useState(cliente2 ? cliente2.razonsocial : '')
         const [domFiscal, setDomFiscal] = useState(cliente2 ? cliente2.domfiscal : '')
-        const [fechaConstitucion, setFechaConstitucion] = useState(cliente2 ? cliente2.cumpclie || '' : '')
-        const [numeroDeRegistro, setNumeroDeRegistro] = useState(cliente2 ? cliente2.numdoc : '')
+        const [fechaConstitucion, setFechaConstitucion] = useState(cliente2 ? cliente2.fechaconstitu || '' : '')
+        const [numeroDeRegistro, setNumeroDeRegistro] = useState(cliente2 ? cliente2.numregistro || '' : '')
         // const [objetoSocial, setObjetaSocial] = useState(cliente1 ? cliente1.detaprofesion || '' : '')
         const [correoDeEmpresa, setCorreoDeEmpresa] = useState(cliente2 ? cliente2.email || '' : '')
         const [selectedSedeRegistral, setSelectedSedeRegistral] = useState<{ id: string; label: string } | null>(() => { 
@@ -529,7 +529,7 @@ const Cliente2Form = ({
                     idcargoprofe: 0,
                     idprofesion: 0,
                     detaprofesion: '',
-                    cumpclie: birthdate,
+                    cumpclie: '',
                     razonsocial: razonSocial,
                     domfiscal: domFiscal,
                     idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
@@ -539,6 +539,7 @@ const Cliente2Form = ({
                     contacempresa: contacEmpresa,
                     ubigeo_plantilla: '',
                     fechaconstitu: fechaConstitucion,
+                    numregistro: numeroDeRegistro,
                     profesion_plantilla: '',
                     tipocli: 'J',
                     residente: residenteForClientePayload(selectedTipoPersona, resident),

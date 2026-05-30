@@ -33,6 +33,7 @@ export interface Cliente {
     actmunicipal: string; // CIIU code
     contacempresa: string; // Contact person in the company
     fechaconstitu: string; // Date in 'DD/MM/YYYY' format
+    numregistro?: string;
     numdoc_plantilla: string;
     conyuge?: string;
     conyugue_name?: string;

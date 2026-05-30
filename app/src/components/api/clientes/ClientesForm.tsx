@@ -205,8 +205,8 @@ const ClientesForm = ({
     // JURIDICAL PERSON
     const [razonSocial, setRazonSocial] = useState(cliente1 ? cliente1.razonsocial : '')
     const [domFiscal, setDomFiscal] = useState(cliente1 ? cliente1.domfiscal : '')
-    const [fechaConstitucion, setFechaConstitucion] = useState(cliente1 ? cliente1.cumpclie || '' : '')
-    const [numeroDeRegistro, setNumeroDeRegistro] = useState(cliente1 ? cliente1.numdoc : '')
+    const [fechaConstitucion, setFechaConstitucion] = useState(cliente1 ? cliente1.fechaconstitu || '' : '')
+    const [numeroDeRegistro, setNumeroDeRegistro] = useState(cliente1 ? cliente1.numregistro || '' : '')
     // const [objetoSocial, setObjetaSocial] = useState(cliente1 ? cliente1.detaprofesion || '' : '')
     const [correoDeEmpresa, setCorreoDeEmpresa] = useState(cliente1 ? cliente1.email || '' : '')
     const [selectedSedeRegistral, setSelectedSedeRegistral] = useState<{ id: string; label: string } | null>(() => { 
@@ -601,7 +601,7 @@ const ClientesForm = ({
                     idcargoprofe: 0,
                     idprofesion: 0,
                     detaprofesion: '',
-                    cumpclie: birthdate,
+                    cumpclie: '',
                     razonsocial: razonSocial,
                     domfiscal: domFiscal,
                     idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
@@ -610,6 +610,7 @@ const ClientesForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
+                    numregistro: numeroDeRegistro,
                 }
             }, {
                 onSuccess: (data) => {
@@ -655,7 +656,7 @@ const ClientesForm = ({
                     idcargoprofe: 0,
                     idprofesion: 0,
                     detaprofesion: '',
-                    cumpclie: birthdate,
+                    cumpclie: '',
                     razonsocial: razonSocial,
                     domfiscal: domFiscal,
                     idsedereg: selectedSedeRegistral ? parseInt(selectedSedeRegistral.id) : 0,
@@ -664,6 +665,7 @@ const ClientesForm = ({
                     actmunicipal: ciiu,
                     contacempresa: contacEmpresa,
                     fechaconstitu: fechaConstitucion,
+                    numregistro: numeroDeRegistro,
                 }
             }, {
                 onSuccess: (data) => {

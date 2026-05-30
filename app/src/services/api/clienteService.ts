@@ -36,6 +36,7 @@ export interface Cliente2 {
     profesion_plantilla: string; 
     ubigeo_plantilla: string;
     fechaconstitu: string
+    numregistro?: string
     idsedereg: number;
     domfiscal: string;
     numpartida: string;
