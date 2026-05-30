@@ -1,21 +1,28 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 interface TopModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
   deepth?: number; // Optional prop to control z-index depth
+  /** Render at document.body (use for modals opened inside another modal). */
+  portal?: boolean;
 }
 
-const TopModal = ({ isOpen, onClose, children, deepth }: TopModalProps) => {
-  return (
+const TopModal = ({ isOpen, onClose, children, deepth, portal = false }: TopModalProps) => {
+  const overlayZIndex = deepth ?? 40
+  const contentZIndex = overlayZIndex + 10
+
+  const modal = (
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Overlay */}
           <motion.div
-            className={`fixed inset-y-0 right-0 left-56 bg-black/40 ${deepth ? `z-${deepth}` : 'z-40'}`}
+            className="fixed inset-y-0 right-0 left-56 bg-black/40"
+            style={{ zIndex: overlayZIndex }}
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -24,7 +31,8 @@ const TopModal = ({ isOpen, onClose, children, deepth }: TopModalProps) => {
 
           {/* Modal container */}
           <motion.div
-            className="fixed top-20 right-0 left-56 z-50 mx-auto w-full max-w-5xl rounded-b-2xl bg-white p-6 shadow-lg max-h-screen overflow-y-auto"
+            className="fixed top-20 right-0 left-56 mx-auto w-full max-w-5xl rounded-b-2xl bg-white p-6 shadow-lg max-h-screen overflow-y-auto"
+            style={{ zIndex: contentZIndex }}
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}
@@ -47,6 +55,12 @@ const TopModal = ({ isOpen, onClose, children, deepth }: TopModalProps) => {
       )}
     </AnimatePresence>
   );
+
+  if (portal && typeof document !== 'undefined') {
+    return createPortal(modal, document.body);
+  }
+
+  return modal;
 }
 
 export default TopModal

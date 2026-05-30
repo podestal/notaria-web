@@ -1,3 +1,4 @@
+import { RepresentanteContratanteData } from "../../../services/api/contratantesService"
 import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
 import useCreateRepresentante from "../../../hooks/api/representante/useCreateRepresentante"
 import useGetSedesRegistrales from "../../../hooks/api/sedesRegistrales/useGetSedesRegistrales"
@@ -9,9 +10,21 @@ interface Props {
     setRepresentanteCreated: React.Dispatch<React.SetStateAction<boolean>>
     setContratanteRepresented: React.Dispatch<React.SetStateAction<string>>
     setOpenRepForm: React.Dispatch<React.SetStateAction<boolean>>
+    onRepresentanteLinked?: (
+        idcontratanterp: string,
+        representanteData: RepresentanteContratanteData
+    ) => void
+    editingContratanteId?: string
 }
 
-const CreateRepresentante = ({ kardex, setRepresentanteCreated, setContratanteRepresented, setOpenRepForm }: Props) => {
+const CreateRepresentante = ({
+    kardex,
+    setRepresentanteCreated,
+    setContratanteRepresented,
+    setOpenRepForm,
+    onRepresentanteLinked,
+    editingContratanteId,
+}: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const createRepresentante = useCreateRepresentante()
@@ -33,6 +46,8 @@ const CreateRepresentante = ({ kardex, setRepresentanteCreated, setContratanteRe
             setRepresentanteCreated={setRepresentanteCreated}
             setContratanteRepresented={setContratanteRepresented}
             setOpenRepForm={setOpenRepForm}
+            onRepresentanteLinked={onRepresentanteLinked}
+            editingContratanteId={editingContratanteId}
         />
     </div>
   )

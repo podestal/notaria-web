@@ -25,6 +25,7 @@ const useUpdateContratante = ({
         mutationFn: (data: UpdateContratanteData) => contratantesService.update(data.contratante, data.access),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["contratantes by kardex", kardex] })
+            queryClient.invalidateQueries({ queryKey: ["contratante", contratanteId] })
             const idNum = idkardex != null ? Number(idkardex) : NaN
             if (Number.isFinite(idNum) && idNum > 0) {
                 queryClient.invalidateQueries({ queryKey: ["kardex", idNum], exact: true })

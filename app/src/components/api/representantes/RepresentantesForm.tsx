@@ -2,7 +2,7 @@ import { useState } from "react"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import { SedeRegistral } from "../../../services/api/sedesRegistralesService"
-import { Contratante } from "../../../services/api/contratantesService"
+import { Contratante, RepresentanteContratanteData } from "../../../services/api/contratantesService"
 import getTitleCase from "../../../utils/getTitleCase"
 import { CreateRepresentanteData } from "../../../hooks/api/representante/useCreateRepresentante"
 import { Representante } from "../../../services/api/representantesService"
@@ -18,9 +18,25 @@ interface Props {
     setRepresentanteCreated: React.Dispatch<React.SetStateAction<boolean>>
     setContratanteRepresented: React.Dispatch<React.SetStateAction<string>>
     setOpenRepForm: React.Dispatch<React.SetStateAction<boolean>>
+    onRepresentanteLinked?: (
+        idcontratanterp: string,
+        representanteData: RepresentanteContratanteData
+    ) => void
+    /** Contratante row being edited (the representante legal actor). */
+    editingContratanteId?: string
 }
 
-const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepresentante, setRepresentanteCreated, setContratanteRepresented, setOpenRepForm }: Props) => {
+const RepresentantesForm = ({
+    sedesRegistrales,
+    contratantes,
+    kardex,
+    createRepresentante,
+    setRepresentanteCreated,
+    setContratanteRepresented,
+    setOpenRepForm,
+    onRepresentanteLinked,
+    editingContratanteId,
+}: Props) => {
 
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [facultades, setFacultades] = useState('')
@@ -29,48 +45,89 @@ const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepr
     const [nPartida, setNPartida] = useState('')
     const access = useAuthStore((s) => s.access_token) || ''
 
-    // ERROR HANDLING
     const [facultadesError, setFacultadesError] = useState('')
-    // const [sedeRegistralError, setSedeRegistralError] = useState('')
+    const [sedeRegistralError, setSedeRegistralError] = useState('')
+    const [nPartidaError, setNPartidaError] = useState('')
 
-    const handleSubmit = ( contratante: Contratante ) => {
-        // e.preventDefault()
+    const validateRepresentanteFields = (): boolean => {
+        let valid = true
 
-        // console.log('selectedContratante', selectedContratante);
-        
+        if (!facultades.trim()) {
+            setFacultadesError('Las facultades son obligatorias.')
+            valid = false
+        } else {
+            setFacultadesError('')
+        }
 
+        if (!sedeRegistral || sedeRegistral <= 0) {
+            setSedeRegistralError('La sede registral es obligatoria.')
+            valid = false
+        } else {
+            setSedeRegistralError('')
+        }
+
+        if (!nPartida.trim()) {
+            setNPartidaError('El número de partida es obligatorio.')
+            valid = false
+        } else {
+            setNPartidaError('')
+        }
+
+        if (!valid) {
+            setType('error')
+            setMessage('Complete facultades, sede registral y número de partida.')
+            setShow(true)
+        }
+
+        return valid
+    }
+
+    const handleSubmit = (contratante: Contratante) => {
         if (contratante === null) {
             setType("error")
             setMessage("Debe seleccionar un contratante")
             setShow(true)
             return
-        } 
-        
+        }
+
+        if (!validateRepresentanteFields()) {
+            return
+        }
+
+        const representanteData: RepresentanteContratanteData = {
+            facultades,
+            inscrito: subscribed.toString(),
+            idsedereg: sedeRegistral.toString(),
+            numpartida: nPartida,
+        }
 
         createRepresentante.mutate({
             access,
             representante: {
                 facultades,
-                inscrito: subscribed.toString(),
-                sede_registral: sedeRegistral.toString(),
-                partida: nPartida,
+                inscrito: representanteData.inscrito,
+                sede_registral: representanteData.idsedereg,
+                partida: representanteData.numpartida,
                 idtipoacto: null, 
                 kardex: kardex,
-                idcontratante: contratante.idcontratante, 
+                idcontratante: editingContratanteId ?? contratante.idcontratante,
                 idcontratante_r: contratante.cliente_id,
                 id_ro_repre: null,
                 odb: null,
                 ido: null
             }
         }, {
-            onSuccess: (data) => {
+            onSuccess: () => {
                 setType("success")
                 setMessage("Representante creado correctamente")
                 setShow(true)
-                setRepresentanteCreated(true)
-                setContratanteRepresented(contratante.idcontratante)
                 setOpenRepForm(false)
-                console.log('data', data);
+                if (onRepresentanteLinked) {
+                    onRepresentanteLinked(contratante.idcontratante, representanteData)
+                } else {
+                    setRepresentanteCreated(true)
+                    setContratanteRepresented(contratante.idcontratante)
+                }
             }
             , onError: (error) => {
                 setType("error")
@@ -113,16 +170,22 @@ const RepresentantesForm = ({ sedesRegistrales, contratantes, kardex, createRepr
                     label="Sede Registral"
                     options={sedesRegistrales.map(sede => ({
                         label: sede.dessede,
-                        value: parseInt(sede.idsedereg)
+                        value: parseInt(sede.idsedereg, 10),
                     }))}
                     setter={setSedeRegistral}
                     defaultValue={sedeRegistral}
+                    required
+                    error={sedeRegistralError}
+                    setError={setSedeRegistralError}
                 />
                 <SimpleInput 
                     label="Número de Partida"
                     value={nPartida}
                     setValue={setNPartida}
                     horizontal
+                    required
+                    error={nPartidaError}
+                    setError={setNPartidaError}
                 />
             </div>
             <div className="mt-6 flex flex-col gap-4">

@@ -9,11 +9,19 @@ interface SingleSelectProps {
     options: Option[];
     selected: string;
     onChange: (value: string) => void;
+    /** Fires on every click (including re-selecting the current option). */
+    onSelect?: (value: string) => void;
     disabled?: boolean;
     name?: string; // Add name prop to make each radio group unique
 }
 
-const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange, disabled, name='single-select' }) => {
+const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange, onSelect, disabled, name='single-select' }) => {
+  const handleSelect = (value: string) => {
+    if (disabled) return
+    onChange(value)
+    onSelect?.(value)
+  }
+
   return (
     <div className="flex justify-baseline items-center gap-10">
       {options.map((option) => (
@@ -28,7 +36,8 @@ const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange
             name={name} // Use the unique name prop
             value={option.value}
             checked={selected === option.value}
-            onChange={() => onChange(option.value)}
+            onChange={() => handleSelect(option.value)}
+            onClick={() => handleSelect(option.value)}
             className="form-radio text-blue-600"
             disabled={disabled}
           />

@@ -16,6 +16,16 @@ export interface Contratante {
     visita: string;
     inscrito: string;
     idcontratanterp: string;
+    idsedereg?: string;
+    numpartida?: string;
+    facultades?: string;
+}
+
+export interface RepresentanteContratanteData {
+    idsedereg: string;
+    numpartida: string;
+    facultades: string;
+    inscrito: string;
 }
 
 export type CreateUpdateContratante = Omit<Contratante, 'idcontratante' | 'cliente' | 'cliente_id' | 'condicion_str'>

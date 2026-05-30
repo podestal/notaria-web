@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import useAuthStore from "../../../store/useAuthStore"
 import SimpleInput from "../../ui/SimpleInput"
 import { Cliente } from "../../../services/api/cliente1Service"
 import ContratantesConditionFilter from "./ContratantesConditionFilter"
 import { CreateContratanteData } from "../../../hooks/api/contratantes/useCreateContratantes"
-import { Contratante } from "../../../services/api/contratantesService"
+import {
+    Contratante,
+    CreateUpdateContratante,
+    RepresentanteContratanteData,
+} from "../../../services/api/contratantesService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import SingleSelect from "../../ui/SingleSelect"
@@ -34,6 +39,15 @@ const representationOptions = [
     { value: "2", label: "Por derecho propio y representante" },
 ]
 
+const normalizeTiporepresentacion = (value?: string | number | null): string => {
+    if (value == null || value === "") return "0"
+    const parsed = parseInt(String(value).trim(), 10)
+    if (parsed === 1) return "1"
+    if (parsed === 2) return "2"
+    if (parsed === 0) return "0"
+    return "0"
+}
+
 const ContratantesForm = ({ 
     cliente1, 
     cliente2,
@@ -63,7 +77,9 @@ const ContratantesForm = ({
     }
 
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const access = useAuthStore((s) => s.access_token) || ""
     const [openRepForm, setOpenRepForm] = useState(false)
+    const userEditedRepresentationRef = useRef(false)
     const [razonSocial, setRazonSocial] = useState(cliente1 ? cliente1.razonsocial : '')
     const [domFiscal, setDomFiscal] = useState(cliente1 ? cliente1.domfiscal : '')
     const [apePaterno, setApePaterno] = useState(cliente1 ? cliente1.apepat : '')
@@ -71,15 +87,134 @@ const ContratantesForm = ({
     const [prinom, setPrinom] = useState( cliente1 ? cliente1.prinom : '')
     const [segnom, setSegnom] = useState( cliente1 ? cliente1.segnom : '')
     const [address, setAddress] = useState( cliente1 ? cliente1.direccion : '')
-    const [representanteCreated, setRepresentanteCreated] = useState(false)
-    const [selectedRepresentation, setSelectedRepresentation] = useState('0')
+    const [representanteCreated, setRepresentanteCreated] = useState(
+        Boolean(contratante?.idcontratanterp)
+    )
+    const [selectedRepresentation, setSelectedRepresentation] = useState(() =>
+        normalizeTiporepresentacion(contratante?.tiporepresentacion)
+    )
     const [selectedActos, setSelectedActos] = useState<string[]>(
         contratante ? parseCondicion(contratante.condicion) : []
     )
-    const [firma, setFirma] = useState(contratante ? contratante.firma === '1' : true)
+    const [firma, setFirma] = useState(() => {
+        if (selectedTipoPersona === 2) return false
+        return contratante ? contratante.firma === "1" : true
+    })
     const [incluirIndic, setIncluirIndic] = useState(contratante ? contratante.indice === '1' : true)
     const [isLoading, setIsLoading] = useState(false)
     const [contratanteRepresented, setContratanteRepresented] = useState(contratante ? contratante.idcontratanterp : '')
+    const [representanteData, setRepresentanteData] = useState<RepresentanteContratanteData>(() => ({
+        idsedereg: contratante?.idsedereg ?? "",
+        numpartida: contratante?.numpartida ?? "",
+        facultades: contratante?.facultades ?? "",
+        inscrito: contratante?.inscrito ?? "1",
+    }))
+
+    const handleRepresentationSelect = (value: string) => {
+        userEditedRepresentationRef.current = true
+        setSelectedRepresentation(value)
+        if (value === "1" || value === "2") {
+            setOpenRepForm(true)
+        } else {
+            setOpenRepForm(false)
+            setContratanteRepresented("")
+            setRepresentanteCreated(false)
+            setRepresentanteData({
+                idsedereg: "",
+                numpartida: "",
+                facultades: "",
+                inscrito: "1",
+            })
+        }
+    }
+
+    const buildContratantePayload = (idcontratanterpOverride?: string): CreateUpdateContratante => {
+        const idcontratanterp =
+            selectedRepresentation === "0"
+                ? ""
+                : (idcontratanterpOverride ?? contratanteRepresented)
+
+        const usesRepresentacion = selectedRepresentation !== "0"
+
+        return {
+            idtipkar,
+            kardex,
+            condicion: serializeCondicion(selectedActos),
+            firma: selectedTipoPersona === 2 ? "0" : firma ? "1" : "0",
+            fechafirma: selectedTipoPersona === 2 ? "" : contratante?.fechafirma ?? "",
+            resfirma: contratante?.resfirma ?? 0,
+            tiporepresentacion: selectedRepresentation,
+            indice: incluirIndic ? "1" : "0",
+            visita: contratante?.visita ?? "0",
+            inscrito: usesRepresentacion ? representanteData.inscrito : contratante?.inscrito ?? "1",
+            idcontratanterp: idcontratanterp,
+            idsedereg: usesRepresentacion ? representanteData.idsedereg : "",
+            numpartida: usesRepresentacion ? representanteData.numpartida : "",
+            facultades: usesRepresentacion ? representanteData.facultades : "",
+        }
+    }
+
+    const handleRepresentanteLinked = (
+        idcontratanterp: string,
+        data: RepresentanteContratanteData
+    ) => {
+        userEditedRepresentationRef.current = true
+        setContratanteRepresented(idcontratanterp)
+        setRepresentanteCreated(true)
+        setRepresentanteData(data)
+
+        if (!updateContratante || !contratante?.idcontratante) return
+
+        updateContratante.mutate(
+            {
+                access,
+                contratante: buildContratantePayload(idcontratanterp),
+            },
+            {
+                onSuccess: () => {
+                    setType("success")
+                    setMessage("Representante vinculado correctamente.")
+                    setShow(true)
+                },
+                onError: () => {
+                    setType("error")
+                    setMessage("No se pudo guardar el representante en el contratante.")
+                    setShow(true)
+                },
+            }
+        )
+    }
+
+    useEffect(() => {
+        if (!contratante?.idcontratante || userEditedRepresentationRef.current) return
+        setSelectedRepresentation(normalizeTiporepresentacion(contratante.tiporepresentacion))
+        setRepresentanteCreated(Boolean(contratante.idcontratanterp))
+        setContratanteRepresented(contratante.idcontratanterp || "")
+        setRepresentanteData({
+            idsedereg: contratante.idsedereg ?? "",
+            numpartida: contratante.numpartida ?? "",
+            facultades: contratante.facultades ?? "",
+            inscrito: contratante.inscrito ?? "1",
+        })
+    }, [
+        contratante?.idcontratante,
+        contratante?.tiporepresentacion,
+        contratante?.idcontratanterp,
+        contratante?.idsedereg,
+        contratante?.numpartida,
+        contratante?.facultades,
+        contratante?.inscrito,
+    ])
+
+    useEffect(() => {
+        userEditedRepresentationRef.current = false
+    }, [contratante?.idcontratante])
+
+    useEffect(() => {
+        if (selectedTipoPersona === 2) {
+            setFirma(false)
+        }
+    }, [selectedTipoPersona])
 
     useEffect(() => {
         console.log('cliente1', cliente1)
@@ -116,7 +251,7 @@ const ContratantesForm = ({
         e.preventDefault()
 
         if (selectedTipoPersona === 1) {
-            if (selectedRepresentation !== "0" && !representanteCreated) {
+            if (selectedRepresentation !== "0" && !contratanteRepresented.trim()) {
                 setType('error')
                 setMessage('Debe crear un representante.')
                 setShow(true)
@@ -182,83 +317,62 @@ const ContratantesForm = ({
         }
 
         setIsLoading(true)
-        const joinedActos = serializeCondicion(selectedActos)
+        const contratantePayload = buildContratantePayload()
 
-        createContratante && createContratante.mutate({
-            access: '',
-            contratante: {
-                idtipkar,
-                kardex,
-                condicion: joinedActos,
-                firma: firma ? '1' : '0',
-                fechafirma: "",
-                resfirma: 0,
-                tiporepresentacion: selectedRepresentation, 
-                indice: incluirIndic ? '1' : '0',
-                visita: '0',
-                inscrito: '1',
-                idcontratanterp: contratanteRepresented,
-            }
-        }, {
+        const mutationCallbacks = {
+            onSettled: () => setIsLoading(false),
+        }
 
-            onSuccess: (res) => {
-                console.log('contratante', res);
-                setType('success')
-                setMessage('Contratante creado correctamente.')
-                setShow(true)
-                setShowContratanteForm(false)
-                setShowClienteForm(false)
-                setClientesCheck(false)
-            },
-            onError: (error) => {
-                console.error('Error creating contratante:', error)
-                setType('error')
-                setMessage('Error al crear el contratante. Por favor, inténtelo de nuevo.')
-                setShow(true)
-            },
-            onSettled: () => {
-                setIsLoading(false)
-            }
-        })
+        if (updateContratante) {
+            updateContratante.mutate(
+                { access, contratante: contratantePayload },
+                {
+                    ...mutationCallbacks,
+                    onSuccess: () => {
+                        setType('success')
+                        setMessage('Contratante actualizado correctamente.')
+                        setShow(true)
+                        setShowContratanteForm(false)
+                        setShowClienteForm(false)
+                        setClientesCheck(false)
+                        setCloseUpdateContratante?.(false)
+                    },
+                    onError: (error) => {
+                        console.error('Error updating contratante:', error)
+                        setType('error')
+                        setMessage('Error al actualizar el contratante. Por favor, inténtelo de nuevo.')
+                        setShow(true)
+                    },
+                }
+            )
+            return
+        }
 
-        updateContratante && updateContratante.mutate({
-            access: '',
-            contratante: {
-                idtipkar,
-                kardex,
-                condicion: joinedActos,
-                firma: firma ? '1' : '0',
-                fechafirma: "",
-                resfirma: 0,
-                tiporepresentacion: selectedRepresentation, 
-                indice: incluirIndic ? '1' : '0',
-                visita: '0',
-                inscrito: '1',
-                idcontratanterp: contratanteRepresented,
-            }
-        }, {
-            onSuccess: (res) => {
-                console.log('contratante updated', res);
-                setType('success')
-                setMessage('Contratante actualizado correctamente.')
-                setShow(true)
-                setShowContratanteForm(false)
-                setShowClienteForm(false)
-                setClientesCheck(false)
-                setCloseUpdateContratante && setCloseUpdateContratante(false)
-            },
-            onError: (error) => {
-                console.error('Error updating contratante:', error)
-                setType('error')
-                setMessage('Error al actualizar el contratante. Por favor, inténtelo de nuevo.')
-                setShow(true)
-            },
-            onSettled: () => {
-                setIsLoading(false)
-            }
-        })
+        if (createContratante) {
+            createContratante.mutate(
+                { access, contratante: contratantePayload },
+                {
+                    ...mutationCallbacks,
+                    onSuccess: () => {
+                        setType('success')
+                        setMessage('Contratante creado correctamente.')
+                        setShow(true)
+                        setShowContratanteForm(false)
+                        setShowClienteForm(false)
+                        setClientesCheck(false)
+                    },
+                    onError: (error) => {
+                        console.error('Error creating contratante:', error)
+                        setType('error')
+                        setMessage('Error al crear el contratante. Por favor, inténtelo de nuevo.')
+                        setShow(true)
+                    },
+                }
+            )
+            return
+        }
 
-
+        setIsLoading(false)
     }
 
   return (
@@ -376,8 +490,9 @@ const ContratantesForm = ({
                 <p className="pl-2 block text-xs font-semibold text-slate-700">Firma</p>
                 <input 
                     type="checkbox"  
-                    checked={firma}
-                    onChange={(e) => setFirma(e.target.checked)}    
+                    checked={false}
+                    disabled
+                    aria-label="Firma no aplica para persona jurídica"
                 />
             </div>}
             <div className="w-full flex justify-center items-center gap-4 h-10">
@@ -431,25 +546,28 @@ const ContratantesForm = ({
             <SingleSelect 
                 options={representationOptions}
                 selected={selectedRepresentation}
-                onChange={(value) => {
-                    if (value !== "0") {
-                        setOpenRepForm(true)
-                    }
-                    setSelectedRepresentation(value)
-                }}
+                onChange={handleRepresentationSelect}
+                onSelect={handleRepresentationSelect}
                 disabled={selectedActos.length === 0}
             />
+            {selectedActos.length === 0 && (
+                <p className="text-xs text-amber-700 mt-2">Selecciona al menos una condición para elegir el tipo de representación.</p>
+            )}
         </div>
     </form>
     <TopModal
         isOpen={openRepForm}
         onClose={() => setOpenRepForm(false)}
+        deepth={60}
+        portal
     >
         <CreateRepresentante 
             kardex={kardex}
             setRepresentanteCreated={setRepresentanteCreated}
             setContratanteRepresented={setContratanteRepresented}
             setOpenRepForm={setOpenRepForm}
+            onRepresentanteLinked={handleRepresentanteLinked}
+            editingContratanteId={contratante?.idcontratante}
         />
     </TopModal>
     </>
