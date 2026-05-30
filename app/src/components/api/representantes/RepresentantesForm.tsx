@@ -1,20 +1,29 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import { SedeRegistral } from "../../../services/api/sedesRegistralesService"
 import { Contratante, RepresentanteContratanteData } from "../../../services/api/contratantesService"
 import getTitleCase from "../../../utils/getTitleCase"
 import { CreateRepresentanteData } from "../../../hooks/api/representante/useCreateRepresentante"
+import { UpdateRepresentanteData } from "../../../hooks/api/representante/useUpdateRepresentante"
 import { Representante } from "../../../services/api/representantesService"
 import { UseMutationResult } from "@tanstack/react-query"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useAuthStore from "../../../store/useAuthStore"
+import {
+    parseInscritoValue,
+    parseSedeRegistralValue,
+    representanteToContratanteData,
+    resolveLinkedRepresentanteContratanteId,
+} from "../../../utils/representanteFormUtils"
 
 interface Props {
     sedesRegistrales: SedeRegistral[]
     contratantes: Contratante[]
     kardex: string
     createRepresentante: UseMutationResult<Representante, Error, CreateRepresentanteData>
+    updateRepresentante: UseMutationResult<Representante, Error, UpdateRepresentanteData>
     setRepresentanteCreated: React.Dispatch<React.SetStateAction<boolean>>
     setContratanteRepresented: React.Dispatch<React.SetStateAction<string>>
     setOpenRepForm: React.Dispatch<React.SetStateAction<boolean>>
@@ -22,8 +31,11 @@ interface Props {
         idcontratanterp: string,
         representanteData: RepresentanteContratanteData
     ) => void
-    /** Contratante row being edited (the representante legal actor). */
+    /** Contratante row being edited (persona jurídica represented). */
     editingContratanteId?: string
+    existingRepresentante?: Representante | null
+    linkedRepresentanteContratanteId?: string
+    initialRepresentanteData?: RepresentanteContratanteData
 }
 
 const RepresentantesForm = ({
@@ -31,117 +43,179 @@ const RepresentantesForm = ({
     contratantes,
     kardex,
     createRepresentante,
+    updateRepresentante,
     setRepresentanteCreated,
     setContratanteRepresented,
     setOpenRepForm,
     onRepresentanteLinked,
     editingContratanteId,
+    existingRepresentante,
+    linkedRepresentanteContratanteId,
+    initialRepresentanteData,
 }: Props) => {
 
+    const queryClient = useQueryClient()
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const access = useAuthStore((s) => s.access_token) || ""
+
+    const [representanteRecordId, setRepresentanteRecordId] = useState<number | null>(null)
     const [facultades, setFacultades] = useState('')
     const [subscribed, setSubscribed] = useState(1)
-    const [sedeRegistral, setSedeRegistral] = useState(1)
+    const [sedeRegistral, setSedeRegistral] = useState(0)
     const [nPartida, setNPartida] = useState('')
-    const access = useAuthStore((s) => s.access_token) || ''
 
     const [facultadesError, setFacultadesError] = useState('')
     const [sedeRegistralError, setSedeRegistralError] = useState('')
     const [nPartidaError, setNPartidaError] = useState('')
 
-    const validateRepresentanteFields = (): boolean => {
-        let valid = true
+    const resolvedLinkedId = useMemo(
+        () =>
+            resolveLinkedRepresentanteContratanteId(
+                linkedRepresentanteContratanteId,
+                existingRepresentante,
+                contratantes
+            ),
+        [linkedRepresentanteContratanteId, existingRepresentante, contratantes]
+    )
 
-        if (!facultades.trim()) {
-            setFacultadesError('Las facultades son obligatorias.')
-            valid = false
-        } else {
-            setFacultadesError('')
-        }
-
-        if (!sedeRegistral || sedeRegistral <= 0) {
-            setSedeRegistralError('La sede registral es obligatoria.')
-            valid = false
-        } else {
-            setSedeRegistralError('')
-        }
-
-        if (!nPartida.trim()) {
-            setNPartidaError('El número de partida es obligatorio.')
-            valid = false
-        } else {
-            setNPartidaError('')
-        }
-
-        if (!valid) {
-            setType('error')
-            setMessage('Complete facultades, sede registral y número de partida.')
-            setShow(true)
-        }
-
-        return valid
-    }
-
-    const handleSubmit = (contratante: Contratante) => {
-        if (contratante === null) {
-            setType("error")
-            setMessage("Debe seleccionar un contratante")
-            setShow(true)
+    useEffect(() => {
+        if (existingRepresentante?.id) {
+            setRepresentanteRecordId(existingRepresentante.id)
+            setFacultades(existingRepresentante.facultades ?? '')
+            setSubscribed(parseInscritoValue(existingRepresentante.inscrito))
+            setSedeRegistral(parseSedeRegistralValue(existingRepresentante.sede_registral))
+            setNPartida(existingRepresentante.partida ?? '')
             return
         }
 
+        setRepresentanteRecordId(null)
+        if (!initialRepresentanteData) return
+
+        setFacultades(initialRepresentanteData.facultades ?? '')
+        setSubscribed(parseInscritoValue(initialRepresentanteData.inscrito))
+        setSedeRegistral(parseSedeRegistralValue(initialRepresentanteData.idsedereg))
+        setNPartida(initialRepresentanteData.numpartida ?? '')
+    }, [existingRepresentante, initialRepresentanteData])
+
+    const isInscrito = subscribed === 1
+
+    const handleSubscribedChange = (value: number) => {
+        setSubscribed(value)
+        if (value === 0) {
+            setSedeRegistral(0)
+            setNPartida('')
+            setSedeRegistralError('')
+            setNPartidaError('')
+        }
+    }
+
+    const validateRepresentanteFields = (): boolean => {
+        setFacultadesError('')
+        setSedeRegistralError('')
+        setNPartidaError('')
+        return true
+    }
+
+    const finishSuccess = (
+        contratante: Contratante,
+        representanteData: RepresentanteContratanteData,
+        isUpdate: boolean
+    ) => {
+        setType('success')
+        setMessage(
+            isUpdate
+                ? 'Representante actualizado correctamente'
+                : 'Representante creado correctamente'
+        )
+        setShow(true)
+        setOpenRepForm(false)
+
+        if (editingContratanteId) {
+            queryClient.invalidateQueries({
+                queryKey: ['representante', 'by_contratante', editingContratanteId],
+            })
+        }
+
+        if (onRepresentanteLinked) {
+            onRepresentanteLinked(contratante.idcontratante, representanteData)
+        } else {
+            setRepresentanteCreated(true)
+            setContratanteRepresented(contratante.idcontratante)
+        }
+    }
+
+    const handleSubmit = (contratante: Contratante) => {
         if (!validateRepresentanteFields()) {
             return
         }
 
+        const sedeValue = isInscrito ? sedeRegistral.toString() : ''
+        const partidaValue = isInscrito ? nPartida : ''
+
         const representanteData: RepresentanteContratanteData = {
             facultades,
             inscrito: subscribed.toString(),
-            idsedereg: sedeRegistral.toString(),
-            numpartida: nPartida,
+            idsedereg: sedeValue,
+            numpartida: partidaValue,
         }
 
-        createRepresentante.mutate({
-            access,
-            representante: {
-                facultades,
-                inscrito: representanteData.inscrito,
-                sede_registral: representanteData.idsedereg,
-                partida: representanteData.numpartida,
-                idtipoacto: null, 
-                kardex: kardex,
-                idcontratante: editingContratanteId ?? contratante.idcontratante,
-                idcontratante_r: contratante.cliente_id,
-                id_ro_repre: null,
-                odb: null,
-                ido: null
-            }
-        }, {
-            onSuccess: () => {
-                setType("success")
-                setMessage("Representante creado correctamente")
-                setShow(true)
-                setOpenRepForm(false)
-                if (onRepresentanteLinked) {
-                    onRepresentanteLinked(contratante.idcontratante, representanteData)
-                } else {
-                    setRepresentanteCreated(true)
-                    setContratanteRepresented(contratante.idcontratante)
+        const payload = {
+            facultades,
+            inscrito: representanteData.inscrito,
+            sede_registral: sedeValue,
+            partida: partidaValue,
+            idtipoacto: null,
+            kardex,
+            idcontratante: editingContratanteId ?? contratante.idcontratante,
+            idcontratante_r: contratante.cliente_id,
+            id_ro_repre: null,
+            odb: null,
+            ido: null,
+        }
+
+        const onError = (error: Error) => {
+            setType('error')
+            setMessage(`Error al guardar el representante: ${error.message}`)
+            setShow(true)
+        }
+
+        if (representanteRecordId) {
+            updateRepresentante.mutate(
+                {
+                    access,
+                    representanteId: representanteRecordId,
+                    representante: payload,
+                },
+                {
+                    onSuccess: () => finishSuccess(contratante, representanteData, true),
+                    onError,
                 }
+            )
+            return
+        }
+
+        createRepresentante.mutate(
+            { access, representante: payload },
+            {
+                onSuccess: (saved) => {
+                    if (saved?.id) setRepresentanteRecordId(saved.id)
+                    finishSuccess(contratante, representanteData, false)
+                },
+                onError,
             }
-            , onError: (error) => {
-                setType("error")
-                setMessage(`Error al crear el representante: ${error.message}`)
-                setShow(true)
-            }
-        })
-        // Aquí puedes manejar el envío del formulario, por ejemplo, enviando los datos a una API
+        )
     }
 
+    const isSaving = createRepresentante.isPending || updateRepresentante.isPending
+
   return (
-        <div
-            className="flex flex-col gap-4 p-4">
-            <h2 className="text-2xl text-center mb-6">Contratantes</h2>
+        <div className="flex flex-col gap-4 p-4">
+            <h2 className="text-2xl text-center mb-2">Representante</h2>
+            {existingRepresentante?.id && (
+                <p className="text-xs text-center text-slate-600 mb-2">
+                    Datos cargados del registro de representantes. Puede actualizar y cambiar la persona.
+                </p>
+            )}
             <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
                 <SimpleInput 
@@ -151,7 +225,6 @@ const RepresentantesForm = ({
                     horizontal
                     error={facultadesError}
                     setError={setFacultadesError}
-                    required
                 />
                 </div>
                 <SimpleSelector 
@@ -160,11 +233,11 @@ const RepresentantesForm = ({
                         { label: 'Sí', value: 1 },
                         { label: 'No', value: 0 }
                     ]}
-                    setter={setSubscribed}
+                    setter={handleSubscribedChange}
                     defaultValue={subscribed}
-                    
                 />
             </div>
+            {isInscrito && (
             <div className="grid grid-cols-2 gap-4">
                 <SimpleSelector 
                     label="Sede Registral"
@@ -174,7 +247,6 @@ const RepresentantesForm = ({
                     }))}
                     setter={setSedeRegistral}
                     defaultValue={sedeRegistral}
-                    required
                     error={sedeRegistralError}
                     setError={setSedeRegistralError}
                 />
@@ -183,31 +255,48 @@ const RepresentantesForm = ({
                     value={nPartida}
                     setValue={setNPartida}
                     horizontal
-                    required
                     error={nPartidaError}
                     setError={setNPartidaError}
                 />
             </div>
+            )}
             <div className="mt-6 flex flex-col gap-4">
-                {/* <h3 className="text-sm">Contratantes Registrados</h3> */}
                 {contratantes.length === 0 && (
                     <p className="text-center text-gray-500 mt-4">No hay contratantes registrados.</p>
                 )}
-                {contratantes.length > 0 && contratantes.map( contratante => (
+                {contratantes
+                    .filter((c) => c.idcontratante !== editingContratanteId)
+                    .map((contratante) => {
+                    const isLinked = contratante.idcontratante === resolvedLinkedId
+                    return (
                     <div
                         key={contratante.idcontratante}
-                        className="grid grid-cols-3 gap-4 items-center hover:bg-gray-100 p-2 rounded-md transition-colors duration-200"
+                        className={`grid grid-cols-3 gap-4 items-center p-2 rounded-md transition-colors duration-200 ${
+                            isLinked
+                                ? 'bg-blue-50 border border-blue-300'
+                                : 'hover:bg-gray-100'
+                        }`}
                     >
-                        <p className="text-xs col-span-2">{getTitleCase(contratante.cliente)}</p>
+                        <p className="text-xs col-span-2">
+                            {getTitleCase(contratante.cliente)}
+                            {isLinked && (
+                                <span className="ml-2 text-blue-700 font-semibold">(actual)</span>
+                            )}
+                        </p>
                         <button 
-                            onClick={() => {
-                                // setSelectedContratante(contratante)
-                                handleSubmit(contratante)
-                            }}
+                            onClick={() => handleSubmit(contratante)}
                             type="button"
-                            className="text-xs bg-blue-600 text-white w-[60%] py-1 rounded-2xl cursor-pointer hover:bg-blue-700">Seleccionar</button>
+                            disabled={isSaving}
+                            className="text-xs bg-blue-600 text-white w-[60%] py-1 rounded-2xl cursor-pointer hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {isSaving
+                                ? 'Guardando...'
+                                : isLinked && representanteRecordId
+                                    ? 'Actualizar'
+                                    : 'Seleccionar'}
+                        </button>
                     </div>
-                ))}
+                )})}
             </div>
         </div>
   )

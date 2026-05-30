@@ -31,14 +31,18 @@ export interface Representante {
 export type CreateUpdateRepresentante = Omit<Representante, 'id'>
 
 interface Props {
-    representanteId?: string;
+    representanteId?: string
+    byContratante?: boolean
 }
 
-const getRepresentantesService = ({ representanteId }: Props) => {
-    let url = '/representantes/';
-    if (representanteId) {
-        url = `/representantes/${representanteId}/`;
+const getRepresentantesService = ({ representanteId, byContratante }: Props) => {
+    let url = '/representantes/'
+    if (byContratante) {
+        url = '/representantes/by_contratante/'
+    } else if (representanteId) {
+        url = `/representantes/${representanteId}/`
     }
-    return new APIClient<Representante, CreateUpdateRepresentante>(url);
+    return new APIClient<Representante, CreateUpdateRepresentante>(url)
 }
-export default getRepresentantesService;
+
+export default getRepresentantesService

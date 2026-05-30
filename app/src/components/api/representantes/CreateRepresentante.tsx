@@ -1,6 +1,8 @@
 import { RepresentanteContratanteData } from "../../../services/api/contratantesService"
 import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
 import useCreateRepresentante from "../../../hooks/api/representante/useCreateRepresentante"
+import useGetRepresentanteByContratante from "../../../hooks/api/representante/useGetRepresentanteByContratante"
+import useUpdateRepresentante from "../../../hooks/api/representante/useUpdateRepresentante"
 import useGetSedesRegistrales from "../../../hooks/api/sedesRegistrales/useGetSedesRegistrales"
 import useAuthStore from "../../../store/useAuthStore"
 import RepresentantesForm from "./RepresentantesForm"
@@ -15,6 +17,8 @@ interface Props {
         representanteData: RepresentanteContratanteData
     ) => void
     editingContratanteId?: string
+    linkedRepresentanteContratanteId?: string
+    initialRepresentanteData?: RepresentanteContratanteData
 }
 
 const CreateRepresentante = ({
@@ -24,17 +28,37 @@ const CreateRepresentante = ({
     setOpenRepForm,
     onRepresentanteLinked,
     editingContratanteId,
+    linkedRepresentanteContratanteId,
+    initialRepresentanteData,
 }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const createRepresentante = useCreateRepresentante()
+    const updateRepresentante = useUpdateRepresentante()
     const { data: sedesRegistrales, isLoading: isLoadingSedes, isError: isErrorSedes, isSuccess: isSuccessSedes } = useGetSedesRegistrales({ access })
     const { data: contratantes, isLoading: isLoadingContratantes, isError: isErrorContratantes, isSuccess: isSuccessContratantes } = useGetContratantesByKardex({ kardex })
+    const {
+        data: existingRepresentante,
+        isLoading: isLoadingRepresentante,
+        isError: isErrorRepresentante,
+    } = useGetRepresentanteByContratante({
+        idcontratante: editingContratanteId ?? '',
+        kardex,
+        enabled: !!editingContratanteId,
+    })
 
-    if (isLoadingSedes || isLoadingContratantes) return <p className="text-md animate-pulse text-center">Cargando ...</p>
+    const isLoading =
+        isLoadingSedes ||
+        isLoadingContratantes ||
+        (!!editingContratanteId && isLoadingRepresentante)
 
-    if (isErrorSedes || isErrorContratantes) return <p className="text-md text-red-500 text-center">Error</p>
-    if (isSuccessSedes && isSuccessContratantes) 
+    if (isLoading) return <p className="text-md animate-pulse text-center">Cargando ...</p>
+
+    if (isErrorSedes || isErrorContratantes || isErrorRepresentante) {
+        return <p className="text-md text-red-500 text-center">Error</p>
+    }
+
+    if (!isSuccessSedes || !isSuccessContratantes) return null
 
   return (
     <div>
@@ -43,11 +67,15 @@ const CreateRepresentante = ({
             contratantes={contratantes}
             kardex={kardex}
             createRepresentante={createRepresentante}
+            updateRepresentante={updateRepresentante}
             setRepresentanteCreated={setRepresentanteCreated}
             setContratanteRepresented={setContratanteRepresented}
             setOpenRepForm={setOpenRepForm}
             onRepresentanteLinked={onRepresentanteLinked}
             editingContratanteId={editingContratanteId}
+            existingRepresentante={existingRepresentante}
+            linkedRepresentanteContratanteId={linkedRepresentanteContratanteId}
+            initialRepresentanteData={initialRepresentanteData}
         />
     </div>
   )

@@ -564,6 +564,8 @@ const ContratantesForm = ({
             setOpenRepForm={setOpenRepForm}
             onRepresentanteLinked={handleRepresentanteLinked}
             editingContratanteId={contratante?.idcontratante}
+            linkedRepresentanteContratanteId={contratanteRepresented}
+            initialRepresentanteData={representanteData}
         />
     </TopModal>
     </>
