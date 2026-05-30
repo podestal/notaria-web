@@ -6,7 +6,11 @@ import DateInput from '../../ui/DateInput'
 import SimpleSelector from '../../ui/SimpleSelector'
 import { UseMutationResult } from '@tanstack/react-query'
 import { UpdateCliente2Data } from '../../../hooks/api/cliente2/useUpdateCliente2'
-import { Cliente2 } from '../../../services/api/clienteService'
+import {
+    Cliente2,
+    omitResidenteFieldsForJuridicaPatch,
+    residenteForClientePayload,
+} from '../../../services/api/clienteService'
 import { Ubigeo } from '../../../services/api/ubigeoService'
 import { Cargo } from '../../../services/api/cargosService'
 import { Profesion } from '../../../services/api/profesionesService'
@@ -368,7 +372,7 @@ const Cliente2Form = ({
                     nombre: nombreNatural,
                     direccion,
                     idubigeo: ubigeo.id,
-                    resedent: resident === 1 ? '1' : '0',
+                    resedent: residenteForClientePayload(selectedTipoPersona, resident),
                     idtipdoc: 1,
                     numdoc: dni,
                     email,
@@ -393,7 +397,7 @@ const Cliente2Form = ({
                     fechaconstitu: '',
                     profesion_plantilla: profesionText,
                     tipocli: 'N',
-                    residente: resident === 1 ? '1' : '0',
+                    residente: residenteForClientePayload(selectedTipoPersona, resident),
                     fechaing: '',
                     dirfer: '',
                     profocupa: cargoText,
@@ -481,7 +485,7 @@ const Cliente2Form = ({
                     nombre,
                     direccion,
                     idubigeo: ubigeo.id,
-                    resedent: resident === 1 ? '1' : '0',
+                    resedent: residenteForClientePayload(selectedTipoPersona, resident),
                     idtipdoc: 1,
                     numdoc: dni,
                     email,
@@ -506,7 +510,7 @@ const Cliente2Form = ({
                     fechaconstitu: fechaConstitucion,
                     profesion_plantilla: '',
                     tipocli: 'J',
-                    residente: resident === 1 ? '1' : '0',
+                    residente: residenteForClientePayload(selectedTipoPersona, resident),
                     fechaing: '',
                     dirfer: '',
                     profocupa: '',
@@ -514,7 +518,10 @@ const Cliente2Form = ({
                     natper: '',
                 }
 
-                const changedPayload = getChangedFields(fullPayload, cliente2 || undefined)
+                const changedPayload = omitResidenteFieldsForJuridicaPatch(
+                    getChangedFields(fullPayload, cliente2 || undefined),
+                    selectedTipoPersona
+                )
                 if (Object.keys(changedPayload).length === 0) {
                     setType('success')
                     setMessage('No hay cambios para guardar')

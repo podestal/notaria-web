@@ -548,11 +548,7 @@ const ContratantesForm = ({
                 selected={selectedRepresentation}
                 onChange={handleRepresentationSelect}
                 onSelect={handleRepresentationSelect}
-                disabled={selectedActos.length === 0}
             />
-            {selectedActos.length === 0 && (
-                <p className="text-xs text-amber-700 mt-2">Selecciona al menos una condición para elegir el tipo de representación.</p>
-            )}
         </div>
     </form>
     <TopModal
