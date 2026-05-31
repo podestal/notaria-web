@@ -1,7 +1,13 @@
+import type { QueryClient } from "@tanstack/react-query"
+import { UseMutationResult } from "@tanstack/react-query"
 import moment from "moment"
+import {
+    cacheLastSisgenSearchRequest,
+    type SisgenSearchHandlers,
+} from "../hooks/sisgen/sisgenSearchKeys"
 import { SearchSisgenData } from "../hooks/sisgen/useSearchSisgen"
 import { SISGENDocument, SISGENSearchResponse } from "../services/sisgen/searchSisgenService"
-import { UseMutationResult } from "@tanstack/react-query"
+import { applySisgenSearchResponse } from "./applySisgenSearchResponse"
 
 
 interface Props {
@@ -18,6 +24,8 @@ interface Props {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>
     access: string
     searchSisgen: UseMutationResult<SISGENSearchResponse, Error, SearchSisgenData>
+    queryClient: QueryClient
+    searchHandlers: SisgenSearchHandlers
 }
 
 const getSisgenDocs = ({
@@ -34,6 +42,8 @@ const getSisgenDocs = ({
     setLoading,
     access,
     searchSisgen,
+    queryClient,
+    searchHandlers,
 }: Props) => {
 
     setErrorDisplay('');
@@ -57,7 +67,7 @@ const getSisgenDocs = ({
 
     setLoading(true)
 
-    searchSisgen.mutate({
+    const variables: SearchSisgenData = {
         access,
         sisgen: {
             tipoInstrumento: instrumentType,
@@ -66,29 +76,26 @@ const getSisgenDocs = ({
             estado: selectedEstado,
             codigoActo: 0,
             page: page,
-            // search_id: searchId,
-        }
-    }, {
+        },
+    }
+
+    cacheLastSisgenSearchRequest(
+        queryClient.setQueryData.bind(queryClient),
+        variables,
+    )
+
+    searchSisgen.mutate(variables, {
         onSuccess: (data) => {
-            if (data.error === 0) {
-                setSisgenDocs(data.data);
-                setItemsCount(data.pagination.total_documents);
-                setSearchId(data.pagination.search_id);
-                if (data.data.length === 0) {
-                    setNoDocsMessage('No se encontraron documentos SISGEN.')
-                } else {
-                    setNoDocsMessage('')
-                }
-            } else {
-                setErrorDisplay(data.message || 'Error al buscar documentos SISGEN.');
-            }
+            applySisgenSearchResponse(data, searchHandlers)
         },
         onError: (error) => {
-            setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
+            searchHandlers.setErrorDisplay(
+                error.message || "Error al buscar documentos SISGEN.",
+            )
         },
         onSettled: () => {
-            setLoading(false)
-        }
+            searchHandlers.setLoading(false)
+        },
     })
 
 }

@@ -12,7 +12,12 @@ const SisgenBooksTableHeader = () => {
         <p>Cliente</p>
         <p>Tipo de Libro</p>
         <p>Estado</p>
-        <p>Errores</p>
+        <p className="leading-tight">
+            Validación
+            <span className="block text-[10px] font-normal text-slate-600">
+                Err. / Obs. / Pers.
+            </span>
+        </p>
         <p></p>
     </div>
   )

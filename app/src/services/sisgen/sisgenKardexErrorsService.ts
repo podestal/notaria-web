@@ -1,4 +1,7 @@
-/** Kardex-level SISGEN validation detail (future GET endpoint). */
+import axios from "axios"
+import SisgenClient from "./sisgenClient"
+
+/** GET {VITE_SISGEN_URL}errors/kardex/:kardex/ → /sisgen/errors/kardex/K2-2026/ */
 export interface SisgenKardexErrorsResponse {
     error: number
     kardex: string
@@ -7,26 +10,40 @@ export interface SisgenKardexErrorsResponse {
     errores: string[]
     observaciones: string[]
     personas: string[]
+    message?: string
 }
 
-/** Temporary mock until the API is wired. */
-export const simulateSisgenKardexErrors = (
-    idkardex: number,
-    kardex: string,
-): SisgenKardexErrorsResponse => ({
-    error: 0,
-    kardex,
-    idkardex: String(idkardex),
-    sisgen_error_count: 2,
-    errores: [
-        "detallemediopago: moneda informada sin importe válido",
-    ],
-    observaciones: [
-        "Falta código ANCERT",
-    ],
-    personas: [
-        "EMPRESA SA (RUC: 20610484949): Falta información registral",
-    ],
-})
+/** Relative to VITE_SISGEN_URL (must not start with `/` or axios drops the `/sisgen/` base). */
+const kardexErrorsEndpoint = (kardex: string) =>
+    `errors/kardex/${encodeURIComponent(kardex)}/`
 
-// TODO: replace simulate with GET when backend is ready, e.g. `/kardex-errors/?idkardex=`
+export const getSisgenKardexErrors = async (
+    kardex: string,
+    access: string,
+): Promise<SisgenKardexErrorsResponse> => {
+    const client = new SisgenClient<SisgenKardexErrorsResponse>(
+        kardexErrorsEndpoint(kardex),
+    )
+
+    try {
+        const data = await client.get(access)
+
+        if (data.error !== 0) {
+            throw new Error(
+                data.message || "No se pudieron obtener los errores SISGEN del kardex.",
+            )
+        }
+
+        return data
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            const apiMessage =
+                (err.response?.data as { message?: string })?.message
+                || (err.response?.data as { detail?: string })?.detail
+            if (apiMessage) {
+                throw new Error(apiMessage)
+            }
+        }
+        throw err
+    }
+}

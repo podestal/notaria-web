@@ -1,13 +1,32 @@
 import type { SISGENDocument } from "../services/sisgen/searchSisgenService"
 
-/** SISGEN error total from API (`sisgen_error_count`). */
-export const getSisgenErrorCount = (doc: SISGENDocument): number => {
-    const count = doc.sisgen_error_count
-    if (typeof count === "number" && !Number.isNaN(count)) {
-        return Math.max(0, count)
-    }
-    return 0
+const normalizeSisgenCount = (value: unknown): number => {
+    if (value === null || value === undefined || value === "") return 0
+    const n = typeof value === "number" ? value : Number(value)
+    if (Number.isNaN(n)) return 0
+    return Math.max(0, Math.floor(n))
 }
+
+export interface SisgenValidationCounts {
+    errores: number
+    observaciones: number
+    personas: number
+}
+
+export const getSisgenValidationCounts = (
+    doc: SISGENDocument,
+): SisgenValidationCounts => ({
+    errores: normalizeSisgenCount(doc.sisgen_error_count),
+    observaciones: normalizeSisgenCount(doc.sisgen_observaciones_count),
+    personas: normalizeSisgenCount(doc.sisgen_personas_count),
+})
+
+export const getSisgenValidationTotal = (counts: SisgenValidationCounts): number =>
+    counts.errores + counts.observaciones + counts.personas
+
+/** @deprecated Use getSisgenValidationCounts for search rows */
+export const getSisgenErrorCount = (doc: SISGENDocument): number =>
+    getSisgenValidationCounts(doc).errores
 
 export const formatSisgenErrorCountLabel = (count: number): string => {
     if (count === 0) return "Sin errores"

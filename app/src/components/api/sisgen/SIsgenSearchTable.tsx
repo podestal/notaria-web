@@ -1,3 +1,4 @@
+import type { SisgenSearchHandlers } from "../../../hooks/sisgen/sisgenSearchKeys"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import SisgenSearchTableBody from "./SisgenSearchTableBody"
 import SisgenSearchTableHeader from "./SisgenSearchTableHeader"
@@ -35,7 +36,8 @@ const SIsgenSearchTable = ({
   setNoDocsMessage, 
   setErrorDisplay,
   searchId,
-  setLoading
+  setLoading,
+  searchHandlers,
  }: Props) => {
   
   return (
@@ -57,6 +59,7 @@ const SIsgenSearchTable = ({
           setErrorDisplay={setErrorDisplay} 
           searchId={searchId}
           setLoading={setLoading}
+          searchHandlers={searchHandlers}
         />
         <SisgenSearchTableBody 
           sisgenDocs={sisgenDocs} 

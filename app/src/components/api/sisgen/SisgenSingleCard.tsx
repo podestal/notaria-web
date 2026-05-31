@@ -9,10 +9,9 @@ import TopModal from "../../ui/TopModal"
 import SisgenKardexModal from "./SisgenKardexModal"
 import {
     canSendSisgenDocument,
-    formatSisgenErrorCountLabel,
     getSisgenDisplayStatus,
-    getSisgenErrorCount,
 } from "../../../utils/sisgenSendState"
+import SisgenValidationCountsCell from "./SisgenValidationCountsCell"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -29,7 +28,6 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const sisgenLastSubmission = sisgenDoc.sisgen_last_submission
     const sisgenStatus = getSisgenDisplayStatus(sisgenDoc)
     const canSend = canSendSisgenDocument(sisgenDoc)
-    const sisgenErrorCount = getSisgenErrorCount(sisgenDoc)
   
     const handleSend = () => {
       setLoading(true)
@@ -88,15 +86,7 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
             </button>
           )}
         </div>
-        <p
-          className={
-            sisgenErrorCount > 0
-              ? "text-red-600 font-semibold"
-              : "text-green-600"
-          }
-        >
-          {formatSisgenErrorCountLabel(sisgenErrorCount)}
-        </p>
+        <SisgenValidationCountsCell doc={sisgenDoc} />
         {canSend 
         ? 
         <button 
@@ -121,6 +111,7 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
         onClose={() => setIsOpen(false)}
         idkardex={sisgenDoc.idkardex}
         kardex={sisgenDoc.kardex}
+        portal
     />
     <TopModal
         isOpen={isSisgenResponseOpen}

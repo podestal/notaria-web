@@ -1,5 +1,7 @@
+import { useQueryClient } from "@tanstack/react-query"
 import { Loader } from "lucide-react"
 import { useEffect, useState } from "react"
+import type { SisgenSearchHandlers } from "../../../hooks/sisgen/sisgenSearchKeys"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import useProcessDocument from "../../../hooks/sisgen/useProcessDocument"
@@ -22,6 +24,7 @@ interface Props {
   setErrorDisplay: React.Dispatch<React.SetStateAction<string>>
   searchId: string
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  searchHandlers: SisgenSearchHandlers
 }
 
 const SisgenSearchTableHeader = ({ 
@@ -39,10 +42,12 @@ const SisgenSearchTableHeader = ({
   setErrorDisplay,
   searchId,
   setLoading,
+  searchHandlers,
 
  }: Props) => {
 
   const access = useAuthStore(s => s.access_token) || ''
+  const queryClient = useQueryClient()
   const [sendLoading, setSendLoading] = useState(false)
   const { setMessage, setShow, setType } =useNotificationsStore()
   const [documents, setDocuments] = useState<{kardex: string, idkardex: string}[]>(sisgenDocs.map(doc => ({kardex: doc.kardex, idkardex: doc.idkardex.toString()})))
@@ -85,6 +90,8 @@ const SisgenSearchTableHeader = ({
           setLoading,
           access,
           searchSisgen,
+          queryClient,
+          searchHandlers,
       })
       },
       onError: () => {
@@ -104,7 +111,12 @@ const SisgenSearchTableHeader = ({
         <p className="col-span-2">Nº Kardex</p>
         <p>Acto</p>
         <p>Estado</p>
-        <p>Errores</p>
+        <p className="leading-tight">
+            Validación
+            <span className="block text-[10px] font-normal text-slate-600">
+                Err. / Obs. / Pers.
+            </span>
+        </p>
         <button 
         className="bg-orange-500 text-white px-2 py-2 rounded-md cursor-pointer hover:bg-orange-600 transition-all duration-300 flex items-center justify-center"
         onClick={handleSendAll}

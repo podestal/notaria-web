@@ -8,10 +8,9 @@ import useAuthStore from "../../../store/useAuthStore"
 import useGetTipoLibros from "../../../hooks/api/extraprotocolares/aperturaLibros/useGetTipoLibros"
 import {
     canSendSisgenDocument,
-    formatSisgenErrorCountLabel,
     getSisgenDisplayStatus,
-    getSisgenErrorCount,
 } from "../../../utils/sisgenSendState"
+import SisgenValidationCountsCell from "./SisgenValidationCountsCell"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -28,7 +27,6 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
     const sisgenLastSubmission = sisgenDoc.sisgen_last_submission
     const sisgenStatus = getSisgenDisplayStatus(sisgenDoc)
     const canSend = canSendSisgenDocument(sisgenDoc)
-    const sisgenErrorCount = getSisgenErrorCount(sisgenDoc)
 
   const handleSend = () => {
     setLoading(true)
@@ -59,15 +57,7 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
             </button>
           )}
         </div>
-        <p
-          className={
-            sisgenErrorCount > 0
-              ? "text-red-600 font-semibold"
-              : "text-green-600"
-          }
-        >
-          {formatSisgenErrorCountLabel(sisgenErrorCount)}
-        </p>
+        <SisgenValidationCountsCell doc={sisgenDoc} />
         {canSend 
         ? 
         <button 

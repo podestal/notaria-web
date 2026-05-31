@@ -20,6 +20,8 @@ export interface SISGENDocument {
     actouif: string;
     actosunat: string;
     sisgen_error_count?: number;
+    sisgen_observaciones_count?: number;
+    sisgen_personas_count?: number;
     descripcionLibro: string;
     descripcionTipoLibro: string;
     domfiscal: string;

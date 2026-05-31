@@ -1,5 +1,6 @@
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { registerSisgenSearchHandlers } from "../../../hooks/sisgen/sisgenSearchKeys";
 import SisgenSearchForm from "./SisgenSearchForm";
 import SIsgenSearchTable from "./SIsgenSearchTable";
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
@@ -29,6 +30,29 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
     const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
     const [errorDisplay, setErrorDisplay] = useState('');
 
+    const searchHandlers = useMemo(
+        () => ({
+            setSisgenDocs,
+            setItemsCount,
+            setSearchId,
+            setNoDocsMessage,
+            setErrorDisplay,
+            setLoading,
+        }),
+        [
+            setSisgenDocs,
+            setItemsCount,
+            setSearchId,
+            setNoDocsMessage,
+            setErrorDisplay,
+            setLoading,
+        ],
+    )
+
+    useEffect(() => {
+        registerSisgenSearchHandlers(searchHandlers)
+    }, [searchHandlers])
+
   return (
     <div className="w-full my-6">
         <h2 className="text-xl font-bold">{typekardex}</h2>
@@ -51,6 +75,7 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
           setSelectedToDate={setSelectedToDate}
           setErrorDisplay={setErrorDisplay}
           errorDisplay={errorDisplay}
+          searchHandlers={searchHandlers}
         />
         {loading ? <p className="text-center text-gray-700 my-8 animate-pulse text-xs ">Cargando...</p> : <>
         {instrumentType === 5 
@@ -73,6 +98,7 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
           setErrorDisplay={setErrorDisplay} 
           searchId={searchId}
           setLoading={setLoading}
+          searchHandlers={searchHandlers}
         />}
         {sisgenDocs && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} />}
         </>}

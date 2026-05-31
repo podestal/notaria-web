@@ -1,11 +1,17 @@
+import { useQueryClient } from "@tanstack/react-query";
 import Calendar from "../../ui/Calendar";
 import { useEffect } from "react";
 import SimpleSelector from "../../ui/SimpleSelector";
+import {
+    cacheLastSisgenSearchRequest,
+    type SisgenSearchHandlers,
+} from "../../../hooks/sisgen/sisgenSearchKeys";
 import useSearchSisgen from "../../../hooks/sisgen/useSearchSisgen";
 import useAuthStore from "../../../store/useAuthStore";
 import moment from "moment";
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
 import getSisgenDocs from "../../../utils/getSisgenDocs";
+import { applySisgenSearchResponse } from "../../../utils/applySisgenSearchResponse";
 
 const estadoSisgenOptions = [
     { value: -1, label: "Todos los Documentos" },
@@ -34,6 +40,7 @@ interface Props {
     setSelectedToDate: React.Dispatch<React.SetStateAction<Date | undefined>>
     setErrorDisplay: React.Dispatch<React.SetStateAction<string>>
     errorDisplay: string
+    searchHandlers: SisgenSearchHandlers
 }
 
 const SisgenSearchForm = ({ 
@@ -53,18 +60,19 @@ const SisgenSearchForm = ({
     selectedToDate,
     setSelectedToDate,
     setErrorDisplay,
-    errorDisplay
+    errorDisplay,
+    searchHandlers,
  }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
-
+    const queryClient = useQueryClient()
     const searchSisgen = useSearchSisgen()
 
     useEffect(() => {
         if (searchId) {
             setLoading(true)
             setNoDocsMessage('')
-            searchSisgen.mutate({
+            const variables = {
                 access,
                 sisgen: {
                     tipoInstrumento: instrumentType,
@@ -75,20 +83,25 @@ const SisgenSearchForm = ({
                     page: page,
                     search_id: searchId,
                 },
-            }, {
-                onSuccess: (data) => {
-                    if (data.error === 0) {
+            }
 
-                        setSisgenDocs(data.data);
-                        setItemsCount(data.pagination.total_documents);
-                    }
+            cacheLastSisgenSearchRequest(
+                queryClient.setQueryData.bind(queryClient),
+                variables,
+            )
+
+            searchSisgen.mutate(variables, {
+                onSuccess: (data) => {
+                    applySisgenSearchResponse(data, searchHandlers)
                 },
                 onError: (error) => {
-                    setErrorDisplay(error.message || 'Error al buscar documentos SISGEN.');
+                    searchHandlers.setErrorDisplay(
+                        error.message || "Error al buscar documentos SISGEN.",
+                    )
                 },
                 onSettled: () => {
-                    setLoading(false)
-                }
+                    searchHandlers.setLoading(false)
+                },
             })
         }
     }, [page])
@@ -113,6 +126,8 @@ const SisgenSearchForm = ({
             setLoading,
             access,
             searchSisgen,
+            queryClient,
+            searchHandlers,
         })
 
     }
