@@ -11,8 +11,9 @@ const SisgenBooksTableHeader = () => {
         <p>Ruc</p>
         <p>Cliente</p>
         <p>Tipo de Libro</p>
-        <p>Errores Pdt</p>
         <p>Estado Sisgen</p>
+        <p>Errores</p>
+        <p></p>
     </div>
   )
 }

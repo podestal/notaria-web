@@ -1,5 +1,20 @@
 import type { SISGENDocument } from "../services/sisgen/searchSisgenService"
 
+/** SISGEN error total from API (`sisgen_error_count`). */
+export const getSisgenErrorCount = (doc: SISGENDocument): number => {
+    const count = doc.sisgen_error_count
+    if (typeof count === "number" && !Number.isNaN(count)) {
+        return Math.max(0, count)
+    }
+    return 0
+}
+
+export const formatSisgenErrorCountLabel = (count: number): string => {
+    if (count === 0) return "Sin errores"
+    if (count === 1) return "1 error"
+    return `${count} errores`
+}
+
 /** Label shown in the Estado column */
 export const getSisgenDisplayStatus = (doc: SISGENDocument): string =>
     doc.sisgen_status?.estado_sisgen_label

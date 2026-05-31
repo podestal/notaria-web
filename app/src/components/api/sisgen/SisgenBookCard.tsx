@@ -1,13 +1,17 @@
 import { useState } from "react"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import getTitleCase from "../../../utils/getTitleCase"
-import { AlertTriangleIcon, ChevronUpIcon, ChevronDownIcon, UserIcon } from "lucide-react"
 import TopModal from "../../ui/TopModal"
 import ArchivoPdtPreLibroForm from "../reportes/archivosPdt/PDTLibros/ArchivoPdtPreLibroForm"
 import useGetLibroByNumlibro from "../../../hooks/api/extraprotocolares/aperturaLibros/useGetLibroByNumlibro"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetTipoLibros from "../../../hooks/api/extraprotocolares/aperturaLibros/useGetTipoLibros"
-import { canSendSisgenDocument, getSisgenDisplayStatus } from "../../../utils/sisgenSendState"
+import {
+    canSendSisgenDocument,
+    formatSisgenErrorCountLabel,
+    getSisgenDisplayStatus,
+    getSisgenErrorCount,
+} from "../../../utils/sisgenSendState"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -19,15 +23,12 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
     const access = useAuthStore( s => s.access_token) || ''
 
     const [loading, setLoading] = useState(false)
-    const [showErrors, setShowErrors] = useState(false)
     const [showLibro, setShowLibro] = useState(false)
     const [isSisgenResponseOpen, setIsSisgenResponseOpen] = useState(false)
     const sisgenLastSubmission = sisgenDoc.sisgen_last_submission
-    const sisgenErrors = sisgenLastSubmission?.errors?.length
-      ? sisgenLastSubmission.errors
-      : (sisgenDoc.errores || [])
     const sisgenStatus = getSisgenDisplayStatus(sisgenDoc)
     const canSend = canSendSisgenDocument(sisgenDoc)
+    const sisgenErrorCount = getSisgenErrorCount(sisgenDoc)
 
   const handleSend = () => {
     setLoading(true)
@@ -58,13 +59,15 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
             </button>
           )}
         </div>
-        {showErrors ? <ChevronUpIcon 
-            className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
-            onClick={() => setShowErrors(!showErrors)}
-        /> : <ChevronDownIcon 
-            className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
-            onClick={() => setShowErrors(!showErrors)}
-        />}
+        <p
+          className={
+            sisgenErrorCount > 0
+              ? "text-red-600 font-semibold"
+              : "text-green-600"
+          }
+        >
+          {formatSisgenErrorCountLabel(sisgenErrorCount)}
+        </p>
         {canSend 
         ? 
         <button 
@@ -84,49 +87,6 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
       </button>
         }
     </div>
-    {showErrors && (
-        <div className="p-4 text-xs flex flex-col gap-2">
-            <div>
-                <h3 className="font-semibold mb-2">Errores Sisgen</h3>
-                <>
-                {sisgenErrors?.map((error, idx) => (
-                    <div key={idx + 'error'} className="flex items-center gap-2">
-                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
-                        <p >{error}</p>
-                    </div>
-                ))}
-                </>
-                <>
-                    {sisgenDoc.observaciones?.map((observacion, idx) => (
-                        <div key={idx + 'observacion'} className="flex items-center gap-2">
-                            <AlertTriangleIcon className="w-4 h-4 text-amber-500" />
-                            <p >{observacion}</p>
-                        </div>
-                    ))}
-                </>
-                <>
-                    {sisgenDoc.personas?.map((persona, idx) => (
-                        <div key={idx + 'persona'} className="flex items-center gap-2">
-                            <UserIcon className="w-4 h-4 text-blue-500" />
-                            <p >{persona}</p>
-                        </div>
-                    ))}
-                </>
-            </div>
-            <div>
-            <h3 className="font-semibold mb-2">Errores Pdt</h3>
-            <>
-                {sisgenDoc.pdt_validation.errors.map((error, idx) => (
-                    <div key={idx + 'error'} className="flex items-center gap-2">
-                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
-                        <p className="text-xs">{error}</p>
-                    </div>
-                ))}
-            </>
-            </div>
-
-        </div>
-    )}
         <TopModal isOpen={showLibro} onClose={() => setShowLibro(false)}>
         {(() => {
             const numlibro = sisgenDoc.libro.split('-')[0]

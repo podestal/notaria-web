@@ -5,10 +5,14 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import useAuthStore from "../../../store/useAuthStore"
 import getTitleCase from "../../../utils/getTitleCase"
-import { ChevronDownIcon, ChevronUpIcon, AlertTriangleIcon, UserIcon } from "lucide-react"
 import TopModal from "../../ui/TopModal"
 import PreKardexForm from "../reportes/registrosUif/PreKardexForm"
-import { canSendSisgenDocument, getSisgenDisplayStatus } from "../../../utils/sisgenSendState"
+import {
+    canSendSisgenDocument,
+    formatSisgenErrorCountLabel,
+    getSisgenDisplayStatus,
+    getSisgenErrorCount,
+} from "../../../utils/sisgenSendState"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -20,21 +24,17 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const { setMessage, setShow, setType } =useNotificationsStore()
     const [loading, setLoading] = useState(false)
     const sendDocument = useProcessDocument()
-    const [showErrors, setShowErrors] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const [isSisgenResponseOpen, setIsSisgenResponseOpen] = useState(false)
     const sisgenLastSubmission = sisgenDoc.sisgen_last_submission
-    const sisgenErrors = sisgenLastSubmission?.errors?.length
-      ? sisgenLastSubmission.errors
-      : (sisgenDoc.errores || [])
     const sisgenStatus = getSisgenDisplayStatus(sisgenDoc)
     const canSend = canSendSisgenDocument(sisgenDoc)
+    const sisgenErrorCount = getSisgenErrorCount(sisgenDoc)
   
     const handleSend = () => {
       setLoading(true)
   
       sendDocument.mutate({
-  
         access,
         data: {
           documents: [
@@ -64,14 +64,12 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
 
   return (
     <>
-    <div>
     <div 
         key={sisgenDoc.idkardex} 
         className="grid grid-cols-7 gap-4 p-2 border-b text-xs align-middle"
     >
         <p>{idx}</p>
         <p 
-            
             className="col-span-2 text-blue-500 cursor-pointer hover:text-blue-700"
             onClick={() => setIsOpen(true)}
         >
@@ -90,13 +88,15 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
             </button>
           )}
         </div>
-        {showErrors ? <ChevronUpIcon 
-            className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
-            onClick={() => setShowErrors(!showErrors)}
-        /> : <ChevronDownIcon 
-            className="w-4 h-4 cursor-pointer text-gray-500 hover:text-gray-700" 
-            onClick={() => setShowErrors(!showErrors)}
-        />}
+        <p
+          className={
+            sisgenErrorCount > 0
+              ? "text-red-600 font-semibold"
+              : "text-green-600"
+          }
+        >
+          {formatSisgenErrorCountLabel(sisgenErrorCount)}
+        </p>
         {canSend 
         ? 
         <button 
@@ -115,70 +115,6 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
         Guardado
       </button>
         }
-    </div>
-    {showErrors && (
-        <div className="p-4 text-xs flex flex-col gap-2">
-            <div>
-                <h3 className="font-semibold mb-2">Errores Sisgen</h3>
-                <>
-                {sisgenErrors.map((error, idx) => (
-                    <div key={idx + 'error'} className="flex items-center gap-2">
-                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
-                        <p >{error}</p>
-                    </div>
-                ))}
-                </>
-                <>
-                    {sisgenDoc.observaciones.map((observacion, idx) => (
-                        <div key={idx + 'observacion'} className="flex items-center gap-2">
-                            <AlertTriangleIcon className="w-4 h-4 text-amber-500" />
-                            <p >{observacion}</p>
-                        </div>
-                    ))}
-                </>
-                <>
-                    {sisgenDoc.personas.map((persona, idx) => (
-                        <div key={idx + 'persona'} className="flex items-center gap-2">
-                            <UserIcon className="w-4 h-4 text-blue-500" />
-                            <p >{persona}</p>
-                        </div>
-                    ))}
-                </>
-            </div>
-            <div>
-            {sisgenDoc.uif_validation.has_errors && <h3 className="font-semibold mb-2">Errores Uif</h3>}
-            <>
-                {sisgenDoc.uif_validation.errors.map((error, idx) => (
-                    <div key={idx + 'error'} className="flex items-center gap-2">
-                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
-                        <p className="text-xs">{error.error_description}</p>
-                    </div>
-                ))}
-                {sisgenDoc.uif_validation.observations.map((observation, idx) => (
-                    <div key={idx + 'observation'} className="flex items-center gap-2">
-                        <AlertTriangleIcon className="w-4 h-4 text-amber-500" />
-                        <p className="text-xs">{observation}</p>
-                    </div>
-                ))}
-            </>
-            </div>
-            <div>
-                
-                {(sisgenDoc.idtipkar === 1 || sisgenDoc.idtipkar === 3 || sisgenDoc.idtipkar === 4) && 
-                <>
-                {sisgenDoc.pdt_validation.has_errors && <h3 className="font-semibold mb-2">Errores Pdt</h3>}
-                {sisgenDoc.pdt_validation.errors.map((error, idx) => (
-                    <div key={idx + 'error'} className="flex items-center gap-2">
-                        <AlertTriangleIcon className="w-4 h-4 text-red-500" />
-                        <p className="text-xs">{error}</p>
-                    </div>
-                ))}
-                </>}
-            </div>
-            
-
-        </div>
-    )}
     </div>
     <TopModal
         isOpen={isOpen}

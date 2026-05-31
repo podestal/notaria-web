@@ -19,9 +19,11 @@ export interface SISGENDocument {
     cod_ancert: string;
     actouif: string;
     actosunat: string;
-    errores: string[];
-    observaciones: string[];
-    personas: string[];
+    /** Total SISGEN validation errors for list display (replaces expandable error lists). */
+    sisgen_error_count?: number;
+    errores?: string[];
+    observaciones?: string[];
+    personas?: string[];
     descripcionLibro: string;
     descripcionTipoLibro: string;
     domfiscal: string;
@@ -33,12 +35,12 @@ export interface SISGENDocument {
     libro: string;
     ruc: string;
     tipoPersona: string;
-    uif_validation: {
+    uif_validation?: {
         has_errors: boolean;
         errors: { error_type: string; error_description: string }[];
         observations: string[];
     };
-    pdt_validation: {
+    pdt_validation?: {
         has_errors: boolean;
         errors: string[];
     };
