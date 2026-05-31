@@ -32,9 +32,6 @@ export interface SisgenResponse {
     error: number;
     data: SisgenDoc[];
     total: number;
-    errores: string[];
-    observaciones: string[];
-    personas: string[];
 } 
 
 export interface SisgenRequest {

@@ -325,12 +325,29 @@ const KardexForm = ({
     <>
     <form 
         onSubmit={handleSubmit}
-        className="bg-slate-700 rounded-b-lg shadow-lg w-full ">
-        <div className="flex justify-center items-center gap-2 p-4 rounded-t-lg text-slate-50 ">
-            <FileText className="text-green-600"/>
-            <h2 className="text-xl text-amber-500">{kardex ? 'Editar' : 'Nuevo'} Kardex</h2>
-        </div>
-        <div className="bg-slate-50 text-black p-4 rounded-b-lg">
+        className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+    >
+        <header className="flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-4">
+            <div className="flex items-center gap-3">
+                <div className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2">
+                    <FileText className="h-5 w-5 text-sky-300" aria-hidden />
+                </div>
+                <div>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-sky-300/90">
+                        {kardex ? "Instrumento protocolar" : "Registro nuevo"}
+                    </p>
+                    <h2 className="text-lg font-semibold tracking-tight text-white">
+                        {kardex ? "Editar kardex" : "Nuevo kardex"}
+                    </h2>
+                </div>
+            </div>
+            {kardex?.kardex && (
+                <span className="rounded-lg border border-slate-600 bg-slate-800/80 px-3 py-1.5 font-mono text-sm font-semibold text-sky-200">
+                    {kardex.kardex}
+                </span>
+            )}
+        </header>
+        <div className="bg-slate-50 p-4 text-slate-900">
             <div className="flex justify-between items-center gap-4 mb-6">
                 <Selector 
                     options={[{ value: 0, label: 'Tipo de Kardex' },...kardexTypes.map(type => ({ value: type.idtipkar, label: getTitleCase(type.nomtipkar) }))]}
@@ -348,10 +365,7 @@ const KardexForm = ({
                     />
                 </div>
             </div>
-            <div className="my-6 w-full flex justify-end items-center gap-4">
-                <p className="font-bold">{kardex?.kardex}</p>
-            </div>
-            <div className="flex justify-between items-center gap-4 mb-6">
+            <div className="mb-6 flex items-center justify-between gap-4">
                 <input 
                     value={karedexReference}
                     onChange={(e) => setKardexReference(e.target.value)}
@@ -361,7 +375,7 @@ const KardexForm = ({
                 <button 
                     type={kardex ? 'button' : 'submit'}
                     disabled={!!kardex || loading}
-                    className={`bg-green-400 px-2 py-1 transition text-slate-50 font-bold duration-300 text-xs border-1 border-green-300   rounded-md ${kardex ? 'opacity-55 cursor-not-allowed' : loading ? 'opacity-55 cursor-not-allowed' : 'cursor-pointer hover:bg-green-500'}`}>{loading ? 'Generando ...' : 'Generar Kardex'}</button>
+                    className={`shrink-0 rounded-lg border border-emerald-400/40 bg-emerald-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 ${kardex || loading ? "opacity-50" : ""}`}>{loading ? "Generando..." : "Generar kardex"}</button>
             </div>
             <div className="flex justify-between items-center gap-4">
                 <input 
@@ -496,9 +510,9 @@ const KardexForm = ({
                 <div className="flex justify-center items-center gap-4">
                     <button
                         type="submit"
-                        className=" bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                     >
-                        Grabar Cambios
+                        Grabar cambios
                     </button>
                 </div>
             </div>}

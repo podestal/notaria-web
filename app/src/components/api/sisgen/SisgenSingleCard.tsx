@@ -6,7 +6,7 @@ import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import useAuthStore from "../../../store/useAuthStore"
 import getTitleCase from "../../../utils/getTitleCase"
 import TopModal from "../../ui/TopModal"
-import PreKardexForm from "../reportes/registrosUif/PreKardexForm"
+import SisgenKardexModal from "./SisgenKardexModal"
 import {
     canSendSisgenDocument,
     formatSisgenErrorCountLabel,
@@ -116,15 +116,12 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
       </button>
         }
     </div>
-    <TopModal
+    <SisgenKardexModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-    >
-        <PreKardexForm
-            isOpen={isOpen}
-            kardexId={sisgenDoc.idkardex}
-        />
-    </TopModal>
+        idkardex={sisgenDoc.idkardex}
+        kardex={sisgenDoc.kardex}
+    />
     <TopModal
         isOpen={isSisgenResponseOpen}
         onClose={() => setIsSisgenResponseOpen(false)}

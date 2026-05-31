@@ -9,9 +9,11 @@ interface TopModalProps {
   deepth?: number; // Optional prop to control z-index depth
   /** Render at document.body (use for modals opened inside another modal). */
   portal?: boolean;
+  /** Wider modal for split layouts (e.g. SISGEN kardex + errors). */
+  wide?: boolean;
 }
 
-const TopModal = ({ isOpen, onClose, children, deepth, portal = false }: TopModalProps) => {
+const TopModal = ({ isOpen, onClose, children, deepth, portal = false, wide = false }: TopModalProps) => {
   const overlayZIndex = deepth ?? 40
   const contentZIndex = overlayZIndex + 10
 
@@ -31,7 +33,11 @@ const TopModal = ({ isOpen, onClose, children, deepth, portal = false }: TopModa
 
           {/* Modal container */}
           <motion.div
-            className="fixed top-20 right-0 left-56 mx-auto w-full max-w-5xl rounded-b-2xl bg-white p-6 shadow-lg max-h-screen overflow-y-auto"
+            className={
+              wide
+                ? "fixed top-16 right-3 left-56 z-50 flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-4 shadow-lg sm:p-6"
+                : `fixed top-20 right-0 left-56 z-50 mx-auto w-full max-h-screen overflow-y-auto rounded-b-2xl bg-white p-6 shadow-lg max-w-5xl`
+            }
             style={{ zIndex: contentZIndex }}
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
@@ -39,7 +45,7 @@ const TopModal = ({ isOpen, onClose, children, deepth, portal = false }: TopModa
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             {/* Close button */}
-            <div className="flex justify-end">
+            <div className="flex shrink-0 justify-end">
               <button 
                 type="button"
                 onClick={onClose} className="text-red-500 hover:text-red-700 cursor-pointer">
@@ -47,7 +53,13 @@ const TopModal = ({ isOpen, onClose, children, deepth, portal = false }: TopModa
               </button>
             </div>
             {/* Modal content */}
-            <div className="mt-2 overflow-y-auto max-h-[75vh]">
+            <div
+              className={
+                wide
+                  ? "mt-1 flex min-h-0 flex-1 flex-col overflow-hidden"
+                  : "mt-2 max-h-[75vh] overflow-y-auto"
+              }
+            >
               {children}
             </div>
           </motion.div>
