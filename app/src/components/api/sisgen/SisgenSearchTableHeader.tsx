@@ -1,13 +1,11 @@
-import { useQueryClient } from "@tanstack/react-query"
-import { Loader } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import type { SisgenSearchHandlers } from "../../../hooks/sisgen/sisgenSearchKeys"
+import type { SisgenSearchFilters } from "../../../utils/buildSisgenSearchFilters"
+import { buildSisgenSearchFilters } from "../../../utils/buildSisgenSearchFilters"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
-import useProcessDocument from "../../../hooks/sisgen/useProcessDocument"
 import useAuthStore from "../../../store/useAuthStore"
-import getSisgenDocs from "../../../utils/getSisgenDocs"
-import useSearchSisgen from "../../../hooks/sisgen/useSearchSisgen"
+import SisgenSendAllPreviewModal from "./SisgenSendAllPreviewModal"
 
 interface Props {
   setPage: React.Dispatch<React.SetStateAction<number>>
@@ -27,104 +25,77 @@ interface Props {
   searchHandlers: SisgenSearchHandlers
 }
 
-const SisgenSearchTableHeader = ({ 
-  setPage,
+const SisgenSearchTableHeader = ({
   sisgenDocs,
   instrumentType,
   selectedFromDate,
   selectedToDate,
   selectedEstado,
-  // page,
-  setSisgenDocs,
-  setItemsCount,
-  setSearchId,
-  setNoDocsMessage,
   setErrorDisplay,
-  searchId,
-  setLoading,
-  searchHandlers,
+}: Props) => {
+  const access = useAuthStore((s) => s.access_token) || ""
+  const { setMessage, setShow, setType } = useNotificationsStore()
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewFilters, setPreviewFilters] = useState<SisgenSearchFilters | null>(
+    null,
+  )
 
- }: Props) => {
-
-  const access = useAuthStore(s => s.access_token) || ''
-  const queryClient = useQueryClient()
-  const [sendLoading, setSendLoading] = useState(false)
-  const { setMessage, setShow, setType } =useNotificationsStore()
-  const [documents, setDocuments] = useState<{kardex: string, idkardex: string}[]>(sisgenDocs.map(doc => ({kardex: doc.kardex, idkardex: doc.idkardex.toString()})))
-
-  const sendDocuments = useProcessDocument()
-  const searchSisgen = useSearchSisgen()
-
-  useEffect(() => {
-    setDocuments(sisgenDocs.map(doc => ({kardex: doc.kardex, idkardex: doc.idkardex.toString()})))
-  }, [sisgenDocs])
-
-
-  const handleSendAll = () => {
-    console.log('Enviar Todos', documents)
-
-    setSendLoading(true)
-    sendDocuments.mutate({
-      access,
-      data: {
-        documents,
-        all: 0
-      }
-    }, {
-      onSuccess: () => {
-        setMessage('Todos los documentos han sido enviados correctamente')
-        setShow(true)
-        setType('success')
-        setPage(1)
-        getSisgenDocs({
-          instrumentType,
-          selectedFromDate,
-          selectedToDate,
-          selectedEstado,
-          page: 1,
-          setSisgenDocs,
-          setItemsCount,
-          setSearchId,
-          setNoDocsMessage,
-          setErrorDisplay,
-          setLoading,
-          access,
-          searchSisgen,
-          queryClient,
-          searchHandlers,
-      })
-      },
-      onError: () => {
-        setMessage('Error al enviar los documentos')
-        setShow(true)
-        setType('error')
-      },
-      onSettled: () => {
-        setSendLoading(false)
-      }
+  const handleOpenSendAllPreview = () => {
+    const built = buildSisgenSearchFilters({
+      instrumentType,
+      selectedFromDate,
+      selectedToDate,
+      selectedEstado,
     })
+
+    if (!built.ok) {
+      setErrorDisplay(built.error)
+      setMessage(built.error)
+      setShow(true)
+      setType("error")
+      return
+    }
+
+    setErrorDisplay("")
+    setPreviewFilters(built.filters)
+    setPreviewOpen(true)
+  }
+
+  const handleClosePreview = () => {
+    setPreviewOpen(false)
+    setPreviewFilters(null)
   }
 
   return (
-    <div className="grid grid-cols-7 gap-4 bg-slate-200 text-black text-xs font-semibold p-2 mb-4 items-center">
+    <>
+      <div className="grid grid-cols-7 gap-4 bg-slate-200 text-black text-xs font-semibold p-2 mb-4 items-center">
         <p>Nº</p>
         <p className="col-span-2">Nº Kardex</p>
         <p>Acto</p>
         <p>Estado</p>
         <p className="leading-tight">
-            Validación
-            <span className="block text-[10px] font-normal text-slate-600">
-                Err. / Obs. / Pers.
-            </span>
+          Validación
+          <span className="block text-[10px] font-normal text-slate-600">
+            Err. / Obs. / Pers.
+          </span>
         </p>
-        <button 
-        className="bg-orange-500 text-white px-2 py-2 rounded-md cursor-pointer hover:bg-orange-600 transition-all duration-300 flex items-center justify-center"
-        onClick={handleSendAll}
-        disabled={sendLoading}
+        <button
+          type="button"
+          className="bg-orange-500 text-white px-2 py-2 rounded-md cursor-pointer hover:bg-orange-600 transition-all duration-300 flex items-center justify-center disabled:opacity-60"
+          onClick={handleOpenSendAllPreview}
+          disabled={sisgenDocs.length === 0}
         >
-            {sendLoading ? <Loader className="animate-spin w-4 h-4 text-center" /> : <p className="text-xs">Enviar Todos</p>}
+          <p className="text-xs">Enviar Todos</p>
         </button>
-    </div>
+      </div>
+
+      <SisgenSendAllPreviewModal
+        isOpen={previewOpen}
+        onClose={handleClosePreview}
+        access={access}
+        filters={previewFilters}
+      />
+    </>
   )
 }
 
