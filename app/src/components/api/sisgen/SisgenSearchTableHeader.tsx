@@ -5,6 +5,7 @@ import { buildSisgenSearchFilters } from "../../../utils/buildSisgenSearchFilter
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import useAuthStore from "../../../store/useAuthStore"
+import useRefreshLastSisgenSearch from "../../../hooks/sisgen/useRefreshLastSisgenSearch"
 import SisgenSendAllPreviewModal from "./SisgenSendAllPreviewModal"
 
 interface Props {
@@ -34,6 +35,7 @@ const SisgenSearchTableHeader = ({
   setErrorDisplay,
 }: Props) => {
   const access = useAuthStore((s) => s.access_token) || ""
+  const refreshLastSisgenSearch = useRefreshLastSisgenSearch()
   const { setMessage, setShow, setType } = useNotificationsStore()
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewFilters, setPreviewFilters] = useState<SisgenSearchFilters | null>(
@@ -94,6 +96,7 @@ const SisgenSearchTableHeader = ({
         onClose={handleClosePreview}
         access={access}
         filters={previewFilters}
+        onSent={() => refreshLastSisgenSearch()}
       />
     </>
   )

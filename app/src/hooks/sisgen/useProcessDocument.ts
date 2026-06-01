@@ -1,21 +1,27 @@
-import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import processDocumentService, { SisgenRequest, SisgenResponse } from "../../services/sisgen/processDocumentService";
+import { useMutation, UseMutationResult } from "@tanstack/react-query"
+import {
+    postSisgenSendDocuments,
+    type SisgenRequest,
+    type SisgenSendDocumentsResponse,
+} from "../../services/sisgen/processDocumentService"
 
 interface SisgenRequestData {
-    access: string;
-    data: SisgenRequest;
+    access: string
+    data: SisgenRequest
 }
 
-const useProcessDocument = (): UseMutationResult<SisgenResponse, Error, SisgenRequestData> => {
+const useProcessDocument = (): UseMutationResult<
+    SisgenSendDocumentsResponse,
+    Error,
+    SisgenRequestData
+> => {
     return useMutation({
-        mutationFn: (data: SisgenRequestData) => processDocumentService.post(data.data, data.access),
-        onSuccess: (data) => {
-            console.log(data);
-        },
-        onError: (error) => {
-            console.log(error);
-        }
+        mutationFn: (data: SisgenRequestData) =>
+            postSisgenSendDocuments(
+                { documents: data.data.documents },
+                data.access,
+            ),
     })
 }
 
-export default useProcessDocument;
+export default useProcessDocument
