@@ -2,6 +2,7 @@ import { AlertTriangle, UserRound } from "lucide-react"
 import type { User } from "../../../../services/auth/userService"
 import { getUsuarioDisplayName } from "../../../../services/api/usuariosService"
 import getTitleCase from "../../../../utils/getTitleCase"
+import LinkTaxesUsuarioSelector from "./LinkTaxesUsuarioSelector"
 
 interface Props {
     user: User
@@ -133,6 +134,10 @@ const UserMappingCard = ({ user }: Props) => {
                     </dd>
                 </div>
             </dl>
+
+            {(user.taxes_usuario_id == null || user.negocio_id == null) && (
+                <LinkTaxesUsuarioSelector idusuario={user.idusuario} />
+            )}
         </article>
     )
 }
