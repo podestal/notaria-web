@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainPage from "../pages/MainPage";
 import Login from "../components/auth/Login";
 import PrivateRoutes from "../components/auth/PrivateRoutes";
@@ -58,6 +58,9 @@ import ConfiNotarioMain from "../components/api/confinotario/ConfiNotarioMain";
 import CreateUser from "../components/auth/CreateUser";
 import AbogadosMain from "../components/api/configuracion/abogadosManager/AbogadosMain";
 import ActoCondicionMain from "../components/api/actoCondicion/ActoCondicionMain";
+import TaxesMain from "../components/taxes/TaxesMain";
+import CatalogoMain from "../components/taxes/catalogo/CatalogoMain";
+import BoletasMain from "../components/taxes/boletas/BoletasMain";
 
 const routes = createBrowserRouter([
     {
@@ -332,6 +335,35 @@ const routes = createBrowserRouter([
                     <SisgenMain />
                 </PrivateRoutes>
             },
+            {
+                path: "taxes",
+                element: 
+                <PrivateRoutes>
+                    <TaxesMain />
+                </PrivateRoutes>,
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="catalogo" replace />,
+                    },
+                    {
+                        path: "catalogo",
+                        element: (
+                            <PrivateRoutes>
+                                <CatalogoMain />
+                            </PrivateRoutes>
+                        ),
+                    },
+                    {
+                        path: "boletas",
+                        element: (
+                            <PrivateRoutes>
+                                <BoletasMain />
+                            </PrivateRoutes>
+                        ),
+                    },
+                ],
+            }
         ]
     },
 ]);
