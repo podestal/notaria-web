@@ -39,6 +39,7 @@ const UpdateCatalogo = ({ catalog, onCancel }: Props) => {
 
     return (
         <CatalogoForm
+            catalog={catalog}
             initialValues={catalogToFormValues(catalog)}
             onSubmit={handleUpdate}
             submitLabel="Actualizar ítem"

@@ -1,4 +1,5 @@
 import TaxesClient from "./taxesCliente"
+import type { CodigosUnitarios } from "./codigosUnitariosService"
 
 export interface Catalog {
     id_catalogo: number
@@ -11,8 +12,8 @@ export interface Catalog {
     negocio_id: number
     usuario_id: number
     moneda_id: number
-    id_codigo_unitario: number
-    codigo_unitario?: string
+    id_codigo_unitario?: number
+    codigo_unitario?: string | CodigosUnitarios
     tipo_igv_id: number
 }
 

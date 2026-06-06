@@ -1,4 +1,5 @@
 import type { Catalog, CreateUpdateCatalog } from "../../../services/taxes/catalogService"
+import type { CodigosUnitarios } from "../../../services/taxes/codigosUnitariosService"
 
 const resolveTaxIgvFactor = (): number => {
     const raw = parseFloat(import.meta.env.VITE_TAX_IGV || "18")
@@ -32,6 +33,37 @@ export const calcIgvFromPrecio = (precio_unitario: string): string => {
         return ""
     }
     return roundMoney(precio - valor)
+}
+
+export const resolveCatalogCodigoUnitarioId = (
+    catalog: Catalog,
+    codigos: CodigosUnitarios[] = [],
+): number => {
+    if (catalog.id_codigo_unitario) {
+        return catalog.id_codigo_unitario
+    }
+
+    const ref = catalog.codigo_unitario
+    if (!ref || codigos.length === 0) return 0
+
+    if (typeof ref === "object" && "id_codigo_unitario" in ref) {
+        return ref.id_codigo_unitario
+    }
+
+    const value = String(ref).trim()
+    if (!value) return 0
+
+    const byCode = codigos.find(
+        (item) => item.codigo.toLowerCase() === value.toLowerCase(),
+    )
+    if (byCode) return byCode.id_codigo_unitario
+
+    const byDescription = codigos.find(
+        (item) => item.descripcion.toLowerCase() === value.toLowerCase(),
+    )
+    if (byDescription) return byDescription.id_codigo_unitario
+
+    return 0
 }
 
 export interface CatalogoFormValues {

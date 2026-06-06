@@ -3,19 +3,24 @@ import useAuthStore from "../../../store/useAuthStore"
 import useGetCodigosUnitarios from "../../../hooks/taxes/useGetCodigosUnitarios"
 import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
 import useGetTiposIgv from "../../../hooks/taxes/tiposIgv/useGetTiposIgv"
-import type { CreateUpdateCatalog } from "../../../services/taxes/catalogService"
+import type {
+    Catalog,
+    CreateUpdateCatalog,
+} from "../../../services/taxes/catalogService"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import {
     calcValorUnitarioFromPrecio,
     calcIgvFromPrecio,
     formValuesToCatalogPayload,
+    resolveCatalogCodigoUnitarioId,
     IGV_PERCENT_LABEL,
     type CatalogoFormValues,
 } from "./catalogoFormShared"
 
 interface Props {
     initialValues: CatalogoFormValues
+    catalog?: Catalog
     onSubmit: (values: CreateUpdateCatalog) => Promise<void> | void
     submitLabel: string
     loading?: boolean
@@ -24,6 +29,7 @@ interface Props {
 
 const CatalogoForm = ({
     initialValues,
+    catalog,
     onSubmit,
     submitLabel,
     loading = false,
@@ -91,11 +97,19 @@ const CatalogoForm = ({
     )
 
     useEffect(() => {
+        const id_codigo_unitario = catalog
+            ? resolveCatalogCodigoUnitarioId(catalog, codigosUnitarios)
+            : initialValues.id_codigo_unitario
+
         setForm({
             ...initialValues,
-            valor_unitario: calcValorUnitarioFromPrecio(initialValues.precio_unitario),
+            id_codigo_unitario:
+                id_codigo_unitario || initialValues.id_codigo_unitario,
+            valor_unitario: calcValorUnitarioFromPrecio(
+                initialValues.precio_unitario,
+            ),
         })
-    }, [initialValues])
+    }, [initialValues, codigosUnitarios, catalog])
 
     const validate = () => {
         let ok = true
@@ -140,6 +154,7 @@ const CatalogoForm = ({
                 </p>
             ) : (
                 <SimpleSelector
+                    key={`tipo-${form.id_codigo_unitario}-${tipoOptions.length}`}
                     label="Tipo"
                     options={tipoOptions}
                     defaultValue={form.id_codigo_unitario}

@@ -27,7 +27,16 @@ const formatDate = (iso: string) => {
     })
 }
 
+const getCodigoUnitarioLabel = (
+    codigoUnitario: Catalog["codigo_unitario"],
+) => {
+    if (!codigoUnitario) return ""
+    if (typeof codigoUnitario === "string") return codigoUnitario
+    return codigoUnitario.codigo || codigoUnitario.descripcion || ""
+}
+
 const CatalogoCard = ({ catalog, onEdit }: Props) => {
+    const codigoUnitarioLabel = getCodigoUnitarioLabel(catalog.codigo_unitario)
     return (
         <article className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -40,9 +49,9 @@ const CatalogoCard = ({ catalog, onEdit }: Props) => {
                             <span className="rounded-full px-2.5 py-0.5 font-mono text-xs font-semibold">
                                 {catalog.codigo || "—"}
                             </span>
-                            {catalog.codigo_unitario && (
+                            {codigoUnitarioLabel && (
                                 <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                                    Ud. {catalog.codigo_unitario}
+                                    Ud. {codigoUnitarioLabel}
                                 </span>
                             )}
                         </div>
