@@ -3,6 +3,7 @@ import {
     codigosUnitariosService,
     type CodigosUnitarios,
 } from "../../services/taxes/codigosUnitariosService"
+import { normalizeTaxesList } from "../../services/taxes/normalizeTaxesList"
 
 interface Props {
     access: string
@@ -15,7 +16,8 @@ const useGetCodigosUnitarios = ({
 }: Props): UseQueryResult<CodigosUnitarios[], Error> => {
     return useQuery({
         queryKey: ["taxes-codigos-unitarios"],
-        queryFn: () => codigosUnitariosService.get(access),
+        queryFn: async () =>
+            normalizeTaxesList(await codigosUnitariosService.get(access)),
         enabled: enabled && !!access,
     })
 }

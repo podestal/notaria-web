@@ -1,13 +1,16 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetCodigosUnitarios from "../../../hooks/taxes/useGetCodigosUnitarios"
+import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
+import useGetTiposIgv from "../../../hooks/taxes/tiposIgv/useGetTiposIgv"
 import type { CreateUpdateCatalog } from "../../../services/taxes/catalogService"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import {
-    CATALOGO_MONEDA_OPTIONS,
-    CATALOGO_TIPO_IGV_OPTIONS,
+    calcValorUnitarioFromPrecio,
+    calcIgvFromPrecio,
     formValuesToCatalogPayload,
+    IGV_PERCENT_LABEL,
     type CatalogoFormValues,
 } from "./catalogoFormShared"
 
@@ -29,41 +32,83 @@ const CatalogoForm = ({
     const access = useAuthStore((s) => s.access_token) || ""
     const { data: codigosUnitarios = [], isLoading: loadingCodigos } =
         useGetCodigosUnitarios({ access })
+    const { data: tiposIgv = [], isLoading: loadingTiposIgv } =
+        useGetTiposIgv({ access })
+    const { data: monedas = [], isLoading: loadingMonedas } =
+        useGetMonedas({ access })
 
     const [form, setForm] = useState<CatalogoFormValues>(initialValues)
     const [codigoError, setCodigoError] = useState("")
     const [descripcionError, setDescripcionError] = useState("")
     const [tipoError, setTipoError] = useState("")
-    const [valorError, setValorError] = useState("")
+    const [tipoIgvError, setTipoIgvError] = useState("")
+    const [monedaError, setMonedaError] = useState("")
     const [precioError, setPrecioError] = useState("")
+
+    const withPlaceholder = (options: { value: number; label: string }[]) => [
+        { value: 0, label: "Seleccione…" },
+        ...options,
+    ]
 
     const tipoOptions = useMemo(
         () =>
-            codigosUnitarios.map((item) => ({
-                value: item.id_codigo_unitario,
-                label: item.descripcion,
-            })),
+            withPlaceholder(
+                codigosUnitarios.map((item) => ({
+                    value: item.id_codigo_unitario,
+                    label: item.descripcion,
+                })),
+            ),
         [codigosUnitarios],
     )
 
-    useEffect(() => {
-        setForm(initialValues)
-    }, [initialValues])
-
-    const isInvalid = useMemo(
+    const tipoIgvOptions = useMemo(
         () =>
-            !form.id_codigo_unitario
-            || !form.codigo.trim()
-            || !form.descripcion.trim()
-            || !form.valor_unitario.trim()
-            || !form.precio_unitario.trim(),
-        [form],
+            withPlaceholder(
+                tiposIgv.map((item) => ({
+                    value: item.id_tipo_igv,
+                    label: item.descripcion,
+                })),
+            ),
+        [tiposIgv],
     )
+
+    const monedaOptions = useMemo(
+        () =>
+            withPlaceholder(
+                monedas.map((item) => ({
+                    value: item.id_moneda,
+                    label: item.descripcion,
+                })),
+            ),
+        [monedas],
+    )
+
+    const loadingOptions = loadingCodigos || loadingTiposIgv || loadingMonedas
+
+    const igvAmount = useMemo(
+        () => calcIgvFromPrecio(form.precio_unitario),
+        [form.precio_unitario],
+    )
+
+    useEffect(() => {
+        setForm({
+            ...initialValues,
+            valor_unitario: calcValorUnitarioFromPrecio(initialValues.precio_unitario),
+        })
+    }, [initialValues])
 
     const validate = () => {
         let ok = true
-        if (!form.id_codigo_unitario) {
+        if (form.id_codigo_unitario <= 0) {
             setTipoError("Seleccione un tipo")
+            ok = false
+        }
+        if (form.tipo_igv_id <= 0) {
+            setTipoIgvError("Seleccione un tipo IGV")
+            ok = false
+        }
+        if (form.moneda_id <= 0) {
+            setMonedaError("Seleccione una moneda")
             ok = false
         }
         if (!form.codigo.trim()) {
@@ -72,10 +117,6 @@ const CatalogoForm = ({
         }
         if (!form.descripcion.trim()) {
             setDescripcionError("El nombre es obligatorio")
-            ok = false
-        }
-        if (!form.valor_unitario.trim() || Number.isNaN(Number(form.valor_unitario))) {
-            setValorError("Ingrese un valor unitario válido")
             ok = false
         }
         if (!form.precio_unitario.trim() || Number.isNaN(Number(form.precio_unitario))) {
@@ -101,14 +142,14 @@ const CatalogoForm = ({
                 <SimpleSelector
                     label="Tipo"
                     options={tipoOptions}
-                    defaultValue={form.id_codigo_unitario || undefined}
+                    defaultValue={form.id_codigo_unitario}
                     setter={(value) => {
                         setForm((prev) => ({ ...prev, id_codigo_unitario: value }))
                         setTipoError("")
                     }}
                     error={tipoError}
                     required
-                    disabled={tipoOptions.length === 0}
+                    disabled={tipoOptions.length <= 1}
                 />
             )}
             <SimpleInput
@@ -133,46 +174,73 @@ const CatalogoForm = ({
                 required
                 horizontal
             />
-            <SimpleSelector
-                label="Tipo IGV"
-                options={CATALOGO_TIPO_IGV_OPTIONS}
-                defaultValue={form.tipo_igv_id}
-                setter={(value) =>
-                    setForm((prev) => ({ ...prev, tipo_igv_id: value }))
-                }
-                required
-            />
-            <SimpleSelector
-                label="Moneda"
-                options={CATALOGO_MONEDA_OPTIONS}
-                defaultValue={form.moneda_id}
-                setter={(value) =>
-                    setForm((prev) => ({ ...prev, moneda_id: value }))
-                }
-                required
-            />
+            {loadingTiposIgv ? (
+                <p className="text-xs text-slate-500 animate-pulse">
+                    Cargando tipos IGV…
+                </p>
+            ) : (
+                <SimpleSelector
+                    label="Tipo IGV"
+                    options={tipoIgvOptions}
+                    defaultValue={form.tipo_igv_id}
+                    setter={(value) => {
+                        setForm((prev) => ({ ...prev, tipo_igv_id: value }))
+                        setTipoIgvError("")
+                    }}
+                    error={tipoIgvError}
+                    required
+                    disabled={tipoIgvOptions.length <= 1}
+                />
+            )}
+            {loadingMonedas ? (
+                <p className="text-xs text-slate-500 animate-pulse">
+                    Cargando monedas…
+                </p>
+            ) : (
+                <SimpleSelector
+                    label="Moneda"
+                    options={monedaOptions}
+                    defaultValue={form.moneda_id}
+                    setter={(value) => {
+                        setForm((prev) => ({ ...prev, moneda_id: value }))
+                        setMonedaError("")
+                    }}
+                    error={monedaError}
+                    required
+                    disabled={monedaOptions.length <= 1}
+                />
+            )}
             <SimpleInput
-                label="Valor unitario"
-                type="number"
-                value={form.valor_unitario}
-                setValue={(value) => {
-                    setForm((prev) => ({ ...prev, valor_unitario: value }))
-                    setValorError("")
-                }}
-                error={valorError}
-                required
-                horizontal
-            />
-            <SimpleInput
-                label="Precio"
+                label="Precio (con IGV)"
                 type="number"
                 value={form.precio_unitario}
                 setValue={(value) => {
-                    setForm((prev) => ({ ...prev, precio_unitario: value }))
+                    setForm((prev) => ({
+                        ...prev,
+                        precio_unitario: value,
+                        valor_unitario: calcValorUnitarioFromPrecio(value),
+                    }))
                     setPrecioError("")
                 }}
                 error={precioError}
                 required
+                horizontal
+            />
+            <SimpleInput
+                label="Valor unitario (sin IGV)"
+                type="number"
+                value={form.valor_unitario}
+                setValue={() => {}}
+                disabled
+                required
+                horizontal
+            />
+            <SimpleInput
+                label={IGV_PERCENT_LABEL}
+                type="number"
+                value={igvAmount}
+                setValue={() => {}}
+                disabled
                 horizontal
             />
 
@@ -189,7 +257,7 @@ const CatalogoForm = ({
                 )}
                 <button
                     type="submit"
-                    disabled={loading || loadingCodigos || isInvalid}
+                    disabled={loading || loadingOptions}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {loading ? "Guardando…" : submitLabel}

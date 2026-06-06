@@ -61,6 +61,7 @@ import ActoCondicionMain from "../components/api/actoCondicion/ActoCondicionMain
 import TaxesMain from "../components/taxes/TaxesMain";
 import CatalogoMain from "../components/taxes/catalogo/CatalogoMain";
 import BoletasMain from "../components/taxes/boletas/BoletasMain";
+import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
 
 const routes = createBrowserRouter([
     {
@@ -325,6 +326,10 @@ const routes = createBrowserRouter([
                     {
                         path: "plantillas",
                         element: <PrivateRoutes><PlantillasMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "user-mapping",
+                        element: <PrivateRoutes><UserMappingMain /></PrivateRoutes>
                     }
                 ]
             },

@@ -204,6 +204,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Crear Usuario", path: "/app/configuracion/create-user"},
                 {name: "Abogados Manager", path: "/app/configuracion/abogados-manager"},
                 {name: "Plantillas", path: "/app/configuracion/plantillas"},
+                {name: "Enlazar Usuarios", path: "/app/configuracion/user-mapping"},
             ]},
         { label: "Sisgen", options:
             [   {name: "SISGEN", path: "/app/sisgen"}
@@ -226,6 +227,16 @@ const Header = ({ kardexTypes }: Props) => {
         return Number(user?.is_superuser) !== 0;
       }
       return true;
+    }).map((item) => {
+      if (item.label !== "Configuracion") return item;
+      const isSuperuser = Number(user?.is_superuser) !== 0;
+      return {
+        ...item,
+        options: item.options.filter(
+          (opt) =>
+            opt.path !== "/app/configuracion/user-mapping" || isSuperuser,
+        ),
+      };
     });
 
 

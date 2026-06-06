@@ -1,5 +1,39 @@
 import type { Catalog, CreateUpdateCatalog } from "../../../services/taxes/catalogService"
 
+const resolveTaxIgvFactor = (): number => {
+    const raw = parseFloat(import.meta.env.VITE_TAX_IGV || "18")
+    if (Number.isNaN(raw) || raw <= 0) return 1.18
+    return raw > 10 ? 1 + raw / 100 : raw
+}
+
+const TAX_IGV_FACTOR = resolveTaxIgvFactor()
+
+export const IGV_PERCENT_LABEL = (() => {
+    const raw = parseFloat(import.meta.env.VITE_TAX_IGV || "18")
+    const pct = raw > 10 ? raw : Math.round((raw - 1) * 100)
+    return `IGV (${pct}%)`
+})()
+
+const roundMoney = (value: number) =>
+    (Math.round(value * 100) / 100).toFixed(2)
+
+export const calcValorUnitarioFromPrecio = (precio_unitario: string): string => {
+    const precio = parseFloat(precio_unitario)
+    if (!precio_unitario.trim() || Number.isNaN(precio) || TAX_IGV_FACTOR <= 0) {
+        return ""
+    }
+    return roundMoney(precio / TAX_IGV_FACTOR)
+}
+
+export const calcIgvFromPrecio = (precio_unitario: string): string => {
+    const precio = parseFloat(precio_unitario)
+    const valor = parseFloat(calcValorUnitarioFromPrecio(precio_unitario))
+    if (!precio_unitario.trim() || Number.isNaN(precio) || Number.isNaN(valor)) {
+        return ""
+    }
+    return roundMoney(precio - valor)
+}
+
 export interface CatalogoFormValues {
     id_codigo_unitario: number
     codigo: string
@@ -10,37 +44,28 @@ export interface CatalogoFormValues {
     precio_unitario: string
 }
 
-export const CATALOGO_TIPO_IGV_OPTIONS = [
-    { value: 1, label: "Gravado — operación onerosa (10)" },
-    { value: 2, label: "Exonerado (20)" },
-    { value: 3, label: "Inafecto (30)" },
-    { value: 4, label: "Exportación (40)" },
-]
-
-export const CATALOGO_MONEDA_OPTIONS = [
-    { value: 1, label: "Soles (PEN)" },
-    { value: 2, label: "Dólares (USD)" },
-]
-
 export const emptyCatalogoFormValues: CatalogoFormValues = {
     id_codigo_unitario: 0,
     codigo: "",
     descripcion: "",
-    tipo_igv_id: 1,
-    moneda_id: 1,
+    tipo_igv_id: 0,
+    moneda_id: 0,
     valor_unitario: "",
     precio_unitario: "",
 }
 
-export const catalogToFormValues = (catalog: Catalog): CatalogoFormValues => ({
-    id_codigo_unitario: catalog.id_codigo_unitario || 0,
-    codigo: catalog.codigo || "",
-    descripcion: catalog.descripcion || "",
-    tipo_igv_id: catalog.tipo_igv_id || 1,
-    moneda_id: catalog.moneda_id || 1,
-    valor_unitario: catalog.valor_unitario || "",
-    precio_unitario: catalog.precio_unitario || "",
-})
+export const catalogToFormValues = (catalog: Catalog): CatalogoFormValues => {
+    const precio_unitario = catalog.precio_unitario || ""
+    return {
+        id_codigo_unitario: catalog.id_codigo_unitario || 0,
+        codigo: catalog.codigo || "",
+        descripcion: catalog.descripcion || "",
+        tipo_igv_id: catalog.tipo_igv_id || 0,
+        moneda_id: catalog.moneda_id || 0,
+        precio_unitario,
+        valor_unitario: calcValorUnitarioFromPrecio(precio_unitario),
+    }
+}
 
 export const formValuesToCatalogPayload = (
     values: CatalogoFormValues,
