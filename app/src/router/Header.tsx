@@ -43,7 +43,13 @@ const Header = ({ kardexTypes }: Props) => {
     const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
     const user = useUserInfoStore( s => s.user)
     const notariaName = import.meta.env.VITE_NOTARIA_NAME || 'Sin nombre'
-    const notariaLogo = "https://pub-298b15d30a4a4c8b8bfd457d07eef0ec.r2.dev/gonzales-caceres/logo.jpeg"
+    const notariaLogoSlug = notariaName
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+    const notariaLogo = `https://pub-298b15d30a4a4c8b8bfd457d07eef0ec.r2.dev/${notariaLogoSlug}/logo.jpeg`
     const welcomeName = user?.username || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'Usuario'
 
     const setBodyRender = useBodyRenderStore((state) => state.setBodyRender)
