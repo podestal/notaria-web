@@ -24,8 +24,24 @@ export interface PersonasPage {
     results: Persona[]
 }
 
+export interface CreateUpdatePersona {
+    nombres: string
+    apellido_paterno: string
+    apellido_materno: string
+    razon_social: string
+    nombre_comercial: string
+    documento: number
+    numero_documento: string
+    direccion: string
+    fecha_nacimiento: string
+    nombre_completo: string
+    email: string | null
+}
+
 export const getPersonasServiceSingle = (id_persona?: number) =>
-    new TaxesClient<Persona>(id_persona ? `/personas/${id_persona}/` : "/personas/")
+    new TaxesClient<Persona, CreateUpdatePersona>(
+        id_persona ? `/personas/${id_persona}/` : "/personas/",
+    )
 
 export const personasService = new TaxesClient<PersonasPage>("/personas/")
 

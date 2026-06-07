@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetPersonas from "../../../hooks/taxes/personas/useGetPersonas"
+import type { Persona } from "../../../services/taxes/personasService"
 import Paginator from "../../ui/Paginator"
 import PersonaCard from "./PersonaCard"
 
@@ -14,6 +15,7 @@ interface Props {
     numero_documento: string
     documento: string
     hasFilters: boolean
+    onEdit?: (persona: Persona) => void
 }
 
 const PersonasList = ({
@@ -26,6 +28,7 @@ const PersonasList = ({
     numero_documento,
     documento,
     hasFilters,
+    onEdit,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { data, isLoading, isError, error, isFetching } = useGetPersonas({
@@ -82,7 +85,7 @@ const PersonasList = ({
                 <ul className="space-y-3">
                     {results.map((persona) => (
                         <li key={persona.id_persona}>
-                            <PersonaCard persona={persona} />
+                            <PersonaCard persona={persona} onEdit={onEdit} />
                         </li>
                     ))}
                 </ul>

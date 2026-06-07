@@ -1,12 +1,14 @@
 import { User } from "lucide-react"
 import type { Persona } from "../../../services/taxes/personasService"
 import getTitleCase from "../../../utils/getTitleCase"
+import { formatLocalDate } from "../../../utils/formatLocalDate"
 
 interface Props {
     persona: Persona
+    onEdit?: (persona: Persona) => void
 }
 
-const formatDate = (iso: string | null) => {
+const formatDateTime = (iso: string | null) => {
     if (!iso) return "—"
     const d = new Date(iso)
     if (Number.isNaN(d.getTime())) return iso
@@ -22,7 +24,7 @@ const displayValue = (value: string | null | undefined) => {
     return value
 }
 
-const PersonaCard = ({ persona }: Props) => {
+const PersonaCard = ({ persona, onEdit }: Props) => {
     const displayName = getTitleCase(persona.nombre_completo || "Sin nombre")
 
     return (
@@ -52,10 +54,21 @@ const PersonaCard = ({ persona }: Props) => {
                     </div>
                 </div>
                 <div className="shrink-0 text-right text-xs">
-                    <p className="text-slate-500">Email</p>
-                    <p className="max-w-[220px] truncate font-medium text-slate-800">
-                        {displayValue(persona.email)}
-                    </p>
+                    <div>
+                        <p className="text-slate-500">Email</p>
+                        <p className="max-w-[220px] truncate font-medium text-slate-800">
+                            {displayValue(persona.email)}
+                        </p>
+                    </div>
+                    {onEdit && (
+                        <button
+                            type="button"
+                            onClick={() => onEdit(persona)}
+                            className="mt-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                            Editar
+                        </button>
+                    )}
                 </div>
             </div>
             <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 border-t border-slate-100 pt-3 text-[11px] sm:grid-cols-4">
@@ -68,7 +81,7 @@ const PersonaCard = ({ persona }: Props) => {
                 <div>
                     <dt className="text-slate-500">Nacimiento</dt>
                     <dd className="font-medium text-slate-800">
-                        {formatDate(persona.fecha_nacimiento)}
+                        {formatLocalDate(persona.fecha_nacimiento)}
                     </dd>
                 </div>
                 <div>
@@ -80,7 +93,7 @@ const PersonaCard = ({ persona }: Props) => {
                 <div>
                     <dt className="text-slate-500">Actualizado</dt>
                     <dd className="font-medium text-slate-800">
-                        {formatDate(persona.actualizado)}
+                        {formatDateTime(persona.actualizado)}
                     </dd>
                 </div>
             </dl>
