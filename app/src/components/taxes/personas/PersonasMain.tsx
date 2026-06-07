@@ -10,10 +10,11 @@ const PersonasMain = () => {
     const [apellidoMaterno, setApellidoMaterno] = useState("")
     const [razonSocial, setRazonSocial] = useState("")
     const [numeroDocumento, setNumeroDocumento] = useState("")
+    const [documento, setDocumento] = useState("")
 
     useEffect(() => {
         setPage(1)
-    }, [nombres, apellidoPaterno, apellidoMaterno, razonSocial, numeroDocumento])
+    }, [nombres, apellidoPaterno, apellidoMaterno, razonSocial, numeroDocumento, documento])
 
     const handleClearFilters = () => {
         setNombres("")
@@ -21,6 +22,7 @@ const PersonasMain = () => {
         setApellidoMaterno("")
         setRazonSocial("")
         setNumeroDocumento("")
+        setDocumento("")
         setPage(1)
     }
 
@@ -29,7 +31,8 @@ const PersonasMain = () => {
         apellidoPaterno.trim() !== "" ||
         apellidoMaterno.trim() !== "" ||
         razonSocial.trim() !== "" ||
-        numeroDocumento.trim() !== ""
+        numeroDocumento.trim() !== "" ||
+        documento.trim() !== ""
 
     return (
         <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -51,11 +54,13 @@ const PersonasMain = () => {
                 apellido_materno={apellidoMaterno}
                 razon_social={razonSocial}
                 numero_documento={numeroDocumento}
+                documento={documento}
                 setNombres={setNombres}
                 setApellidoPaterno={setApellidoPaterno}
                 setApellidoMaterno={setApellidoMaterno}
                 setRazonSocial={setRazonSocial}
                 setNumeroDocumento={setNumeroDocumento}
+                setDocumento={setDocumento}
                 onClear={handleClearFilters}
             />
 
@@ -67,6 +72,7 @@ const PersonasMain = () => {
                 apellido_materno={apellidoMaterno}
                 razon_social={razonSocial}
                 numero_documento={numeroDocumento}
+                documento={documento}
                 hasFilters={hasFilters}
             />
         </section>

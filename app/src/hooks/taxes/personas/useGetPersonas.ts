@@ -9,6 +9,7 @@ interface Props {
     apellido_materno?: string
     razon_social?: string
     numero_documento?: string
+    documento?: string
     enabled?: boolean
 }
 
@@ -20,6 +21,7 @@ const useGetPersonas = ({
     apellido_materno = "",
     razon_social = "",
     numero_documento = "",
+    documento = "",
     enabled = true,
 }: Props): UseQueryResult<PersonasPage, Error> => {
     const params: Record<string, string> = {
@@ -30,6 +32,7 @@ const useGetPersonas = ({
     if (apellido_materno.trim()) params.apellido_materno = apellido_materno.trim()
     if (razon_social.trim()) params.razon_social = razon_social.trim()
     if (numero_documento.trim()) params.numero_documento = numero_documento.trim()
+    if (documento.trim()) params.documento = documento.trim()
 
     return useQuery({
         queryKey: [
@@ -40,6 +43,7 @@ const useGetPersonas = ({
             apellido_materno.trim(),
             razon_social.trim(),
             numero_documento.trim(),
+            documento.trim(),
         ],
         queryFn: () => personasService.get(access, params),
         enabled: enabled && !!access,

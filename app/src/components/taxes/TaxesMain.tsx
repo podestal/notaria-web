@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom"
-import { Receipt } from "lucide-react"
 
 const TaxesMain = () => {
     return (

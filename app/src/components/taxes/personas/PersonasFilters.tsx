@@ -1,4 +1,6 @@
 import { Search, X } from "lucide-react"
+import useAuthStore from "../../../store/useAuthStore"
+import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
 
 export interface PersonasFilterValues {
     nombres: string
@@ -6,6 +8,7 @@ export interface PersonasFilterValues {
     apellido_materno: string
     razon_social: string
     numero_documento: string
+    documento: string
 }
 
 interface Props extends PersonasFilterValues {
@@ -14,6 +17,7 @@ interface Props extends PersonasFilterValues {
     setApellidoMaterno: (value: string) => void
     setRazonSocial: (value: string) => void
     setNumeroDocumento: (value: string) => void
+    setDocumento: (value: string) => void
     onClear: () => void
     loading?: boolean
 }
@@ -24,20 +28,28 @@ const PersonasFilters = ({
     apellido_materno,
     razon_social,
     numero_documento,
+    documento,
     setNombres,
     setApellidoPaterno,
     setApellidoMaterno,
     setRazonSocial,
     setNumeroDocumento,
+    setDocumento,
     onClear,
     loading = false,
 }: Props) => {
+    const access = useAuthStore((s) => s.access_token) || ""
+    const { data: documentos, isLoading: loadingDocumentos } = useGetDocumentos({
+        access,
+    })
+
     const hasFilters =
         nombres.trim() !== "" ||
         apellido_paterno.trim() !== "" ||
         apellido_materno.trim() !== "" ||
         razon_social.trim() !== "" ||
-        numero_documento.trim() !== ""
+        numero_documento.trim() !== "" ||
+        documento.trim() !== ""
 
     const inputClassName =
         "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
@@ -62,6 +74,24 @@ const PersonasFilters = ({
                 )}
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <label className="block text-xs">
+                    <span className="mb-1 block font-medium text-slate-600">Tipo de documento</span>
+                    <select
+                        value={documento}
+                        onChange={(e) => setDocumento(e.target.value)}
+                        disabled={loadingDocumentos}
+                        className={inputClassName}
+                    >
+                        <option value="">Todos</option>
+                        {(documentos ?? []).map((doc) => (
+                            <option key={doc.id_documento} value={String(doc.id_documento)}>
+                                {doc.abreviatura
+                                    ? `${doc.abreviatura} — ${doc.descripcion}`
+                                    : doc.descripcion}
+                            </option>
+                        ))}
+                    </select>
+                </label>
                 <label className="block text-xs">
                     <span className="mb-1 block font-medium text-slate-600">Nombres</span>
                     <input

@@ -12,6 +12,7 @@ interface Props {
     apellido_materno: string
     razon_social: string
     numero_documento: string
+    documento: string
     hasFilters: boolean
 }
 
@@ -23,6 +24,7 @@ const PersonasList = ({
     apellido_materno,
     razon_social,
     numero_documento,
+    documento,
     hasFilters,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
@@ -34,6 +36,7 @@ const PersonasList = ({
         apellido_materno,
         razon_social,
         numero_documento,
+        documento,
     })
 
     const results = data?.results ?? []
