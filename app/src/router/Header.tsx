@@ -9,6 +9,7 @@ import getTitleCase from '../utils/getTitleCase'
 import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
 import { Link } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
+import { isFacturacionEnabled } from '../utils/isFacturacionEnabled'
 
 interface SubOption {
   name: string
@@ -228,6 +229,9 @@ const Header = ({ kardexTypes }: Props) => {
       }
       if (item.label === "Sisgen") {
         return Number(user?.is_superuser) !== 0;
+      }
+      if (item.label === "Facturacion") {
+        return isFacturacionEnabled();
       }
       return true;
     }).map((item) => {

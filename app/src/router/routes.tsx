@@ -63,6 +63,50 @@ import CatalogoMain from "../components/taxes/catalogo/CatalogoMain";
 import BoletasMain from "../components/taxes/boletas/BoletasMain";
 import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
 import PersonasMain from "../components/taxes/personas/PersonasMain";
+import { isFacturacionEnabled } from "../utils/isFacturacionEnabled";
+
+const taxesRoutes = isFacturacionEnabled()
+    ? [
+          {
+              path: "taxes",
+              element: (
+                  <PrivateRoutes>
+                      <TaxesMain />
+                  </PrivateRoutes>
+              ),
+              children: [
+                  {
+                      index: true,
+                      element: <Navigate to="catalogo" replace />,
+                  },
+                  {
+                      path: "personas",
+                      element: (
+                          <PrivateRoutes>
+                              <PersonasMain />
+                          </PrivateRoutes>
+                      ),
+                  },
+                  {
+                      path: "catalogo",
+                      element: (
+                          <PrivateRoutes>
+                              <CatalogoMain />
+                          </PrivateRoutes>
+                      ),
+                  },
+                  {
+                      path: "boletas",
+                      element: (
+                          <PrivateRoutes>
+                              <BoletasMain />
+                          </PrivateRoutes>
+                      ),
+                  },
+              ],
+          },
+      ]
+    : [];
 
 const routes = createBrowserRouter([
     {
@@ -341,43 +385,7 @@ const routes = createBrowserRouter([
                     <SisgenMain />
                 </PrivateRoutes>
             },
-            {
-                path: "taxes",
-                element: 
-                <PrivateRoutes>
-                    <TaxesMain />
-                </PrivateRoutes>,
-                children: [
-                    {
-                        index: true,
-                        element: <Navigate to="catalogo" replace />,
-                    },
-                    {
-                        path: "personas",
-                        element: (
-                            <PrivateRoutes>
-                                <PersonasMain />
-                            </PrivateRoutes>
-                        ),
-                    },
-                    {
-                        path: "catalogo",
-                        element: (
-                            <PrivateRoutes>
-                                <CatalogoMain />
-                            </PrivateRoutes>
-                        ),
-                    },
-                    {
-                        path: "boletas",
-                        element: (
-                            <PrivateRoutes>
-                                <BoletasMain />
-                            </PrivateRoutes>
-                        ),
-                    },
-                ],
-            }
+            ...taxesRoutes,
         ]
     },
 ]);
