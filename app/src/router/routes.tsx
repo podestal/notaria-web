@@ -62,6 +62,7 @@ import TaxesMain from "../components/taxes/TaxesMain";
 import CatalogoMain from "../components/taxes/catalogo/CatalogoMain";
 import BoletasMain from "../components/taxes/boletas/BoletasMain";
 import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
+import PersonasMain from "../components/taxes/personas/PersonasMain";
 
 const routes = createBrowserRouter([
     {
@@ -350,6 +351,14 @@ const routes = createBrowserRouter([
                     {
                         index: true,
                         element: <Navigate to="catalogo" replace />,
+                    },
+                    {
+                        path: "personas",
+                        element: (
+                            <PrivateRoutes>
+                                <PersonasMain />
+                            </PrivateRoutes>
+                        ),
                     },
                     {
                         path: "catalogo",
