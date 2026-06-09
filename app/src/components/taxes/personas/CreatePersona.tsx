@@ -1,44 +1,53 @@
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreatePersona from "../../../hooks/taxes/personas/useCreatePersona"
-import type { CreateUpdatePersona } from "../../../services/taxes/personasService"
+import type { CreateUpdatePersona, Persona } from "../../../services/taxes/personasService"
 import PersonaForm from "./PersonaForm"
-import { emptyPersonaFormValues, getPersonaBackendError } from "./personaFormShared"
+import {
+    emptyPersonaFormValues,
+    getPersonaBackendError,
+    type PersonaFormValues,
+} from "./personaFormShared"
 
 interface Props {
     onDone?: () => void
+    onCreated?: (persona: Persona) => void
+    onCancel?: () => void
+    initialValues?: PersonaFormValues
 }
 
-const CreatePersona = ({ onDone }: Props) => {
+const CreatePersona = ({
+    onDone,
+    onCreated,
+    onCancel,
+    initialValues = emptyPersonaFormValues,
+}: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createPersona = useCreatePersona()
 
     const handleCreate = async (values: CreateUpdatePersona) => {
-        await createPersona.mutateAsync(
-            { access, persona: values },
-            {
-                onSuccess: () => {
-                    setMessage("Persona creada correctamente")
-                    setType("success")
-                    setShow(true)
-                    onDone?.()
-                },
-                onError: (error) => {
-                    setMessage(getPersonaBackendError(error))
-                    setType("error")
-                    setShow(true)
-                },
-            },
-        )
+        try {
+            const persona = await createPersona.mutateAsync({ access, persona: values })
+            setMessage("Persona creada correctamente")
+            setType("success")
+            setShow(true)
+            onCreated?.(persona)
+            onDone?.()
+        } catch (error) {
+            setMessage(getPersonaBackendError(error))
+            setType("error")
+            setShow(true)
+        }
     }
 
     return (
         <PersonaForm
-            initialValues={emptyPersonaFormValues}
+            initialValues={initialValues}
             onSubmit={handleCreate}
             submitLabel="Crear persona"
             loading={createPersona.isPending}
+            onCancel={onCancel}
         />
     )
 }

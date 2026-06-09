@@ -38,11 +38,14 @@ export interface IngresoLineaPayload {
 
 export interface CreateUpdateIngreso {
     id_serie: number
+    serie: string
     moneda_id: number
     persona_id: number
     direccion: string
     observaciones: string
     total: string
+    anulada: boolean
+    canjeada: boolean
     lineas: IngresoLineaPayload[]
 }
 
@@ -50,6 +53,11 @@ export const getIngresosServiceSingle = (id_ingreso?: number) =>
     new TaxesClient<Ingreso, CreateUpdateIngreso>(
         id_ingreso ? `/ingresos/${id_ingreso}/` : "/ingresos/",
     )
+
+export const controlInternoIngresosService = new TaxesClient<
+    Ingreso,
+    CreateUpdateIngreso
+>("/ingresos/control-interno/")
 
 export const ingresosService = new TaxesClient<IngresosPage, CreateUpdateIngreso>(
     "/ingresos/",

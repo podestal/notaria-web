@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
 import useGetSeriesControlInterno from "../../../hooks/taxes/series/useGetSeriesControlInterno"
 import useUpdateIngreso from "../../../hooks/taxes/ingresos/useUpdateIngreso"
 import type { CreateUpdateIngreso, Ingreso } from "../../../services/taxes/ingresosService"
@@ -17,10 +18,11 @@ const UpdateIngreso = ({ ingreso, onCancel }: Props) => {
     const { setMessage, setShow, setType } = useNotificationsStore()
     const updateIngreso = useUpdateIngreso({ id_ingreso: ingreso.id_ingreso })
     const { data: series = [] } = useGetSeriesControlInterno({ access })
+    const { data: monedas = [] } = useGetMonedas({ access })
 
     const initialValues = useMemo(
-        () => ingresoToFormValues(ingreso, series),
-        [ingreso, series],
+        () => ingresoToFormValues(ingreso, series, monedas),
+        [ingreso, series, monedas],
     )
 
     const handleUpdate = async (values: CreateUpdateIngreso) => {
@@ -49,6 +51,8 @@ const UpdateIngreso = ({ ingreso, onCancel }: Props) => {
             submitLabel="Actualizar ingreso"
             loading={updateIngreso.isPending}
             onCancel={onCancel}
+            anulada={ingreso.anulada}
+            canjeada={ingreso.canjeada}
         />
     )
 }
