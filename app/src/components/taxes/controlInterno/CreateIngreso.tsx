@@ -3,7 +3,7 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateIngreso from "../../../hooks/taxes/ingresos/useCreateIngreso"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
 import IngresoForm from "./IngresoForm"
-import { emptyIngresoFormValues, getIngresoBackendError } from "./ingresoFormShared"
+import { getEmptyIngresoFormValues, getIngresoBackendError } from "./ingresoFormShared"
 
 interface Props {
     onDone?: () => void
@@ -35,7 +35,7 @@ const CreateIngreso = ({ onDone }: Props) => {
 
     return (
         <IngresoForm
-            initialValues={emptyIngresoFormValues}
+            initialValues={getEmptyIngresoFormValues()}
             onSubmit={handleCreate}
             submitLabel="Crear ingreso"
             loading={createIngreso.isPending}

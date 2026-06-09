@@ -15,6 +15,7 @@ import {
     applyIngresoFormDefaults,
     computeIngresoTotalFromLineas,
     formValuesToIngresoPayload,
+    isValidIngresoFechaEmision,
     resolveDefaultMonedaId,
     resolveDefaultSerieId,
     type IngresoFormValues,
@@ -50,6 +51,7 @@ const IngresoForm = ({
     const [serieError, setSerieError] = useState("")
     const [monedaError, setMonedaError] = useState("")
     const [personaDocumentoError, setPersonaDocumentoError] = useState("")
+    const [fechaEmisionError, setFechaEmisionError] = useState("")
     const [direccionError, setDireccionError] = useState("")
     const [lineasError, setLineasError] = useState("")
     const [openCreatePersonaModal, setOpenCreatePersonaModal] = useState(false)
@@ -143,6 +145,10 @@ const IngresoForm = ({
             setMonedaError("Seleccione una moneda")
             ok = false
         }
+        if (!isValidIngresoFechaEmision(form.fecha_emision)) {
+            setFechaEmisionError("Ingrese una fecha de emisión válida")
+            ok = false
+        }
         if (form.persona_id <= 0) {
             setPersonaDocumentoError("Busque y seleccione una persona")
             ok = false
@@ -215,6 +221,32 @@ const IngresoForm = ({
                     disabled={monedas.length <= 1}
                 />
             )}
+
+            <div className="grid w-full grid-cols-3 items-center gap-6">
+                <label className="pl-2 text-xs font-semibold text-slate-700">
+                    Fecha emisión
+                </label>
+                <div className="col-span-2 flex items-center gap-2">
+                    <input
+                        type="date"
+                        value={form.fecha_emision}
+                        onChange={(e) => {
+                            setForm((prev) => ({
+                                ...prev,
+                                fecha_emision: e.target.value,
+                            }))
+                            setFechaEmisionError("")
+                        }}
+                        className="min-w-40 flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                    />
+                    <span className="text-red-500">*</span>
+                </div>
+                {fechaEmisionError && (
+                    <p className="col-span-3 px-2 text-xs text-red-500">
+                        {fechaEmisionError}
+                    </p>
+                )}
+            </div>
 
             <IngresoPersonaLooker
                 personaId={form.persona_id}

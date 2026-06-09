@@ -48,8 +48,6 @@ const IngresoLineasLooker = ({
     const [query, setQuery] = useState("")
     const [debouncedQuery, setDebouncedQuery] = useState("")
     const [open, setOpen] = useState(false)
-    const [selectedCatalog, setSelectedCatalog] = useState<Catalog | null>(null)
-    const [selectError, setSelectError] = useState("")
 
     useEffect(() => {
         const timeout = window.setTimeout(() => {
@@ -81,31 +79,15 @@ const IngresoLineasLooker = ({
     }, [])
 
     const handleSelectCatalog = (catalog: Catalog) => {
-        setSelectedCatalog(catalog)
-        setQuery(getCatalogLabel(catalog))
-        setSelectError("")
+        onChange([...lineas, catalogToIngresoLinea(catalog)])
+        setQuery("")
+        setDebouncedQuery("")
         setOpen(false)
     }
 
     const handleQueryChange = (value: string) => {
         setQuery(value)
-        setSelectedCatalog(null)
-        setSelectError("")
         setOpen(true)
-    }
-
-    const handleAddLinea = () => {
-        if (!selectedCatalog) {
-            setSelectError("Seleccione un concepto del catálogo")
-            return
-        }
-
-        onChange([...lineas, catalogToIngresoLinea(selectedCatalog)])
-        setSelectedCatalog(null)
-        setQuery("")
-        setDebouncedQuery("")
-        setSelectError("")
-        setOpen(false)
     }
 
     const handleRemoveLinea = (index: number) => {
@@ -141,7 +123,7 @@ const IngresoLineasLooker = ({
             <div>
                 <h3 className="text-sm font-semibold text-slate-800">Conceptos</h3>
                 <p className="mt-0.5 text-xs text-slate-500">
-                    Escriba para filtrar el catálogo, seleccione el concepto y agréguelo.
+                    Escriba para filtrar el catálogo y seleccione un concepto para agregarlo.
                 </p>
             </div>
 
@@ -157,11 +139,7 @@ const IngresoLineasLooker = ({
                             onChange={(e) => handleQueryChange(e.target.value)}
                             onFocus={() => setOpen(true)}
                             placeholder="Escriba para buscar…"
-                            className={`min-w-64 w-full rounded-md border bg-white py-2 px-3 text-sm text-slate-700 outline-none focus:ring-2 ${
-                                selectError
-                                    ? "border-red-500 focus:ring-red-300"
-                                    : "border-slate-300 focus:border-sky-400 focus:ring-sky-200"
-                            }`}
+                            className="min-w-64 w-full rounded-md border border-slate-300 bg-white py-2 px-3 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
                         />
 
                         {showDropdown && (
@@ -192,12 +170,7 @@ const IngresoLineasLooker = ({
                                             <button
                                                 type="button"
                                                 onClick={() => handleSelectCatalog(catalog)}
-                                                className={`w-full px-3 py-2 text-left hover:bg-sky-50 ${
-                                                    selectedCatalog?.id_catalogo ===
-                                                    catalog.id_catalogo
-                                                        ? "bg-sky-50"
-                                                        : ""
-                                                }`}
+                                                className="w-full px-3 py-2 text-left hover:bg-sky-50"
                                             >
                                                 <span className="font-mono text-[10px] font-semibold text-slate-500">
                                                     {catalog.codigo || "—"}
@@ -214,21 +187,7 @@ const IngresoLineasLooker = ({
                             </ul>
                         )}
 
-                        {selectError && (
-                            <p className="mt-1 px-2 text-xs text-red-500">{selectError}</p>
-                        )}
                     </div>
-                </div>
-
-                <div className="flex justify-end">
-                    <button
-                        type="button"
-                        onClick={handleAddLinea}
-                        disabled={!selectedCatalog}
-                        className="rounded-md bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                        Agregar línea
-                    </button>
                 </div>
             </div>
 

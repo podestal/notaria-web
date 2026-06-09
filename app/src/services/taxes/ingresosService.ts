@@ -44,6 +44,7 @@ export interface CreateUpdateIngreso {
     direccion: string
     observaciones: string
     total: string
+    fecha_emision: string
     anulada: boolean
     canjeada: boolean
     lineas: IngresoLineaPayload[]

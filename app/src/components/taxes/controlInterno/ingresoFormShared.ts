@@ -1,4 +1,5 @@
 import { calcValorUnitarioFromPrecio } from "../catalogo/catalogoFormShared"
+import { parseLocalDateParts, toDateInputValue } from "../../../utils/formatLocalDate"
 import type { Catalog } from "../../../services/taxes/catalogService"
 import type { CreateUpdateIngreso, Ingreso } from "../../../services/taxes/ingresosService"
 import type { IngresoLineaPayload } from "../../../services/taxes/ingresosService"
@@ -18,11 +19,30 @@ export interface IngresoFormValues {
     persona_nombre: string
     direccion: string
     observaciones: string
+    fecha_emision: string
     total: string
     lineas: CreateUpdateIngreso["lineas"]
 }
 
-export const emptyIngresoFormValues: IngresoFormValues = {
+export const getDefaultIngresoFechaEmision = (): string => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, "0")
+    const day = String(now.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
+}
+
+export const parseIngresoFechaEmisionToForm = (
+    value: string | null | undefined,
+): string => {
+    if (!value) return getDefaultIngresoFechaEmision()
+    return toDateInputValue(value) || getDefaultIngresoFechaEmision()
+}
+
+export const isValidIngresoFechaEmision = (fecha: string): boolean =>
+    parseLocalDateParts(fecha.trim()) !== null
+
+export const getEmptyIngresoFormValues = (): IngresoFormValues => ({
     id_serie: 0,
     moneda_id: 0,
     persona_id: 0,
@@ -30,9 +50,10 @@ export const emptyIngresoFormValues: IngresoFormValues = {
     persona_nombre: "",
     direccion: "",
     observaciones: "",
+    fecha_emision: getDefaultIngresoFechaEmision(),
     total: "",
     lineas: [],
-}
+})
 
 export const DEFAULT_SERIE = "0001"
 export const DEFAULT_MONEDA = "SOLES"
@@ -160,6 +181,8 @@ export const applyIngresoFormDefaults = (
         values.id_serie > 0 ? values.id_serie : resolveDefaultSerieId(series),
     moneda_id:
         values.moneda_id > 0 ? values.moneda_id : resolveDefaultMonedaId(monedas),
+    fecha_emision:
+        values.fecha_emision.trim() || getDefaultIngresoFechaEmision(),
 })
 
 export const resolveIngresoSerieId = (
@@ -200,6 +223,7 @@ export const ingresoToFormValues = (
     persona_nombre: ingreso.persona_nombres || "",
     direccion: ingreso.direccion || "",
     observaciones: ingreso.observaciones || "",
+    fecha_emision: parseIngresoFechaEmisionToForm(ingreso.fecha_emision),
     total: ingreso.total || "",
     lineas: [],
 })
@@ -221,6 +245,7 @@ export const formValuesToIngresoPayload = (
     direccion: values.direccion.trim(),
     observaciones: values.observaciones.trim(),
     total: values.total.trim(),
+    fecha_emision: values.fecha_emision.trim(),
     anulada: options.anulada ?? false,
     canjeada: options.canjeada ?? false,
     lineas: values.lineas,
