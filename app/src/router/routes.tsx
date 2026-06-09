@@ -64,6 +64,7 @@ import BoletasMain from "../components/taxes/boletas/BoletasMain";
 import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
 import PersonasMain from "../components/taxes/personas/PersonasMain";
 import { isFacturacionEnabled } from "../utils/isFacturacionEnabled";
+import ControlInternoMain from "../components/taxes/controlInterno/ControlInternoMain";
 
 const taxesRoutes = isFacturacionEnabled()
     ? [
@@ -92,6 +93,14 @@ const taxesRoutes = isFacturacionEnabled()
                       element: (
                           <PrivateRoutes>
                               <CatalogoMain />
+                          </PrivateRoutes>
+                      ),
+                  },
+                  {
+                      path: "control-interno",
+                      element: (
+                          <PrivateRoutes>
+                              <ControlInternoMain />
                           </PrivateRoutes>
                       ),
                   },
