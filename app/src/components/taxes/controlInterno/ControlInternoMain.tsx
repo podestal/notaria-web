@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { ClipboardList, FileText } from "lucide-react"
 import type { Ingreso } from "../../../services/taxes/ingresosService"
 import TopModal from "../../ui/TopModal"
+import AnularIngresoModal from "./AnularIngresoModal"
 import CreateIngreso from "./CreateIngreso"
 import IngresosFilters from "./IngresosFilters"
 import IngresosList from "./IngresosList"
@@ -11,6 +12,7 @@ const ControlInternoMain = () => {
     const [formKey, setFormKey] = useState(0)
     const [openReporteModal, setOpenReporteModal] = useState(false)
     const [editingIngreso, setEditingIngreso] = useState<Ingreso | null>(null)
+    const [anulandoIngreso, setAnulandoIngreso] = useState<Ingreso | null>(null)
     const [page, setPage] = useState(1)
     const [fechaEmisionDesde, setFechaEmisionDesde] = useState("")
     const [fechaEmisionHasta, setFechaEmisionHasta] = useState("")
@@ -50,6 +52,10 @@ const ControlInternoMain = () => {
 
     const handleEditFromReporte = (ingreso: Ingreso) => {
         setEditingIngreso(ingreso)
+    }
+
+    const handleAnularFromReporte = (ingreso: Ingreso) => {
+        setAnulandoIngreso(ingreso)
     }
 
     return (
@@ -124,6 +130,7 @@ const ControlInternoMain = () => {
                             usuario={usuario}
                             hasFilters={hasFilters}
                             onEdit={handleEditFromReporte}
+                            onAnular={handleAnularFromReporte}
                         />
                     </div>
                 </div>
@@ -150,6 +157,11 @@ const ControlInternoMain = () => {
                     </div>
                 </div>
             </TopModal>
+
+            <AnularIngresoModal
+                ingreso={anulandoIngreso}
+                onClose={() => setAnulandoIngreso(null)}
+            />
         </section>
     )
 }

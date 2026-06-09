@@ -36,6 +36,10 @@ export interface IngresoLineaPayload {
     total: string
 }
 
+export interface AnularIngresoPayload {
+    motivo_baja: string
+}
+
 export interface CreateUpdateIngreso {
     id_serie: number
     serie: string
@@ -53,6 +57,11 @@ export interface CreateUpdateIngreso {
 export const getIngresosServiceSingle = (id_ingreso?: number) =>
     new TaxesClient<Ingreso, CreateUpdateIngreso>(
         id_ingreso ? `/ingresos/${id_ingreso}/` : "/ingresos/",
+    )
+
+export const getIngresoAnularService = (id_ingreso: number) =>
+    new TaxesClient<Ingreso, AnularIngresoPayload>(
+        `/ingresos/${id_ingreso}/anular/`,
     )
 
 export const controlInternoIngresosService = new TaxesClient<

@@ -15,6 +15,7 @@ interface Props {
     usuario: string
     hasFilters: boolean
     onEdit?: (ingreso: Ingreso) => void
+    onAnular?: (ingreso: Ingreso) => void
 }
 
 const IngresosList = ({
@@ -27,6 +28,7 @@ const IngresosList = ({
     usuario,
     hasFilters,
     onEdit,
+    onAnular,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { data, isLoading, isError, error, isFetching } = useGetIngresos({
@@ -82,7 +84,11 @@ const IngresosList = ({
                 <ul className="space-y-3">
                     {results.map((ingreso) => (
                         <li key={ingreso.id_ingreso}>
-                            <IngresoCard ingreso={ingreso} onEdit={onEdit} />
+                            <IngresoCard
+                                ingreso={ingreso}
+                                onEdit={onEdit}
+                                onAnular={onAnular}
+                            />
                         </li>
                     ))}
                 </ul>
