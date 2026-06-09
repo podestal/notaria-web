@@ -1,4 +1,31 @@
+import axios from "axios"
 import TaxesClient from "./taxesCliente"
+import { attachAxiosAuthRefreshInterceptor } from "../http/attachAxiosAuthRefreshInterceptor"
+import {
+    attachAxiosAuthRequestInterceptor,
+    authHeaderValue,
+} from "../http/attachAxiosAuthRequestInterceptor"
+
+const taxesHttp = axios.create({
+    baseURL: import.meta.env.VITE_TAXES_URL,
+    withCredentials: true,
+})
+attachAxiosAuthRequestInterceptor(taxesHttp)
+attachAxiosAuthRefreshInterceptor(taxesHttp)
+
+export const getIngresoPdfPath = (id_ingreso: number) =>
+    `/ingresos/${id_ingreso}/pdf/`
+
+export const fetchIngresoPdfBlob = async (
+    id_ingreso: number,
+    access: string,
+): Promise<Blob> => {
+    const response = await taxesHttp.get(getIngresoPdfPath(id_ingreso), {
+        responseType: "blob",
+        headers: { Authorization: authHeaderValue(access) },
+    })
+    return new Blob([response.data], { type: "application/pdf" })
+}
 
 export interface Ingreso {
     id_ingreso: number

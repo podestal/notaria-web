@@ -15,6 +15,7 @@ interface Props {
     usuario: string
     hasFilters: boolean
     onEdit?: (ingreso: Ingreso) => void
+    onImprimir?: (ingreso: Ingreso) => void
     onAnular?: (ingreso: Ingreso) => void
 }
 
@@ -28,6 +29,7 @@ const IngresosList = ({
     usuario,
     hasFilters,
     onEdit,
+    onImprimir,
     onAnular,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
@@ -87,6 +89,7 @@ const IngresosList = ({
                             <IngresoCard
                                 ingreso={ingreso}
                                 onEdit={onEdit}
+                                onImprimir={onImprimir}
                                 onAnular={onAnular}
                             />
                         </li>

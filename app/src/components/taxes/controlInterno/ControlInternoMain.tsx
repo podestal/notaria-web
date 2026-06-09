@@ -4,6 +4,7 @@ import type { Ingreso } from "../../../services/taxes/ingresosService"
 import TopModal from "../../ui/TopModal"
 import AnularIngresoModal from "./AnularIngresoModal"
 import CreateIngreso from "./CreateIngreso"
+import IngresoPdfModal from "./IngresoPdfModal"
 import IngresosFilters from "./IngresosFilters"
 import IngresosList from "./IngresosList"
 import UpdateIngreso from "./UpdateIngreso"
@@ -13,6 +14,7 @@ const ControlInternoMain = () => {
     const [openReporteModal, setOpenReporteModal] = useState(false)
     const [editingIngreso, setEditingIngreso] = useState<Ingreso | null>(null)
     const [anulandoIngreso, setAnulandoIngreso] = useState<Ingreso | null>(null)
+    const [printingIngreso, setPrintingIngreso] = useState<Ingreso | null>(null)
     const [page, setPage] = useState(1)
     const [fechaEmisionDesde, setFechaEmisionDesde] = useState("")
     const [fechaEmisionHasta, setFechaEmisionHasta] = useState("")
@@ -56,6 +58,10 @@ const ControlInternoMain = () => {
 
     const handleAnularFromReporte = (ingreso: Ingreso) => {
         setAnulandoIngreso(ingreso)
+    }
+
+    const handleImprimirFromReporte = (ingreso: Ingreso) => {
+        setPrintingIngreso(ingreso)
     }
 
     return (
@@ -130,6 +136,7 @@ const ControlInternoMain = () => {
                             usuario={usuario}
                             hasFilters={hasFilters}
                             onEdit={handleEditFromReporte}
+                            onImprimir={handleImprimirFromReporte}
                             onAnular={handleAnularFromReporte}
                         />
                     </div>
@@ -161,6 +168,11 @@ const ControlInternoMain = () => {
             <AnularIngresoModal
                 ingreso={anulandoIngreso}
                 onClose={() => setAnulandoIngreso(null)}
+            />
+
+            <IngresoPdfModal
+                ingreso={printingIngreso}
+                onClose={() => setPrintingIngreso(null)}
             />
         </section>
     )
