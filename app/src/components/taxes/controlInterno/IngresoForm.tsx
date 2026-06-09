@@ -1,17 +1,16 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react"
+import { FormEvent, useEffect, useMemo, useState } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
-import useLookupPersonaByDocumento from "../../../hooks/taxes/personas/useLookupPersonaByDocumento"
 import useGetSeriesControlInterno from "../../../hooks/taxes/series/useGetSeriesControlInterno"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
 import type { Persona } from "../../../services/taxes/personasService"
-import getTitleCase from "../../../utils/getTitleCase"
 import CreatePersona from "../personas/CreatePersona"
 import { emptyPersonaFormValues } from "../personas/personaFormShared"
 import TopModal from "../../ui/TopModal"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import IngresoLineasLooker from "./IngresoLineasLooker"
+import IngresoPersonaLooker from "./IngresoPersonaLooker"
 import {
     applyIngresoFormDefaults,
     computeIngresoTotalFromLineas,
@@ -41,8 +40,6 @@ const IngresoForm = ({
     canjeada = false,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
-    const lookupPersona = useLookupPersonaByDocumento()
-    const lookupOnMountDone = useRef(false)
 
     const { data: series = [], isLoading: loadingSeries } = useGetSeriesControlInterno({
         access,
@@ -53,7 +50,6 @@ const IngresoForm = ({
     const [serieError, setSerieError] = useState("")
     const [monedaError, setMonedaError] = useState("")
     const [personaDocumentoError, setPersonaDocumentoError] = useState("")
-    const [personaLookupMessage, setPersonaLookupMessage] = useState("")
     const [direccionError, setDireccionError] = useState("")
     const [lineasError, setLineasError] = useState("")
     const [openCreatePersonaModal, setOpenCreatePersonaModal] = useState(false)
@@ -98,13 +94,9 @@ const IngresoForm = ({
 
     useEffect(() => {
         setForm(applyIngresoFormDefaults(initialValues, series, monedas))
-        lookupOnMountDone.current = false
     }, [initialValues, series, monedas])
 
-    const applyPersonaLookup = (persona: Pick<
-        Persona,
-        "id_persona" | "nombre_completo" | "direccion" | "numero_documento"
-    >) => {
+    const applyPersonaLookup = (persona: Persona) => {
         setForm((prev) => ({
             ...prev,
             persona_id: persona.id_persona,
@@ -113,14 +105,15 @@ const IngresoForm = ({
             direccion: persona.direccion || prev.direccion,
         }))
         setPersonaDocumentoError("")
-        setPersonaLookupMessage(getTitleCase(persona.nombre_completo))
         setDireccionError("")
     }
 
-    const openCreatePersonaForm = (documento: string) => {
+    const openCreatePersonaForm = (query: string) => {
+        const trimmed = query.trim()
+        const documento = /^\d+$/.test(trimmed) ? trimmed : ""
         setPersonaFormSeed({
             ...emptyPersonaFormValues,
-            numero_documento: documento.trim(),
+            numero_documento: documento,
         })
         setOpenCreatePersonaModal(true)
     }
@@ -130,49 +123,14 @@ const IngresoForm = ({
         setOpenCreatePersonaModal(false)
     }
 
-    const handleLookupPersona = async (documento: string) => {
-        const trimmed = documento.trim()
-        if (!trimmed) {
-            setPersonaDocumentoError("Ingrese un número de documento")
-            setPersonaLookupMessage("")
-            return
-        }
-
+    const handlePersonaQueryChange = () => {
+        setForm((prev) => ({
+            ...prev,
+            persona_id: 0,
+            persona_nombre: "",
+        }))
         setPersonaDocumentoError("")
-        setPersonaLookupMessage("")
-
-        try {
-            const persona = await lookupPersona.mutateAsync({
-                access,
-                numero_documento: trimmed,
-            })
-
-            if (!persona) {
-                setForm((prev) => ({
-                    ...prev,
-                    persona_id: 0,
-                    persona_nombre: "",
-                }))
-                setPersonaDocumentoError("No se encontró una persona con ese documento")
-                openCreatePersonaForm(trimmed)
-                return
-            }
-
-            applyPersonaLookup(persona)
-        } catch {
-            setPersonaDocumentoError("No se pudo buscar la persona")
-        }
     }
-
-    useEffect(() => {
-        if (lookupOnMountDone.current) return
-        if (!initialValues.persona_documento.trim() || initialValues.persona_id > 0) {
-            return
-        }
-
-        lookupOnMountDone.current = true
-        void handleLookupPersona(initialValues.persona_documento)
-    }, [initialValues.persona_documento, initialValues.persona_id])
 
     const validate = () => {
         let ok = true
@@ -185,11 +143,8 @@ const IngresoForm = ({
             setMonedaError("Seleccione una moneda")
             ok = false
         }
-        if (!form.persona_documento.trim()) {
-            setPersonaDocumentoError("Ingrese un número de documento")
-            ok = false
-        } else if (form.persona_id <= 0) {
-            setPersonaDocumentoError("Busque y seleccione una persona válida")
+        if (form.persona_id <= 0) {
+            setPersonaDocumentoError("Busque y seleccione una persona")
             ok = false
         }
         if (!form.direccion.trim()) {
@@ -261,45 +216,15 @@ const IngresoForm = ({
                 />
             )}
 
-            <SimpleInput
-                label="Documento persona"
-                value={form.persona_documento}
-                setValue={(value) => {
-                    setForm((prev) => ({
-                        ...prev,
-                        persona_documento: value,
-                        persona_id: 0,
-                        persona_nombre: "",
-                    }))
-                    setPersonaDocumentoError("")
-                    setPersonaLookupMessage("")
-                }}
+            <IngresoPersonaLooker
+                personaId={form.persona_id}
+                personaDocumento={form.persona_documento}
+                personaNombre={form.persona_nombre}
+                onSelect={applyPersonaLookup}
+                onQueryChange={handlePersonaQueryChange}
+                onCreateRequest={openCreatePersonaForm}
                 error={personaDocumentoError}
-                required
-                horizontal
-                suffix={
-                    <button
-                        type="button"
-                        onClick={() => handleLookupPersona(form.persona_documento)}
-                        disabled={lookupPersona.isPending}
-                        className="shrink-0 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
-                    >
-                        {lookupPersona.isPending ? "Buscando…" : "Buscar"}
-                    </button>
-                }
             />
-
-            {personaLookupMessage && (
-                <p className="rounded-lg bg-sky-50 px-3 py-2 text-xs font-medium text-sky-900">
-                    Persona: {personaLookupMessage}
-                </p>
-            )}
-
-            {!personaLookupMessage && form.persona_nombre && form.persona_id <= 0 && (
-                <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                    {getTitleCase(form.persona_nombre)} — busque el documento para confirmar.
-                </p>
-            )}
 
             <SimpleInput
                 label="Dirección"
@@ -343,7 +268,7 @@ const IngresoForm = ({
                 )}
                 <button
                     type="submit"
-                    disabled={loading || loadingOptions || lookupPersona.isPending}
+                    disabled={loading || loadingOptions}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {loading ? "Guardando…" : submitLabel}

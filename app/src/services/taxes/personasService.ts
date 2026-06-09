@@ -45,4 +45,16 @@ export const getPersonasServiceSingle = (id_persona?: number) =>
 
 export const personasService = new TaxesClient<PersonasPage>("/personas/")
 
+export const personasLookupService = new TaxesClient<Persona[] | PersonasPage>(
+    "/personas/lookup/",
+)
+
+export const normalizePersonasLookupResults = (
+    data: Persona[] | PersonasPage | null | undefined,
+): Persona[] => {
+    if (!data) return []
+    if (Array.isArray(data)) return data
+    return data.results ?? []
+}
+
 export default personasService
