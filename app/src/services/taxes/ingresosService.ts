@@ -67,6 +67,33 @@ export interface AnularIngresoPayload {
     motivo_baja: string
 }
 
+export interface CanjearIngresoPayload {
+    serie: string
+    comprobante_id: number
+    observaciones: string
+    fecha_emision: string
+}
+
+export type CanjeComprobanteTipo = "boleta" | "factura"
+
+export const CANJE_COMPROBANTE_OPTIONS: Record<
+    CanjeComprobanteTipo,
+    { comprobante_id: number; serie: string; label: string; description: string }
+> = {
+    boleta: {
+        comprobante_id: 2,
+        serie: "B001",
+        label: "Boleta",
+        description: "Serie B001",
+    },
+    factura: {
+        comprobante_id: 1,
+        serie: "F001",
+        label: "Factura",
+        description: "Serie F001",
+    },
+}
+
 export interface CreateUpdateIngreso {
     id_serie: number
     serie: string
@@ -89,6 +116,11 @@ export const getIngresosServiceSingle = (id_ingreso?: number) =>
 export const getIngresoAnularService = (id_ingreso: number) =>
     new TaxesClient<Ingreso, AnularIngresoPayload>(
         `/ingresos/${id_ingreso}/anular/`,
+    )
+
+export const getIngresoCanjearService = (id_ingreso: number) =>
+    new TaxesClient<Ingreso, CanjearIngresoPayload>(
+        `/ingresos/${id_ingreso}/canjear/`,
     )
 
 export const controlInternoIngresosService = new TaxesClient<

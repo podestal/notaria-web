@@ -3,6 +3,7 @@ import { ClipboardList, FileText } from "lucide-react"
 import type { Ingreso } from "../../../services/taxes/ingresosService"
 import TopModal from "../../ui/TopModal"
 import AnularIngresoModal from "./AnularIngresoModal"
+import CanjearIngresoModal from "./CanjearIngresoModal"
 import CreateIngreso from "./CreateIngreso"
 import IngresoPdfModal from "./IngresoPdfModal"
 import IngresosFilters from "./IngresosFilters"
@@ -15,6 +16,7 @@ const ControlInternoMain = () => {
     const [editingIngreso, setEditingIngreso] = useState<Ingreso | null>(null)
     const [anulandoIngreso, setAnulandoIngreso] = useState<Ingreso | null>(null)
     const [printingIngreso, setPrintingIngreso] = useState<Ingreso | null>(null)
+    const [canjeandoIngreso, setCanjeandoIngreso] = useState<Ingreso | null>(null)
     const [page, setPage] = useState(1)
     const [fechaEmisionDesde, setFechaEmisionDesde] = useState("")
     const [fechaEmisionHasta, setFechaEmisionHasta] = useState("")
@@ -62,6 +64,10 @@ const ControlInternoMain = () => {
 
     const handleImprimirFromReporte = (ingreso: Ingreso) => {
         setPrintingIngreso(ingreso)
+    }
+
+    const handleCanjearFromReporte = (ingreso: Ingreso) => {
+        setCanjeandoIngreso(ingreso)
     }
 
     return (
@@ -138,6 +144,7 @@ const ControlInternoMain = () => {
                             onEdit={handleEditFromReporte}
                             onImprimir={handleImprimirFromReporte}
                             onAnular={handleAnularFromReporte}
+                            onCanjear={handleCanjearFromReporte}
                         />
                     </div>
                 </div>
@@ -173,6 +180,11 @@ const ControlInternoMain = () => {
             <IngresoPdfModal
                 ingreso={printingIngreso}
                 onClose={() => setPrintingIngreso(null)}
+            />
+
+            <CanjearIngresoModal
+                ingreso={canjeandoIngreso}
+                onClose={() => setCanjeandoIngreso(null)}
             />
         </section>
     )

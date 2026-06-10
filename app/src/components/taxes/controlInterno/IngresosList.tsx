@@ -17,6 +17,7 @@ interface Props {
     onEdit?: (ingreso: Ingreso) => void
     onImprimir?: (ingreso: Ingreso) => void
     onAnular?: (ingreso: Ingreso) => void
+    onCanjear?: (ingreso: Ingreso) => void
 }
 
 const IngresosList = ({
@@ -31,6 +32,7 @@ const IngresosList = ({
     onEdit,
     onImprimir,
     onAnular,
+    onCanjear,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { data, isLoading, isError, error, isFetching } = useGetIngresos({
@@ -91,6 +93,7 @@ const IngresosList = ({
                                 onEdit={onEdit}
                                 onImprimir={onImprimir}
                                 onAnular={onAnular}
+                                onCanjear={onCanjear}
                             />
                         </li>
                     ))}
