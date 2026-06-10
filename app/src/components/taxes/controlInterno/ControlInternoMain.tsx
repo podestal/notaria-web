@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import { ClipboardList, FileText } from "lucide-react"
 import type { Ingreso } from "../../../services/taxes/ingresosService"
 import TopModal from "../../ui/TopModal"
-import AnularIngresoModal from "./AnularIngresoModal"
+import AnularComprobanteModal from "../comprobantes/AnularComprobanteModal"
+import ComprobantePdfModal from "../comprobantes/ComprobantePdfModal"
 import CanjearIngresoModal from "./CanjearIngresoModal"
 import CreateIngreso from "./CreateIngreso"
-import IngresoPdfModal from "./IngresoPdfModal"
 import IngresosFilters from "./IngresosFilters"
 import IngresosList from "./IngresosList"
 import UpdateIngreso from "./UpdateIngreso"
@@ -172,13 +172,15 @@ const ControlInternoMain = () => {
                 </div>
             </TopModal>
 
-            <AnularIngresoModal
-                ingreso={anulandoIngreso}
+            <AnularComprobanteModal
+                variant="ingreso"
+                item={anulandoIngreso}
                 onClose={() => setAnulandoIngreso(null)}
             />
 
-            <IngresoPdfModal
-                ingreso={printingIngreso}
+            <ComprobantePdfModal
+                variant="ingreso"
+                item={printingIngreso}
                 onClose={() => setPrintingIngreso(null)}
             />
 

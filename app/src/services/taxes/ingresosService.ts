@@ -1,17 +1,6 @@
-import axios from "axios"
 import TaxesClient from "./taxesCliente"
-import { attachAxiosAuthRefreshInterceptor } from "../http/attachAxiosAuthRefreshInterceptor"
-import {
-    attachAxiosAuthRequestInterceptor,
-    authHeaderValue,
-} from "../http/attachAxiosAuthRequestInterceptor"
-
-const taxesHttp = axios.create({
-    baseURL: import.meta.env.VITE_TAXES_URL,
-    withCredentials: true,
-})
-attachAxiosAuthRequestInterceptor(taxesHttp)
-attachAxiosAuthRefreshInterceptor(taxesHttp)
+import taxesHttp from "./taxesHttpClient"
+import { authHeaderValue } from "../http/attachAxiosAuthRequestInterceptor"
 
 export const getIngresoPdfPath = (id_ingreso: number) =>
     `/ingresos/${id_ingreso}/pdf/`

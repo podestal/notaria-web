@@ -1,0 +1,55 @@
+import TaxesClient from "./taxesCliente"
+import taxesHttp from "./taxesHttpClient"
+import { authHeaderValue } from "../http/attachAxiosAuthRequestInterceptor"
+
+export const RECIBO_COMPROBANTE_FACTURA = 1
+export const RECIBO_COMPROBANTE_BOLETA = 2
+
+export interface Recibo {
+    id_recibo: number
+    fecha_emision: string
+    comprobante: number
+    serie: string
+    numero: number
+    moneda: string
+    gravada: string
+    igv: string
+    total: string
+    persona_documento: string
+    persona_nombres: string
+    usuario: string
+    anulada: boolean
+    enviada_sunat: boolean
+    aceptada_sunat: boolean
+}
+
+export interface RecibosPage {
+    count: number
+    next: string | null
+    previous: string | null
+    results: Recibo[]
+}
+
+export interface AnularReciboPayload {
+    motivo_baja: string
+}
+
+export const getReciboPdfPath = (id_recibo: number) => `/recibos/${id_recibo}/pdf/`
+
+export const fetchReciboPdfBlob = async (
+    id_recibo: number,
+    access: string,
+): Promise<Blob> => {
+    const response = await taxesHttp.get(getReciboPdfPath(id_recibo), {
+        responseType: "blob",
+        headers: { Authorization: authHeaderValue(access) },
+    })
+    return new Blob([response.data], { type: "application/pdf" })
+}
+
+export const getReciboAnularService = (id_recibo: number) =>
+    new TaxesClient<Recibo, AnularReciboPayload>(`/recibos/${id_recibo}/anular/`)
+
+export const recibosService = new TaxesClient<RecibosPage>("/recibos/")
+
+export default recibosService
