@@ -240,25 +240,20 @@ export interface IngresoPayloadOptions {
     canjeada?: boolean
 }
 
-export interface ReciboPayloadOptions {
-    anulada?: boolean
-}
-
 export const formValuesToReciboPayload = (
     values: IngresoFormValues,
     series: SerieControlInterno[] = [],
-    options: ReciboPayloadOptions = {},
 ): CreateUpdateRecibo => ({
-    id_serie: values.id_serie,
     serie: resolveSerieFromId(values.id_serie, series),
     moneda_id: values.moneda_id,
     persona_id: values.persona_id,
     direccion: values.direccion.trim(),
-    observaciones: values.observaciones.trim(),
-    total: values.total.trim(),
-    fecha_emision: values.fecha_emision.trim(),
-    anulada: options.anulada ?? false,
-    lineas: values.lineas,
+    lineas: values.lineas.map((linea) => ({
+        catalogo_id: linea.catalogo_id,
+        cantidad: linea.cantidad,
+        descripcion: linea.descripcion,
+        total: linea.total,
+    })),
 })
 
 export const reciboToFormValues = (

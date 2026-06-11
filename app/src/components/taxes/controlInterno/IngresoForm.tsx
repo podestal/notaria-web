@@ -209,9 +209,7 @@ const IngresoForm = ({
         )
 
         if (isBoleta) {
-            await onSubmit(
-                formValuesToReciboPayload(normalized, series, { anulada }),
-            )
+            await onSubmit(formValuesToReciboPayload(normalized, series))
             return
         }
 

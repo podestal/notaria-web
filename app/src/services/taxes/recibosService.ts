@@ -38,21 +38,14 @@ export interface ReciboLineaPayload {
     catalogo_id: number
     cantidad: number
     descripcion: string
-    detalles: string
-    precio_unitario: string
     total: string
 }
 
 export interface CreateUpdateRecibo {
-    id_serie: number
     serie: string
     moneda_id: number
     persona_id: number
     direccion: string
-    observaciones: string
-    total: string
-    fecha_emision: string
-    anulada: boolean
     lineas: ReciboLineaPayload[]
 }
 
