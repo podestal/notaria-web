@@ -61,6 +61,7 @@ import ActoCondicionMain from "../components/api/actoCondicion/ActoCondicionMain
 import TaxesMain from "../components/taxes/TaxesMain";
 import CatalogoMain from "../components/taxes/catalogo/CatalogoMain";
 import BoletasMain from "../components/taxes/boletas/BoletasMain";
+import FacturasMain from "../components/taxes/facturas/FacturasMain";
 import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
 import PersonasMain from "../components/taxes/personas/PersonasMain";
 import { isFacturacionEnabled } from "../utils/isFacturacionEnabled";
@@ -109,6 +110,14 @@ const taxesRoutes = isFacturacionEnabled()
                       element: (
                           <PrivateRoutes>
                               <BoletasMain />
+                          </PrivateRoutes>
+                      ),
+                  },
+                  {
+                      path: "facturas",
+                      element: (
+                          <PrivateRoutes>
+                              <FacturasMain />
                           </PrivateRoutes>
                       ),
                   },
