@@ -15,4 +15,8 @@ export const boletaSeriesService = new TaxesClient<SerieControlInterno[]>(
     "/series/boleta/",
 )
 
+export const facturaSeriesService = new TaxesClient<SerieControlInterno[]>(
+    "/series/factura/",
+)
+
 export default controlInternoSeriesService

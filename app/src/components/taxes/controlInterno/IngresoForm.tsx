@@ -1,8 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
-import useGetSeriesBoleta from "../../../hooks/taxes/series/useGetSeriesBoleta"
-import useGetSeriesControlInterno from "../../../hooks/taxes/series/useGetSeriesControlInterno"
+import useGetSeriesForVariant from "../../../hooks/taxes/series/useGetSeriesForVariant"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
 import type { CreateUpdateRecibo } from "../../../services/taxes/recibosService"
 import type { Persona } from "../../../services/taxes/personasService"
@@ -14,10 +13,12 @@ import SimpleSelector from "../../ui/SimpleSelector"
 import IngresoLineasLooker from "./IngresoLineasLooker"
 import IngresoPersonaLooker from "./IngresoPersonaLooker"
 import {
+    EMISION_FORM_VARIANT_CONFIG,
+    type EmisionFormVariant,
+} from "../comprobantes/comprobanteFormConfig"
+import {
     applyIngresoFormDefaults,
     computeIngresoTotalFromLineas,
-    DEFAULT_BOLETA_SERIE,
-    DEFAULT_SERIE,
     formValuesToIngresoPayload,
     formValuesToReciboPayload,
     isValidIngresoFechaEmision,
@@ -26,10 +27,10 @@ import {
     type IngresoFormValues,
 } from "./ingresoFormShared"
 
-export type IngresoFormVariant = "ingreso" | "boleta"
+export type IngresoFormVariant = EmisionFormVariant
 
 interface Props {
-    variant?: IngresoFormVariant
+    variant?: EmisionFormVariant
     initialValues: IngresoFormValues
     onSubmit: (values: CreateUpdateIngreso | CreateUpdateRecibo) => Promise<void> | void
     submitLabel: string
@@ -50,23 +51,14 @@ const IngresoForm = ({
     canjeada = false,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
-    const isBoleta = variant === "boleta"
-    const defaultSerieCode = isBoleta ? DEFAULT_BOLETA_SERIE : DEFAULT_SERIE
+    const variantConfig = EMISION_FORM_VARIANT_CONFIG[variant]
+    const defaultSerieCode = variantConfig.defaultSerie
+    const isRecibo = variantConfig.isRecibo
 
-    const controlInternoSeries = useGetSeriesControlInterno({
+    const { data: series = [], isLoading: loadingSeries } = useGetSeriesForVariant({
         access,
-        enabled: !isBoleta,
+        variant,
     })
-    const boletaSeries = useGetSeriesBoleta({
-        access,
-        enabled: isBoleta,
-    })
-    const series = isBoleta
-        ? (boletaSeries.data ?? [])
-        : (controlInternoSeries.data ?? [])
-    const loadingSeries = isBoleta
-        ? boletaSeries.isLoading
-        : controlInternoSeries.isLoading
 
     const { data: monedas = [], isLoading: loadingMonedas } = useGetMonedas({ access })
 
@@ -208,7 +200,7 @@ const IngresoForm = ({
             defaultSerieCode,
         )
 
-        if (isBoleta) {
+        if (isRecibo) {
             await onSubmit(formValuesToReciboPayload(normalized, series))
             return
         }
@@ -359,7 +351,7 @@ const IngresoForm = ({
                 <h3 className="text-sm font-semibold text-slate-800">Registrar persona</h3>
                 <p className="mt-1 text-xs text-slate-500">
                     No se encontró la persona. Complete los datos para registrarla y continuar
-                    con {isBoleta ? "la boleta" : "el ingreso"}.
+                    con {variantConfig.entityLabel}.
                 </p>
                 <div className="mt-4">
                     <CreatePersona

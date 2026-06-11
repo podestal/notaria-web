@@ -7,22 +7,28 @@ import {
     getEmptyIngresoFormValues,
     getIngresoBackendError,
 } from "../controlInterno/ingresoFormShared"
+import {
+    EMISION_FORM_VARIANT_CONFIG,
+    type EmisionFormVariant,
+} from "./comprobanteFormConfig"
 
 interface Props {
+    variant: Extract<EmisionFormVariant, "boleta" | "factura">
     onDone?: () => void
 }
 
-const CreateBoleta = ({ onDone }: Props) => {
+const CreateRecibo = ({ variant, onDone }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createRecibo = useCreateRecibo()
+    const config = EMISION_FORM_VARIANT_CONFIG[variant]
 
     const handleCreate = async (values: CreateUpdateRecibo) => {
         await createRecibo.mutateAsync(
             { access, recibo: values },
             {
                 onSuccess: () => {
-                    setMessage("Boleta creada correctamente")
+                    setMessage(config.createSuccessMessage)
                     setType("success")
                     setShow(true)
                     onDone?.()
@@ -38,13 +44,13 @@ const CreateBoleta = ({ onDone }: Props) => {
 
     return (
         <IngresoForm
-            variant="boleta"
+            variant={variant}
             initialValues={getEmptyIngresoFormValues()}
             onSubmit={handleCreate}
-            submitLabel="Crear boleta"
+            submitLabel={config.createSubmitLabel}
             loading={createRecibo.isPending}
         />
     )
 }
 
-export default CreateBoleta
+export default CreateRecibo
