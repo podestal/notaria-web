@@ -3,6 +3,7 @@ import { parseLocalDateParts, toDateInputValue } from "../../../utils/formatLoca
 import type { Catalog } from "../../../services/taxes/catalogService"
 import type { CreateUpdateIngreso, Ingreso } from "../../../services/taxes/ingresosService"
 import type { IngresoLineaPayload } from "../../../services/taxes/ingresosService"
+import type { CreateUpdateRecibo, Recibo } from "../../../services/taxes/recibosService"
 import type { Moneda } from "../../../services/taxes/monedaService"
 import type { SerieControlInterno } from "../../../services/taxes/seriesService"
 
@@ -56,9 +57,10 @@ export const getEmptyIngresoFormValues = (): IngresoFormValues => ({
 })
 
 export const DEFAULT_SERIE = "0001"
+export const DEFAULT_BOLETA_SERIE = "B001"
 export const DEFAULT_MONEDA = "SOLES"
 
-const normalizeSerieCode = (serie: string) => serie.trim().padStart(4, "0")
+const normalizeSerieCode = (serie: string) => serie.trim().toUpperCase().padStart(4, "0")
 
 const getMonedaCandidates = (moneda: Moneda) =>
     [moneda.descripcion, moneda.abreviatura, moneda.codigo, moneda.simbolo]
@@ -67,11 +69,13 @@ const getMonedaCandidates = (moneda: Moneda) =>
 
 export const resolveDefaultSerieId = (
     series: SerieControlInterno[] = [],
+    defaultSerie = DEFAULT_SERIE,
 ): number => {
     if (series.length === 0) return 0
 
+    const normalizedDefault = normalizeSerieCode(defaultSerie)
     const match = series.find(
-        (item) => normalizeSerieCode(item.serie) === DEFAULT_SERIE,
+        (item) => normalizeSerieCode(item.serie) === normalizedDefault,
     )
     if (match) return match.id_serie
 
@@ -175,10 +179,13 @@ export const applyIngresoFormDefaults = (
     values: IngresoFormValues,
     series: SerieControlInterno[] = [],
     monedas: Moneda[] = [],
+    defaultSerie = DEFAULT_SERIE,
 ): IngresoFormValues => ({
     ...values,
     id_serie:
-        values.id_serie > 0 ? values.id_serie : resolveDefaultSerieId(series),
+        values.id_serie > 0
+            ? values.id_serie
+            : resolveDefaultSerieId(series, defaultSerie),
     moneda_id:
         values.moneda_id > 0 ? values.moneda_id : resolveDefaultMonedaId(monedas),
     fecha_emision:
@@ -232,6 +239,52 @@ export interface IngresoPayloadOptions {
     anulada?: boolean
     canjeada?: boolean
 }
+
+export interface ReciboPayloadOptions {
+    anulada?: boolean
+}
+
+export const formValuesToReciboPayload = (
+    values: IngresoFormValues,
+    series: SerieControlInterno[] = [],
+    options: ReciboPayloadOptions = {},
+): CreateUpdateRecibo => ({
+    id_serie: values.id_serie,
+    serie: resolveSerieFromId(values.id_serie, series),
+    moneda_id: values.moneda_id,
+    persona_id: values.persona_id,
+    direccion: values.direccion.trim(),
+    observaciones: values.observaciones.trim(),
+    total: values.total.trim(),
+    fecha_emision: values.fecha_emision.trim(),
+    anulada: options.anulada ?? false,
+    lineas: values.lineas,
+})
+
+export const reciboToFormValues = (
+    recibo: Recibo,
+    series: SerieControlInterno[] = [],
+    monedas: Moneda[] = [],
+): IngresoFormValues => ({
+    id_serie: resolveIngresoSerieId(
+        {
+            serie: recibo.serie,
+        } as Ingreso,
+        series,
+    ),
+    moneda_id: resolveIngresoMonedaId(
+        { moneda: recibo.moneda } as Ingreso,
+        monedas,
+    ),
+    persona_id: 0,
+    persona_documento: recibo.persona_documento || "",
+    persona_nombre: recibo.persona_nombres || "",
+    direccion: "",
+    observaciones: "",
+    fecha_emision: parseIngresoFechaEmisionToForm(recibo.fecha_emision),
+    total: recibo.total || "",
+    lineas: [],
+})
 
 export const formValuesToIngresoPayload = (
     values: IngresoFormValues,

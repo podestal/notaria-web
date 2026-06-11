@@ -1,8 +1,10 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
+import useGetSeriesBoleta from "../../../hooks/taxes/series/useGetSeriesBoleta"
 import useGetSeriesControlInterno from "../../../hooks/taxes/series/useGetSeriesControlInterno"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
+import type { CreateUpdateRecibo } from "../../../services/taxes/recibosService"
 import type { Persona } from "../../../services/taxes/personasService"
 import CreatePersona from "../personas/CreatePersona"
 import { emptyPersonaFormValues } from "../personas/personaFormShared"
@@ -14,16 +16,22 @@ import IngresoPersonaLooker from "./IngresoPersonaLooker"
 import {
     applyIngresoFormDefaults,
     computeIngresoTotalFromLineas,
+    DEFAULT_BOLETA_SERIE,
+    DEFAULT_SERIE,
     formValuesToIngresoPayload,
+    formValuesToReciboPayload,
     isValidIngresoFechaEmision,
     resolveDefaultMonedaId,
     resolveDefaultSerieId,
     type IngresoFormValues,
 } from "./ingresoFormShared"
 
+export type IngresoFormVariant = "ingreso" | "boleta"
+
 interface Props {
+    variant?: IngresoFormVariant
     initialValues: IngresoFormValues
-    onSubmit: (values: CreateUpdateIngreso) => Promise<void> | void
+    onSubmit: (values: CreateUpdateIngreso | CreateUpdateRecibo) => Promise<void> | void
     submitLabel: string
     loading?: boolean
     onCancel?: () => void
@@ -32,6 +40,7 @@ interface Props {
 }
 
 const IngresoForm = ({
+    variant = "ingreso",
     initialValues,
     onSubmit,
     submitLabel,
@@ -41,10 +50,24 @@ const IngresoForm = ({
     canjeada = false,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const isBoleta = variant === "boleta"
+    const defaultSerieCode = isBoleta ? DEFAULT_BOLETA_SERIE : DEFAULT_SERIE
 
-    const { data: series = [], isLoading: loadingSeries } = useGetSeriesControlInterno({
+    const controlInternoSeries = useGetSeriesControlInterno({
         access,
+        enabled: !isBoleta,
     })
+    const boletaSeries = useGetSeriesBoleta({
+        access,
+        enabled: isBoleta,
+    })
+    const series = isBoleta
+        ? (boletaSeries.data ?? [])
+        : (controlInternoSeries.data ?? [])
+    const loadingSeries = isBoleta
+        ? boletaSeries.isLoading
+        : controlInternoSeries.isLoading
+
     const { data: monedas = [], isLoading: loadingMonedas } = useGetMonedas({ access })
 
     const [form, setForm] = useState<IngresoFormValues>(initialValues)
@@ -57,7 +80,10 @@ const IngresoForm = ({
     const [openCreatePersonaModal, setOpenCreatePersonaModal] = useState(false)
     const [personaFormSeed, setPersonaFormSeed] = useState(emptyPersonaFormValues)
 
-    const defaultSerieId = useMemo(() => resolveDefaultSerieId(series), [series])
+    const defaultSerieId = useMemo(
+        () => resolveDefaultSerieId(series, defaultSerieCode),
+        [series, defaultSerieCode],
+    )
     const defaultMonedaId = useMemo(() => resolveDefaultMonedaId(monedas), [monedas])
 
     const serieOptions = useMemo(() => {
@@ -95,8 +121,15 @@ const IngresoForm = ({
     }, [monedas, defaultMonedaId])
 
     useEffect(() => {
-        setForm(applyIngresoFormDefaults(initialValues, series, monedas))
-    }, [initialValues, series, monedas])
+        setForm(
+            applyIngresoFormDefaults(
+                initialValues,
+                series,
+                monedas,
+                defaultSerieCode,
+            ),
+        )
+    }, [initialValues, series, monedas, defaultSerieCode])
 
     const applyPersonaLookup = (persona: Persona) => {
         setForm((prev) => ({
@@ -168,12 +201,22 @@ const IngresoForm = ({
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!validate()) return
+        const normalized = applyIngresoFormDefaults(
+            form,
+            series,
+            monedas,
+            defaultSerieCode,
+        )
+
+        if (isBoleta) {
+            await onSubmit(
+                formValuesToReciboPayload(normalized, series, { anulada }),
+            )
+            return
+        }
+
         await onSubmit(
-            formValuesToIngresoPayload(
-                applyIngresoFormDefaults(form, series, monedas),
-                series,
-                { anulada, canjeada },
-            ),
+            formValuesToIngresoPayload(normalized, series, { anulada, canjeada }),
         )
     }
 
@@ -318,7 +361,7 @@ const IngresoForm = ({
                 <h3 className="text-sm font-semibold text-slate-800">Registrar persona</h3>
                 <p className="mt-1 text-xs text-slate-500">
                     No se encontró la persona. Complete los datos para registrarla y continuar
-                    con el ingreso.
+                    con {isBoleta ? "la boleta" : "el ingreso"}.
                 </p>
                 <div className="mt-4">
                     <CreatePersona

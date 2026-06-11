@@ -6,9 +6,11 @@ import AnularComprobanteModal from "../comprobantes/AnularComprobanteModal"
 import ComprobantePdfModal from "../comprobantes/ComprobantePdfModal"
 import ComprobantesList from "../comprobantes/ComprobantesList"
 import type { ComprobanteItem } from "../comprobantes/comprobanteTypes"
+import CreateBoleta from "./CreateBoleta"
 import IngresosFilters from "../controlInterno/IngresosFilters"
 
 const BoletasMain = () => {
+    const [formKey, setFormKey] = useState(0)
     const [openReporteModal, setOpenReporteModal] = useState(false)
     const [printingItem, setPrintingItem] = useState<ComprobanteItem | null>(null)
     const [anulandoItem, setAnulandoItem] = useState<ComprobanteItem | null>(null)
@@ -45,6 +47,10 @@ const BoletasMain = () => {
         personaNombres.trim() !== "" ||
         usuario.trim() !== ""
 
+    const handleCreateDone = () => {
+        setFormKey((prev) => prev + 1)
+    }
+
     return (
         <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <header className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-sky-100 pb-3">
@@ -70,10 +76,13 @@ const BoletasMain = () => {
                 </button>
             </header>
 
-            <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
-                Use el botón <span className="font-semibold text-slate-700">Reporte</span> para
-                ver y filtrar las boletas registradas.
-            </p>
+            <div className="rounded-lg border border-slate-100 bg-slate-50/40 p-4">
+                <h3 className="mb-1 text-sm font-semibold text-slate-800">Nueva boleta</h3>
+                <p className="mb-4 text-xs text-slate-500">
+                    Complete los datos para emitir una boleta de venta.
+                </p>
+                <CreateBoleta key={formKey} onDone={handleCreateDone} />
+            </div>
 
             <TopModal
                 isOpen={openReporteModal}

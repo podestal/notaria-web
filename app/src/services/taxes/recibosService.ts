@@ -34,6 +34,28 @@ export interface AnularReciboPayload {
     motivo_baja: string
 }
 
+export interface ReciboLineaPayload {
+    catalogo_id: number
+    cantidad: number
+    descripcion: string
+    detalles: string
+    precio_unitario: string
+    total: string
+}
+
+export interface CreateUpdateRecibo {
+    id_serie: number
+    serie: string
+    moneda_id: number
+    persona_id: number
+    direccion: string
+    observaciones: string
+    total: string
+    fecha_emision: string
+    anulada: boolean
+    lineas: ReciboLineaPayload[]
+}
+
 export const getReciboPdfPath = (id_recibo: number) => `/recibos/${id_recibo}/pdf/`
 
 export const fetchReciboPdfBlob = async (
@@ -51,5 +73,10 @@ export const getReciboAnularService = (id_recibo: number) =>
     new TaxesClient<Recibo, AnularReciboPayload>(`/recibos/${id_recibo}/anular/`)
 
 export const recibosService = new TaxesClient<RecibosPage>("/recibos/")
+
+export const getRecibosServiceSingle = (id_recibo?: number) =>
+    new TaxesClient<Recibo, CreateUpdateRecibo>(
+        id_recibo ? `/recibos/${id_recibo}/` : "/recibos/",
+    )
 
 export default recibosService
