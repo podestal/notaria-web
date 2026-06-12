@@ -67,6 +67,10 @@ export const getReciboAnularService = (id_recibo: number) =>
 
 export const recibosService = new TaxesClient<RecibosPage>("/recibos/")
 
+export const recibosPendientesSunatService = new TaxesClient<
+    Recibo[] | RecibosPage
+>("/recibos/pendientes-sunat/")
+
 export const getRecibosServiceSingle = (id_recibo?: number) =>
     new TaxesClient<Recibo, CreateUpdateRecibo>(
         id_recibo ? `/recibos/${id_recibo}/` : "/recibos/",

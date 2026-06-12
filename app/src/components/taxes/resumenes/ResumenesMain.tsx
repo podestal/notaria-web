@@ -1,9 +1,11 @@
 import { useState } from "react"
-import { FileStack } from "lucide-react"
+import { FileStack, Plus } from "lucide-react"
+import GenerarResumenModal from "./GenerarResumenModal"
 import ResumenesList from "./ResumenesList"
 
 const ResumenesMain = () => {
     const [page, setPage] = useState(1)
+    const [openGenerarModal, setOpenGenerarModal] = useState(false)
 
     return (
         <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -19,9 +21,22 @@ const ResumenesMain = () => {
                         </p>
                     </div>
                 </div>
+                <button
+                    type="button"
+                    onClick={() => setOpenGenerarModal(true)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700"
+                >
+                    <Plus className="h-3.5 w-3.5" aria-hidden />
+                    Generar Resumen
+                </button>
             </header>
 
             <ResumenesList page={page} setPage={setPage} />
+
+            <GenerarResumenModal
+                isOpen={openGenerarModal}
+                onClose={() => setOpenGenerarModal(false)}
+            />
         </section>
     )
 }
