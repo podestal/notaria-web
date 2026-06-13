@@ -15,6 +15,8 @@ const BoletasMain = () => (
         reporteTitle="Reporte de boletas"
         reporteDescription="Consulte y filtre las boletas emitidas."
         listVariant="recibo"
+        reciboComprobanteId={RECIBO_COMPROBANTE_BOLETA}
+        anularEntityLabel="boleta"
         renderReporteList={(context) => (
             <ComprobantesList
                 variant="recibo"

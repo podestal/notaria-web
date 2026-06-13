@@ -9,6 +9,7 @@ import {
     isIngreso,
     isRecibo,
 } from "./comprobanteTypes"
+import { RECIBO_COMPROBANTE_BOLETA } from "../../../services/taxes/recibosService"
 
 interface Props {
     variant: ComprobanteVariant
@@ -123,6 +124,14 @@ const ComprobanteCard = ({
                                         Anulada
                                     </span>
                                 )}
+                                {item.anulada &&
+                                    recibo &&
+                                    recibo.comprobante === RECIBO_COMPROBANTE_BOLETA &&
+                                    recibo.resumen_id == null && (
+                                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                                        Pend. resumen
+                                    </span>
+                                )}
                                 {ingreso?.canjeada && (
                                     <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
                                         Canjeada
@@ -232,6 +241,22 @@ const ComprobanteCard = ({
                                 <dt className="text-slate-500">Fecha baja</dt>
                                 <dd className="font-medium text-slate-800">
                                     {formatLocalDate(ingreso.fecha_baja)}
+                                </dd>
+                            </div>
+                        </>
+                    )}
+                    {recibo?.anulada && (
+                        <>
+                            <div>
+                                <dt className="text-slate-500">Motivo baja</dt>
+                                <dd className="font-medium text-red-700">
+                                    {displayValue(recibo.motivo_baja)}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt className="text-slate-500">Fecha baja</dt>
+                                <dd className="font-medium text-slate-800">
+                                    {formatLocalDate(recibo.fecha_baja)}
                                 </dd>
                             </div>
                         </>

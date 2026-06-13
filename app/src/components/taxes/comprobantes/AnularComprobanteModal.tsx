@@ -5,7 +5,7 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateBaja from "../../../hooks/taxes/bajas/useCreateBaja"
 import useAnularIngreso from "../../../hooks/taxes/ingresos/useAnularIngreso"
 import useAnularRecibo from "../../../hooks/taxes/recibos/useAnularRecibo"
-import { RECIBO_COMPROBANTE_FACTURA } from "../../../services/taxes/recibosService"
+import { RECIBO_COMPROBANTE_BOLETA, RECIBO_COMPROBANTE_FACTURA } from "../../../services/taxes/recibosService"
 import getTitleCase from "../../../utils/getTitleCase"
 import { toDateInputValue } from "../../../utils/formatLocalDate"
 import TopModal from "../../ui/TopModal"
@@ -40,6 +40,8 @@ const AnularComprobanteModal = ({
     const itemId = item ? getComprobanteItemId(item) : 0
     const usesBajaFactura =
         variant === "recibo" && reciboComprobanteId === RECIBO_COMPROBANTE_FACTURA
+    const usesAnularBoletaLocal =
+        variant === "recibo" && reciboComprobanteId === RECIBO_COMPROBANTE_BOLETA
 
     const anularIngreso = useAnularIngreso({
         id_ingreso: variant === "ingreso" ? itemId : 0,
@@ -69,7 +71,32 @@ const AnularComprobanteModal = ({
           : anularRecibo.isPending
     const entityLabel =
         entityLabelProp ??
-        (variant === "ingreso" ? "ingreso" : usesBajaFactura ? "factura" : "recibo")
+        (variant === "ingreso"
+            ? "ingreso"
+            : usesBajaFactura
+              ? "factura"
+              : usesAnularBoletaLocal
+                ? "boleta"
+                : "recibo")
+
+    const mapAnularError = (err: unknown): string => {
+        const raw = getIngresoBackendError(err)
+        const lower = raw.toLowerCase()
+        if (lower.includes("ya está anulado") || lower.includes("ya esta anulado")) {
+            return "El recibo ya está anulado."
+        }
+        if (
+            usesAnularBoletaLocal &&
+            isRecibo(item) &&
+            item.comprobante === RECIBO_COMPROBANTE_FACTURA
+        ) {
+            return "Use Comunicación de baja (RA), no este botón."
+        }
+        if (lower.includes("comunicación de baja") || lower.includes("comunicacion de baja")) {
+            return "Use Comunicación de baja (RA), no este botón."
+        }
+        return raw
+    }
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -112,14 +139,16 @@ const AnularComprobanteModal = ({
             setMessage(
                 usesBajaFactura
                     ? "Factura dada de baja correctamente"
-                    : `${entityLabel.charAt(0).toUpperCase()}${entityLabel.slice(1)} anulado correctamente`,
+                    : usesAnularBoletaLocal
+                      ? "Boleta anulada localmente. Debe incluirse en el resumen diario para comunicar la baja a SUNAT."
+                      : `${entityLabel.charAt(0).toUpperCase()}${entityLabel.slice(1)} anulado correctamente`,
             )
             setType("success")
             setShow(true)
             onSuccess?.()
             onClose()
         } catch (err) {
-            setMessage(getIngresoBackendError(err))
+            setMessage(mapAnularError(err))
             setType("error")
             setShow(true)
         }
@@ -137,8 +166,11 @@ const AnularComprobanteModal = ({
                             Anular {entityLabel}
                         </h3>
                         <p className="mt-1 text-sm text-slate-600">
-                            Esta acción marcará el comprobante como anulado. Indique el
-                            motivo para continuar.
+                            {usesAnularBoletaLocal
+                                ? "Anulación local de la boleta. La baja se comunicará a SUNAT en el resumen diario."
+                                : usesBajaFactura
+                                  ? "Comunicación de baja a SUNAT para esta factura."
+                                  : "Esta acción marcará el comprobante como anulado. Indique el motivo para continuar."}
                         </p>
                     </div>
                 </div>
@@ -161,8 +193,9 @@ const AnularComprobanteModal = ({
                         aria-hidden
                     />
                     <p className="text-xs leading-relaxed text-amber-900">
-                        Una vez anulado, el {entityLabel} quedará registrado como baja y no
-                        podrá revertirse desde esta pantalla.
+                        {usesAnularBoletaLocal
+                            ? "La boleta quedará anulada localmente. Debe incluirla en el resumen diario (RC) para informar la baja a SUNAT."
+                            : `Una vez anulado, el ${entityLabel} quedará registrado como baja y no podrá revertirse desde esta pantalla.`}
                     </p>
                 </div>
 

@@ -3,7 +3,8 @@ import { FileStack } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateResumen from "../../../hooks/taxes/resumenes/useCreateResumen"
-import useGetRecibosPendientesSunat from "../../../hooks/taxes/recibos/useGetRecibosPendientesSunat"
+import useGetResumenRecibosPendientes from "../../../hooks/taxes/resumenes/useGetResumenRecibosPendientes"
+import { RECIBO_COMPROBANTE_BOLETA } from "../../../services/taxes/recibosService"
 import type { Recibo } from "../../../services/taxes/recibosService"
 import getTitleCase from "../../../utils/getTitleCase"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
@@ -54,6 +55,16 @@ const PendienteReciboRow = ({
                 <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
                     {recibo.comprobante === 2 ? "Boleta" : "Factura"}
                 </span>
+                {recibo.anulada && (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-700">
+                        Anulada local
+                    </span>
+                )}
+                {recibo.anulada && recibo.resumen_id == null && (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                        Pend. resumen
+                    </span>
+                )}
             </div>
             <p className="mt-0.5 text-sm text-slate-800">
                 {getTitleCase(recibo.persona_nombres || "Sin nombre")}
@@ -100,9 +111,10 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
     const fechaComunicacionValida = isValidIngresoFechaEmision(fechaComunicacion)
 
     const { data: pendientes = [], isLoading, isError, error, isFetching } =
-        useGetRecibosPendientesSunat({
+        useGetResumenRecibosPendientes({
             access,
             fecha_emision: fechaEmision,
+            comprobante_id: RECIBO_COMPROBANTE_BOLETA,
             enabled: isOpen && fechaEmisionValida,
         })
 
@@ -167,6 +179,7 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
                 payload: {
                     fecha_comunicacion: fechaComunicacion.trim(),
                     fecha_emision: fechaEmision.trim(),
+                    comprobante_id: RECIBO_COMPROBANTE_BOLETA,
                     recibo_ids: selectedIds,
                 },
             })
@@ -198,8 +211,8 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
                                 Generar resumen
                             </h3>
                             <p className="mt-1 text-xs text-slate-500">
-                                Seleccione los comprobantes pendientes de SUNAT y confirme las
-                                fechas para generar el resumen de boletas.
+                                Comunicar boletas a SUNAT: incluye emisiones nuevas y bajas
+                                anuladas localmente pendientes de resumen.
                             </p>
                         </div>
                     </div>

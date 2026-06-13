@@ -14,7 +14,9 @@ const useCreateBaja = (): UseMutationResult<unknown, Error, CreateBajaData> => {
             bajasService.post(data.payload, data.access),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["taxes-recibos"] })
-            queryClient.invalidateQueries({ queryKey: ["taxes-recibos-pendientes-sunat"] })
+            queryClient.invalidateQueries({
+                queryKey: ["taxes-resumen-recibos-pendientes"],
+            })
         },
     })
 }

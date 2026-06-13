@@ -25,6 +25,9 @@ const useAnularRecibo = ({
             service.post(data.payload, data.access),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["taxes-recibos"] })
+            queryClient.invalidateQueries({
+                queryKey: ["taxes-resumen-recibos-pendientes"],
+            })
         },
     })
 }

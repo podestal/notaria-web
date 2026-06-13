@@ -18,7 +18,9 @@ const useCreateResumen = (): UseMutationResult<Resumen, Error, CreateResumenData
             resumenesCreateService.post(data.payload, data.access),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["taxes-resumenes"] })
-            queryClient.invalidateQueries({ queryKey: ["taxes-recibos-pendientes-sunat"] })
+            queryClient.invalidateQueries({
+                queryKey: ["taxes-resumen-recibos-pendientes"],
+            })
             queryClient.invalidateQueries({ queryKey: ["taxes-recibos"] })
         },
     })

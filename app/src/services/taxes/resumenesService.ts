@@ -1,4 +1,5 @@
 import TaxesClient from "./taxesCliente"
+import type { Recibo, RecibosPage } from "./recibosService"
 
 export interface Resumen {
     id_resumen: number
@@ -23,6 +24,7 @@ export interface ResumenesPage {
 export interface CreateResumenPayload {
     fecha_comunicacion: string
     fecha_emision: string
+    comprobante_id: number
     recibo_ids: number[]
 }
 
@@ -31,5 +33,12 @@ export const resumenesService = new TaxesClient<ResumenesPage>("/resumenes/")
 export const resumenesCreateService = new TaxesClient<Resumen, CreateResumenPayload>(
     "/resumenes/",
 )
+
+export const resumenesRecibosPendientesService = new TaxesClient<
+    Recibo[] | RecibosPage
+>("/resumenes/recibos-pendientes/")
+
+export const getResumenConsultarTicketService = (id_resumen: number) =>
+    new TaxesClient<Resumen>(`/resumenes/${id_resumen}/consultar-ticket/`)
 
 export default resumenesService

@@ -21,6 +21,9 @@ export interface Recibo {
     anulada: boolean
     enviada_sunat: boolean
     aceptada_sunat: boolean
+    motivo_baja: string | null
+    fecha_baja: string | null
+    resumen_id: number | null
 }
 
 export interface RecibosPage {
@@ -66,10 +69,6 @@ export const getReciboAnularService = (id_recibo: number) =>
     new TaxesClient<Recibo, AnularReciboPayload>(`/recibos/${id_recibo}/anular/`)
 
 export const recibosService = new TaxesClient<RecibosPage>("/recibos/")
-
-export const recibosPendientesSunatService = new TaxesClient<
-    Recibo[] | RecibosPage
->("/recibos/pendientes-sunat/")
 
 export const getRecibosServiceSingle = (id_recibo?: number) =>
     new TaxesClient<Recibo, CreateUpdateRecibo>(
