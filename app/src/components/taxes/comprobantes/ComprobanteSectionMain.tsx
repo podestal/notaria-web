@@ -29,6 +29,8 @@ interface Props {
     reporteTitle: string
     reporteDescription: string
     listVariant: ComprobanteVariant
+    reciboComprobanteId?: number
+    anularEntityLabel?: string
     renderReporteList: (context: ComprobanteReporteContext) => ReactNode
     children?: ReactNode
 }
@@ -43,6 +45,8 @@ const ComprobanteSectionMain = ({
     reporteTitle,
     reporteDescription,
     listVariant,
+    reciboComprobanteId,
+    anularEntityLabel,
     renderReporteList,
     children,
 }: Props) => {
@@ -166,6 +170,8 @@ const ComprobanteSectionMain = ({
             <AnularComprobanteModal
                 variant={listVariant}
                 item={anulandoItem}
+                reciboComprobanteId={reciboComprobanteId}
+                entityLabel={anularEntityLabel}
                 onClose={() => setAnulandoItem(null)}
             />
 

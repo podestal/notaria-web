@@ -128,7 +128,7 @@ const ComprobanteCard = ({
                                         Canjeada
                                     </span>
                                 )}
-                                {recibo && (
+                                {recibo && !recibo.anulada && (
                                     <>
                                         <SunatBadge
                                             ok={recibo.enviada_sunat}

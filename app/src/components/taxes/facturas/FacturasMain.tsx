@@ -15,6 +15,8 @@ const FacturasMain = () => (
         reporteTitle="Reporte de facturas"
         reporteDescription="Consulte y filtre las facturas emitidas."
         listVariant="recibo"
+        reciboComprobanteId={RECIBO_COMPROBANTE_FACTURA}
+        anularEntityLabel="factura"
         renderReporteList={(context) => (
             <ComprobantesList
                 variant="recibo"

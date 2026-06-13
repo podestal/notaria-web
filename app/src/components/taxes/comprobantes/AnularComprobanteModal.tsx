@@ -2,9 +2,12 @@ import { FormEvent, useEffect, useState } from "react"
 import { AlertTriangle, Ban } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import useCreateBaja from "../../../hooks/taxes/bajas/useCreateBaja"
 import useAnularIngreso from "../../../hooks/taxes/ingresos/useAnularIngreso"
 import useAnularRecibo from "../../../hooks/taxes/recibos/useAnularRecibo"
+import { RECIBO_COMPROBANTE_FACTURA } from "../../../services/taxes/recibosService"
 import getTitleCase from "../../../utils/getTitleCase"
+import { toDateInputValue } from "../../../utils/formatLocalDate"
 import TopModal from "../../ui/TopModal"
 import { getIngresoBackendError } from "../controlInterno/ingresoFormShared"
 import {
@@ -12,26 +15,39 @@ import {
     type ComprobanteVariant,
     getComprobanteItemId,
     getComprobanteSerieNumero,
+    isRecibo,
 } from "./comprobanteTypes"
 
 interface Props {
     variant: ComprobanteVariant
     item: ComprobanteItem | null
+    reciboComprobanteId?: number
+    entityLabel?: string
     onClose: () => void
     onSuccess?: () => void
 }
 
-const AnularComprobanteModal = ({ variant, item, onClose, onSuccess }: Props) => {
+const AnularComprobanteModal = ({
+    variant,
+    item,
+    reciboComprobanteId,
+    entityLabel: entityLabelProp,
+    onClose,
+    onSuccess,
+}: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const itemId = item ? getComprobanteItemId(item) : 0
+    const usesBajaFactura =
+        variant === "recibo" && reciboComprobanteId === RECIBO_COMPROBANTE_FACTURA
 
     const anularIngreso = useAnularIngreso({
         id_ingreso: variant === "ingreso" ? itemId : 0,
     })
     const anularRecibo = useAnularRecibo({
-        id_recibo: variant === "recibo" ? itemId : 0,
+        id_recibo: variant === "recibo" && !usesBajaFactura ? itemId : 0,
     })
+    const createBaja = useCreateBaja()
 
     const [motivoBaja, setMotivoBaja] = useState("")
     const [error, setError] = useState("")
@@ -46,9 +62,14 @@ const AnularComprobanteModal = ({ variant, item, onClose, onSuccess }: Props) =>
     if (!item) return null
 
     const comprobante = getComprobanteSerieNumero(item)
-    const isPending =
-        variant === "ingreso" ? anularIngreso.isPending : anularRecibo.isPending
-    const entityLabel = variant === "ingreso" ? "ingreso" : "recibo"
+    const isPending = usesBajaFactura
+        ? createBaja.isPending
+        : variant === "ingreso"
+          ? anularIngreso.isPending
+          : anularRecibo.isPending
+    const entityLabel =
+        entityLabelProp ??
+        (variant === "ingreso" ? "ingreso" : usesBajaFactura ? "factura" : "recibo")
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -67,13 +88,32 @@ const AnularComprobanteModal = ({ variant, item, onClose, onSuccess }: Props) =>
                     access,
                     payload: { motivo_baja: trimmed },
                 })
+            } else if (usesBajaFactura && isRecibo(item)) {
+                const fechaEmision = toDateInputValue(item.fecha_emision)
+                if (!fechaEmision) {
+                    setError("La factura no tiene una fecha de emisión válida")
+                    return
+                }
+                await createBaja.mutateAsync({
+                    access,
+                    payload: {
+                        fecha_emision: fechaEmision,
+                        comprobante_id: RECIBO_COMPROBANTE_FACTURA,
+                        recibo_ids: [item.id_recibo],
+                        motivo: trimmed,
+                    },
+                })
             } else {
                 await anularRecibo.mutateAsync({
                     access,
                     payload: { motivo_baja: trimmed },
                 })
             }
-            setMessage(`${entityLabel.charAt(0).toUpperCase()}${entityLabel.slice(1)} anulado correctamente`)
+            setMessage(
+                usesBajaFactura
+                    ? "Factura dada de baja correctamente"
+                    : `${entityLabel.charAt(0).toUpperCase()}${entityLabel.slice(1)} anulado correctamente`,
+            )
             setType("success")
             setShow(true)
             onSuccess?.()
