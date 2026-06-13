@@ -36,6 +36,7 @@ const ResumenesMain = () => {
             <GenerarResumenModal
                 isOpen={openGenerarModal}
                 onClose={() => setOpenGenerarModal(false)}
+                onCreated={() => setPage(1)}
             />
         </section>
     )

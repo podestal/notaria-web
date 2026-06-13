@@ -20,6 +20,16 @@ export interface ResumenesPage {
     results: Resumen[]
 }
 
+export interface CreateResumenPayload {
+    fecha_comunicacion: string
+    fecha_emision: string
+    recibo_ids: number[]
+}
+
 export const resumenesService = new TaxesClient<ResumenesPage>("/resumenes/")
+
+export const resumenesCreateService = new TaxesClient<Resumen, CreateResumenPayload>(
+    "/resumenes/",
+)
 
 export default resumenesService
