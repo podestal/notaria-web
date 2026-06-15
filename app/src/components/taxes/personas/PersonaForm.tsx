@@ -1,7 +1,9 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import type { CreateUpdatePersona } from "../../../services/taxes/personasService"
+import { lookupReniecByDni } from "../../../utils/reniecLookup"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import {
@@ -29,11 +31,13 @@ const PersonaForm = ({
     onCancel,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const { setMessage, setShow, setType } = useNotificationsStore()
     const { data: documentos = [], isLoading: loadingDocumentos } = useGetDocumentos({
         access,
     })
 
     const [form, setForm] = useState<PersonaFormValues>(initialValues)
+    const [loadingReniec, setLoadingReniec] = useState(false)
     const [documentoError, setDocumentoError] = useState("")
     const [numeroDocumentoError, setNumeroDocumentoError] = useState("")
     const [nombresError, setNombresError] = useState("")
@@ -115,8 +119,45 @@ const PersonaForm = ({
         await onSubmit(formValuesToPersonaPayload(form))
     }
 
-    const handleReniec = () => {
-        // TODO: implement RENIEC lookup
+    const handleReniec = async () => {
+        const numeroError = validateNumeroDocumento(form.numero_documento, "dni")
+        if (numeroError) {
+            setNumeroDocumentoError(numeroError)
+            setMessage(numeroError)
+            setType("error")
+            setShow(true)
+            return
+        }
+
+        setLoadingReniec(true)
+        try {
+            const data = await lookupReniecByDni(form.numero_documento)
+            setForm((prev) => ({
+                ...prev,
+                nombres: data.nombres || prev.nombres,
+                apellido_paterno: data.apellido_paterno || prev.apellido_paterno,
+                apellido_materno: data.apellido_materno || prev.apellido_materno,
+                fecha_nacimiento: data.fecha_nacimiento || prev.fecha_nacimiento,
+                direccion: data.direccion || prev.direccion,
+            }))
+            setNombresError("")
+            setApellidoPaternoError("")
+            setApellidoMaternoError("")
+            setFechaNacimientoError("")
+            if (data.direccion) {
+                setDireccionError("")
+            }
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "No se pudo consultar RENIEC."
+            setMessage(message)
+            setType("error")
+            setShow(true)
+        } finally {
+            setLoadingReniec(false)
+        }
     }
 
     return (
@@ -167,9 +208,10 @@ const PersonaForm = ({
                         <button
                             type="button"
                             onClick={handleReniec}
-                            className="shrink-0 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+                            disabled={loadingReniec || loading}
+                            className="shrink-0 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            RENIEC
+                            {loadingReniec ? "…" : "RENIEC"}
                         </button>
                     ) : undefined
                 }
