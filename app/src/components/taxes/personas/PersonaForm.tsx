@@ -4,11 +4,13 @@ import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import type { CreateUpdatePersona } from "../../../services/taxes/personasService"
 import { lookupReniecByDni } from "../../../utils/reniecLookup"
+import { lookupSunatByRuc } from "../../../utils/sunatLookup"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import {
     formValuesToPersonaPayload,
     getDocumentKind,
+    isPersonaJuridica,
     sanitizeNumeroDocumento,
     validateEmail,
     validateNumeroDocumento,
@@ -37,12 +39,13 @@ const PersonaForm = ({
     })
 
     const [form, setForm] = useState<PersonaFormValues>(initialValues)
-    const [loadingReniec, setLoadingReniec] = useState(false)
+    const [loadingLookup, setLoadingLookup] = useState(false)
     const [documentoError, setDocumentoError] = useState("")
     const [numeroDocumentoError, setNumeroDocumentoError] = useState("")
     const [nombresError, setNombresError] = useState("")
     const [apellidoPaternoError, setApellidoPaternoError] = useState("")
     const [apellidoMaternoError, setApellidoMaternoError] = useState("")
+    const [razonSocialError, setRazonSocialError] = useState("")
     const [fechaNacimientoError, setFechaNacimientoError] = useState("")
     const [direccionError, setDireccionError] = useState("")
     const [emailError, setEmailError] = useState("")
@@ -51,6 +54,7 @@ const PersonaForm = ({
         () => getDocumentKind(form.documento, documentos),
         [form.documento, documentos],
     )
+    const isJuridica = isPersonaJuridica(documentKind)
 
     const documentoOptions = useMemo(
         () => [
@@ -83,22 +87,30 @@ const PersonaForm = ({
             ok = false
         }
 
-        if (!form.nombres.trim()) {
-            setNombresError("Los nombres son obligatorios")
-            ok = false
+        if (isJuridica) {
+            if (!form.razon_social.trim()) {
+                setRazonSocialError("La razón social es obligatoria")
+                ok = false
+            }
+        } else {
+            if (!form.nombres.trim()) {
+                setNombresError("Los nombres son obligatorios")
+                ok = false
+            }
+            if (!form.apellido_paterno.trim()) {
+                setApellidoPaternoError("El apellido paterno es obligatorio")
+                ok = false
+            }
+            if (!form.apellido_materno.trim()) {
+                setApellidoMaternoError("El apellido materno es obligatorio")
+                ok = false
+            }
+            if (!form.fecha_nacimiento.trim()) {
+                setFechaNacimientoError("La fecha de nacimiento es obligatoria")
+                ok = false
+            }
         }
-        if (!form.apellido_paterno.trim()) {
-            setApellidoPaternoError("El apellido paterno es obligatorio")
-            ok = false
-        }
-        if (!form.apellido_materno.trim()) {
-            setApellidoMaternoError("El apellido materno es obligatorio")
-            ok = false
-        }
-        if (!form.fecha_nacimiento.trim()) {
-            setFechaNacimientoError("La fecha de nacimiento es obligatoria")
-            ok = false
-        }
+
         if (!form.direccion.trim()) {
             setDireccionError("La dirección es obligatoria")
             ok = false
@@ -116,7 +128,7 @@ const PersonaForm = ({
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!validate()) return
-        await onSubmit(formValuesToPersonaPayload(form))
+        await onSubmit(formValuesToPersonaPayload(form, documentKind))
     }
 
     const handleReniec = async () => {
@@ -129,7 +141,7 @@ const PersonaForm = ({
             return
         }
 
-        setLoadingReniec(true)
+        setLoadingLookup(true)
         try {
             const data = await lookupReniecByDni(form.numero_documento)
             setForm((prev) => ({
@@ -156,8 +168,70 @@ const PersonaForm = ({
             setType("error")
             setShow(true)
         } finally {
-            setLoadingReniec(false)
+            setLoadingLookup(false)
         }
+    }
+
+    const handleSunat = async () => {
+        const numeroError = validateNumeroDocumento(form.numero_documento, "ruc")
+        if (numeroError) {
+            setNumeroDocumentoError(numeroError)
+            setMessage(numeroError)
+            setType("error")
+            setShow(true)
+            return
+        }
+
+        setLoadingLookup(true)
+        try {
+            const data = await lookupSunatByRuc(form.numero_documento)
+            setForm((prev) => ({
+                ...prev,
+                razon_social: data.razon_social || prev.razon_social,
+                direccion: data.direccion || prev.direccion,
+            }))
+            setRazonSocialError("")
+            if (data.direccion) {
+                setDireccionError("")
+            }
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "No se pudo consultar SUNAT."
+            setMessage(message)
+            setType("error")
+            setShow(true)
+        } finally {
+            setLoadingLookup(false)
+        }
+    }
+
+    const handleDocumentoChange = (value: number) => {
+        const newKind = getDocumentKind(value, documentos)
+        setForm((prev) => ({
+            ...prev,
+            documento: value,
+            numero_documento: sanitizeNumeroDocumento(prev.numero_documento, newKind),
+            ...(isPersonaJuridica(newKind)
+                ? {
+                      nombres: "",
+                      apellido_paterno: "",
+                      apellido_materno: "",
+                      fecha_nacimiento: "",
+                  }
+                : {
+                      razon_social: "",
+                      nombre_comercial: "",
+                  }),
+        }))
+        setDocumentoError("")
+        setNumeroDocumentoError("")
+        setNombresError("")
+        setApellidoPaternoError("")
+        setApellidoMaternoError("")
+        setRazonSocialError("")
+        setFechaNacimientoError("")
     }
 
     return (
@@ -172,18 +246,7 @@ const PersonaForm = ({
                     label="Tipo documento"
                     options={documentoOptions}
                     defaultValue={form.documento}
-                    setter={(value) => {
-                        setForm((prev) => ({
-                            ...prev,
-                            documento: value,
-                            numero_documento: sanitizeNumeroDocumento(
-                                prev.numero_documento,
-                                getDocumentKind(value, documentos),
-                            ),
-                        }))
-                        setDocumentoError("")
-                        setNumeroDocumentoError("")
-                    }}
+                    setter={handleDocumentoChange}
                     error={documentoError}
                     required
                     disabled={documentoOptions.length <= 1}
@@ -208,60 +271,96 @@ const PersonaForm = ({
                         <button
                             type="button"
                             onClick={handleReniec}
-                            disabled={loadingReniec || loading}
+                            disabled={loadingLookup || loading}
                             className="shrink-0 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            {loadingReniec ? "…" : "RENIEC"}
+                            {loadingLookup ? "…" : "RENIEC"}
+                        </button>
+                    ) : documentKind === "ruc" ? (
+                        <button
+                            type="button"
+                            onClick={handleSunat}
+                            disabled={loadingLookup || loading}
+                            className="shrink-0 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                            {loadingLookup ? "…" : "SUNAT"}
                         </button>
                     ) : undefined
                 }
             />
 
-            <SimpleInput
-                label="Nombres"
-                value={form.nombres}
-                setValue={(value) => {
-                    setForm((prev) => ({ ...prev, nombres: value }))
-                    setNombresError("")
-                }}
-                error={nombresError}
-                required
-                horizontal
-            />
-            <SimpleInput
-                label="Apellido paterno"
-                value={form.apellido_paterno}
-                setValue={(value) => {
-                    setForm((prev) => ({ ...prev, apellido_paterno: value }))
-                    setApellidoPaternoError("")
-                }}
-                error={apellidoPaternoError}
-                required
-                horizontal
-            />
-            <SimpleInput
-                label="Apellido materno"
-                value={form.apellido_materno}
-                setValue={(value) => {
-                    setForm((prev) => ({ ...prev, apellido_materno: value }))
-                    setApellidoMaternoError("")
-                }}
-                error={apellidoMaternoError}
-                required
-                horizontal
-            />
-            <SimpleInput
-                label="Fecha de nacimiento"
-                type="date"
-                value={form.fecha_nacimiento}
-                setValue={(value) => {
-                    setForm((prev) => ({ ...prev, fecha_nacimiento: value }))
-                    setFechaNacimientoError("")
-                }}
-                error={fechaNacimientoError}
-                required
-                horizontal
-            />
+            {isJuridica ? (
+                <>
+                    <SimpleInput
+                        label="Razón social"
+                        value={form.razon_social}
+                        setValue={(value) => {
+                            setForm((prev) => ({ ...prev, razon_social: value }))
+                            setRazonSocialError("")
+                        }}
+                        error={razonSocialError}
+                        required
+                        horizontal
+                    />
+                    <SimpleInput
+                        label="Nombre comercial"
+                        value={form.nombre_comercial}
+                        setValue={(value) => {
+                            setForm((prev) => ({ ...prev, nombre_comercial: value }))
+                        }}
+                        horizontal
+                    />
+                </>
+            ) : (
+                <>
+                    <SimpleInput
+                        label="Nombres"
+                        value={form.nombres}
+                        setValue={(value) => {
+                            setForm((prev) => ({ ...prev, nombres: value }))
+                            setNombresError("")
+                        }}
+                        error={nombresError}
+                        required
+                        horizontal
+                    />
+                    <SimpleInput
+                        label="Apellido paterno"
+                        value={form.apellido_paterno}
+                        setValue={(value) => {
+                            setForm((prev) => ({ ...prev, apellido_paterno: value }))
+                            setApellidoPaternoError("")
+                        }}
+                        error={apellidoPaternoError}
+                        required
+                        horizontal
+                    />
+                    <SimpleInput
+                        label="Apellido materno"
+                        value={form.apellido_materno}
+                        setValue={(value) => {
+                            setForm((prev) => ({ ...prev, apellido_materno: value }))
+                            setApellidoMaternoError("")
+                        }}
+                        error={apellidoMaternoError}
+                        required
+                        horizontal
+                    />
+                    <SimpleInput
+                        label="Fecha de nacimiento"
+                        type="date"
+                        value={form.fecha_nacimiento}
+                        setValue={(value) => {
+                            setForm((prev) => ({ ...prev, fecha_nacimiento: value }))
+                            setFechaNacimientoError("")
+                        }}
+                        error={fechaNacimientoError}
+                        required
+                        horizontal
+                    />
+                </>
+            )}
+
             <SimpleInput
                 label="Dirección"
                 value={form.direccion}

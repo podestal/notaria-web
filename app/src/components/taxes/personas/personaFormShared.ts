@@ -10,6 +10,8 @@ export interface PersonaFormValues {
     nombres: string
     apellido_paterno: string
     apellido_materno: string
+    razon_social: string
+    nombre_comercial: string
     fecha_nacimiento: string
     direccion: string
     email: string
@@ -21,10 +23,25 @@ export const emptyPersonaFormValues: PersonaFormValues = {
     nombres: "",
     apellido_paterno: "",
     apellido_materno: "",
+    razon_social: "",
+    nombre_comercial: "",
     fecha_nacimiento: "",
     direccion: "",
     email: "",
 }
+
+export const getDefaultPersonaFechaNacimiento = (): string => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, "0")
+    const day = String(now.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
+}
+
+export const isPersonaJuridica = (kind: PersonaDocumentKind): boolean => kind === "ruc"
+
+export const isPersonaJuridicaRecord = (persona: Persona): boolean =>
+    persona.razon_social != null && persona.razon_social !== "0"
 
 export const getDocumentKind = (
     documentoId: number,
@@ -100,32 +117,64 @@ export const buildNombreCompleto = (
         .join(" ")
         .toUpperCase()
 
-export const personaToFormValues = (persona: Persona): PersonaFormValues => ({
-    documento: persona.documento || 0,
-    numero_documento: persona.numero_documento || "",
-    nombres: persona.nombres || "",
-    apellido_paterno: persona.apellido_paterno || "",
-    apellido_materno: persona.apellido_materno || "",
-    fecha_nacimiento: toDateInputValue(persona.fecha_nacimiento),
-    direccion: persona.direccion || "",
-    email: persona.email && persona.email !== "-" ? persona.email : "",
-})
+export const personaToFormValues = (persona: Persona): PersonaFormValues => {
+    const juridica = isPersonaJuridicaRecord(persona)
+
+    return {
+        documento: persona.documento || 0,
+        numero_documento: persona.numero_documento || "",
+        nombres: juridica ? "" : persona.nombres || "",
+        apellido_paterno: juridica ? "" : persona.apellido_paterno || "",
+        apellido_materno: juridica ? "" : persona.apellido_materno || "",
+        razon_social: juridica ? persona.razon_social || "" : "",
+        nombre_comercial:
+            juridica && persona.nombre_comercial !== "0"
+                ? persona.nombre_comercial || ""
+                : "",
+        fecha_nacimiento: toDateInputValue(persona.fecha_nacimiento),
+        direccion: persona.direccion || "",
+        email: persona.email && persona.email !== "-" ? persona.email : "",
+    }
+}
 
 export const formValuesToPersonaPayload = (
     values: PersonaFormValues,
-): CreateUpdatePersona => ({
-    nombres: values.nombres.trim().toUpperCase(),
-    apellido_paterno: values.apellido_paterno.trim().toUpperCase(),
-    apellido_materno: values.apellido_materno.trim().toUpperCase(),
-    razon_social: "0",
-    nombre_comercial: "0",
-    documento: values.documento,
-    numero_documento: values.numero_documento.trim(),
-    direccion: values.direccion.trim().toUpperCase(),
-    fecha_nacimiento: values.fecha_nacimiento,
-    nombre_completo: buildNombreCompleto(values),
-    email: values.email.trim() || null,
-})
+    documentKind: PersonaDocumentKind,
+): CreateUpdatePersona => {
+    if (isPersonaJuridica(documentKind)) {
+        const razonSocial = values.razon_social.trim().toUpperCase()
+        const nombreComercial = values.nombre_comercial.trim().toUpperCase()
+
+        return {
+            nombres: "0",
+            apellido_paterno: "0",
+            apellido_materno: "0",
+            razon_social: razonSocial,
+            nombre_comercial: nombreComercial || "0",
+            documento: values.documento,
+            numero_documento: values.numero_documento.trim(),
+            direccion: values.direccion.trim().toUpperCase(),
+            fecha_nacimiento:
+                values.fecha_nacimiento.trim() || getDefaultPersonaFechaNacimiento(),
+            nombre_completo: razonSocial,
+            email: values.email.trim() || null,
+        }
+    }
+
+    return {
+        nombres: values.nombres.trim().toUpperCase(),
+        apellido_paterno: values.apellido_paterno.trim().toUpperCase(),
+        apellido_materno: values.apellido_materno.trim().toUpperCase(),
+        razon_social: "0",
+        nombre_comercial: "0",
+        documento: values.documento,
+        numero_documento: values.numero_documento.trim(),
+        direccion: values.direccion.trim().toUpperCase(),
+        fecha_nacimiento: values.fecha_nacimiento,
+        nombre_completo: buildNombreCompleto(values),
+        email: values.email.trim() || null,
+    }
+}
 
 export const isMeaningfulDireccion = (
     value: string | null | undefined,
@@ -161,6 +210,14 @@ export const enrichPersonaFromPayload = (
     apellido_materno: persona.apellido_materno?.trim()
         ? persona.apellido_materno
         : payload.apellido_materno,
+    razon_social:
+        persona.razon_social?.trim() && persona.razon_social !== "0"
+            ? persona.razon_social
+            : payload.razon_social,
+    nombre_comercial:
+        persona.nombre_comercial?.trim() && persona.nombre_comercial !== "0"
+            ? persona.nombre_comercial
+            : payload.nombre_comercial,
     direccion: resolvePersonaDireccion(persona, payload),
     email: persona.email?.trim() && persona.email !== "-"
         ? persona.email
