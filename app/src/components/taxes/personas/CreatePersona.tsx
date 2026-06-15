@@ -5,13 +5,14 @@ import type { CreateUpdatePersona, Persona } from "../../../services/taxes/perso
 import PersonaForm from "./PersonaForm"
 import {
     emptyPersonaFormValues,
+    enrichPersonaFromPayload,
     getPersonaBackendError,
     type PersonaFormValues,
 } from "./personaFormShared"
 
 interface Props {
     onDone?: () => void
-    onCreated?: (persona: Persona) => void
+    onCreated?: (persona: Persona, payload: CreateUpdatePersona) => void
     onCancel?: () => void
     initialValues?: PersonaFormValues
 }
@@ -28,11 +29,12 @@ const CreatePersona = ({
 
     const handleCreate = async (values: CreateUpdatePersona) => {
         try {
-            const persona = await createPersona.mutateAsync({ access, persona: values })
+            const created = await createPersona.mutateAsync({ access, persona: values })
+            const persona = enrichPersonaFromPayload(created, values)
             setMessage("Persona creada correctamente")
             setType("success")
             setShow(true)
-            onCreated?.(persona)
+            onCreated?.(persona, values)
             onDone?.()
         } catch (error) {
             setMessage(getPersonaBackendError(error))

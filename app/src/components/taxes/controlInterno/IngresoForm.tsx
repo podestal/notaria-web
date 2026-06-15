@@ -4,9 +4,9 @@ import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
 import useGetSeriesForVariant from "../../../hooks/taxes/series/useGetSeriesForVariant"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
 import type { CreateUpdateRecibo } from "../../../services/taxes/recibosService"
-import type { Persona } from "../../../services/taxes/personasService"
+import type { CreateUpdatePersona, Persona } from "../../../services/taxes/personasService"
 import CreatePersona from "../personas/CreatePersona"
-import { emptyPersonaFormValues } from "../personas/personaFormShared"
+import { emptyPersonaFormValues, resolvePersonaDireccion } from "../personas/personaFormShared"
 import TopModal from "../../ui/TopModal"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
@@ -113,6 +113,12 @@ const IngresoForm = ({
     }, [monedas, defaultMonedaId])
 
     useEffect(() => {
+        setForm((prev) =>
+            applyIngresoFormDefaults(prev, series, monedas, defaultSerieCode),
+        )
+    }, [series, monedas, defaultSerieCode])
+
+    useEffect(() => {
         setForm(
             applyIngresoFormDefaults(
                 initialValues,
@@ -121,15 +127,18 @@ const IngresoForm = ({
                 defaultSerieCode,
             ),
         )
-    }, [initialValues, series, monedas, defaultSerieCode])
+    }, [initialValues])
 
-    const applyPersonaLookup = (persona: Persona) => {
+    const applyPersonaLookup = (
+        persona: Persona,
+        payload?: Pick<CreateUpdatePersona, "direccion">,
+    ) => {
         setForm((prev) => ({
             ...prev,
             persona_id: persona.id_persona,
             persona_nombre: persona.nombre_completo,
             persona_documento: persona.numero_documento || prev.persona_documento,
-            direccion: persona.direccion || prev.direccion,
+            direccion: resolvePersonaDireccion(persona, payload) || prev.direccion,
         }))
         setPersonaDocumentoError("")
         setDireccionError("")
@@ -145,8 +154,11 @@ const IngresoForm = ({
         setOpenCreatePersonaModal(true)
     }
 
-    const handlePersonaCreated = (persona: Persona) => {
-        applyPersonaLookup(persona)
+    const handlePersonaCreated = (
+        persona: Persona,
+        payload: CreateUpdatePersona,
+    ) => {
+        applyPersonaLookup(persona, payload)
         setOpenCreatePersonaModal(false)
     }
 

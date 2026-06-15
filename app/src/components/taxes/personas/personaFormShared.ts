@@ -127,6 +127,46 @@ export const formValuesToPersonaPayload = (
     email: values.email.trim() || null,
 })
 
+export const isMeaningfulDireccion = (
+    value: string | null | undefined,
+): value is string => {
+    const trimmed = value?.trim()
+    return !!trimmed && trimmed !== "0"
+}
+
+export const resolvePersonaDireccion = (
+    persona: Pick<Persona, "direccion">,
+    payload?: Pick<CreateUpdatePersona, "direccion">,
+): string => {
+    if (isMeaningfulDireccion(persona.direccion)) {
+        return persona.direccion
+    }
+    if (payload?.direccion?.trim()) {
+        return payload.direccion.trim()
+    }
+    return persona.direccion?.trim() || ""
+}
+
+export const enrichPersonaFromPayload = (
+    persona: Persona,
+    payload: CreateUpdatePersona,
+): Persona => ({
+    ...persona,
+    numero_documento: persona.numero_documento || payload.numero_documento,
+    nombre_completo: persona.nombre_completo || payload.nombre_completo,
+    nombres: persona.nombres?.trim() ? persona.nombres : payload.nombres,
+    apellido_paterno: persona.apellido_paterno?.trim()
+        ? persona.apellido_paterno
+        : payload.apellido_paterno,
+    apellido_materno: persona.apellido_materno?.trim()
+        ? persona.apellido_materno
+        : payload.apellido_materno,
+    direccion: resolvePersonaDireccion(persona, payload),
+    email: persona.email?.trim() && persona.email !== "-"
+        ? persona.email
+        : payload.email,
+})
+
 export const getPersonaBackendError = (error: unknown): string => {
     const data = (error as { response?: { data?: Record<string, unknown> } })
         ?.response?.data

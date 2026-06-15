@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateIngreso from "../../../hooks/taxes/ingresos/useCreateIngreso"
@@ -13,6 +14,7 @@ const CreateIngreso = ({ onDone }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createIngreso = useCreateIngreso()
+    const initialValues = useMemo(() => getEmptyIngresoFormValues(), [])
 
     const handleCreate = async (values: CreateUpdateIngreso) => {
         await createIngreso.mutateAsync(
@@ -35,7 +37,7 @@ const CreateIngreso = ({ onDone }: Props) => {
 
     return (
         <IngresoForm
-            initialValues={getEmptyIngresoFormValues()}
+            initialValues={initialValues}
             onSubmit={handleCreate}
             submitLabel="Crear ingreso"
             loading={createIngreso.isPending}

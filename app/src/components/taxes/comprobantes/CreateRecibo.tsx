@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateRecibo from "../../../hooks/taxes/recibos/useCreateRecibo"
@@ -22,6 +23,7 @@ const CreateRecibo = ({ variant, onDone }: Props) => {
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createRecibo = useCreateRecibo()
     const config = EMISION_FORM_VARIANT_CONFIG[variant]
+    const initialValues = useMemo(() => getEmptyIngresoFormValues(), [])
 
     const handleCreate = async (values: CreateUpdateRecibo) => {
         await createRecibo.mutateAsync(
@@ -45,7 +47,7 @@ const CreateRecibo = ({ variant, onDone }: Props) => {
     return (
         <IngresoForm
             variant={variant}
-            initialValues={getEmptyIngresoFormValues()}
+            initialValues={initialValues}
             onSubmit={handleCreate}
             submitLabel={config.createSubmitLabel}
             loading={createRecibo.isPending}
