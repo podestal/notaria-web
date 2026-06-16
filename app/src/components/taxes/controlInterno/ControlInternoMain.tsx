@@ -14,6 +14,7 @@ const ControlInternoMain = () => {
 
     return (
         <ComprobanteSectionMain
+            sectionKey="control-interno"
             icon={ClipboardList}
             title="Control interno"
             description="Registre ingresos y consulte el reporte de comprobantes emitidos."

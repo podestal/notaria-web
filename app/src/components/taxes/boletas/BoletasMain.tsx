@@ -6,6 +6,7 @@ import CreateRecibo from "../comprobantes/CreateRecibo"
 
 const BoletasMain = () => (
     <ComprobanteSectionMain
+        sectionKey="boletas"
         icon={Receipt}
         title="Boletas"
         description="Registre boletas de venta y consulte comprobantes electrónicos emitidos."

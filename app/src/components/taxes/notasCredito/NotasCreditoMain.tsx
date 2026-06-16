@@ -1,4 +1,4 @@
-import { ScrollText } from "lucide-react"
+import { FileText } from "lucide-react"
 import { RECIBO_COMPROBANTE_NOTA_CREDITO } from "../../../services/taxes/recibosService"
 import ComprobanteSectionMain from "../comprobantes/ComprobanteSectionMain"
 import ComprobantesList from "../comprobantes/ComprobantesList"
@@ -6,7 +6,8 @@ import CreateRecibo from "../comprobantes/CreateRecibo"
 
 const NotasCreditoMain = () => (
     <ComprobanteSectionMain
-        icon={ScrollText}
+        sectionKey="notas-credito"
+        icon={FileText}
         title="Notas de crédito"
         description="Registre notas de crédito y consulte comprobantes electrónicos emitidos."
         createTitle="Nueva nota de crédito"

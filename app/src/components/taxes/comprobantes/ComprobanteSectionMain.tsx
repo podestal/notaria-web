@@ -1,5 +1,6 @@
 import { useEffect, useState, type LucideIcon, type ReactNode } from "react"
 import { FileText } from "lucide-react"
+import { useLocation } from "react-router-dom"
 import TopModal from "../../ui/TopModal"
 import IngresosFilters, {
     type KardexPresenceFilter,
@@ -24,6 +25,7 @@ export interface ComprobanteReporteContext {
 }
 
 interface Props {
+    sectionKey: string
     icon: LucideIcon
     title: string
     description: string
@@ -40,6 +42,7 @@ interface Props {
 }
 
 const ComprobanteSectionMain = ({
+    sectionKey,
     icon: Icon,
     title,
     description,
@@ -54,6 +57,7 @@ const ComprobanteSectionMain = ({
     renderReporteList,
     children,
 }: Props) => {
+    const { pathname } = useLocation()
     const [formKey, setFormKey] = useState(0)
     const [openReporteModal, setOpenReporteModal] = useState(false)
     const [printingItem, setPrintingItem] = useState<ComprobanteItem | null>(null)
@@ -78,6 +82,21 @@ const ComprobanteSectionMain = ({
         hasKardex,
         usuario,
     ])
+
+    useEffect(() => {
+        setFormKey((prev) => prev + 1)
+        setOpenReporteModal(false)
+        setPrintingItem(null)
+        setAnulandoItem(null)
+        setPage(1)
+        setFechaEmisionDesde("")
+        setFechaEmisionHasta("")
+        setPersonaDocumento("")
+        setPersonaNombres("")
+        setKardex("")
+        setHasKardex("")
+        setUsuario("")
+    }, [pathname, sectionKey])
 
     const handleClearFilters = () => {
         setFechaEmisionDesde("")
@@ -128,7 +147,7 @@ const ComprobanteSectionMain = ({
             <div className="rounded-lg border border-slate-100 bg-slate-50/40 p-4">
                 <h3 className="mb-1 text-sm font-semibold text-slate-800">{createTitle}</h3>
                 <p className="mb-4 text-xs text-slate-500">{createDescription}</p>
-                <div key={formKey}>{createForm(handleCreateDone)}</div>
+                <div key={`${sectionKey}-${formKey}`}>{createForm(handleCreateDone)}</div>
             </div>
 
             <TopModal

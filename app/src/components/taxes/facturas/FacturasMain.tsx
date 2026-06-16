@@ -6,6 +6,7 @@ import CreateRecibo from "../comprobantes/CreateRecibo"
 
 const FacturasMain = () => (
     <ComprobanteSectionMain
+        sectionKey="facturas"
         icon={FileText}
         title="Facturas"
         description="Registre facturas de venta y consulte comprobantes electrónicos emitidos."

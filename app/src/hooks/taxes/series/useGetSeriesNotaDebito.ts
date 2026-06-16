@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query"
 import {
-    notaCreditoSeriesService,
+    notaDebitoSeriesService,
     type SerieControlInterno,
 } from "../../../services/taxes/seriesService"
 import { normalizeTaxesList } from "../../../services/taxes/normalizeTaxesList"
@@ -10,17 +10,16 @@ interface Props {
     enabled?: boolean
 }
 
-const useGetSeriesNotaCredito = ({
+const useGetSeriesNotaDebito = ({
     access,
     enabled = true,
 }: Props): UseQueryResult<SerieControlInterno[], Error> => {
     return useQuery({
-        queryKey: ["taxes-series-nota-credito"],
+        queryKey: ["taxes-series-nota-debito"],
         queryFn: async () =>
-            normalizeTaxesList(await notaCreditoSeriesService.get(access)),
+            normalizeTaxesList(await notaDebitoSeriesService.get(access)),
         enabled: enabled && !!access,
-        retry: false,
     })
 }
 
-export default useGetSeriesNotaCredito
+export default useGetSeriesNotaDebito

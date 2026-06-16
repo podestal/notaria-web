@@ -5,6 +5,8 @@ import useGetSeriesControlInterno from "./useGetSeriesControlInterno"
 import useGetSeriesFactura from "./useGetSeriesFactura"
 import useGetSeriesNotaCredito from "./useGetSeriesNotaCredito"
 
+const EMPTY_SERIES: SerieControlInterno[] = []
+
 interface Props {
     access: string
     variant: EmisionFormVariant
@@ -34,19 +36,22 @@ const useGetSeriesForVariant = ({ access, variant }: Props): SeriesQueryResult =
     })
 
     if (variant === "boleta") {
-        return { data: boleta.data ?? [], isLoading: boleta.isLoading }
+        return { data: boleta.data ?? EMPTY_SERIES, isLoading: boleta.isLoading }
     }
 
     if (variant === "factura") {
-        return { data: factura.data ?? [], isLoading: factura.isLoading }
+        return { data: factura.data ?? EMPTY_SERIES, isLoading: factura.isLoading }
     }
 
     if (variant === "nota_credito") {
-        return { data: notaCredito.data ?? [], isLoading: notaCredito.isLoading }
+        return {
+            data: notaCredito.data ?? EMPTY_SERIES,
+            isLoading: notaCredito.isLoading,
+        }
     }
 
     return {
-        data: controlInterno.data ?? [],
+        data: controlInterno.data ?? EMPTY_SERIES,
         isLoading: controlInterno.isLoading,
     }
 }

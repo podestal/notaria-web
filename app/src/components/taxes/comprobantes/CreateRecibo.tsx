@@ -47,6 +47,7 @@ const CreateRecibo = ({ variant, onDone, kardex }: Props) => {
 
     return (
         <IngresoForm
+            key={variant}
             variant={variant}
             initialValues={initialValues}
             onSubmit={handleCreate}
