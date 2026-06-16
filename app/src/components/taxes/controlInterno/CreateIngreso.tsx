@@ -8,9 +8,10 @@ import { getEmptyIngresoFormValues, getIngresoBackendError } from "./ingresoForm
 
 interface Props {
     onDone?: () => void
+    kardex?: string
 }
 
-const CreateIngreso = ({ onDone }: Props) => {
+const CreateIngreso = ({ onDone, kardex }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createIngreso = useCreateIngreso()
@@ -41,6 +42,7 @@ const CreateIngreso = ({ onDone }: Props) => {
             onSubmit={handleCreate}
             submitLabel="Crear ingreso"
             loading={createIngreso.isPending}
+            kardex={kardex}
         />
     )
 }

@@ -9,6 +9,7 @@ import {
     type Ingreso,
 } from "../../../services/taxes/ingresosService"
 import getTitleCase from "../../../utils/getTitleCase"
+import { buildAppDateTimePayload } from "../../../utils/appTimezone"
 import TopModal from "../../ui/TopModal"
 import {
     getDefaultIngresoFechaEmision,
@@ -65,7 +66,7 @@ const CanjearIngresoModal = ({ ingreso, onClose, onSuccess }: Props) => {
                     serie: selected.serie,
                     comprobante_id: selected.comprobante_id,
                     observaciones: observaciones.trim(),
-                    fecha_emision: fechaEmision.trim(),
+                    fecha_emision: buildAppDateTimePayload(fechaEmision),
                 },
             })
             setMessage(`Ingreso canjeado a ${selected.label} correctamente`)

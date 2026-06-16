@@ -1,5 +1,6 @@
 import { calcValorUnitarioFromPrecio } from "../catalogo/catalogoFormShared"
 import { parseLocalDateParts, toDateInputValue } from "../../../utils/formatLocalDate"
+import { buildAppDateTimePayload, getTodayDateInputValue } from "../../../utils/appTimezone"
 import type { Catalog } from "../../../services/taxes/catalogService"
 import type { CreateUpdateIngreso, Ingreso } from "../../../services/taxes/ingresosService"
 import type { IngresoLineaPayload } from "../../../services/taxes/ingresosService"
@@ -25,13 +26,7 @@ export interface IngresoFormValues {
     lineas: CreateUpdateIngreso["lineas"]
 }
 
-export const getDefaultIngresoFechaEmision = (): string => {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, "0")
-    const day = String(now.getDate()).padStart(2, "0")
-    return `${year}-${month}-${day}`
-}
+export const getDefaultIngresoFechaEmision = (): string => getTodayDateInputValue()
 
 export const parseIngresoFechaEmisionToForm = (
     value: string | null | undefined,
@@ -248,6 +243,7 @@ export const formValuesToReciboPayload = (
     moneda_id: values.moneda_id,
     persona_id: values.persona_id,
     direccion: values.direccion.trim(),
+    fecha_emision: buildAppDateTimePayload(values.fecha_emision),
     lineas: values.lineas.map((linea) => ({
         catalogo_id: linea.catalogo_id,
         cantidad: linea.cantidad,
@@ -293,7 +289,7 @@ export const formValuesToIngresoPayload = (
     direccion: values.direccion.trim(),
     observaciones: values.observaciones.trim(),
     total: values.total.trim(),
-    fecha_emision: values.fecha_emision.trim(),
+    fecha_emision: buildAppDateTimePayload(values.fecha_emision),
     anulada: options.anulada ?? false,
     canjeada: options.canjeada ?? false,
     lineas: values.lineas,

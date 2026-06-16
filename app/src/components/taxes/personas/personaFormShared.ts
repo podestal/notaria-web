@@ -1,6 +1,7 @@
 import type { Documento } from "../../../services/taxes/documentosService"
 import type { CreateUpdatePersona, Persona } from "../../../services/taxes/personasService"
 import { toDateInputValue } from "../../../utils/formatLocalDate"
+import { getTodayDateInputValue } from "../../../utils/appTimezone"
 
 export type PersonaDocumentKind = "dni" | "ruc" | "other"
 
@@ -30,13 +31,7 @@ export const emptyPersonaFormValues: PersonaFormValues = {
     email: "",
 }
 
-export const getDefaultPersonaFechaNacimiento = (): string => {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, "0")
-    const day = String(now.getDate()).padStart(2, "0")
-    return `${year}-${month}-${day}`
-}
+export const getDefaultPersonaFechaNacimiento = (): string => getTodayDateInputValue()
 
 export const isPersonaJuridica = (kind: PersonaDocumentKind): boolean => kind === "ruc"
 

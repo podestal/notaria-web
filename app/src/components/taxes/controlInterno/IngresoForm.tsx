@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import useAuthStore from "../../../store/useAuthStore"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
 import useGetSeriesForVariant from "../../../hooks/taxes/series/useGetSeriesForVariant"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
@@ -11,6 +12,7 @@ import TopModal from "../../ui/TopModal"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import IngresoLineasLooker from "./IngresoLineasLooker"
+import IngresoContratanteSelector from "./IngresoContratanteSelector"
 import IngresoPersonaLooker from "./IngresoPersonaLooker"
 import {
     EMISION_FORM_VARIANT_CONFIG,
@@ -38,6 +40,7 @@ interface Props {
     onCancel?: () => void
     anulada?: boolean
     canjeada?: boolean
+    kardex?: string
 }
 
 const IngresoForm = ({
@@ -49,8 +52,10 @@ const IngresoForm = ({
     onCancel,
     anulada = false,
     canjeada = false,
+    kardex,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const { setMessage, setShow, setType } = useNotificationsStore()
     const variantConfig = EMISION_FORM_VARIANT_CONFIG[variant]
     const defaultSerieCode = variantConfig.defaultSerie
     const isRecibo = variantConfig.isRecibo
@@ -292,6 +297,19 @@ const IngresoForm = ({
                     </p>
                 )}
             </div>
+
+            {kardex && (
+                <IngresoContratanteSelector
+                    kardex={kardex}
+                    onResolved={applyPersonaLookup}
+                    onError={(message) => {
+                        setMessage(message)
+                        setType("error")
+                        setShow(true)
+                    }}
+                    disabled={loading}
+                />
+            )}
 
             <IngresoPersonaLooker
                 personaId={form.persona_id}

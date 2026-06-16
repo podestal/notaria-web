@@ -51,12 +51,32 @@ const KardexFacturacionMain = ({ kardex }: Props) => {
     const renderForm = () => {
         switch (selectedType) {
             case "boleta":
-                return <CreateRecibo key={formKey} variant="boleta" onDone={handleCreateDone} />
+                return (
+                    <CreateRecibo
+                        key={formKey}
+                        variant="boleta"
+                        onDone={handleCreateDone}
+                        kardex={kardex.kardex}
+                    />
+                )
             case "factura":
-                return <CreateRecibo key={formKey} variant="factura" onDone={handleCreateDone} />
+                return (
+                    <CreateRecibo
+                        key={formKey}
+                        variant="factura"
+                        onDone={handleCreateDone}
+                        kardex={kardex.kardex}
+                    />
+                )
             case "control_interno":
             default:
-                return <CreateIngreso key={formKey} onDone={handleCreateDone} />
+                return (
+                    <CreateIngreso
+                        key={formKey}
+                        onDone={handleCreateDone}
+                        kardex={kardex.kardex}
+                    />
+                )
         }
     }
 

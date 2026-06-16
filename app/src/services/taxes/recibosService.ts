@@ -49,6 +49,7 @@ export interface CreateUpdateRecibo {
     moneda_id: number
     persona_id: number
     direccion: string
+    fecha_emision: string
     lineas: ReciboLineaPayload[]
 }
 

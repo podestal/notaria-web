@@ -1,6 +1,7 @@
 import { User } from "lucide-react"
 import type { Persona } from "../../../services/taxes/personasService"
 import getTitleCase from "../../../utils/getTitleCase"
+import { formatAppDateTime } from "../../../utils/appTimezone"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
 
 interface Props {
@@ -8,16 +9,7 @@ interface Props {
     onEdit?: (persona: Persona) => void
 }
 
-const formatDateTime = (iso: string | null) => {
-    if (!iso) return "—"
-    const d = new Date(iso)
-    if (Number.isNaN(d.getTime())) return iso
-    return d.toLocaleDateString("es-PE", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    })
-}
+const formatDateTime = (iso: string | null) => formatAppDateTime(iso)
 
 const displayValue = (value: string | null | undefined) => {
     if (!value || value === "0" || value === "-") return "—"

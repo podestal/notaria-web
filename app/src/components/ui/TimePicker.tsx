@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
+import { getCurrentTimeHHmm } from '../../utils/appTimezone';
 
 interface Props {
   selectedTime: string | undefined;
@@ -12,8 +13,7 @@ const TimePicker: React.FC<Props> = ({ selectedTime, setSelectedTime }) => {
   useEffect(() => {
     // Set current time on mount if no selectedTime
     if (!selectedTime) {
-      const now = new Date();
-      const formatted = now.toTimeString().slice(0, 5); // "HH:mm"
+      const formatted = getCurrentTimeHHmm();
       setSelectedTime(formatted);
       setInputValue(formatted);
     } else {

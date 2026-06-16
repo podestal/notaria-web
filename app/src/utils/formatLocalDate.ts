@@ -1,3 +1,5 @@
+import { APP_LOCALE, APP_TIMEZONE } from "./appTimezone"
+
 const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/
 
 export const parseLocalDateParts = (
@@ -14,10 +16,10 @@ export const parseLocalDateParts = (
     return { year, month, day }
 }
 
-/** Format YYYY-MM-DD without UTC timezone shift. */
+/** Format YYYY-MM-DD without UTC timezone shift; datetimes use America/Lima. */
 export const formatLocalDate = (
     value: string | null | undefined,
-    locale = "es-PE",
+    locale = APP_LOCALE,
 ): string => {
     if (!value) return "—"
 
@@ -37,6 +39,7 @@ export const formatLocalDate = (
         day: "2-digit",
         month: "short",
         year: "numeric",
+        timeZone: APP_TIMEZONE,
     })
 }
 

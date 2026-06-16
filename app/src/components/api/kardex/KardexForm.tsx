@@ -37,6 +37,7 @@ import KardexFacturacionMain from "./facturacion/KardexFacturacionMain"
 import { isFacturacionEnabled } from "../../../utils/isFacturacionEnabled"
 import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
+import { getCurrentTimeHHmm } from "../../../utils/appTimezone"
 import { CreateUpdateKardex } from "../../../services/api/kardexService"
 
 const getFacturacionTab = (kardex: Kardex) =>
@@ -102,7 +103,7 @@ const KardexForm = ({
     const [karedexReference, setKardexReference] = useState(kardex?.referencia || '') 
     const [selectedKardexType, setSelectedKardexType] = useState(kardex?.idtipkar || bodyRender) 
     const [date, setDate] = useState<Date | undefined>(kardex ? moment(kardex?.fechaingreso, 'DD/MM/YYYY').toDate() : new Date())
-    const [selectedTime, setSelectedTime] = useState<string | undefined>(new Date().toTimeString().slice(0, 5)) // Default to current time in "HH:mm" format
+    const [selectedTime, setSelectedTime] = useState<string | undefined>(getCurrentTimeHHmm())
 
     // const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])

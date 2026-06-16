@@ -16,9 +16,10 @@ import {
 interface Props {
     variant: Extract<EmisionFormVariant, "boleta" | "factura">
     onDone?: () => void
+    kardex?: string
 }
 
-const CreateRecibo = ({ variant, onDone }: Props) => {
+const CreateRecibo = ({ variant, onDone, kardex }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const createRecibo = useCreateRecibo()
@@ -51,6 +52,7 @@ const CreateRecibo = ({ variant, onDone }: Props) => {
             onSubmit={handleCreate}
             submitLabel={config.createSubmitLabel}
             loading={createRecibo.isPending}
+            kardex={kardex}
         />
     )
 }
