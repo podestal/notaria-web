@@ -63,6 +63,7 @@ import CatalogoMain from "../components/taxes/catalogo/CatalogoMain";
 import BoletasMain from "../components/taxes/boletas/BoletasMain";
 import FacturasMain from "../components/taxes/facturas/FacturasMain";
 import NotasCreditoMain from "../components/taxes/notasCredito/NotasCreditoMain";
+import NotasDebitoMain from "../components/taxes/notasDebito/NotasDebitoMain";
 import ResumenesMain from "../components/taxes/resumenes/ResumenesMain";
 import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
 import PersonasMain from "../components/taxes/personas/PersonasMain";
@@ -128,6 +129,14 @@ const taxesRoutes = isFacturacionEnabled()
                       element: (
                           <PrivateRoutes>
                               <NotasCreditoMain />
+                          </PrivateRoutes>
+                      ),
+                  },
+                  {
+                      path: "notas-debito",
+                      element: (
+                          <PrivateRoutes>
+                              <NotasDebitoMain />
                           </PrivateRoutes>
                       ),
                   },

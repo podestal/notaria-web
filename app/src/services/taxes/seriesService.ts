@@ -23,4 +23,8 @@ export const notaCreditoSeriesService = new TaxesClient<SerieControlInterno[]>(
     "/series/nota-credito/",
 )
 
+export const notaDebitoSeriesService = new TaxesClient<SerieControlInterno[]>(
+    "/series/nota-debito/",
+)
+
 export default controlInternoSeriesService

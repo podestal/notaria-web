@@ -225,6 +225,7 @@ const Header = ({ kardexTypes }: Props) => {
               {name: "Boletas", path: "/app/taxes/boletas"},
               {name: "Facturas", path: "/app/taxes/facturas"},
               {name: "Notas de credito", path: "/app/taxes/notas-credito"},
+              {name: "Notas de debito", path: "/app/taxes/notas-debito"},
               {name: "Resumenes", path: "/app/taxes/resumenes"},
             ]},
     //   { label: "EXTRAPROTOCOLARES", options: ["Calificacíon de Firmas", "Cert. Autorización de viaje", "Poderes Fuera de Registro", "Cartas Notariales", "Cert. Apertura de Libros", "Cert. Supervivencia Persona Capaz", "Cert. Supervivencia Persona Incapaz", "Certificado Domiciliario", "Cambio de Características", "Busqueda Avanzada"] },

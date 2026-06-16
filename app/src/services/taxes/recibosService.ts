@@ -5,6 +5,7 @@ import { authHeaderValue } from "../http/attachAxiosAuthRequestInterceptor"
 export const RECIBO_COMPROBANTE_FACTURA = 1
 export const RECIBO_COMPROBANTE_BOLETA = 2
 export const RECIBO_COMPROBANTE_NOTA_CREDITO = 3
+export const RECIBO_COMPROBANTE_NOTA_DEBITO = 4
 
 export interface Recibo {
     id_recibo: number

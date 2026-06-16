@@ -14,7 +14,7 @@ import {
 } from "./comprobanteFormConfig"
 
 interface Props {
-    variant: Extract<EmisionFormVariant, "boleta" | "factura" | "nota_credito">
+    variant: Extract<EmisionFormVariant, "boleta" | "factura" | "nota_credito" | "nota_debito">
     onDone?: () => void
     kardex?: string
 }

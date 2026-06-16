@@ -5,12 +5,14 @@ import {
 
 export const DEFAULT_FACTURA_SERIE = "F001"
 export const DEFAULT_NOTA_CREDITO_SERIE = "FC01"
+export const DEFAULT_NOTA_DEBITO_SERIE = "FD01"
 
 export type EmisionFormVariant =
     | "ingreso"
     | "boleta"
     | "factura"
     | "nota_credito"
+    | "nota_debito"
 
 export interface EmisionFormVariantConfig {
     defaultSerie: string
@@ -51,5 +53,12 @@ export const EMISION_FORM_VARIANT_CONFIG: Record<
         entityLabel: "la nota de crédito",
         createSuccessMessage: "Nota de crédito creada correctamente",
         createSubmitLabel: "Crear nota de crédito",
+    },
+    nota_debito: {
+        defaultSerie: DEFAULT_NOTA_DEBITO_SERIE,
+        isRecibo: true,
+        entityLabel: "la nota de débito",
+        createSuccessMessage: "Nota de débito creada correctamente",
+        createSubmitLabel: "Crear nota de débito",
     },
 }

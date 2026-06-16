@@ -4,6 +4,7 @@ import useGetSeriesBoleta from "./useGetSeriesBoleta"
 import useGetSeriesControlInterno from "./useGetSeriesControlInterno"
 import useGetSeriesFactura from "./useGetSeriesFactura"
 import useGetSeriesNotaCredito from "./useGetSeriesNotaCredito"
+import useGetSeriesNotaDebito from "./useGetSeriesNotaDebito"
 
 const EMPTY_SERIES: SerieControlInterno[] = []
 
@@ -34,6 +35,10 @@ const useGetSeriesForVariant = ({ access, variant }: Props): SeriesQueryResult =
         access,
         enabled: variant === "nota_credito",
     })
+    const notaDebito = useGetSeriesNotaDebito({
+        access,
+        enabled: variant === "nota_debito",
+    })
 
     if (variant === "boleta") {
         return { data: boleta.data ?? EMPTY_SERIES, isLoading: boleta.isLoading }
@@ -47,6 +52,13 @@ const useGetSeriesForVariant = ({ access, variant }: Props): SeriesQueryResult =
         return {
             data: notaCredito.data ?? EMPTY_SERIES,
             isLoading: notaCredito.isLoading,
+        }
+    }
+
+    if (variant === "nota_debito") {
+        return {
+            data: notaDebito.data ?? EMPTY_SERIES,
+            isLoading: notaDebito.isLoading,
         }
     }
 

@@ -19,6 +19,7 @@ const useGetSeriesNotaDebito = ({
         queryFn: async () =>
             normalizeTaxesList(await notaDebitoSeriesService.get(access)),
         enabled: enabled && !!access,
+        retry: false,
     })
 }
 
