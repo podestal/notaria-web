@@ -33,9 +33,20 @@ import useAuthStore from "../../../store/useAuthStore"
 import useGetTemplatesByActos from "../../../hooks/api/templates/useGetTemplatesByActos"
 import DigitacionMain from "../digitacion/DigitacionMain"
 import EscrituracionMain from "../escrituracion/EscrituracionMain"
+import KardexFacturacionMain from "./facturacion/KardexFacturacionMain"
+import { isFacturacionEnabled } from "../../../utils/isFacturacionEnabled"
 import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import { CreateUpdateKardex } from "../../../services/api/kardexService"
+
+const getFacturacionTab = (kardex: Kardex) =>
+    isFacturacionEnabled()
+        ? [{
+            id: "facturacion",
+            label: "Facturación",
+            content: <KardexFacturacionMain kardex={kardex} />,
+        }]
+        : []
 
 /** Escrituración / minuta — managed in other tabs; keep on main form save. */
 const preservedKardexFields = (existing?: Kardex | null): Pick<
@@ -539,21 +550,21 @@ const KardexForm = ({
         {kardex.idtipkar === 2 || kardex.idtipkar === 5 ? 
         <KardexFormTabs 
             tabs={[
-                // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
                 { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardexWithSelectedTemplate || kardex} /> },
                 { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardexWithSelectedTemplate || kardex} /> },
+                ...getFacturacionTab(kardex),
             ]}
         /> 
         : 
         <KardexFormTabs 
             tabs={[
-                // { id: 'general', label: 'Kardex Info', content: <KardexForm createKardex={createKardex} setNotAllowed={setNotAllowed} /> },
                 { id: 'details', label: 'Contratantes', content: <ContratantesMain kardex={kardex}/> },
                 { id: 'uif', label: 'UIF/PDT Patrimonial', content: <PatrimonialMain kardex={kardex}/> },
                 { id: 'notes', label: 'Digitación', content: <DigitacionMain kardex={kardexWithSelectedTemplate || kardex} /> },
                 { id: 'escrituración', label: 'Escrituración', content: <EscrituracionMain kardex={kardexWithSelectedTemplate || kardex} /> },
                 { id: 'uifp', label: 'UIF/PDT Participa', content: <ParticipaMain kardex={kardex}/> },
+                ...getFacturacionTab(kardex),
             ]}
         />}
         </>
