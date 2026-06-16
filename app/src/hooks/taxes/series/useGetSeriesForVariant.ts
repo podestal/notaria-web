@@ -3,6 +3,7 @@ import type { SerieControlInterno } from "../../../services/taxes/seriesService"
 import useGetSeriesBoleta from "./useGetSeriesBoleta"
 import useGetSeriesControlInterno from "./useGetSeriesControlInterno"
 import useGetSeriesFactura from "./useGetSeriesFactura"
+import useGetSeriesNotaCredito from "./useGetSeriesNotaCredito"
 
 interface Props {
     access: string
@@ -27,6 +28,10 @@ const useGetSeriesForVariant = ({ access, variant }: Props): SeriesQueryResult =
         access,
         enabled: variant === "factura",
     })
+    const notaCredito = useGetSeriesNotaCredito({
+        access,
+        enabled: variant === "nota_credito",
+    })
 
     if (variant === "boleta") {
         return { data: boleta.data ?? [], isLoading: boleta.isLoading }
@@ -34,6 +39,10 @@ const useGetSeriesForVariant = ({ access, variant }: Props): SeriesQueryResult =
 
     if (variant === "factura") {
         return { data: factura.data ?? [], isLoading: factura.isLoading }
+    }
+
+    if (variant === "nota_credito") {
+        return { data: notaCredito.data ?? [], isLoading: notaCredito.isLoading }
     }
 
     return {

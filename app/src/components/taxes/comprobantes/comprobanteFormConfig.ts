@@ -4,8 +4,13 @@ import {
 } from "../controlInterno/ingresoFormShared"
 
 export const DEFAULT_FACTURA_SERIE = "F001"
+export const DEFAULT_NOTA_CREDITO_SERIE = "FC01"
 
-export type EmisionFormVariant = "ingreso" | "boleta" | "factura"
+export type EmisionFormVariant =
+    | "ingreso"
+    | "boleta"
+    | "factura"
+    | "nota_credito"
 
 export interface EmisionFormVariantConfig {
     defaultSerie: string
@@ -39,5 +44,12 @@ export const EMISION_FORM_VARIANT_CONFIG: Record<
         entityLabel: "la factura",
         createSuccessMessage: "Factura creada correctamente",
         createSubmitLabel: "Crear factura",
+    },
+    nota_credito: {
+        defaultSerie: DEFAULT_NOTA_CREDITO_SERIE,
+        isRecibo: true,
+        entityLabel: "la nota de crédito",
+        createSuccessMessage: "Nota de crédito creada correctamente",
+        createSubmitLabel: "Crear nota de crédito",
     },
 }
