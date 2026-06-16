@@ -17,6 +17,7 @@ export interface Recibo {
     total: string
     persona_documento: string
     persona_nombres: string
+    kardex: string | null
     usuario: string
     anulada: boolean
     enviada_sunat: boolean

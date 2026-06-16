@@ -1,7 +1,9 @@
 import { useEffect, useState, type LucideIcon, type ReactNode } from "react"
 import { FileText } from "lucide-react"
 import TopModal from "../../ui/TopModal"
-import IngresosFilters from "../controlInterno/IngresosFilters"
+import IngresosFilters, {
+    type KardexPresenceFilter,
+} from "../controlInterno/IngresosFilters"
 import AnularComprobanteModal from "./AnularComprobanteModal"
 import ComprobantePdfModal from "./ComprobantePdfModal"
 import type { ComprobanteItem, ComprobanteVariant } from "./comprobanteTypes"
@@ -13,6 +15,8 @@ export interface ComprobanteReporteContext {
     fecha_emision_hasta: string
     persona_documento: string
     persona_nombres: string
+    kardex: string
+    has_kardex: KardexPresenceFilter
     usuario: string
     hasFilters: boolean
     onImprimir: (item: ComprobanteItem) => void
@@ -59,6 +63,8 @@ const ComprobanteSectionMain = ({
     const [fechaEmisionHasta, setFechaEmisionHasta] = useState("")
     const [personaDocumento, setPersonaDocumento] = useState("")
     const [personaNombres, setPersonaNombres] = useState("")
+    const [kardex, setKardex] = useState("")
+    const [hasKardex, setHasKardex] = useState<KardexPresenceFilter>("")
     const [usuario, setUsuario] = useState("")
 
     useEffect(() => {
@@ -68,6 +74,8 @@ const ComprobanteSectionMain = ({
         fechaEmisionHasta,
         personaDocumento,
         personaNombres,
+        kardex,
+        hasKardex,
         usuario,
     ])
 
@@ -76,6 +84,8 @@ const ComprobanteSectionMain = ({
         setFechaEmisionHasta("")
         setPersonaDocumento("")
         setPersonaNombres("")
+        setKardex("")
+        setHasKardex("")
         setUsuario("")
         setPage(1)
     }
@@ -85,6 +95,8 @@ const ComprobanteSectionMain = ({
         fechaEmisionHasta.trim() !== "" ||
         personaDocumento.trim() !== "" ||
         personaNombres.trim() !== "" ||
+        kardex.trim() !== "" ||
+        hasKardex.trim() !== "" ||
         usuario.trim() !== ""
 
     const handleCreateDone = () => {
@@ -136,11 +148,15 @@ const ComprobanteSectionMain = ({
                             fecha_emision_hasta={fechaEmisionHasta}
                             persona_documento={personaDocumento}
                             persona_nombres={personaNombres}
+                            kardex={kardex}
+                            has_kardex={hasKardex}
                             usuario={usuario}
                             setFechaEmisionDesde={setFechaEmisionDesde}
                             setFechaEmisionHasta={setFechaEmisionHasta}
                             setPersonaDocumento={setPersonaDocumento}
                             setPersonaNombres={setPersonaNombres}
+                            setKardex={setKardex}
+                            setHasKardex={setHasKardex}
                             setUsuario={setUsuario}
                             onClear={handleClearFilters}
                         />
@@ -152,6 +168,8 @@ const ComprobanteSectionMain = ({
                             fecha_emision_hasta: fechaEmisionHasta,
                             persona_documento: personaDocumento,
                             persona_nombres: personaNombres,
+                            kardex,
+                            has_kardex: hasKardex,
                             usuario,
                             hasFilters,
                             onImprimir: setPrintingItem,

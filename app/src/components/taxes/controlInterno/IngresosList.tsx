@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from "react"
 import type { Ingreso } from "../../../services/taxes/ingresosService"
 import ComprobantesList from "../comprobantes/ComprobantesList"
 import type { ComprobanteItem } from "../comprobantes/comprobanteTypes"
+import type { KardexPresenceFilter } from "./IngresosFilters"
 
 interface Props {
     page: number
@@ -10,6 +11,8 @@ interface Props {
     fecha_emision_hasta: string
     persona_documento: string
     persona_nombres: string
+    kardex: string
+    has_kardex: KardexPresenceFilter
     usuario: string
     hasFilters: boolean
     onEdit?: (ingreso: Ingreso) => void
@@ -31,6 +34,8 @@ const IngresosList = ({
     fecha_emision_hasta,
     persona_documento,
     persona_nombres,
+    kardex,
+    has_kardex,
     usuario,
     hasFilters,
     onEdit,
@@ -48,6 +53,8 @@ const IngresosList = ({
         fecha_emision_hasta={fecha_emision_hasta}
         persona_documento={persona_documento}
         persona_nombres={persona_nombres}
+        kardex={kardex}
+        has_kardex={has_kardex}
         usuario={usuario}
         hasFilters={hasFilters}
         onEdit={asIngresoHandler(onEdit)}

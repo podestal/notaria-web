@@ -235,6 +235,14 @@ const ComprobanteCard = ({
                             {getTitleCase(displayValue(item.usuario))}
                         </dd>
                     </div>
+                    {item.kardex && (
+                        <div>
+                            <dt className="text-slate-500">Kardex</dt>
+                            <dd className="font-mono font-semibold text-sky-800">
+                                {item.kardex}
+                            </dd>
+                        </div>
+                    )}
                     {recibo && (
                         <>
                             <div>

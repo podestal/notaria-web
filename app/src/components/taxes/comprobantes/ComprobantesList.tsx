@@ -3,6 +3,7 @@ import useAuthStore from "../../../store/useAuthStore"
 import useGetIngresos from "../../../hooks/taxes/ingresos/useGetIngresos"
 import useGetRecibos from "../../../hooks/taxes/recibos/useGetRecibos"
 import Paginator from "../../ui/Paginator"
+import type { KardexPresenceFilter } from "../controlInterno/IngresosFilters"
 import ComprobanteCard from "./ComprobanteCard"
 import {
     type ComprobanteItem,
@@ -21,6 +22,8 @@ interface Props {
     fecha_emision_hasta: string
     persona_documento: string
     persona_nombres: string
+    kardex: string
+    has_kardex: KardexPresenceFilter
     usuario: string
     hasFilters: boolean
     onEdit?: (item: ComprobanteItem) => void
@@ -40,6 +43,8 @@ const ComprobantesList = ({
     fecha_emision_hasta,
     persona_documento,
     persona_nombres,
+    kardex,
+    has_kardex,
     usuario,
     hasFilters,
     onEdit,
@@ -56,6 +61,8 @@ const ComprobantesList = ({
         fecha_emision_hasta,
         persona_documento,
         persona_nombres,
+        kardex,
+        has_kardex,
         usuario,
         enabled: variant === "ingreso",
     })
@@ -68,6 +75,8 @@ const ComprobantesList = ({
         fecha_emision_hasta,
         persona_documento,
         persona_nombres,
+        kardex,
+        has_kardex,
         usuario,
         enabled: variant === "recibo",
     })

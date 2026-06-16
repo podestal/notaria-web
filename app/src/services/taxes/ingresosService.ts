@@ -27,6 +27,7 @@ export interface Ingreso {
     negocio_id: number
     persona_documento: string
     persona_nombres: string
+    kardex: string | null
     direccion: string
     motivo_baja: string | null
     fecha_baja: string | null

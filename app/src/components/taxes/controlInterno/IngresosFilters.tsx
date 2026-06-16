@@ -1,10 +1,14 @@
 import { Search, X } from "lucide-react"
 
+export type KardexPresenceFilter = "" | "true" | "false"
+
 export interface IngresosFilterValues {
     fecha_emision_desde: string
     fecha_emision_hasta: string
     persona_documento: string
     persona_nombres: string
+    kardex: string
+    has_kardex: KardexPresenceFilter
     usuario: string
 }
 
@@ -13,6 +17,8 @@ interface Props extends IngresosFilterValues {
     setFechaEmisionHasta: (value: string) => void
     setPersonaDocumento: (value: string) => void
     setPersonaNombres: (value: string) => void
+    setKardex: (value: string) => void
+    setHasKardex: (value: KardexPresenceFilter) => void
     setUsuario: (value: string) => void
     onClear: () => void
     loading?: boolean
@@ -23,11 +29,15 @@ const IngresosFilters = ({
     fecha_emision_hasta,
     persona_documento,
     persona_nombres,
+    kardex,
+    has_kardex,
     usuario,
     setFechaEmisionDesde,
     setFechaEmisionHasta,
     setPersonaDocumento,
     setPersonaNombres,
+    setKardex,
+    setHasKardex,
     setUsuario,
     onClear,
     loading = false,
@@ -37,6 +47,8 @@ const IngresosFilters = ({
         fecha_emision_hasta.trim() !== "" ||
         persona_documento.trim() !== "" ||
         persona_nombres.trim() !== "" ||
+        kardex.trim() !== "" ||
+        has_kardex.trim() !== "" ||
         usuario.trim() !== ""
 
     const inputClassName =
@@ -113,6 +125,18 @@ const IngresosFilters = ({
                         className={inputClassName}
                     />
                 </label>
+                <label className="block text-xs">
+                    <span className="mb-1 block font-medium text-slate-600">
+                        Kardex
+                    </span>
+                    <input
+                        type="text"
+                        value={kardex}
+                        onChange={(e) => setKardex(e.target.value)}
+                        placeholder="Ej. KAR0001-2026"
+                        className={`${inputClassName} font-mono`}
+                    />
+                </label>
                 <label className="block text-xs sm:col-span-2 lg:col-span-1">
                     <span className="mb-1 block font-medium text-slate-600">Usuario</span>
                     <input
@@ -123,6 +147,38 @@ const IngresosFilters = ({
                         className={inputClassName}
                     />
                 </label>
+                <div className="block text-xs sm:col-span-2 lg:col-span-3">
+                    <span className="mb-1 block font-medium text-slate-600">
+                        Relación con kardex
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                        {[
+                            { value: "", label: "Todos" },
+                            { value: "true", label: "Con kardex" },
+                            { value: "false", label: "Sin kardex" },
+                        ].map((option) => {
+                            const active = has_kardex === option.value
+
+                            return (
+                                <button
+                                    key={option.value || "all"}
+                                    type="button"
+                                    onClick={() =>
+                                        setHasKardex(option.value as KardexPresenceFilter)
+                                    }
+                                    disabled={loading}
+                                    className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-50 ${
+                                        active
+                                            ? "border-sky-600 bg-sky-600 text-white"
+                                            : "border-slate-300 bg-white text-slate-700 hover:bg-slate-100"
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
+                            )
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     )
