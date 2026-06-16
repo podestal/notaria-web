@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
+import { Loader2 } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
 import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
@@ -68,9 +69,12 @@ const IngresoContratanteSelector = ({
     }
 
     const isBusy = disabled || loadingContratantes || resolveMutation.isPending
+    const selectedContratante = contratantes.find(
+        (contratante) => contratante.idcontratante === selectedContratanteId,
+    )
 
     return (
-        <div className="rounded-lg border border-sky-100 bg-sky-50/40 p-3">
+        <div className="relative rounded-lg border border-sky-100 bg-sky-50/40 p-3">
             <SimpleSelectorStr
                 key={`contratante-${kardex}-${contratantes.length}`}
                 label="Contratante del kardex"
@@ -85,9 +89,24 @@ const IngresoContratanteSelector = ({
                 </p>
             )}
             {resolveMutation.isPending && (
-                <p className="mt-2 px-2 text-xs text-slate-500 animate-pulse">
-                    Buscando o registrando persona…
-                </p>
+                <div className="mt-3 flex items-start gap-3 rounded-lg border border-sky-200 bg-white px-3 py-2 shadow-sm">
+                    <Loader2
+                        className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-sky-600"
+                        aria-hidden
+                    />
+                    <div>
+                        <p className="text-xs font-semibold text-slate-800">
+                            Cargando datos de facturación…
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-slate-500">
+                            Estamos buscando o creando la persona para{" "}
+                            {selectedContratante
+                                ? getTitleCase(selectedContratante.cliente)
+                                : "el contratante seleccionado"}
+                            .
+                        </p>
+                    </div>
+                </div>
             )}
             <p className="mt-2 px-2 text-[11px] text-slate-500">
                 Al seleccionar un contratante se usa su persona existente o se crea una
