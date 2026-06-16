@@ -30,6 +30,7 @@ export interface Kardex {
     fechaconclusion?: string;
     fecha_conclusion?: string;
     nc?: string;
+    pagado?: number;
 }
 
 export interface KardexPage {

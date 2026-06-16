@@ -92,6 +92,7 @@ export interface CreateUpdateIngreso {
     observaciones: string
     total: string
     fecha_emision: string
+    kardex?: string
     anulada: boolean
     canjeada: boolean
     lineas: IngresoLineaPayload[]

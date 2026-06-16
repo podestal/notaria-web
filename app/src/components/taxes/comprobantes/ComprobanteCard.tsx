@@ -1,5 +1,7 @@
 import type { ReactNode } from "react"
 import { ArrowLeftRight, Ban, Printer, Receipt } from "lucide-react"
+import useAuthStore from "../../../store/useAuthStore"
+import useLookupPersonas from "../../../hooks/taxes/personas/useLookupPersonas"
 import getTitleCase from "../../../utils/getTitleCase"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
 import {
@@ -33,6 +35,24 @@ const formatAmount = (value: string, moneda: string) => {
 const displayValue = (value: string | null | undefined) => {
     if (!value || value === "-") return "—"
     return value
+}
+
+const isPlaceholderPersonaName = (value: string | null | undefined) => {
+    const normalized = (value || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toUpperCase()
+
+    return !normalized || normalized === "0" || normalized === "0 0 0"
+}
+
+const getPersonaDisplayName = (
+    fallbackName: string | null | undefined,
+    resolvedName: string | null | undefined,
+) => {
+    if (!isPlaceholderPersonaName(fallbackName)) return fallbackName || "Sin nombre"
+    if (!isPlaceholderPersonaName(resolvedName)) return resolvedName || "Sin nombre"
+    return "Sin nombre"
 }
 
 interface ActionButtonProps {
@@ -94,6 +114,7 @@ const ComprobanteCard = ({
     onAnular,
     onCanjear,
 }: Props) => {
+    const access = useAuthStore((s) => s.access_token) || ""
     const comprobante = getComprobanteSerieNumero(item)
     const canAnular = !item.anulada
     const showCanjear = variant === "ingreso" && Boolean(onCanjear)
@@ -101,6 +122,23 @@ const ComprobanteCard = ({
     const recibo = isRecibo(item) ? item : null
     const canCanjear =
         showCanjear && ingreso != null && !ingreso.anulada && !ingreso.canjeada
+    const shouldResolvePersonaName = isPlaceholderPersonaName(item.persona_nombres)
+    const { data: personaMatches = [] } = useLookupPersonas({
+        access,
+        q: item.persona_documento || "",
+        enabled: shouldResolvePersonaName && Boolean(item.persona_documento),
+    })
+    const resolvedPersona = personaMatches.find(
+        (persona) => persona.numero_documento === item.persona_documento,
+    )
+    const resolvedPersonaName =
+        resolvedPersona?.razon_social && resolvedPersona.razon_social !== "0"
+            ? resolvedPersona.razon_social
+            : resolvedPersona?.nombre_completo
+    const personaDisplayName = getPersonaDisplayName(
+        item.persona_nombres,
+        resolvedPersonaName,
+    )
 
     return (
         <article
@@ -159,7 +197,7 @@ const ComprobanteCard = ({
                                 )}
                             </div>
                             <h3 className="mt-1 text-sm font-medium leading-snug text-slate-900">
-                                {getTitleCase(item.persona_nombres || "Sin nombre")}
+                                {getTitleCase(personaDisplayName)}
                             </h3>
                             <p className="mt-0.5 font-mono text-xs text-slate-600">
                                 {item.persona_documento || "—"}

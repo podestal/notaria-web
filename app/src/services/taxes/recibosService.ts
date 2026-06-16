@@ -50,6 +50,7 @@ export interface CreateUpdateRecibo {
     persona_id: number
     direccion: string
     fecha_emision: string
+    kardex?: string
     lineas: ReciboLineaPayload[]
 }
 

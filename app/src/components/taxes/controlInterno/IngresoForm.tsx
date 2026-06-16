@@ -218,12 +218,16 @@ const IngresoForm = ({
         )
 
         if (isRecibo) {
-            await onSubmit(formValuesToReciboPayload(normalized, series))
+            await onSubmit(formValuesToReciboPayload(normalized, series, { kardex }))
             return
         }
 
         await onSubmit(
-            formValuesToIngresoPayload(normalized, series, { anulada, canjeada }),
+            formValuesToIngresoPayload(normalized, series, {
+                anulada,
+                canjeada,
+                kardex,
+            }),
         )
     }
 

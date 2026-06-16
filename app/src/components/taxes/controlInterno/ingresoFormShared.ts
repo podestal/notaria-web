@@ -233,24 +233,31 @@ export const ingresoToFormValues = (
 export interface IngresoPayloadOptions {
     anulada?: boolean
     canjeada?: boolean
+    kardex?: string
 }
 
 export const formValuesToReciboPayload = (
     values: IngresoFormValues,
     series: SerieControlInterno[] = [],
-): CreateUpdateRecibo => ({
-    serie: resolveSerieFromId(values.id_serie, series),
-    moneda_id: values.moneda_id,
-    persona_id: values.persona_id,
-    direccion: values.direccion.trim(),
-    fecha_emision: buildAppDateTimePayload(values.fecha_emision),
-    lineas: values.lineas.map((linea) => ({
-        catalogo_id: linea.catalogo_id,
-        cantidad: linea.cantidad,
-        descripcion: linea.descripcion,
-        total: linea.total,
-    })),
-})
+    options: Pick<IngresoPayloadOptions, "kardex"> = {},
+): CreateUpdateRecibo => {
+    const kardex = options.kardex?.trim()
+
+    return {
+        serie: resolveSerieFromId(values.id_serie, series),
+        moneda_id: values.moneda_id,
+        persona_id: values.persona_id,
+        direccion: values.direccion.trim(),
+        fecha_emision: buildAppDateTimePayload(values.fecha_emision),
+        ...(kardex ? { kardex } : {}),
+        lineas: values.lineas.map((linea) => ({
+            catalogo_id: linea.catalogo_id,
+            cantidad: linea.cantidad,
+            descripcion: linea.descripcion,
+            total: linea.total,
+        })),
+    }
+}
 
 export const reciboToFormValues = (
     recibo: Recibo,
@@ -281,19 +288,24 @@ export const formValuesToIngresoPayload = (
     values: IngresoFormValues,
     series: SerieControlInterno[] = [],
     options: IngresoPayloadOptions = {},
-): CreateUpdateIngreso => ({
-    id_serie: values.id_serie,
-    serie: resolveSerieFromId(values.id_serie, series),
-    moneda_id: values.moneda_id,
-    persona_id: values.persona_id,
-    direccion: values.direccion.trim(),
-    observaciones: values.observaciones.trim(),
-    total: values.total.trim(),
-    fecha_emision: buildAppDateTimePayload(values.fecha_emision),
-    anulada: options.anulada ?? false,
-    canjeada: options.canjeada ?? false,
-    lineas: values.lineas,
-})
+): CreateUpdateIngreso => {
+    const kardex = options.kardex?.trim()
+
+    return {
+        id_serie: values.id_serie,
+        serie: resolveSerieFromId(values.id_serie, series),
+        moneda_id: values.moneda_id,
+        persona_id: values.persona_id,
+        direccion: values.direccion.trim(),
+        observaciones: values.observaciones.trim(),
+        total: values.total.trim(),
+        fecha_emision: buildAppDateTimePayload(values.fecha_emision),
+        ...(kardex ? { kardex } : {}),
+        anulada: options.anulada ?? false,
+        canjeada: options.canjeada ?? false,
+        lineas: values.lineas,
+    }
+}
 
 export const getIngresoBackendError = (error: unknown): string => {
     const data = (error as { response?: { data?: Record<string, unknown> } })
