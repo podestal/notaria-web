@@ -109,18 +109,42 @@ export const calcLineaSubtotal = (linea: IngresoLineaPayload): string => {
     return roundMoney(valorUnit * linea.cantidad)
 }
 
-export const updateIngresoLineaCantidad = (
+const recalcIngresoLineaTotal = (
     linea: IngresoLineaPayload,
-    cantidad: number,
+    cantidad = linea.cantidad,
+    precio_unitario = linea.precio_unitario,
 ): IngresoLineaPayload => {
     const qty = cantidad >= 1 ? cantidad : 1
-    const precio = Number(linea.precio_unitario)
+    const precio = Number(precio_unitario)
     const lineTotal = Number.isNaN(precio) ? 0 : precio * qty
+
     return {
         ...linea,
         cantidad: qty,
+        precio_unitario,
         total: roundMoney(lineTotal),
     }
+}
+
+export const updateIngresoLineaCantidad = (
+    linea: IngresoLineaPayload,
+    cantidad: number,
+): IngresoLineaPayload => recalcIngresoLineaTotal(linea, cantidad)
+
+export const updateIngresoLineaPrecioUnitario = (
+    linea: IngresoLineaPayload,
+    precio_unitario: string,
+): IngresoLineaPayload => recalcIngresoLineaTotal(linea, linea.cantidad, precio_unitario)
+
+export const normalizeIngresoLineaPrecioUnitario = (
+    linea: IngresoLineaPayload,
+): IngresoLineaPayload => {
+    const precio = Number(linea.precio_unitario)
+    if (!linea.precio_unitario.trim() || Number.isNaN(precio)) {
+        return recalcIngresoLineaTotal(linea, linea.cantidad, "0.00")
+    }
+
+    return recalcIngresoLineaTotal(linea, linea.cantidad, roundMoney(precio))
 }
 
 export const computeIngresoGravadaFromLineas = (

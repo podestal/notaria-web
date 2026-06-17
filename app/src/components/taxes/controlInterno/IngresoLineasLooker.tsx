@@ -12,7 +12,9 @@ import {
     computeIngresoGravadaFromLineas,
     computeIngresoIgvFromLineas,
     computeIngresoTotalFromLineas,
+    normalizeIngresoLineaPrecioUnitario,
     updateIngresoLineaCantidad,
+    updateIngresoLineaPrecioUnitario,
 } from "./ingresoFormShared"
 
 interface Props {
@@ -109,6 +111,24 @@ const IngresoLineasLooker = ({
         onChange(
             lineas.map((linea, i) =>
                 i === index ? { ...linea, detalles } : linea,
+            ),
+        )
+    }
+
+    const handleUpdatePrecioUnitario = (index: number, precio_unitario: string) => {
+        onChange(
+            lineas.map((linea, i) =>
+                i === index
+                    ? updateIngresoLineaPrecioUnitario(linea, precio_unitario)
+                    : linea,
+            ),
+        )
+    }
+
+    const handleBlurPrecioUnitario = (index: number) => {
+        onChange(
+            lineas.map((linea, i) =>
+                i === index ? normalizeIngresoLineaPrecioUnitario(linea) : linea,
             ),
         )
     }
@@ -255,8 +275,23 @@ const IngresoLineasLooker = ({
                                                 className="w-full min-w-[80px] rounded border border-slate-300 px-1.5 py-1 text-xs text-slate-800 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-200"
                                             />
                                         </td>
-                                        <td className="px-2 py-2 align-middle text-right font-mono text-slate-800">
-                                            {formatAmount(linea.precio_unitario)}
+                                        <td className="px-2 py-2 align-middle">
+                                            <input
+                                                type="number"
+                                                min={0}
+                                                step={0.01}
+                                                value={linea.precio_unitario}
+                                                onChange={(e) =>
+                                                    handleUpdatePrecioUnitario(
+                                                        index,
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                onBlur={() =>
+                                                    handleBlurPrecioUnitario(index)
+                                                }
+                                                className="w-full min-w-[72px] rounded border border-slate-300 px-1.5 py-1 text-right font-mono text-xs text-slate-800 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-200"
+                                            />
                                         </td>
                                         <td className="px-2 py-2 align-middle text-right font-mono text-slate-800">
                                             {formatAmount(calcLineaSubtotal(linea))}
