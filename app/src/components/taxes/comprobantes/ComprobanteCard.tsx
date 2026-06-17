@@ -116,7 +116,8 @@ const ComprobanteCard = ({
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const comprobante = getComprobanteSerieNumero(item)
-    const canAnular = !item.anulada
+    const canAnular = !item.anulada && Boolean(onAnular)
+    const showAnular = Boolean(onAnular)
     const showCanjear = variant === "ingreso" && Boolean(onCanjear)
     const ingreso = isIngreso(item) ? item : null
     const recibo = isRecibo(item) ? item : null
@@ -312,7 +313,11 @@ const ComprobanteCard = ({
 
             <div
                 className={`grid gap-1 border-t border-slate-100 bg-slate-50/80 px-2 py-2 ${
-                    showCanjear ? "grid-cols-3" : "grid-cols-2"
+                    showCanjear
+                        ? "grid-cols-3"
+                        : showAnular
+                          ? "grid-cols-2"
+                          : "grid-cols-1"
                 }`}
             >
                 <ActionButton
@@ -320,13 +325,15 @@ const ComprobanteCard = ({
                     icon={<Printer className="h-4 w-4" aria-hidden />}
                     onClick={() => onImprimir?.(item)}
                 />
-                <ActionButton
-                    label="Anular"
-                    icon={<Ban className="h-4 w-4" aria-hidden />}
-                    onClick={() => onAnular?.(item)}
-                    disabled={!canAnular}
-                    tone="danger"
-                />
+                {showAnular && (
+                    <ActionButton
+                        label="Anular"
+                        icon={<Ban className="h-4 w-4" aria-hidden />}
+                        onClick={() => onAnular?.(item)}
+                        disabled={!canAnular}
+                        tone="danger"
+                    />
+                )}
                 {showCanjear && (
                     <ActionButton
                         label="Canjear"

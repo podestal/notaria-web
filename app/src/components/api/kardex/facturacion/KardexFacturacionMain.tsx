@@ -3,6 +3,7 @@ import { useState } from "react"
 import type { Kardex } from "../../../../services/api/kardexService"
 import CreateRecibo from "../../../taxes/comprobantes/CreateRecibo"
 import CreateIngreso from "../../../taxes/controlInterno/CreateIngreso"
+import KardexFacturacionComprobantes from "./KardexFacturacionComprobantes"
 
 type FacturacionType = "control_interno" | "boleta" | "factura"
 
@@ -39,7 +40,6 @@ const FACTURACION_OPTIONS: {
 const KardexFacturacionMain = ({ kardex }: Props) => {
     const [selectedType, setSelectedType] = useState<FacturacionType>("control_interno")
     const [formKey, setFormKey] = useState(0)
-    const hasDocumentoGenerado = Number(kardex.pagado ?? 0) === 1
 
     const selectedOption =
         FACTURACION_OPTIONS.find((option) => option.id === selectedType) ??
@@ -86,23 +86,20 @@ const KardexFacturacionMain = ({ kardex }: Props) => {
             <header className="mb-4">
                 <h2 className="text-base font-semibold text-slate-800">Facturación</h2>
                 <p className="mt-1 text-xs text-slate-500">
-                    Kardex {kardex.kardex}. Seleccione el tipo de comprobante y complete el
-                    formulario.
+                    Kardex {kardex.kardex}. Consulte los comprobantes vinculados o registre
+                    uno nuevo.
                 </p>
             </header>
 
-            {hasDocumentoGenerado ? (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                    <h3 className="text-sm font-semibold text-amber-900">
-                        Documento ya generado
-                    </h3>
-                    <p className="mt-1 text-xs text-amber-800">
-                        Ya existe un documento de facturación generado para este kardex.
-                        No se puede crear otro comprobante desde esta sección.
-                    </p>
+            <div className="mb-6 rounded-lg border border-slate-200 bg-white p-4">
+                <h3 className="text-sm font-semibold text-slate-800">
+                    Comprobantes del kardex
+                </h3>
+                <div className="mt-3">
+                    <KardexFacturacionComprobantes kardexCode={kardex.kardex} />
                 </div>
-            ) : (
-                <>
+            </div>
+
             <div className="mb-4 flex flex-wrap gap-2">
                 {FACTURACION_OPTIONS.map((option) => {
                     const Icon = option.icon
@@ -134,8 +131,6 @@ const KardexFacturacionMain = ({ kardex }: Props) => {
                 <p className="mb-4 mt-1 text-xs text-slate-500">{selectedOption.description}</p>
                 <div key={`${selectedType}-${formKey}`}>{renderForm()}</div>
             </div>
-                </>
-            )}
         </div>
     )
 }
