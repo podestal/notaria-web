@@ -1,9 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useMutation, useQueryClient, useQueries } from "@tanstack/react-query"
+import { useMemo, useState } from "react"
 import { Loader2 } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
 import useGetContratantesByKardex from "../../../hooks/api/contratantes/useGetContratantesByKardex"
+import getCliente2Service, { type Cliente2 } from "../../../services/api/clienteService"
 import type { Contratante } from "../../../services/api/contratantesService"
 import { resolvePersonaFromContratante } from "../../../services/taxes/resolvePersonaFromContratante"
 import type { CreateUpdatePersona, Persona } from "../../../services/taxes/personasService"
@@ -12,6 +13,7 @@ import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 
 interface Props {
     kardex: string
+    juridicaOnly?: boolean
     onResolved: (persona: Persona, payload: CreateUpdatePersona) => void
     onError?: (message: string) => void
     disabled?: boolean
@@ -19,8 +21,15 @@ interface Props {
 
 const PLACEHOLDER_VALUE = "0"
 
+const isClienteJuridica = (cliente: Cliente2 | undefined): boolean => {
+    if (!cliente) return false
+    const digits = (cliente.numdoc || "").replace(/\D/g, "")
+    return cliente.tipper === "J" || digits.length === 11
+}
+
 const IngresoContratanteSelector = ({
     kardex,
+    juridicaOnly = false,
     onResolved,
     onError,
     disabled = false,
@@ -32,6 +41,31 @@ const IngresoContratanteSelector = ({
     const { data: contratantes = [], isLoading: loadingContratantes } =
         useGetContratantesByKardex({ kardex })
     const { data: documentos = [] } = useGetDocumentos({ access })
+
+    const clienteQueries = useQueries({
+        queries: contratantes.map((contratante) => ({
+            queryKey: ["cliente2-by-contratante", contratante.idcontratante],
+            queryFn: () =>
+                getCliente2Service({ byContratante: true }).get(access, {
+                    idcontratante: contratante.idcontratante,
+                }),
+            enabled: juridicaOnly && Boolean(access && contratante.idcontratante),
+            staleTime: 5 * 60 * 1000,
+        })),
+    })
+
+    const visibleContratantes = useMemo(() => {
+        if (!juridicaOnly) return contratantes
+
+        return contratantes.filter((_, index) =>
+            isClienteJuridica(clienteQueries[index]?.data),
+        )
+    }, [contratantes, clienteQueries, juridicaOnly])
+
+    const loadingJuridicaFilter =
+        juridicaOnly &&
+        contratantes.length > 0 &&
+        clienteQueries.some((query) => query.isLoading)
 
     const resolveMutation = useMutation({
         mutationFn: (idcontratante: string) =>
@@ -54,9 +88,12 @@ const IngresoContratanteSelector = ({
     const contratanteOptions = [
         {
             value: PLACEHOLDER_VALUE,
-            label: loadingContratantes ? "Cargando contratantes…" : "Seleccione…",
+            label:
+                loadingContratantes || loadingJuridicaFilter
+                    ? "Cargando contratantes…"
+                    : "Seleccione…",
         },
-        ...contratantes.map((contratante: Contratante) => ({
+        ...visibleContratantes.map((contratante: Contratante) => ({
             value: contratante.idcontratante,
             label: getContratanteLabel(contratante),
         })),
@@ -68,24 +105,36 @@ const IngresoContratanteSelector = ({
         resolveMutation.mutate(value)
     }
 
-    const isBusy = disabled || loadingContratantes || resolveMutation.isPending
-    const selectedContratante = contratantes.find(
+    const isBusy =
+        disabled ||
+        loadingContratantes ||
+        loadingJuridicaFilter ||
+        resolveMutation.isPending
+    const selectedContratante = visibleContratantes.find(
         (contratante) => contratante.idcontratante === selectedContratanteId,
     )
 
     return (
         <div className="relative rounded-lg border border-sky-100 bg-sky-50/40 p-3">
             <SimpleSelectorStr
-                key={`contratante-${kardex}-${contratantes.length}`}
-                label="Contratante del kardex"
+                key={`contratante-${kardex}-${visibleContratantes.length}-${juridicaOnly}`}
+                label={
+                    juridicaOnly
+                        ? "Contratante jurídico del kardex"
+                        : "Contratante del kardex"
+                }
                 options={contratanteOptions}
                 defaultValue={selectedContratanteId}
                 setter={handleSelect}
-                disabled={isBusy || contratantes.length === 0}
+                disabled={isBusy || visibleContratantes.length === 0}
             />
-            {contratantes.length === 0 && !loadingContratantes && (
+            {visibleContratantes.length === 0 &&
+                !loadingContratantes &&
+                !loadingJuridicaFilter && (
                 <p className="mt-2 px-2 text-xs text-slate-500">
-                    No hay contratantes registrados en este kardex.
+                    {juridicaOnly
+                        ? "No hay contratantes persona jurídica en este kardex."
+                        : "No hay contratantes registrados en este kardex."}
                 </p>
             )}
             {resolveMutation.isPending && (
@@ -109,8 +158,9 @@ const IngresoContratanteSelector = ({
                 </div>
             )}
             <p className="mt-2 px-2 text-[11px] text-slate-500">
-                Al seleccionar un contratante se usa su persona existente o se crea una
-                nueva con sus datos.
+                {juridicaOnly
+                    ? "Solo se listan contratantes persona jurídica. Al seleccionar uno se usa su persona existente o se crea una nueva con sus datos."
+                    : "Al seleccionar un contratante se usa su persona existente o se crea una nueva con sus datos."}
             </p>
         </div>
     )

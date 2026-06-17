@@ -35,8 +35,14 @@ export const getDefaultPersonaFechaNacimiento = (): string => getTodayDateInputV
 
 export const isPersonaJuridica = (kind: PersonaDocumentKind): boolean => kind === "ruc"
 
-export const isPersonaJuridicaRecord = (persona: Persona): boolean =>
-    persona.razon_social != null && persona.razon_social !== "0"
+export const isPersonaJuridicaRecord = (persona: Persona): boolean => {
+    if (persona.razon_social != null && persona.razon_social !== "0") {
+        return true
+    }
+
+    const digits = (persona.numero_documento || "").replace(/\D/g, "")
+    return digits.length === 11
+}
 
 export const getDocumentKind = (
     documentoId: number,
@@ -51,6 +57,23 @@ export const getDocumentKind = (
         return "ruc"
     }
     return "other"
+}
+
+export const resolveDocumentoIdByKind = (
+    kind: PersonaDocumentKind,
+    documentos: Documento[] = [],
+): number => {
+    const match = documentos.find(
+        (doc) => getDocumentKind(doc.id_documento, documentos) === kind,
+    )
+    if (match) return match.id_documento
+
+    if (kind === "ruc") {
+        const byId = documentos.find((doc) => doc.id_documento === 4)
+        if (byId) return byId.id_documento
+    }
+
+    return documentos[0]?.id_documento ?? 0
 }
 
 export const sanitizeNumeroDocumento = (

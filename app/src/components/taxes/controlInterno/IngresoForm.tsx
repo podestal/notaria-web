@@ -2,12 +2,13 @@ import { FormEvent, useEffect, useMemo, useState } from "react"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
+import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
 import useGetSeriesForVariant from "../../../hooks/taxes/series/useGetSeriesForVariant"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
 import type { CreateUpdateRecibo } from "../../../services/taxes/recibosService"
 import type { CreateUpdatePersona, Persona } from "../../../services/taxes/personasService"
 import CreatePersona from "../personas/CreatePersona"
-import { emptyPersonaFormValues, resolvePersonaDireccion } from "../personas/personaFormShared"
+import { emptyPersonaFormValues, resolveDocumentoIdByKind, resolvePersonaDireccion } from "../personas/personaFormShared"
 import TopModal from "../../ui/TopModal"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
@@ -18,6 +19,8 @@ import {
     EMISION_FORM_VARIANT_CONFIG,
     type EmisionFormVariant,
 } from "../comprobantes/comprobanteFormConfig"
+import { extractLeadingDocumentNumber } from "../../../services/taxes/findPersonaByNumeroDocumento"
+import { lookupSunatByRuc } from "../../../utils/sunatLookup"
 import {
     applyIngresoFormDefaults,
     computeIngresoTotalFromLineas,
@@ -59,6 +62,8 @@ const IngresoForm = ({
     const variantConfig = EMISION_FORM_VARIANT_CONFIG[variant]
     const defaultSerieCode = variantConfig.defaultSerie
     const isRecibo = variantConfig.isRecibo
+    const isFactura = variant === "factura"
+    const showFacturaPersonaSource = Boolean(kardex) && isFactura
 
     const { data: series = [], isLoading: loadingSeries } = useGetSeriesForVariant({
         access,
@@ -66,6 +71,7 @@ const IngresoForm = ({
     })
 
     const { data: monedas = [], isLoading: loadingMonedas } = useGetMonedas({ access })
+    const { data: documentos = [] } = useGetDocumentos({ access })
 
     const [form, setForm] = useState<IngresoFormValues>(initialValues)
     const [serieError, setSerieError] = useState("")
@@ -76,6 +82,9 @@ const IngresoForm = ({
     const [lineasError, setLineasError] = useState("")
     const [openCreatePersonaModal, setOpenCreatePersonaModal] = useState(false)
     const [personaFormSeed, setPersonaFormSeed] = useState(emptyPersonaFormValues)
+    const [facturaPersonaSource, setFacturaPersonaSource] = useState<
+        "contratante" | "manual"
+    >("contratante")
 
     const defaultSerieId = useMemo(
         () => resolveDefaultSerieId(series, defaultSerieCode),
@@ -134,6 +143,18 @@ const IngresoForm = ({
         )
     }, [initialValues])
 
+    const clearPersonaFields = () => {
+        setForm((prev) => ({
+            ...prev,
+            persona_id: 0,
+            persona_nombre: "",
+            persona_documento: "",
+            direccion: "",
+        }))
+        setPersonaDocumentoError("")
+        setDireccionError("")
+    }
+
     const applyPersonaLookup = (
         persona: Persona,
         payload?: Pick<CreateUpdatePersona, "direccion">,
@@ -149,13 +170,32 @@ const IngresoForm = ({
         setDireccionError("")
     }
 
-    const openCreatePersonaForm = (query: string) => {
-        const trimmed = query.trim()
-        const documento = /^\d+$/.test(trimmed) ? trimmed : ""
-        setPersonaFormSeed({
+    const openCreatePersonaForm = async (query: string) => {
+        const documento = extractLeadingDocumentNumber(query)
+        const rucDocumentoId = isFactura
+            ? resolveDocumentoIdByKind("ruc", documentos)
+            : 0
+
+        let seed = {
             ...emptyPersonaFormValues,
             numero_documento: documento,
-        })
+            ...(isFactura && rucDocumentoId > 0 ? { documento: rucDocumentoId } : {}),
+        }
+
+        if (isFactura && documento.length === 11) {
+            try {
+                const sunat = await lookupSunatByRuc(documento)
+                seed = {
+                    ...seed,
+                    razon_social: sunat.razon_social,
+                    direccion: sunat.direccion,
+                }
+            } catch {
+                // El usuario puede consultar SUNAT manualmente en el formulario.
+            }
+        }
+
+        setPersonaFormSeed(seed)
         setOpenCreatePersonaModal(true)
     }
 
@@ -231,6 +271,11 @@ const IngresoForm = ({
         )
     }
 
+    const showContratanteSelector =
+        Boolean(kardex) && (!isFactura || facturaPersonaSource === "contratante")
+    const showPersonaLooker =
+        !kardex || !isFactura || facturaPersonaSource === "manual"
+
     const loadingOptions = loadingSeries || loadingMonedas
 
     return (
@@ -302,9 +347,55 @@ const IngresoForm = ({
                 )}
             </div>
 
-            {kardex && (
+            {showFacturaPersonaSource && (
+                <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+                    <p className="mb-2 px-2 text-xs font-semibold text-slate-700">
+                        Cliente de la factura
+                    </p>
+                    <div className="flex flex-wrap gap-2 px-2">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (facturaPersonaSource === "contratante") return
+                                setFacturaPersonaSource("contratante")
+                                clearPersonaFields()
+                            }}
+                            className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                facturaPersonaSource === "contratante"
+                                    ? "bg-sky-600 text-white shadow-sm"
+                                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                            }`}
+                        >
+                            Contratante jurídico
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (facturaPersonaSource === "manual") return
+                                setFacturaPersonaSource("manual")
+                                clearPersonaFields()
+                            }}
+                            className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
+                                facturaPersonaSource === "manual"
+                                    ? "bg-sky-600 text-white shadow-sm"
+                                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                            }`}
+                        >
+                            Otra persona jurídica
+                        </button>
+                    </div>
+                    <p className="mt-2 px-2 text-[11px] text-slate-500">
+                        Use un contratante persona jurídica del kardex o busque y registre
+                        otra persona jurídica.
+                    </p>
+                </div>
+            )}
+
+            {showContratanteSelector && (
                 <IngresoContratanteSelector
-                    kardex={kardex}
+                    key={`contratante-${kardex}-${facturaPersonaSource}`}
+                    kardex={kardex!}
+                    juridicaOnly={isFactura}
                     onResolved={applyPersonaLookup}
                     onError={(message) => {
                         setMessage(message)
@@ -315,15 +406,18 @@ const IngresoForm = ({
                 />
             )}
 
-            <IngresoPersonaLooker
-                personaId={form.persona_id}
-                personaDocumento={form.persona_documento}
-                personaNombre={form.persona_nombre}
-                onSelect={applyPersonaLookup}
-                onQueryChange={handlePersonaQueryChange}
-                onCreateRequest={openCreatePersonaForm}
-                error={personaDocumentoError}
-            />
+            {showPersonaLooker && (
+                <IngresoPersonaLooker
+                    personaId={form.persona_id}
+                    personaDocumento={form.persona_documento}
+                    personaNombre={form.persona_nombre}
+                    juridicaOnly={isFactura}
+                    onSelect={applyPersonaLookup}
+                    onQueryChange={handlePersonaQueryChange}
+                    onCreateRequest={openCreatePersonaForm}
+                    error={personaDocumentoError}
+                />
+            )}
 
             <SimpleInput
                 label="Dirección"

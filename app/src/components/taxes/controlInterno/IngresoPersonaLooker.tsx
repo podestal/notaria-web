@@ -1,13 +1,20 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import useAuthStore from "../../../store/useAuthStore"
 import useLookupPersonas from "../../../hooks/taxes/personas/useLookupPersonas"
 import type { Persona } from "../../../services/taxes/personasService"
+import {
+    extractLeadingDocumentNumber,
+    findPersonaByNumeroDocumento,
+} from "../../../services/taxes/findPersonaByNumeroDocumento"
 import getTitleCase from "../../../utils/getTitleCase"
+import { isPersonaJuridicaRecord } from "../personas/personaFormShared"
 
 interface Props {
     personaId: number
     personaDocumento: string
     personaNombre: string
+    juridicaOnly?: boolean
     onSelect: (persona: Persona) => void
     onQueryChange: (query: string) => void
     onCreateRequest: (query: string) => void
@@ -33,6 +40,7 @@ const IngresoPersonaLooker = ({
     personaId,
     personaDocumento,
     personaNombre,
+    juridicaOnly = false,
     onSelect,
     onQueryChange,
     onCreateRequest,
@@ -62,12 +70,55 @@ const IngresoPersonaLooker = ({
         }
     }, [personaId, personaDocumento, personaNombre])
 
-    const { data: results = [], isLoading, isError, error: fetchError } =
+    const documentQuery = useMemo(
+        () => extractLeadingDocumentNumber(debouncedQuery),
+        [debouncedQuery],
+    )
+
+    const isCompleteDocumentQuery =
+        debouncedQuery.trim() === documentQuery &&
+        (juridicaOnly
+            ? documentQuery.length === 11
+            : documentQuery.length === 8 || documentQuery.length === 11)
+
+    const { data: exactPersona, isLoading: loadingExactPersona } = useQuery({
+        queryKey: ["persona-by-numero-documento", documentQuery],
+        queryFn: () => findPersonaByNumeroDocumento(access, documentQuery),
+        enabled:
+            open &&
+            isCompleteDocumentQuery &&
+            personaId <= 0 &&
+            Boolean(access),
+        staleTime: 30_000,
+    })
+
+    const { data: results = [], isLoading: loadingLookup, isError, error: fetchError } =
         useLookupPersonas({
             access,
             q: debouncedQuery,
-            enabled: open && debouncedQuery.length > 0 && personaId <= 0,
+            enabled:
+                open &&
+                debouncedQuery.length > 0 &&
+                personaId <= 0 &&
+                !isCompleteDocumentQuery,
         })
+
+    const visibleResults = useMemo(() => {
+        const merged = [...results]
+
+        if (
+            exactPersona &&
+            !merged.some((persona) => persona.id_persona === exactPersona.id_persona)
+        ) {
+            merged.unshift(exactPersona)
+        }
+
+        return juridicaOnly
+            ? merged.filter(isPersonaJuridicaRecord)
+            : merged
+    }, [results, exactPersona, juridicaOnly])
+
+    const isLoading = loadingLookup || loadingExactPersona
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -96,6 +147,18 @@ const IngresoPersonaLooker = ({
         setOpen(false)
     }
 
+    useEffect(() => {
+        if (!exactPersona || personaId > 0 || !isCompleteDocumentQuery) return
+        if (juridicaOnly && !isPersonaJuridicaRecord(exactPersona)) return
+
+        onSelect(exactPersona)
+        setQuery(
+            `${exactPersona.numero_documento} — ${getPersonaDisplayName(exactPersona)}`,
+        )
+        setDebouncedQuery("")
+        setOpen(false)
+    }, [exactPersona, isCompleteDocumentQuery, juridicaOnly, personaId, onSelect])
+
     const showDropdown = open && debouncedQuery.length > 0 && personaId <= 0
 
     return (
@@ -109,7 +172,11 @@ const IngresoPersonaLooker = ({
                     value={query}
                     onChange={(e) => handleQueryChange(e.target.value)}
                     onFocus={() => setOpen(true)}
-                    placeholder="Documento, nombres o apellidos…"
+                    placeholder={
+                        juridicaOnly
+                            ? "RUC, razón social o nombre comercial…"
+                            : "Documento, nombres o apellidos…"
+                    }
                     className={`min-w-64 w-full rounded-md border bg-white py-2 px-3 text-sm text-slate-700 outline-none focus:ring-2 ${
                         error
                             ? "border-red-500 focus:ring-red-300"
@@ -133,10 +200,12 @@ const IngresoPersonaLooker = ({
                             </li>
                         )}
 
-                        {!isLoading && !isError && results.length === 0 && (
+                        {!isLoading && !isError && visibleResults.length === 0 && (
                             <li className="px-3 py-2">
                                 <p className="text-xs text-slate-500">
-                                    No se encontraron personas.
+                                    {juridicaOnly
+                                        ? "No se encontraron personas jurídicas."
+                                        : "No se encontraron personas."}
                                 </p>
                                 <button
                                     type="button"
@@ -152,7 +221,7 @@ const IngresoPersonaLooker = ({
                         )}
 
                         {!isLoading &&
-                            results.map((persona) => (
+                            visibleResults.map((persona) => (
                                 <li key={persona.id_persona}>
                                     <button
                                         type="button"

@@ -1,36 +1,13 @@
 import getCliente2Service from "../../services/api/clienteService"
 import type { Documento } from "../../services/taxes/documentosService"
+import { findPersonaByNumeroDocumento } from "./findPersonaByNumeroDocumento"
 import {
     getPersonasServiceSingle,
-    normalizePersonasLookupResults,
-    personasLookupService,
-    personasService,
     type CreateUpdatePersona,
     type Persona,
 } from "../../services/taxes/personasService"
 import { enrichPersonaFromPayload } from "../../components/taxes/personas/personaFormShared"
 import { cliente2ToPersonaPayload } from "../../utils/taxes/cliente2ToPersonaPayload"
-
-const findPersonaByDocumento = async (
-    access: string,
-    numeroDocumento: string,
-): Promise<Persona | null> => {
-    const trimmed = numeroDocumento.trim()
-    if (!trimmed) return null
-
-    const page = await personasService.get(access, {
-        page: "1",
-        numero_documento: trimmed,
-    })
-    const exactFromList = page.results?.find(
-        (persona) => persona.numero_documento === trimmed,
-    )
-    if (exactFromList) return exactFromList
-
-    const lookup = await personasLookupService.get(access, { q: trimmed })
-    const results = normalizePersonasLookupResults(lookup)
-    return results.find((persona) => persona.numero_documento === trimmed) ?? null
-}
 
 export const resolvePersonaFromContratante = async (
     access: string,
@@ -45,7 +22,7 @@ export const resolvePersonaFromContratante = async (
         throw new Error("El contratante no tiene número de documento.")
     }
 
-    const existing = await findPersonaByDocumento(access, payload.numero_documento)
+    const existing = await findPersonaByNumeroDocumento(access, payload.numero_documento)
     if (existing) {
         return {
             persona: enrichPersonaFromPayload(existing, payload),
