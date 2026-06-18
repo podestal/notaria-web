@@ -1,3 +1,4 @@
+import { ClipboardList, Receipt } from "lucide-react"
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import useAuthStore from "../../../../store/useAuthStore"
@@ -19,6 +20,26 @@ import KardexComprobanteCard from "./KardexComprobanteCard"
 
 interface Props {
     kardexCode: string
+}
+
+interface SummaryChipProps {
+    label: string
+    count: number
+    icon: typeof ClipboardList
+    className: string
+}
+
+const SummaryChip = ({ label, count, icon: Icon, className }: SummaryChipProps) => {
+    if (count <= 0) return null
+
+    return (
+        <span
+            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${className}`}
+        >
+            <Icon className="h-3.5 w-3.5" aria-hidden />
+            {count} {label}
+        </span>
+    )
 }
 
 const KardexFacturacionComprobantes = ({ kardexCode }: Props) => {
@@ -83,30 +104,57 @@ const KardexFacturacionComprobantes = ({ kardexCode }: Props) => {
 
     if (totalCount === 0) {
         return (
-            <p className="text-sm text-slate-500">
-                Aún no hay comprobantes vinculados a este kardex.
-            </p>
+            <div className="rounded-lg border border-dashed border-slate-200 bg-white px-4 py-6 text-center">
+                <p className="text-sm font-medium text-slate-700">
+                    Sin comprobantes en este kardex
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                    Los documentos que emita aparecerán aquí antes de crear uno nuevo.
+                </p>
+            </div>
         )
     }
 
     return (
         <div className="space-y-4">
-            <p className="text-xs text-slate-500">
-                {totalCount} comprobante{totalCount === 1 ? "" : "s"} vinculado
-                {totalCount === 1 ? "" : "s"} a este kardex.
-            </p>
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2.5">
+                <p className="text-sm font-semibold text-slate-800">
+                    {totalCount} documento{totalCount === 1 ? "" : "s"} en este kardex
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                    <SummaryChip
+                        label={ingresosCount === 1 ? "control interno" : "controles internos"}
+                        count={ingresosCount}
+                        icon={ClipboardList}
+                        className="bg-indigo-100 text-indigo-800"
+                    />
+                    <SummaryChip
+                        label={
+                            recibosCount === 1
+                                ? "boleta o factura"
+                                : "boletas y facturas"
+                        }
+                        count={recibosCount}
+                        icon={Receipt}
+                        className="bg-emerald-100 text-emerald-800"
+                    />
+                </div>
+            </div>
 
             {ingresosCount > 0 && (
                 <section className="space-y-2">
-                    <header className="flex items-center justify-between gap-2">
-                        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <header className="flex items-center gap-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-100 text-indigo-700">
+                            <ClipboardList className="h-3.5 w-3.5" aria-hidden />
+                        </span>
+                        <h4 className="text-xs font-bold uppercase tracking-wide text-indigo-800">
                             Control interno
                         </h4>
-                        <span className="text-[11px] text-slate-400">
-                            {ingresosCount} ingreso{ingresosCount === 1 ? "" : "s"}
+                        <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-700">
+                            {ingresosCount}
                         </span>
                     </header>
-                    <ul className="space-y-2">
+                    <ul className="grid gap-3 sm:grid-cols-2">
                         {ingresos.map((item) => (
                             <li key={getComprobanteItemId(item)}>
                                 <KardexComprobanteCard
@@ -137,15 +185,18 @@ const KardexFacturacionComprobantes = ({ kardexCode }: Props) => {
 
             {recibosCount > 0 && (
                 <section className="space-y-2">
-                    <header className="flex items-center justify-between gap-2">
-                        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Recibos
+                    <header className="flex items-center gap-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-100 text-emerald-700">
+                            <Receipt className="h-3.5 w-3.5" aria-hidden />
+                        </span>
+                        <h4 className="text-xs font-bold uppercase tracking-wide text-emerald-800">
+                            Boletas y facturas
                         </h4>
-                        <span className="text-[11px] text-slate-400">
-                            {recibosCount} recibo{recibosCount === 1 ? "" : "s"}
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                            {recibosCount}
                         </span>
                     </header>
-                    <ul className="space-y-2">
+                    <ul className="grid gap-3 sm:grid-cols-2">
                         {recibos.map((item) => (
                             <li key={getComprobanteItemId(item)}>
                                 <KardexComprobanteCard
