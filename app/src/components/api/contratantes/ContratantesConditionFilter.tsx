@@ -1,7 +1,6 @@
-import { useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { ChevronDown, ListChecks } from "lucide-react"
 import FilteredActoCondiciones from "../actoCondicion/FilteredActoCondiciones"
-import TopModal from "../../ui/TopModal"
-import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray"
 
 interface Props {
@@ -9,71 +8,85 @@ interface Props {
     idtipoacto: string
     selectedActos: string[]
     setSelectedActos: React.Dispatch<React.SetStateAction<string[]>>
+    expanded: boolean
+    onToggle: () => void
 }
 
-const ContratantesConditionFilter = ({ idtipoacto, selectedActos, setSelectedActos, kardex }: Props) => {
-
-    const [open, setOpen] = useState(false)
-    const { setMessage, setShow, setType } = useNotificationsStore()
+const ContratantesConditionFilter = ({
+    idtipoacto,
+    selectedActos,
+    setSelectedActos,
+    kardex,
+    expanded,
+    onToggle,
+}: Props) => {
     const tiposActos = getTipoActoIdArray(idtipoacto)
+    const selectedCount = selectedActos.length
 
-  return (
-    <>
-        <div className="w-full flex justify-center items-center gap-4">
-            <button 
+    return (
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <button
                 type="button"
-                onClick={() => setOpen(true)}
-                className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
-                <span className="font-bold text-green-600 text-md">+</span>
-                <span>Condición</span>
+                onClick={onToggle}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-slate-50"
+            >
+                <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                        <ListChecks className="h-4 w-4" aria-hidden />
+                    </span>
+                    <div>
+                        <p className="text-sm font-semibold text-slate-800">Condiciones</p>
+                        <p className="text-xs text-slate-500">
+                            {selectedCount === 0
+                                ? "Ninguna seleccionada"
+                                : `${selectedCount} condición${selectedCount === 1 ? "" : "es"} seleccionada${selectedCount === 1 ? "" : "s"}`}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    {selectedCount > 0 && (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                            {selectedCount}
+                        </span>
+                    )}
+                    <ChevronDown
+                        className={`h-5 w-5 shrink-0 text-slate-400 transition-transform ${expanded ? "rotate-180" : ""}`}
+                        aria-hidden
+                    />
+                </div>
             </button>
-            <button 
-                type="button"
-                onClick={() => setOpen(true)}
-                className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex flex-col gap-1">
-                <span className="font-bold text-red-600 text-md">-</span>
-                <span>Condición</span>
-            </button>
+
+            <AnimatePresence initial={false}>
+                {expanded && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden border-t border-slate-100 bg-slate-50/60"
+                    >
+                        <div className="space-y-3 p-4">
+                            {tiposActos.length === 0 ? (
+                                <p className="rounded-lg border border-dashed border-slate-200 bg-white px-4 py-6 text-center text-xs text-slate-500">
+                                    No hay tipos de acto configurados para este kardex.
+                                </p>
+                            ) : (
+                                tiposActos.map((tipo) => (
+                                    <FilteredActoCondiciones
+                                        key={tipo}
+                                        kardex={kardex}
+                                        idtipoacto={tipo}
+                                        selectedActos={selectedActos}
+                                        setSelectedActos={setSelectedActos}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
-        <TopModal
-            isOpen={open}
-            onClose={() => {
-                setOpen(false)
-                // setSelectedActos([])
-            }}
-        >
-            {tiposActos.length > 0 && tiposActos.map((tipo, index) => (
-                <FilteredActoCondiciones 
-                    kardex={kardex}
-                    idtipoacto={tipo}
-                    selectedActos={selectedActos}
-                    setSelectedActos={setSelectedActos}
-                    key={index}
-                />
-            ))}
-            <div className="w-full flex justify-center items-center gap-4">
-                <button 
-                    className="bg-blue-600 px-4 py-2 transition duration-300 text-xs border-1 text-white border-blue-300 cursor-pointer hover:bg-blue-500 rounded-md mt-4"
-                    type="button"
-                    onClick={() => {
-                        if (selectedActos.length === 0) {
-                            setMessage("Debe seleccionar al menos una condición")
-                            setType("error")
-                            setShow(true)
-                        } else {
-                            setMessage("Condiciones seleccionadas correctamente")
-                            setType("success")
-                            setShow(true)
-                            setOpen(false)
-                        }
-                    }}
-                >
-                    Aceptar
-                </button>
-            </div>
-        </TopModal>
-    </>
-  )
+    )
 }
 
 export default ContratantesConditionFilter

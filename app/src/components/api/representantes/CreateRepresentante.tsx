@@ -19,6 +19,7 @@ interface Props {
     editingContratanteId?: string
     linkedRepresentanteContratanteId?: string
     initialRepresentanteData?: RepresentanteContratanteData
+    embedded?: boolean
 }
 
 const CreateRepresentante = ({
@@ -30,6 +31,7 @@ const CreateRepresentante = ({
     editingContratanteId,
     linkedRepresentanteContratanteId,
     initialRepresentanteData,
+    embedded = false,
 }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
@@ -76,6 +78,7 @@ const CreateRepresentante = ({
             existingRepresentante={existingRepresentante}
             linkedRepresentanteContratanteId={linkedRepresentanteContratanteId}
             initialRepresentanteData={initialRepresentanteData}
+            embedded={embedded}
         />
     </div>
   )

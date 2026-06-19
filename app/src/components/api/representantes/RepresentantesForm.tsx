@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
+import { CheckCircle2, UserRound } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
-import SimpleInput from "../../ui/SimpleInput"
-import SimpleSelector from "../../ui/SimpleSelector"
 import { SedeRegistral } from "../../../services/api/sedesRegistralesService"
 import { Contratante, RepresentanteContratanteData } from "../../../services/api/contratantesService"
 import getTitleCase from "../../../utils/getTitleCase"
@@ -14,7 +13,6 @@ import useAuthStore from "../../../store/useAuthStore"
 import {
     parseInscritoValue,
     parseSedeRegistralValue,
-    representanteToContratanteData,
     resolveLinkedRepresentanteContratanteId,
 } from "../../../utils/representanteFormUtils"
 
@@ -31,12 +29,32 @@ interface Props {
         idcontratanterp: string,
         representanteData: RepresentanteContratanteData
     ) => void
-    /** Contratante row being edited (persona jurídica represented). */
     editingContratanteId?: string
     existingRepresentante?: Representante | null
     linkedRepresentanteContratanteId?: string
     initialRepresentanteData?: RepresentanteContratanteData
+    embedded?: boolean
 }
+
+const fieldControlClass =
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
+
+interface RegistralFieldProps {
+    label: string
+    htmlFor: string
+    error?: string
+    children: ReactNode
+}
+
+const RegistralField = ({ label, htmlFor, error, children }: RegistralFieldProps) => (
+    <div className="flex flex-col gap-1.5">
+        <label htmlFor={htmlFor} className="text-xs font-semibold text-slate-700">
+            {label}
+        </label>
+        {children}
+        {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+)
 
 const RepresentantesForm = ({
     sedesRegistrales,
@@ -52,21 +70,21 @@ const RepresentantesForm = ({
     existingRepresentante,
     linkedRepresentanteContratanteId,
     initialRepresentanteData,
+    embedded = false,
 }: Props) => {
-
     const queryClient = useQueryClient()
     const { setMessage, setShow, setType } = useNotificationsStore()
     const access = useAuthStore((s) => s.access_token) || ""
 
     const [representanteRecordId, setRepresentanteRecordId] = useState<number | null>(null)
-    const [facultades, setFacultades] = useState('')
+    const [facultades, setFacultades] = useState("")
     const [subscribed, setSubscribed] = useState(1)
     const [sedeRegistral, setSedeRegistral] = useState(0)
-    const [nPartida, setNPartida] = useState('')
+    const [nPartida, setNPartida] = useState("")
 
-    const [facultadesError, setFacultadesError] = useState('')
-    const [sedeRegistralError, setSedeRegistralError] = useState('')
-    const [nPartidaError, setNPartidaError] = useState('')
+    const [facultadesError, setFacultadesError] = useState("")
+    const [sedeRegistralError, setSedeRegistralError] = useState("")
+    const [nPartidaError, setNPartidaError] = useState("")
 
     const resolvedLinkedId = useMemo(
         () =>
@@ -78,23 +96,28 @@ const RepresentantesForm = ({
         [linkedRepresentanteContratanteId, existingRepresentante, contratantes]
     )
 
+    const availableContratantes = useMemo(
+        () => contratantes.filter((contratante) => contratante.idcontratante !== editingContratanteId),
+        [contratantes, editingContratanteId]
+    )
+
     useEffect(() => {
         if (existingRepresentante?.id) {
             setRepresentanteRecordId(existingRepresentante.id)
-            setFacultades(existingRepresentante.facultades ?? '')
+            setFacultades(existingRepresentante.facultades ?? "")
             setSubscribed(parseInscritoValue(existingRepresentante.inscrito))
             setSedeRegistral(parseSedeRegistralValue(existingRepresentante.sede_registral))
-            setNPartida(existingRepresentante.partida ?? '')
+            setNPartida(existingRepresentante.partida ?? "")
             return
         }
 
         setRepresentanteRecordId(null)
         if (!initialRepresentanteData) return
 
-        setFacultades(initialRepresentanteData.facultades ?? '')
+        setFacultades(initialRepresentanteData.facultades ?? "")
         setSubscribed(parseInscritoValue(initialRepresentanteData.inscrito))
         setSedeRegistral(parseSedeRegistralValue(initialRepresentanteData.idsedereg))
-        setNPartida(initialRepresentanteData.numpartida ?? '')
+        setNPartida(initialRepresentanteData.numpartida ?? "")
     }, [existingRepresentante, initialRepresentanteData])
 
     const isInscrito = subscribed === 1
@@ -103,16 +126,16 @@ const RepresentantesForm = ({
         setSubscribed(value)
         if (value === 0) {
             setSedeRegistral(0)
-            setNPartida('')
-            setSedeRegistralError('')
-            setNPartidaError('')
+            setNPartida("")
+            setSedeRegistralError("")
+            setNPartidaError("")
         }
     }
 
     const validateRepresentanteFields = (): boolean => {
-        setFacultadesError('')
-        setSedeRegistralError('')
-        setNPartidaError('')
+        setFacultadesError("")
+        setSedeRegistralError("")
+        setNPartidaError("")
         return true
     }
 
@@ -121,18 +144,18 @@ const RepresentantesForm = ({
         representanteData: RepresentanteContratanteData,
         isUpdate: boolean
     ) => {
-        setType('success')
+        setType("success")
         setMessage(
-            isUpdate
-                ? 'Representante actualizado correctamente'
-                : 'Representante creado correctamente'
+            isUpdate ? "Representante actualizado correctamente" : "Representante creado correctamente"
         )
         setShow(true)
-        setOpenRepForm(false)
+        if (!embedded) {
+            setOpenRepForm(false)
+        }
 
         if (editingContratanteId) {
             queryClient.invalidateQueries({
-                queryKey: ['representante', 'by_contratante', editingContratanteId],
+                queryKey: ["representante", "by_contratante", editingContratanteId],
             })
         }
 
@@ -149,8 +172,8 @@ const RepresentantesForm = ({
             return
         }
 
-        const sedeValue = isInscrito ? sedeRegistral.toString() : ''
-        const partidaValue = isInscrito ? nPartida : ''
+        const sedeValue = isInscrito ? sedeRegistral.toString() : ""
+        const partidaValue = isInscrito ? nPartida : ""
 
         const representanteData: RepresentanteContratanteData = {
             facultades,
@@ -174,7 +197,7 @@ const RepresentantesForm = ({
         }
 
         const onError = (error: Error) => {
-            setType('error')
+            setType("error")
             setMessage(`Error al guardar el representante: ${error.message}`)
             setShow(true)
         }
@@ -208,98 +231,170 @@ const RepresentantesForm = ({
 
     const isSaving = createRepresentante.isPending || updateRepresentante.isPending
 
-  return (
-        <div className="flex flex-col gap-4 p-4">
-            <h2 className="text-2xl text-center mb-2">Representante</h2>
-            {existingRepresentante?.id && (
-                <p className="text-xs text-center text-slate-600 mb-2">
-                    Datos cargados del registro de representantes. Puede actualizar y cambiar la persona.
-                </p>
-            )}
-            <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
-                <SimpleInput 
-                    label="Facultades"
-                    value={facultades}
-                    setValue={setFacultades}
-                    horizontal
-                    error={facultadesError}
-                    setError={setFacultadesError}
-                />
-                </div>
-                <SimpleSelector 
-                    label="Inscrito"
-                    options={[
-                        { label: 'Sí', value: 1 },
-                        { label: 'No', value: 0 }
-                    ]}
-                    setter={handleSubscribedChange}
-                    defaultValue={subscribed}
-                />
-            </div>
-            {isInscrito && (
-            <div className="grid grid-cols-2 gap-4">
-                <SimpleSelector 
-                    label="Sede Registral"
-                    options={sedesRegistrales.map(sede => ({
-                        label: sede.dessede,
-                        value: parseInt(sede.idsedereg, 10),
-                    }))}
-                    setter={setSedeRegistral}
-                    defaultValue={sedeRegistral}
-                    error={sedeRegistralError}
-                    setError={setSedeRegistralError}
-                />
-                <SimpleInput 
-                    label="Número de Partida"
-                    value={nPartida}
-                    setValue={setNPartida}
-                    horizontal
-                    error={nPartidaError}
-                    setError={setNPartidaError}
-                />
-            </div>
-            )}
-            <div className="mt-6 flex flex-col gap-4">
-                {contratantes.length === 0 && (
-                    <p className="text-center text-gray-500 mt-4">No hay contratantes registrados.</p>
+    return (
+        <div
+            className={
+                embedded
+                    ? "overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+                    : "flex flex-col gap-4 p-4"
+            }
+        >
+            <div className={embedded ? "border-b border-slate-100 bg-slate-50/80 px-4 py-3" : ""}>
+                <h2
+                    className={`font-semibold text-slate-800 ${embedded ? "text-sm" : "mb-2 text-center text-2xl"}`}
+                >
+                    Datos del representante
+                </h2>
+                {embedded && (
+                    <p className="mt-0.5 text-xs text-slate-500">
+                        Complete los datos registrales y elija quién representará al contratante.
+                    </p>
                 )}
-                {contratantes
-                    .filter((c) => c.idcontratante !== editingContratanteId)
-                    .map((contratante) => {
-                    const isLinked = contratante.idcontratante === resolvedLinkedId
-                    return (
-                    <div
-                        key={contratante.idcontratante}
-                        className={`grid grid-cols-3 gap-4 items-center p-2 rounded-md transition-colors duration-200 ${
-                            isLinked
-                                ? 'bg-blue-50 border border-blue-300'
-                                : 'hover:bg-gray-100'
-                        }`}
-                    >
-                        <p className="text-xs col-span-2">
-                            {getTitleCase(contratante.cliente)}
-                            {isLinked && (
-                                <span className="ml-2 text-blue-700 font-semibold">(actual)</span>
-                            )}
-                        </p>
-                        <button 
-                            onClick={() => handleSubmit(contratante)}
-                            type="button"
-                            disabled={isSaving}
-                            className="text-xs bg-blue-600 text-white w-[60%] py-1 rounded-2xl cursor-pointer hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {isSaving
-                                ? 'Guardando...'
-                                : isLinked && representanteRecordId
-                                    ? 'Actualizar'
-                                    : 'Seleccionar'}
-                        </button>
+            </div>
+
+            <div className={embedded ? "space-y-5 p-4" : "flex flex-col gap-4"}>
+                <section className="rounded-lg border border-slate-200 bg-slate-50/40 p-4">
+                    <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Información registral
+                    </p>
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        <RegistralField label="Facultades" htmlFor="rep-facultades" error={facultadesError}>
+                            <input
+                                id="rep-facultades"
+                                type="text"
+                                value={facultades}
+                                onChange={(e) => {
+                                    setFacultadesError("")
+                                    setFacultades(e.target.value)
+                                }}
+                                placeholder="Facultades"
+                                className={fieldControlClass}
+                            />
+                        </RegistralField>
+                        {isInscrito && (
+                            <RegistralField
+                                label="Número de Partida"
+                                htmlFor="rep-partida"
+                                error={nPartidaError}
+                            >
+                                <input
+                                    id="rep-partida"
+                                    type="text"
+                                    value={nPartida}
+                                    onChange={(e) => {
+                                        setNPartidaError("")
+                                        setNPartida(e.target.value)
+                                    }}
+                                    placeholder="Número de Partida"
+                                    className={fieldControlClass}
+                                />
+                            </RegistralField>
+                        )}
                     </div>
-                )})}
+                    <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        <RegistralField label="Inscrito" htmlFor="rep-inscrito">
+                            <select
+                                id="rep-inscrito"
+                                value={subscribed}
+                                onChange={(e) => handleSubscribedChange(parseInt(e.target.value, 10))}
+                                className={fieldControlClass}
+                            >
+                                <option value={1}>Sí</option>
+                                <option value={0}>No</option>
+                            </select>
+                        </RegistralField>
+                        {isInscrito && (
+                            <RegistralField
+                                label="Sede Registral"
+                                htmlFor="rep-sede"
+                                error={sedeRegistralError}
+                            >
+                                <select
+                                    id="rep-sede"
+                                    value={sedeRegistral}
+                                    onChange={(e) => {
+                                        setSedeRegistralError("")
+                                        setSedeRegistral(parseInt(e.target.value, 10))
+                                    }}
+                                    className={fieldControlClass}
+                                >
+                                    <option value={0}>Seleccione sede registral</option>
+                                    {sedesRegistrales.map((sede) => (
+                                        <option key={sede.idsedereg} value={parseInt(sede.idsedereg, 10)}>
+                                            {sede.dessede}
+                                        </option>
+                                    ))}
+                                </select>
+                            </RegistralField>
+                        )}
+                    </div>
+                </section>
+
+                <section>
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Elegir persona representante
+                    </p>
+                    <div className="flex flex-col gap-2">
+                        {availableContratantes.length === 0 && (
+                            <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-xs text-slate-500">
+                                No hay otras personas registradas como contratantes en este kardex.
+                            </p>
+                        )}
+                        {availableContratantes.map((contratante) => {
+                            const isLinked = contratante.idcontratante === resolvedLinkedId
+
+                            return (
+                                <div
+                                    key={contratante.idcontratante}
+                                    className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${
+                                        isLinked
+                                            ? "border-emerald-300 bg-emerald-50/70 ring-1 ring-emerald-100"
+                                            : "border-slate-200 bg-white hover:bg-slate-50"
+                                    }`}
+                                >
+                                    <span
+                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                                            isLinked
+                                                ? "bg-emerald-100 text-emerald-700"
+                                                : "bg-slate-100 text-slate-500"
+                                        }`}
+                                    >
+                                        {isLinked ? (
+                                            <CheckCircle2 className="h-4 w-4" aria-hidden />
+                                        ) : (
+                                            <UserRound className="h-4 w-4" aria-hidden />
+                                        )}
+                                    </span>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-medium text-slate-800">
+                                            {getTitleCase(contratante.cliente)}
+                                        </p>
+                                        {isLinked && (
+                                            <p className="text-xs text-emerald-700">Seleccionado como representante</p>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => handleSubmit(contratante)}
+                                        type="button"
+                                        disabled={isSaving}
+                                        className="shrink-0 rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-xs transition duration-300 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        {isSaving
+                                            ? "Guardando..."
+                                            : isLinked && representanteRecordId
+                                              ? "Actualizar"
+                                              : isLinked
+                                                ? "Confirmar"
+                                                : "Seleccionar"}
+                                    </button>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </section>
             </div>
         </div>
-  )
+    )
 }
 
 export default RepresentantesForm

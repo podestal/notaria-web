@@ -14,6 +14,7 @@ interface Props {
     idkardex?: number
     contratante: Contratante
     setCloseUpdateContratante: React.Dispatch<React.SetStateAction<boolean>>
+    onRegisterCloseGuard?: (guard: () => boolean) => void
 }
 
 const PreUpdateContratantesForm = ({
@@ -23,6 +24,7 @@ const PreUpdateContratantesForm = ({
     idkardex,
     contratante,
     setCloseUpdateContratante,
+    onRegisterCloseGuard,
 }: Props) => {
 
     const access = useAuthStore((state) => state.access_token) || ''
@@ -76,6 +78,7 @@ const PreUpdateContratantesForm = ({
                 contratante={contratanteForForm}
                 updateContratante={updateContratante}
                 selectedTipoPersona={cliente2.tipper === 'N' ? 1 : 2}
+                onRegisterCloseGuard={onRegisterCloseGuard}
             />}
         {showClienteForm &&
         <UpdateCliente2 

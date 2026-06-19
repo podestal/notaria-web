@@ -1,7 +1,7 @@
 import { Pencil } from "lucide-react"
 import { Contratante } from "../../../services/api/contratantesService"
 import TopModal from "../../ui/TopModal"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import PreUpdateContratantesForm from "./PreUpdateContratantesForm"
 
 interface Props {
@@ -14,6 +14,12 @@ interface Props {
 
 const UpdateContratante = ({ idtipoacto, idtipkar, kardex, idkardex, contratante }: Props) => {
     const [open, setOpen] = useState(false)
+    const closeGuardRef = useRef<(() => boolean) | null>(null)
+
+    const handleClose = () => {
+        if (closeGuardRef.current && !closeGuardRef.current()) return
+        setOpen(false)
+    }
 
   return (
     <>
@@ -28,7 +34,7 @@ const UpdateContratante = ({ idtipoacto, idtipkar, kardex, idkardex, contratante
     </button>
     <TopModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
     >
         <PreUpdateContratantesForm 
             idtipoacto={idtipoacto}
@@ -37,6 +43,9 @@ const UpdateContratante = ({ idtipoacto, idtipkar, kardex, idkardex, contratante
             idkardex={idkardex}
             contratante={contratante}
             setCloseUpdateContratante={setOpen}
+            onRegisterCloseGuard={(guard) => {
+                closeGuardRef.current = guard
+            }}
         />
     
     </TopModal>
