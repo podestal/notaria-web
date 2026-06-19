@@ -58,5 +58,33 @@ export const toDateInputValue = (value: string | null | undefined): string => {
         return `${slashMatch[3]}-${slashMatch[2]}-${slashMatch[1]}`
     }
 
+    const dashMatch = value.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/)
+    if (dashMatch) {
+        return `${dashMatch[3]}-${dashMatch[2]}-${dashMatch[1]}`
+    }
+
     return value.slice(0, 10)
+}
+
+/** Parse API/display dates (DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD) as local calendar date. */
+export const parseDisplayDate = (value: string | null | undefined): Date | undefined => {
+    if (!value?.trim()) return undefined
+
+    const normalized = toDateInputValue(value)
+    const parts = parseLocalDateParts(normalized)
+    if (parts) {
+        return new Date(parts.year, parts.month - 1, parts.day)
+    }
+
+    return undefined
+}
+
+/** Format date for kardex API payloads (DD/MM/YYYY). */
+export const formatKardexFechaIngreso = (date: Date | undefined | null): string => {
+    if (!date || Number.isNaN(date.getTime())) return ""
+
+    const day = String(date.getDate()).padStart(2, "0")
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
 }

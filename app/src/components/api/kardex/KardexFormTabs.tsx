@@ -1,66 +1,79 @@
 import { motion } from "framer-motion"
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react"
 
 interface Tab {
-    id: string;
-    label: string;
-    content: ReactNode;
-    notAllowed?: boolean;
+    id: string
+    label: string
+    content: ReactNode
+    notAllowed?: boolean
 }
 
 interface Props {
-    tabs: Tab[];
+    tabs: Tab[]
     setFilter?: React.Dispatch<React.SetStateAction<string>>
     initialActiveTab?: string
     extraFunction?: () => void
 }
 
-const KardexFormTabs = ({ 
-    tabs, 
+const KardexFormTabs = ({
+    tabs,
     setFilter,
     initialActiveTab,
-    extraFunction
+    extraFunction,
 }: Props) => {
-
-    const [activeTab, setActiveTab] = useState(initialActiveTab || (tabs[0]?.id ?? ''))
+    const [activeTab, setActiveTab] = useState(initialActiveTab || (tabs[0]?.id ?? ""))
 
     useEffect(() => {
         if (!initialActiveTab && setFilter) {
-            setFilter(tabs[0]?.id ?? '')
+            setFilter(tabs[0]?.id ?? "")
         }
-    }, [tabs, initialActiveTab, setFilter])
+    }, [tabs[0]?.id, initialActiveTab, setFilter])
 
-  return (
-    <div className="flex flex-col h-full w-full">
-        <div className="bg-slate-100 border-t border-slate-200 flex justify-center gap-2 p-4 sticky bottom-0 w-full">
-            {tabs.map((tab) => (
-                <motion.button
-                    key={tab.id}
-                    onClick={() => {
-                        setFilter &&setFilter(tab.id)
-                        setActiveTab(tab.id)
-                        extraFunction && extraFunction()
-                    }}
-                    disabled={tab.notAllowed}
-                    className={`px-4 py-2 rounded-full font-medium text-sm transition-all cursor-pointer
-                    ${tab.notAllowed && 'opacity-50 cursor-not-allowed'}
-                    ${
-                        activeTab === tab.id
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : 'bg-white text-slate-700 hover:bg-slate-200'
-                    }`}
-                    whileTap={{ scale: 0.97 }}
-                    whileHover={{ scale: 1.03 }}
-                >
-                    {tab.label}
-                </motion.button>
-            ))}
+    const activeContent = tabs.find((tab) => tab.id === activeTab)?.content
+
+    return (
+        <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-200 bg-slate-50/80 px-2 pt-2">
+                <div className="flex gap-1 overflow-x-auto pb-0.5">
+                    {tabs.map((tab) => {
+                        const isActive = activeTab === tab.id
+
+                        return (
+                            <motion.button
+                                key={tab.id}
+                                type="button"
+                                onClick={() => {
+                                    setFilter?.(tab.id)
+                                    setActiveTab(tab.id)
+                                    extraFunction?.()
+                                }}
+                                disabled={tab.notAllowed}
+                                className={`relative shrink-0 rounded-t-lg px-4 py-2.5 text-xs font-semibold transition ${
+                                    tab.notAllowed
+                                        ? "cursor-not-allowed opacity-50"
+                                        : "cursor-pointer"
+                                } ${
+                                    isActive
+                                        ? "bg-white text-sky-700 shadow-sm"
+                                        : "text-slate-600 hover:bg-white/70 hover:text-slate-800"
+                                }`}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                {tab.label}
+                                {isActive && (
+                                    <motion.span
+                                        layoutId="kardex-tab-indicator"
+                                        className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-sky-600"
+                                    />
+                                )}
+                            </motion.button>
+                        )
+                    })}
+                </div>
+            </div>
+            <div className="min-h-[12rem] p-4 sm:p-6">{activeContent}</div>
         </div>
-        <div className="flex-1 px-6 overflow-y-auto">
-            {tabs.find((tab) => tab.id === activeTab)?.content}
-        </div>
-    </div>
-  )
+    )
 }
 
 export default KardexFormTabs

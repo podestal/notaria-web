@@ -10,9 +10,10 @@ import { es } from "react-day-picker/locale";
 interface Props {
   selectedDate: Date | undefined;
   setSelectedDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  fullWidth?: boolean;
 }
 
-const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
+const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate, fullWidth = false }) => {
   const [open, setOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
@@ -61,14 +62,17 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate }) => {
   }, [open]);
 
   return (
-    <div className="relative my-auto w-56">
+    <div className={`relative my-auto ${fullWidth ? "w-full" : "w-56"}`}>
       <p
-        className="flex justify-center items-center gap-6 cursor-pointer text-center bg-white border-neutral-400 border-2 rounded-lg w-full text-xs px-2 py-2 focus:border-blue-700 focus:outline-none"
+        className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
         onClick={() => setOpen(true)}
       >
-        <span className="font-bold"></span>{' '}
-        {selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : 'Seleccione Fecha'}
-        <CalendarIcon />
+        <span className="font-medium">
+        {selectedDate && !Number.isNaN(selectedDate.getTime())
+            ? moment(selectedDate).format('DD-MM-YYYY')
+            : 'Seleccione fecha'}
+        </span>
+        <CalendarIcon className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
       </p>
       <AnimatePresence>
         {open && (

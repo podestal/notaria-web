@@ -1,10 +1,8 @@
-import { FileText } from "lucide-react"
+import { CalendarDays, FileText, Scale, Sparkles, Users } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
-import Selector from "../../ui/Selector"
 import getTitleCase from "../../../utils/getTitleCase"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Calendar from "../../ui/Calendar"
-import TimePicker from "../../ui/TimePicker"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
@@ -13,7 +11,6 @@ import useGetAbogados from "../../../hooks/api/abogados/useGetAbogados"
 import { CreateKardexData } from "../../../hooks/api/kardex/useCreateKardex"
 import { Kardex } from "../../../services/api/kardexService"
 import { UseMutationResult } from "@tanstack/react-query"
-import moment from "moment"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import KardexFormTabs from "./KardexFormTabs"
@@ -23,8 +20,6 @@ import MultiSelect from "../../ui/MultiSelect"
 import { AnimatePresence, motion } from "framer-motion"
 import KardexActosSelector from "./KardexActosSelector"
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray"
-import SimpleInput from "../../ui/SimpleInput"
-import SimpleSelector from "../../ui/SimpleSelector"
 import useUpdateKardex, { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
@@ -36,9 +31,11 @@ import EscrituracionMain from "../escrituracion/EscrituracionMain"
 import KardexFacturacionMain from "./facturacion/KardexFacturacionMain"
 import { isFacturacionEnabled } from "../../../utils/isFacturacionEnabled"
 import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
-import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
-import { getCurrentTimeHHmm } from "../../../utils/appTimezone"
 import { CreateUpdateKardex } from "../../../services/api/kardexService"
+import {
+    formatKardexFechaIngreso,
+    parseDisplayDate,
+} from "../../../utils/formatLocalDate"
 
 const getFacturacionTab = (kardex: Kardex) =>
     isFacturacionEnabled()
@@ -73,6 +70,63 @@ const preservedKardexFields = (existing?: Kardex | null): Pick<
     numminuta: existing?.numminuta ?? "",
 })
 
+const fieldInputClass =
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+
+const fieldSelectClass =
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+
+interface FieldLabelProps {
+    htmlFor?: string
+    children: React.ReactNode
+}
+
+const FieldLabel = ({ htmlFor, children }: FieldLabelProps) => (
+    <label
+        htmlFor={htmlFor}
+        className="block text-xs font-semibold uppercase tracking-wide text-slate-600"
+    >
+        {children}
+    </label>
+)
+
+interface FormFieldProps {
+    label: string
+    htmlFor?: string
+    children: React.ReactNode
+}
+
+const FormField = ({ label, htmlFor, children }: FormFieldProps) => (
+    <div className="flex flex-col gap-1.5">
+        <FieldLabel htmlFor={htmlFor}>{label}</FieldLabel>
+        <div className="min-h-[2.5rem]">{children}</div>
+    </div>
+)
+
+interface FormSectionProps {
+    title: string
+    description?: string
+    icon: React.ReactNode
+    children: React.ReactNode
+}
+
+const FormSection = ({ title, description, icon, children }: FormSectionProps) => (
+    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="mb-4 flex items-start gap-3 border-b border-slate-100 pb-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+                {icon}
+            </span>
+            <div>
+                <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+                {description && (
+                    <p className="mt-0.5 text-xs text-slate-500">{description}</p>
+                )}
+            </div>
+        </div>
+        {children}
+    </section>
+)
+
 interface Props {
     setNotAllowed?: React.Dispatch<React.SetStateAction<boolean>>
     kardex?: Kardex | null
@@ -102,17 +156,25 @@ const KardexForm = ({
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const [karedexReference, setKardexReference] = useState(kardex?.referencia || '') 
     const [selectedKardexType, setSelectedKardexType] = useState(kardex?.idtipkar || bodyRender) 
-    const [date, setDate] = useState<Date | undefined>(kardex ? moment(kardex?.fechaingreso, 'DD/MM/YYYY').toDate() : new Date())
-    const [selectedTime, setSelectedTime] = useState<string | undefined>(getCurrentTimeHHmm())
+    const [date, setDate] = useState<Date | undefined>(() =>
+        kardex?.fechaingreso
+            ? parseDisplayDate(kardex.fechaingreso) ?? new Date()
+            : new Date(),
+    )
 
     // const [contrato, setContrato] = useState<{ id: string; label: string } | null>(kardex ? {id: '', label: kardex.contrato} : null);
     const [contratos, setContratos] = useState<string[]>(kardex ? getTipoActoIdArray(kardex.codactos) : [])
-    const [contratosDes, setContratosDes] = useState<string[]>(kardex ? kardex.contrato?.split(' / ') : [])
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>(null)
     const [recepcion, setRecepcion] = useState<string>(kardex?.recepcion || user?.idusuario.toString() || '0')
 
     const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
     const kardexWithSelectedTemplate = kardex ? { ...kardex, fktemplate: selectedTemplate } : null
+
+    useEffect(() => {
+        if (!kardex?.fechaingreso) return
+        const parsed = parseDisplayDate(kardex.fechaingreso)
+        if (parsed) setDate(parsed)
+    }, [kardex?.fechaingreso])
 
     useEffect(() => {
         setSelectedTemplate(kardex?.fktemplate || 0)
@@ -142,7 +204,6 @@ const KardexForm = ({
         }
 
         const formattedContratoDes = contratosDes.map(des => des.trim()).join(' / ')
-        console.log('formattedContratoDes', formattedContratoDes);
         
         setLoading(true)
 
@@ -151,7 +212,7 @@ const KardexForm = ({
                 access,
                 kardex: {
                     idtipkar: selectedKardexType,
-                    fechaingreso: moment(date).format('DD/MM/YYYY'),
+                    fechaingreso: formatKardexFechaIngreso(date),
                     referencia: karedexReference,
                     codactos: contratos.join(''),
                     idusuario: Number(responsible.id),
@@ -206,7 +267,7 @@ const KardexForm = ({
             updateKardexInternal.mutate({
                 kardex: {
                     idtipkar: selectedKardexType,
-                    fechaingreso: moment(date).format('DD/MM/YYYY'),
+                    fechaingreso: formatKardexFechaIngreso(date),
                     referencia: karedexReference,
                     codactos: contratos.join(''),
                     idusuario: Number(responsible.id),
@@ -254,7 +315,7 @@ const KardexForm = ({
                 kardex: {
                     // idkardex: kardex?.idkardex || 0,
                     idtipkar: selectedKardexType,
-                    fechaingreso:kardex.fechaingreso,
+                    fechaingreso: formatKardexFechaIngreso(date) || kardex.fechaingreso,
                     referencia: karedexReference,
                     codactos: contratos.join(''),
                     idusuario: Number(responsible.id),
@@ -304,6 +365,19 @@ const KardexForm = ({
     const { data: abogados, isLoading: isLoadingAbogados, isError: isErrorAbogados, error: errorAbogados, isSuccess: isSuccessAbogados } = useGetAbogados({ access })
     const { data: templates, isSuccess: isSuccessTemplates } = useGetTemplatesByActos({ access, codactos: contratos.join('') })
 
+    const filteredTipoActos = useMemo(
+        () => (tipoActos ?? []).filter((acto) => acto.idtipkar === selectedKardexType),
+        [tipoActos, selectedKardexType],
+    )
+
+    const contratosDes = useMemo(
+        () =>
+            filteredTipoActos
+                .filter((acto) => contratos.includes(acto.idtipoacto))
+                .map((acto) => acto.desacto),
+        [filteredTipoActos, contratos],
+    )
+
     useEffect(() => {
         if (!isSuccessUsuarios || !usuarios?.length) return
 
@@ -311,37 +385,63 @@ const KardexForm = ({
         if (kardex && responsableId != null && responsableId > 0) {
             const saved = usuarios.find((u) => u.idusuario === responsableId)
             if (saved) {
-                setResponsible({ id: String(saved.idusuario), label: getTitleCase(getUsuarioDisplayName(saved)) })
+                const next = {
+                    id: String(saved.idusuario),
+                    label: getTitleCase(getUsuarioDisplayName(saved)),
+                }
+                setResponsible((prev) =>
+                    prev?.id === next.id && prev?.label === next.label ? prev : next,
+                )
             }
             return
         }
 
         if (!kardex && user?.idusuario) {
             const current = usuarios.find((u) => u.idusuario === user.idusuario)
-            setResponsible(
-                current
-                    ? { id: String(current.idusuario), label: getTitleCase(getUsuarioDisplayName(current)) }
-                    : { id: String(user.idusuario), label: user.username }
+            const next = current
+                ? {
+                      id: String(current.idusuario),
+                      label: getTitleCase(getUsuarioDisplayName(current)),
+                  }
+                : { id: String(user.idusuario), label: user.username }
+
+            setResponsible((prev) =>
+                prev?.id === next.id && prev?.label === next.label ? prev : next,
             )
         }
-    }, [kardex?.idkardex, kardex?.responsable, kardex?.idusuario, usuarios, isSuccessUsuarios, user, kardex])
+    }, [
+        kardex?.idkardex,
+        kardex?.responsable,
+        kardex?.idusuario,
+        usuarios,
+        isSuccessUsuarios,
+        user?.idusuario,
+        user?.username,
+    ])
 
-    if (isLoading || isLoadingUsuarios || isLoadingAbogados) return <p className="text-sm animate-pulse text-center my-10">Cargando ....</p>
+    if (isLoading || isLoadingUsuarios || isLoadingAbogados) {
+        return (
+            <div className="flex min-h-[16rem] items-center justify-center rounded-xl border border-slate-200 bg-white p-8">
+                <p className="text-sm font-medium text-slate-500 animate-pulse">
+                    Cargando formulario…
+                </p>
+            </div>
+        )
+    }
     if (isError) return <p className="text-center my-8">Error: {error.message}</p>
     if (isErrorUsuarios) return <p className="text-center my-8">Error: {errorUsuarios.message}</p>
     if (isErrorAbogados) return <p className="text-center my-8">Error: {errorAbogados.message}</p>
-    // if (isErrorTemplates) return <p className="text-center my-8">Error: {errorTemplates.message}</p>
     if (isSuccess && isSuccessUsuarios && isSuccessAbogados )
 
   return (
     <>
     <form 
         onSubmit={handleSubmit}
-        className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+        className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md"
     >
         <header className="flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-4">
             <div className="flex items-center gap-3">
-                <div className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2">
+                <div className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2.5">
                     <FileText className="h-5 w-5 text-sky-300" aria-hidden />
                 </div>
                 <div>
@@ -359,176 +459,245 @@ const KardexForm = ({
                 </span>
             )}
         </header>
-        <div className="bg-slate-50 p-4 text-slate-900">
-            <div className="flex justify-between items-center gap-4 mb-6">
-                <Selector 
-                    options={[{ value: 0, label: 'Tipo de Kardex' },...kardexTypes.map(type => ({ value: type.idtipkar, label: getTitleCase(type.nomtipkar) }))]}
-                    setter={setSelectedKardexType}
-                    defaultValue={selectedKardexType}
-                />
-                <Calendar 
-                    selectedDate={date}
-                    setSelectedDate={setDate}
-                />
-                <div className="relative w-56">
-                    <TimePicker 
-                        selectedTime={selectedTime}
-                        setSelectedTime={setSelectedTime}
-                    />
-                </div>
-            </div>
-            <div className="mb-6 flex items-center justify-between gap-4">
-                <input 
-                    value={karedexReference}
-                    onChange={(e) => setKardexReference(e.target.value)}
-                    placeholder="Referencia del Kardex"
-                    className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
-                />
-                <button 
-                    type={kardex ? 'button' : 'submit'}
-                    disabled={!!kardex || loading}
-                    className={`shrink-0 rounded-lg border border-emerald-400/40 bg-emerald-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 ${kardex || loading ? "opacity-50" : ""}`}>{loading ? "Generando..." : "Generar kardex"}</button>
-            </div>
-            <div className="flex justify-between items-center gap-4">
-                <input 
-                    // value={contrato ? contrato.id : `${kardex ? tipoActos.find(acto => acto.desacto === kardex.contrato)?.idtipoacto : '00'}`}
-                    // value={kardex ? tipoActos.find(acto => acto.desacto === kardex.contrato.split('/')[0].trim())?.idtipoacto || '00' : `${contrato ? contrato.id : ''}`}
-                    value={contratos.join('')}
-                    onChange={() => {}}
-                    disabled
-                    placeholder="Código de Acto"
-                    className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
-                />
-                <input 
-                    placeholder="Derecho Notarial"
-                    className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
-                />
-                <input 
-                    placeholder="Derecho Registral"
-                    className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
-                />
-            </div>
-            <div className="grid grid-cols-9 items-start my-4">
-            <div className="col-span-8">
-                <KardexActosSelector 
-                    tipoActos={tipoActos.filter(acto => acto.idtipkar === selectedKardexType)}
-                    contratos={contratos}
-                    setContratosDes={setContratosDes}
-                    setSelectedIds={setContratos}
-                />
-            </div>
-            </div>
-            <AnimatePresence>
-            <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                // className="w-full my-4"
-            
+
+        <div className="space-y-4 bg-slate-50 p-4 text-slate-900 sm:p-5">
+            <FormSection
+                title="Datos generales"
+                description="Tipo de instrumento, fecha de ingreso y referencia interna."
+                icon={<CalendarDays className="h-4 w-4" aria-hidden />}
             >
-                <input 
-                    type="text"
-                    value={filteredActos}
-                    onChange={(e) => setFilteredActos(e.target.value)}
-                    placeholder="Buscar Acto..."
-                    className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none mb-4"
-                />
-                {filteredActos.length > 0 && <MultiSelect 
-                    options={tipoActos
-                        .filter(acto => acto.idtipkar === selectedKardexType)
-                        .filter(acto => acto.desacto.toLowerCase().includes(filteredActos.toLowerCase()))
-                        .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} ${acto.actosunat && `/ Sunat: ${acto.actosunat}`}  ${acto.actouif && `/ UIF: ${acto.actouif}`}` }))}
-                    placeholder="Buscar contrato..."
-                    label=""
-                    selectedIds={contratos}
-                    setSelectedIds={setContratos}
-                    resetInput={() => setFilteredActos('')}
-                />}
-            </motion.div>
-            </AnimatePresence>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex justify-center items-center gap-4">
-                    <p className="text-md font-bold py-2">Responsable</p>
-                    {responsableLocked ? (
-                        <p className="min-h-[2.625rem] flex-1 rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-800">
-                            {responsible?.label || "—"}
-                        </p>
-                    ) : (
-                        <SearchableDropdownInput
-                            options={usuarios.map((u) => ({
-                                id: String(u.idusuario),
-                                label: getTitleCase(getUsuarioDisplayName(u)),
-                            }))}
-                            selected={responsible}
-                            setSelected={setResponsible}
-                            placeholder="Buscar responsable..."
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <FormField label="Tipo de kardex">
+                        <select
+                            value={selectedKardexType}
+                            onChange={(e) =>
+                                setSelectedKardexType(
+                                    e.target.value ? parseInt(e.target.value, 10) : 0,
+                                )
+                            }
+                            className={fieldSelectClass}
+                        >
+                            <option value={0}>Tipo de kardex</option>
+                            {kardexTypes.map((type) => (
+                                <option key={type.idtipkar} value={type.idtipkar}>
+                                    {getTitleCase(type.nomtipkar)}
+                                </option>
+                            ))}
+                        </select>
+                    </FormField>
+                    <FormField label="Fecha de ingreso">
+                        <Calendar
+                            selectedDate={date}
+                            setSelectedDate={setDate}
+                            fullWidth
                         />
+                    </FormField>
+                    <FormField label="Referencia" htmlFor="kardex-referencia">
+                        <input
+                            id="kardex-referencia"
+                            value={karedexReference}
+                            onChange={(e) => setKardexReference(e.target.value)}
+                            placeholder="Referencia del kardex"
+                            className={fieldInputClass}
+                        />
+                    </FormField>
+                    {!kardex && (
+                        <div className="flex items-end sm:justify-end">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                            >
+                                <Sparkles className="h-4 w-4" aria-hidden />
+                                {loading ? "Generando…" : "Generar kardex"}
+                            </button>
+                        </div>
                     )}
                 </div>
-                <div className="flex justify-center items-center gap-4">
-                    <SimpleSelectorStr 
-                        options={[{ value: '0', label: 'Seleccionar Usuario' }, ...usuarios.map((u) => ({ value: String(u.idusuario), label: getTitleCase(getUsuarioDisplayName(u)) }))]}
-                        setter={setRecepcion}
-                        defaultValue={recepcion}
-                        label="Recepción"
-                        horizontal
-                    />
+            </FormSection>
+
+            <FormSection
+                title="Actos y contratos"
+                description="Seleccione los actos notariales que aplican a este instrumento."
+                icon={<Scale className="h-4 w-4" aria-hidden />}
+            >
+                <div className="mb-4 grid gap-4 sm:grid-cols-3">
+                    <FormField label="Código de acto">
+                        <input 
+                            value={contratos.join('')}
+                            onChange={() => {}}
+                            disabled
+                            placeholder="Código de acto"
+                            className={`${fieldInputClass} bg-slate-50 text-slate-500`}
+                        />
+                    </FormField>
+                    <FormField label="Derecho notarial">
+                        <input 
+                            placeholder="Derecho notarial"
+                            className={fieldInputClass}
+                        />
+                    </FormField>
+                    <FormField label="Derecho registral">
+                        <input 
+                            placeholder="Derecho registral"
+                            className={fieldInputClass}
+                        />
+                    </FormField>
                 </div>
-            </div>
-            <div className="grid grid-cols-2 place-content-center place-items-start gap-4 my-4">
-                <Selector 
-                    options={[{ value: 0, label: 'Seleccionar Abogado' }, ...abogados.map(abogado => ({ value: Number(abogado.idabogado), label: getTitleCase(abogado.razonsocial) }))]}
-                    setter={() => {}}
-                    label="Abogado"
-                    horizontal
+
+                <KardexActosSelector 
+                    tipoActos={filteredTipoActos}
+                    contratos={contratos}
+                    setSelectedIds={setContratos}
                 />
-                <div className="flex justify-center items-center gap-4">
-                    <p>Funcionario</p>
-                    <input 
-                        className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
-                    />
+
+                <AnimatePresence>
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="mt-4 overflow-hidden"
+                    >
+                        <FormField label="Buscar acto" htmlFor="kardex-buscar-acto">
+                            <input 
+                                id="kardex-buscar-acto"
+                                type="text"
+                                value={filteredActos}
+                                onChange={(e) => setFilteredActos(e.target.value)}
+                                placeholder="Escriba para buscar un acto…"
+                                className={fieldInputClass}
+                            />
+                        </FormField>
+                        {filteredActos.length > 0 && (
+                            <div className="mt-3">
+                                <MultiSelect 
+                                    options={filteredTipoActos
+                                        .filter(acto => acto.desacto.toLowerCase().includes(filteredActos.toLowerCase()))
+                                        .map(acto => ({ id: acto.idtipoacto, label: `${acto.desacto} ${acto.actosunat && `/ Sunat: ${acto.actosunat}`}  ${acto.actouif && `/ UIF: ${acto.actouif}`}` }))}
+                                    placeholder="Buscar contrato..."
+                                    label=""
+                                    selectedIds={contratos}
+                                    setSelectedIds={setContratos}
+                                    resetInput={() => setFilteredActos('')}
+                                />
+                            </div>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+            </FormSection>
+
+            <FormSection
+                title="Equipo y configuración"
+                description="Responsable del trámite, recepción y plantilla documental."
+                icon={<Users className="h-4 w-4" aria-hidden />}
+            >
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <FormField label="Responsable">
+                        {responsableLocked ? (
+                            <p className={`${fieldInputClass} bg-slate-50 font-medium`}>
+                                {responsible?.label || "—"}
+                            </p>
+                        ) : (
+                            <div className="[&>div]:!my-0 [&_input]:rounded-lg [&_input]:border-slate-200 [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:shadow-sm">
+                                <SearchableDropdownInput
+                                    options={usuarios.map((u) => ({
+                                        id: String(u.idusuario),
+                                        label: getTitleCase(getUsuarioDisplayName(u)),
+                                    }))}
+                                    selected={responsible}
+                                    setSelected={setResponsible}
+                                    placeholder="Buscar responsable…"
+                                />
+                            </div>
+                        )}
+                    </FormField>
+                    <FormField label="Recepción">
+                        <select
+                            value={recepcion}
+                            onChange={(e) => setRecepcion(e.target.value)}
+                            className={fieldSelectClass}
+                        >
+                            <option value="0">Seleccionar usuario</option>
+                            {usuarios.map((u) => (
+                                <option key={u.idusuario} value={String(u.idusuario)}>
+                                    {getTitleCase(getUsuarioDisplayName(u))}
+                                </option>
+                            ))}
+                        </select>
+                    </FormField>
+                    <FormField label="Abogado">
+                        <select
+                            defaultValue={0}
+                            onChange={() => {}}
+                            className={fieldSelectClass}
+                        >
+                            <option value={0}>Seleccionar abogado</option>
+                            {abogados.map((abogado) => (
+                                <option
+                                    key={abogado.idabogado}
+                                    value={Number(abogado.idabogado)}
+                                >
+                                    {getTitleCase(abogado.razonsocial)}
+                                </option>
+                            ))}
+                        </select>
+                    </FormField>
+                    <FormField label="Funcionario">
+                        <input
+                            placeholder="Funcionario"
+                            className={fieldInputClass}
+                        />
+                    </FormField>
+                    <FormField label="Presentante">
+                        <select
+                            defaultValue={0}
+                            onChange={() => {}}
+                            className={fieldSelectClass}
+                        >
+                            <option value={0}>Seleccionar presentante</option>
+                        </select>
+                    </FormField>
+                    <FormField label="Plantilla">
+                        <select
+                            value={selectedTemplate}
+                            onChange={(e) =>
+                                setSelectedTemplate(parseInt(e.target.value, 10) || 0)
+                            }
+                            className={fieldSelectClass}
+                        >
+                            {isSuccessTemplates && templates.length > 0 ? (
+                                <>
+                                    <option value={0}>Seleccione plantilla</option>
+                                    {templates.map((template) => (
+                                        <option
+                                            key={template.pktemplate}
+                                            value={template.pktemplate}
+                                        >
+                                            {getTitleCase(template.nametemplate)}
+                                        </option>
+                                    ))}
+                                </>
+                            ) : (
+                                <option value={0}>No hay plantillas disponibles</option>
+                            )}
+                        </select>
+                    </FormField>
                 </div>
-            </div>
-            <div className="grid grid-cols-2 place-content-center place-items-start gap-4 my-4">
-                <Selector 
-                    options={[{ value: 0, label: 'Seleccionar Presentante' }]}
-                    setter={() => {}}
-                    label="Presentante"
-                    horizontal
-                />
-                <SimpleSelector 
-                    options={(isSuccessTemplates && templates.length > 0) ? [{ value: 0, label: 'Seleccione Plantilla' }, ...templates.map(template => ({ value: template.pktemplate, label: getTitleCase(template.nametemplate) }))] : [{ value: 0, label: 'No hay plantillas disponibles' }]}
-                    setter={setSelectedTemplate}
-                    defaultValue={selectedTemplate}
-                    label="Plantilla"
-                    horizontal
-                />
-            </div>
-            {kardex && 
-            <div className="w-full grid grid-cols-3 gap-3 items-center my-10">
-                <SimpleInput 
-                    value=""
-                    setValue={() => {}}
-                    label="Kardex Conexo"
-                    horizontal
-                />
-                <SimpleSelector 
-                    options={[{ value: 0, label: 'Seleccionar Notaría' }]}
-                    defaultValue={0}
-                    setter={() => {}}
-                    horizontal
-                />
-                <div className="flex justify-center items-center gap-4">
+            </FormSection>
+
+            {kardex && (
+                <div className="flex justify-end rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-5">
                     <button
                         type="submit"
-                        className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                        disabled={loading}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                     >
-                        Grabar cambios
+                        <Sparkles className="h-4 w-4" aria-hidden />
+                        {loading ? "Guardando…" : "Grabar cambios"}
                     </button>
                 </div>
-            </div>}
-            
+            )}
         </div>
     </form>
     <TopModal 
