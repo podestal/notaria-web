@@ -6,6 +6,7 @@ import { Cliente } from "../../../services/api/cliente1Service"
 import CreateCliente from "./CreateCliente"
 import UpdateCliente from "./UpdateCliente"
 import CreateContratante from "../contratantes/CreateContratante"
+import ContratanteClienteFormTransition from "../contratantes/ContratanteClienteFormTransition"
 import { documentoJuridicaOptions, documentNaturalOptions } from "../../../data/clienteData"
 import useAuthStore from "../../../store/useAuthStore"
 import ClienteLookByName from "./byName/ClienteLookByName"
@@ -223,45 +224,47 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
             />
         </form>
     </div>
-    {showContratanteForm &&
-        <div className="mt-10">
-            <CreateContratante 
-                cliente1={cliente1}
-                setShowContratanteForm={setShowContratanteForm}
-                setShowClienteForm={setShowClienteForm}
-                setClientesCheck={setClientesCheck}
-                idtipoacto={idtipoacto}
-                idtipkar={idtipkar}
-                kardex={kardex}
-                selectedTipoPersona={selectedTipoPersona}
-            />
-        </div>
-    }
-    {showClienteForm &&
-        <div className="mt-10">
-            {cliente1 
-            ? 
-            <UpdateCliente 
-                setShowContratanteForm={setShowContratanteForm}
-                setShowClienteForm={setShowClienteForm}
-                setCliente1={setCliente1}
-                dni={document}
-                cliente1={cliente1}
-                selectedTipoDocumento={selectedTipoDocumento}
-                selectedTipoPersona={selectedTipoPersona}
-            />
-            : 
-            <CreateCliente 
-                setShowContratanteForm={setShowContratanteForm}
-                setShowClienteForm={setShowClienteForm}
-                setCliente1={setCliente1}
-                dni={document}
-                cliente1={null}
-                selectedTipoPersona={selectedTipoPersona}
-                selectedTipoDocumento={selectedTipoDocumento}
-            />}
-        </div>
-    }
+    {(showContratanteForm || showClienteForm) && (
+        <ContratanteClienteFormTransition
+            className="mt-10"
+            activeView={showClienteForm ? "cliente" : "contratante"}
+            contratante={
+                <CreateContratante
+                    cliente1={cliente1}
+                    setShowContratanteForm={setShowContratanteForm}
+                    setShowClienteForm={setShowClienteForm}
+                    setClientesCheck={setClientesCheck}
+                    idtipoacto={idtipoacto}
+                    idtipkar={idtipkar}
+                    kardex={kardex}
+                    selectedTipoPersona={selectedTipoPersona}
+                />
+            }
+            cliente={
+                cliente1 ? (
+                    <UpdateCliente
+                        setShowContratanteForm={setShowContratanteForm}
+                        setShowClienteForm={setShowClienteForm}
+                        setCliente1={setCliente1}
+                        dni={document}
+                        cliente1={cliente1}
+                        selectedTipoDocumento={selectedTipoDocumento}
+                        selectedTipoPersona={selectedTipoPersona}
+                    />
+                ) : (
+                    <CreateCliente
+                        setShowContratanteForm={setShowContratanteForm}
+                        setShowClienteForm={setShowClienteForm}
+                        setCliente1={setCliente1}
+                        dni={document}
+                        cliente1={null}
+                        selectedTipoPersona={selectedTipoPersona}
+                        selectedTipoDocumento={selectedTipoDocumento}
+                    />
+                )
+            }
+        />
+    )}
     </>
   )
 }

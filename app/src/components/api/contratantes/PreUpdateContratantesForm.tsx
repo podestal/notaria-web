@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Contratante } from '../../../services/api/contratantesService'
 import ContratantesForm from './ContratantesForm'
+import ContratanteClienteFormTransition from './ContratanteClienteFormTransition'
 import useGetCliente2ByContratante from '../../../hooks/api/cliente2/useGetCliente2ByContratante'
 import useGetContratanteById from '../../../hooks/api/contratantes/useGetContratanteById'
 import useAuthStore from '../../../store/useAuthStore'
@@ -63,9 +64,10 @@ const PreUpdateContratantesForm = ({
     if (!cliente2) return null
 
   return (
-    <>
-        {showContratanteForm && 
-            <ContratantesForm 
+    <ContratanteClienteFormTransition
+        activeView={showClienteForm ? 'cliente' : 'contratante'}
+        contratante={
+            <ContratantesForm
                 cliente1={null}
                 cliente2={cliente2}
                 setShowContratanteForm={setShowContratanteForm}
@@ -79,17 +81,18 @@ const PreUpdateContratantesForm = ({
                 updateContratante={updateContratante}
                 selectedTipoPersona={cliente2.tipper === 'N' ? 1 : 2}
                 onRegisterCloseGuard={onRegisterCloseGuard}
-            />}
-        {showClienteForm &&
-        <UpdateCliente2 
-            dni={cliente2.numdoc}
-            setShowContratanteForm={setShowContratanteForm}
-            setShowClienteForm={setShowClienteForm}
-            // setCliente1={() => {}}
-            cliente2={cliente2}
-            kardex={kardex}
-        />}
-    </>
+            />
+        }
+        cliente={
+            <UpdateCliente2
+                dni={cliente2.numdoc}
+                setShowContratanteForm={setShowContratanteForm}
+                setShowClienteForm={setShowClienteForm}
+                cliente2={cliente2}
+                kardex={kardex}
+            />
+        }
+    />
   )
 }
 

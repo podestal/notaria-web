@@ -19,6 +19,7 @@ import useAuthStore from "../../../store/useAuthStore"
 import ClienteMarriedMain from "./married/ClienteMarriedMain"
 import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
+import ClienteContratanteFormLayout, { clienteFormBackButtonClass } from "./shared/ClienteContratanteFormLayout"
 import {
     isRequiredTextMissing,
     isRequiredValueMissing,
@@ -736,18 +737,41 @@ const ClientesForm = ({
         });
     }
 
+    const handleBackToContratante = () => {
+        setShowClienteForm(false)
+        setShowContratanteForm(true)
+    }
+
+    const clienteFormTitle = cliente1 ? "Editar cliente" : "Nuevo cliente"
+    const clienteFormFooter = (
+        <>
+            <button type="button" onClick={handleBackToContratante} className={clienteFormBackButtonClass}>
+                Volver al contratante
+            </button>
+            <button type="button" onClick={handleSubmit} className={clienteFormBackButtonClass}>
+                {cliente1 ? "Actualizar cliente" : "Crear cliente"}
+            </button>
+        </>
+    )
+
   return (
-    <div>
+    <ClienteContratanteFormLayout
+        title={clienteFormTitle}
+        subtitle={dni ? `Documento: ${dni}` : undefined}
+        onBack={handleBackToContratante}
+        footer={clienteFormFooter}
+    >
+    <div className="space-y-4">
         {selectedTipoPersona === 1 && 
         <>
-        <div className="grid grid-cols-3 items-center gap-6 mb-10">
-            <div></div>
-            <h2 className="text-xl font-bold text-center text-black">Nuevo Cliente</h2>
+        <div className="flex justify-end">
             <button
                 type="button"
                 onClick={handleReniec}
-                className="bg-gray-50 text-black px-2 py-1 w-[60%] text-sm h-full transition duration-300 border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex justify-center items-center gap-1"
-            >Consulta Reniec</button>
+                className={clienteFormBackButtonClass}
+            >
+                Consulta Reniec
+            </button>
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
@@ -938,13 +962,6 @@ const ClientesForm = ({
                 horizontal={true}
             />
         </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <button 
-                onClick={handleSubmit}
-                className="mt-8 bg-blue-600 text-white px-4 cursor-pointer py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
-                {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
-            </button>
-        </div>
         <TopModal
             isOpen={openChangeConyuge}
             onClose={() => setOpenChangeConyuge(false)}
@@ -963,14 +980,14 @@ const ClientesForm = ({
         </>}
         {selectedTipoPersona === 2 &&
         <>
-        <div className="grid grid-cols-3 items-center gap-6 mb-10">
-            <div></div>
-            <h2 className="text-xl font-bold text-center text-black">Nuevo Cliente</h2>
+        <div className="flex justify-end">
             <button
                 type="button"
                 onClick={handleSunat}
-                className="bg-gray-50 text-black px-2 py-1 w-[60%] text-sm h-full transition duration-300 border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md flex justify-center items-center gap-1"
-            >Consulta Sunat</button>
+                className={clienteFormBackButtonClass}
+            >
+                Consulta Sunat
+            </button>
         </div>
         <div className="flex justify-center items-center gap-6 mb-4">
             <SimpleInput 
@@ -1076,16 +1093,10 @@ const ClientesForm = ({
                 fullWidth
             />
         </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <button 
-                onClick={handleSubmit}
-                className="mt-8 bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
-                {cliente1 ? 'Actualizar Cliente' : 'Crear Cliente'}
-            </button>
-        </div>
         </>
         }
     </div>
+    </ClienteContratanteFormLayout>
   )
 }
 
