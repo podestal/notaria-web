@@ -151,7 +151,7 @@ const KardexForm = ({
     const [filteredActos, setFilteredActos] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const { setMessage, setShow, setType } = useNotificationsStore()
+    const { notify } = useNotificationsStore()
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const kardexTypes = useKardexTypesStore(s => s.kardexTypes)
     const [karedexReference, setKardexReference] = useState(kardex?.referencia || '') 
@@ -189,17 +189,13 @@ const KardexForm = ({
         e.preventDefault()
 
         if (contratos.length === 0) {
-            setMessage('No se ha seleccionado un contrato')
-            setShow(true)
-            setType('error')
+            notify("error", "No se ha seleccionado un contrato")
             return
             
         }
 
         if (responsible === null) {
-            setMessage('No se ha seleccionado un responsable')
-            setShow(true)
-            setType('error')
+            notify("error", "No se ha seleccionado un responsable")
             return
         }
 
@@ -242,9 +238,7 @@ const KardexForm = ({
                 }
             }, {
                 onSuccess: (res) => {
-                    setMessage('Kardex creado exitosamente')
-                    setShow(true)
-                    setType('success')
+                    notify("success", "Kardex creado exitosamente")
                     setNotAllowed && setNotAllowed(false)
                     const newKardex = res as unknown as Kardex
                     setKardex && setKardex(newKardex)
@@ -253,9 +247,7 @@ const KardexForm = ({
                     // setKardex && setKardex(res.)
                 }, 
                 onError: (error) => {
-                    setMessage(`Error al crear el kardex: ${error.message}`)
-                    setShow(true)
-                    setType('error')
+                    notify("error", `Error al crear el kardex: ${error.message}`)
                 },
                 onSettled: () => {
                     setLoading(false)
@@ -289,9 +281,7 @@ const KardexForm = ({
                 access
             }, {
                 onSuccess: () => {
-                    setMessage('Kardex actualizado exitosamente')
-                    setShow(true)
-                    setType('success')
+                    notify("success", "Kardex actualizado exitosamente")
                 }, 
                 onError: (error) => {
                     let errorMessage = ''
@@ -299,9 +289,7 @@ const KardexForm = ({
                         setCannotUpdateKardex(true)
                         setCannotUpdateKardexMessage((error as any)?.response?.data?.error)
                     } else {
-                        setMessage(`Error al actualizar el kardex: ${errorMessage}`)
-                        setShow(true)
-                        setType('error')
+                        notify("error", `Error al actualizar el kardex: ${errorMessage}`)
                     }
                 },
                 onSettled: () => {
@@ -337,9 +325,7 @@ const KardexForm = ({
                 access
             }, {
                 onSuccess: () => {
-                    setMessage('Kardex actualizado exitosamente')
-                    setShow(true)
-                    setType('success')
+                    notify("success", "Kardex actualizado exitosamente")
                 }, 
                 onError: (error) => {
                     let errorMessage = ''
@@ -347,9 +333,7 @@ const KardexForm = ({
                         setCannotUpdateKardex(true)
                         setCannotUpdateKardexMessage((error as any)?.response?.data?.error)
                     } else {
-                        setMessage(`Error al actualizar el kardex: ${errorMessage}`)
-                        setShow(true)
-                        setType('error')
+                        notify("error", `Error al actualizar el kardex: ${errorMessage}`)
                     }
                 },
                 onSettled: () => {
