@@ -27,7 +27,7 @@ const SisgenMain = () => {
   }
 
   return (
-    <div className="mt-[80px] w-[85%] h-screen mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black flex flex-col items-center justify-start">
+    <div className="mx-auto mb-10 mt-[80px] w-[85%] rounded-lg bg-slate-100 pb-10 text-black shadow-lg">
         <KardexFormTabs 
             extraFunction={extraFunction}
             tabs={[

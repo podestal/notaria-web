@@ -32,7 +32,7 @@ const KardexFormTabs = ({
     const activeContent = tabs.find((tab) => tab.id === activeTab)?.content
 
     return (
-        <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-200 bg-slate-50/80 px-2 pt-2">
                 <div className="flex gap-1 overflow-x-auto pb-0.5">
                     {tabs.map((tab) => {
@@ -71,7 +71,7 @@ const KardexFormTabs = ({
                     })}
                 </div>
             </div>
-            <div className="min-h-[12rem] p-4 sm:p-6">{activeContent}</div>
+            <div className="min-h-[12rem] overflow-visible p-4 sm:p-6">{activeContent}</div>
         </div>
     )
 }

@@ -133,42 +133,43 @@ const SisgenSearchForm = ({
     }
 
   return (
-        <form
-            onSubmit={handleSubmit}
-            className="h-full">
+        <form onSubmit={handleSubmit} className="overflow-visible">
             {errorDisplay && (
                 <p className="text-red-500 text-center text-sm my-2">
                     {errorDisplay}
                 </p>
             )}
-            <div className="w-full flex justify-evenly items-center gap-4 my-6 h-full">
-                <div className="w-full flex justify-evenly items-center">
-                    <p className="font-semibold">Estado</p>
-                    <SimpleSelector 
+            <div className="my-6 flex w-full flex-wrap items-end justify-evenly gap-4 overflow-visible">
+                <div className="flex min-w-[12rem] flex-1 flex-col gap-2 sm:max-w-xs">
+                    <p className="text-sm font-semibold text-slate-700">Estado</p>
+                    <SimpleSelector
                         options={estadoSisgenOptions}
                         setter={setSelectedEstado}
                         defaultValue={selectedEstado}
                     />
                 </div>
-                <div className="w-full flex justify-evenly items-center">
-                    <p className="font-semibold">Desde</p>
-                    <Calendar 
+                <div className="flex min-w-[12rem] flex-1 flex-col gap-2 sm:max-w-xs">
+                    <p className="text-sm font-semibold text-slate-700">Desde</p>
+                    <Calendar
                         selectedDate={selectedFromDate}
                         setSelectedDate={setSelectedFromDate}
+                        fullWidth
                     />
                 </div>
-                <div className="w-full flex justify-evenly items-center">
-                    <p className="font-semibold">Hasta</p>
-                    <Calendar 
+                <div className="flex min-w-[12rem] flex-1 flex-col gap-2 sm:max-w-xs">
+                    <p className="text-sm font-semibold text-slate-700">Hasta</p>
+                    <Calendar
                         selectedDate={selectedToDate}
                         setSelectedDate={setSelectedToDate}
+                        fullWidth
                     />
                 </div>
-                <button 
-                    className="bg-blue-600 cursor-pointer text-sm text-white px-2 py-1 rounded-md hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                <button
+                    type="submit"
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={loading}
                 >
-                    {loading ? 'Buscando...' : 'Buscar'}
+                    {loading ? "Buscando..." : "Buscar"}
                 </button>
             </div>
         </form>
