@@ -34,11 +34,15 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
 
     useEffect(() => {
         setSelectedTipoDocumento(0)
+        setDocument('')
     }, [selectedTipoPersona])
 
     useEffect(() => {
-        if (selectedTipoPersona === 2 && selectedTipoDocumento === 10) {
+        if (selectedTipoDocumento === 10) {
+            setDocument('')
             setShowClienteForm(true)
+            setShowContratanteForm(false)
+            setCliente1(null)
         }
     }, [selectedTipoPersona, selectedTipoDocumento])
 
@@ -61,10 +65,14 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
             return
         }
         
-        if (selectedTipoPersona === 2 && document.length !== 11) {
+        if (selectedTipoPersona === 2 && selectedTipoDocumento === 8 && document.length !== 11) {
             setType('error')
             setMessage('El RUC debe tener 11 dígitos.')
             setShow(true)
+            return
+        }
+
+        if (selectedTipoDocumento === 10) {
             return
         }
 
@@ -197,8 +205,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                     setter={setSelectedTipoDocumento}
                     defaultValue={selectedTipoDocumento}
                 />
-                {selectedTipoDocumento > 0 && <div className="flex flex-col gap-2 col-span-2">
-                    <>{console.log('selectedTipoDocumento', selectedTipoDocumento)}</>
+                {selectedTipoDocumento === 8 && <div className="flex flex-col gap-2 col-span-2">
                     <p className="text-md font-bold py-2">RUC</p>
                     <input 
                         type="text"
@@ -208,7 +215,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                         className="w-full bg-white text-slate-700 border border-slate-300 rounded-md py-2 px-3 focus:border-blue-700 focus:outline-none"
                     />
                 </div>}
-                {document.length === 11 && 
+                {selectedTipoDocumento === 8 && document.length === 11 && 
                 <button 
                     disabled={loading}
                     className={`w-[60%] mx-auto bg-blue-600 text-white rounded-md py-2 mt-4 transition-colors duration-300 ${loading && 'animate-pulse'} ${document.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer hover:bg-blue-500'}`} 

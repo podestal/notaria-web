@@ -105,9 +105,10 @@ const PreClienteForm = ({
             ).then(response => {
                 console.log(response.data);
                 if (response.data.idcliente) {
-                    setRazonSocial(response.data.razonsocial);
-                    setDomicilioFiscal(response.data.domfiscal);
+                    setRazonSocial(response.data.razonsocial || '');
+                    setDomicilioFiscal(response.data.domfiscal || '');
                     setCodeCliente(response.data.idcliente);
+                    setUbigeo(response.data.idubigeo || '');
                 } else {
                     console.log('Cliente no encontrado, creando nuevo cliente')
                     setOpenCreateCliente(true)

@@ -254,21 +254,23 @@ const ClientesForm = ({
     const handleSubmit = () => {
         clearFieldErrors()
 
-        if (selectedTipoDocumento === 0) {
+        const resolvedTipDoc = cliente1?.idtipdoc ?? selectedTipoDocumento
+
+        if (resolvedTipDoc === 0) {
             setType('error')
             setMessage('Debe seleccionar un tipo de documento.')
             setShow(true)
             return
         }
 
-        if (selectedTipoDocumento === 1 && dni.length !== 8) {
+        if (resolvedTipDoc === 1 && dni.length !== 8) {
             setType('error')
             setMessage('El DNI debe tener 8 dígitos.')
             setShow(true)
             return
         }
         
-        if (selectedTipoDocumento === 8 && dni.length !== 11) {
+        if (resolvedTipDoc === 8 && dni.length !== 11) {
             setType('error')
             setMessage('El RUC debe tener 11 dígitos.')
             setShow(true)
@@ -434,8 +436,8 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     residente: residenteForClientePayload(selectedTipoPersona, resident),
-                    idtipdoc: selectedTipoDocumento,
-                    numdoc: dni,
+                    idtipdoc: resolvedTipDoc,
+                    numdoc: resolvedTipDoc === 10 ? '' : dni,
                     email,
                     nacionalidad: nationality.id,
                     idestcivil: noCivilStatus ? 1 : civilStatus,
@@ -493,8 +495,8 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     residente: residenteForClientePayload(selectedTipoPersona, resident),
-                    idtipdoc: cliente1?.idtipdoc || 1,
-                    numdoc: dni,
+                    idtipdoc: cliente1?.idtipdoc || resolvedTipDoc || 1,
+                    numdoc: (cliente1?.idtipdoc ?? resolvedTipDoc) === 10 ? '' : dni,
                     email,
                     nacionalidad: nationality.id,
                     idestcivil: civilStatus,
@@ -562,6 +564,13 @@ const ClientesForm = ({
                 return
             }
 
+            if (resolvedTipDoc === 8 && dni.length !== 11) {
+                setType('error')
+                setMessage('El RUC debe tener 11 dígitos.')
+                setShow(true)
+                return
+            }
+
             if (isRequiredValueMissing(ciiu)) {
                 setCiiuError('CIIU es requerido')
                 setType('error')
@@ -590,8 +599,8 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     residente: residenteForClientePayload(selectedTipoPersona, resident),
-                    idtipdoc: selectedTipoDocumento,
-                    numdoc: dni,
+                    idtipdoc: resolvedTipDoc,
+                    numdoc: resolvedTipDoc === 10 ? '' : dni,
                     email,
                     nacionalidad: '',
                     idestcivil: civilStatus,
@@ -645,8 +654,8 @@ const ClientesForm = ({
                     direccion,
                     idubigeo: ubigeo.id,
                     residente: residenteForClientePayload(selectedTipoPersona, resident),
-                    idtipdoc: cliente1?.idtipdoc || 1,
-                    numdoc: dni,
+                    idtipdoc: cliente1?.idtipdoc || resolvedTipDoc || 1,
+                    numdoc: (cliente1?.idtipdoc ?? resolvedTipDoc) === 10 ? '' : dni,
                     email,
                     nacionalidad: '',
                     idestcivil: civilStatus,

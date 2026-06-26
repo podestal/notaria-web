@@ -35,6 +35,7 @@ interface Props {
     setDireccion: React.Dispatch<React.SetStateAction<string>>
     setRazonSocial: React.Dispatch<React.SetStateAction<string>>
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
+    setCodeCliente?: React.Dispatch<React.SetStateAction<string>>
     document: string
     setDocument: React.Dispatch<React.SetStateAction<string>>
     initialNatural?: NuevoClienteNaturalInitial
@@ -69,6 +70,7 @@ const NuevoClienteForm = ({
     setDireccion: setDireccionNatural,
     setRazonSocial: setRazonSocialJuridica,
     setDomicilioFiscal,
+    setCodeCliente,
     document,
     setDocument,
     initialNatural,
@@ -366,15 +368,15 @@ const NuevoClienteForm = ({
                 }
             }, {
                 onSuccess: (data) => {
-                    console.log('Cliente creado:', data)
                     setType('success')
                     setMessage('Cliente creado exitosamente')
                     setShow(true)
-                    setApellidoPaterno(apepat)
-                    setApellidoMaterno(apemat)
-                    setPrimerNombre(prinom)
-                    setSegundoNombre(segnom)
-                    setDireccionNatural(direccion)
+                    setApellidoPaterno(data.apepat)
+                    setApellidoMaterno(data.apemat)
+                    setPrimerNombre(data.prinom)
+                    setSegundoNombre(data.segnom)
+                    setDireccionNatural(data.direccion)
+                    setCodeCliente?.(data.idcliente)
                     onCreated?.()
                 },
                 onError: (error) => {
@@ -458,14 +460,14 @@ const NuevoClienteForm = ({
                 }
             }, {
                 onSuccess: (data) => {
-                    console.log('Cliente creado:', data)
                     setType('success')
                     setMessage('Cliente creado exitosamente')
                     setShow(true)
-                    setRazonSocialJuridica(razonSocial)
-                    setDomicilioFiscal(domFiscal)
-                    setDocument(data.numdoc_plantilla)
-    
+                    setRazonSocialJuridica(data.razonsocial)
+                    setDomicilioFiscal(data.domfiscal)
+                    setDocument(data.numdoc_plantilla || data.numdoc || document)
+                    setCodeCliente?.(data.idcliente)
+                    onCreated?.()
                 },
                 onError: (error) => {
                     console.error('Error al crear cliente:', error)

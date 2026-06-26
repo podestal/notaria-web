@@ -104,8 +104,6 @@ const ClienteMain = ({
             setDireccion={setDireccion}
             razonSocial={razonSocial}
             domicilioFiscal={domicilioFiscal}
-            setRazonSocial={setRazonSocial}
-            setDomicilioFiscal={setDomicilioFiscal}
         />
         <TopModal
             isOpen={openCreateCliente}
@@ -126,6 +124,8 @@ const ClienteMain = ({
                 setDireccion={setDireccion}
                 setRazonSocial={setRazonSocial}
                 setDomicilioFiscal={setDomicilioFiscal}
+                setCodeCliente={setCodeCliente}
+                onCreated={() => setOpenCreateCliente(false)}
             />
         </TopModal>
     </>
