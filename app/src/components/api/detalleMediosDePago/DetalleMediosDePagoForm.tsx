@@ -39,6 +39,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
         : patrimonial.medios_pago_sum
     const detalleActualImporte = detalleMedioDePago ? (Number(detalleMedioDePago.importemp) || 0) : 0
     const notExceedImport = totalImporte - totalMediosPago + detalleActualImporte
+    const simboloPatrimonial = MONEDAS.find(m => m.idmon === patrimonial.idmon)?.simbolo || 'S/'
 
     const [loading, setLoading] = useState(false)
 
@@ -53,7 +54,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
         }
 
         if (parseInt(importe) > notExceedImport) {
-            setImporteError(`El importe no puede exceder los ${MONEDAS.find(moneda => patrimonial.idmon === moneda.idmon)?.simbolo || ''} ${notExceedImport}`)
+            setImporteError(`El importe no puede exceder los ${simboloPatrimonial} ${notExceedImport}`)
             return
         }
 
@@ -133,11 +134,15 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
 
   return (
     <div className=" w-[80%] mx-auto flex flex-col justify-center items-center gap-2">
-        <h2 className="text-center font-bold text-lg mb-8">Nuevo Medio de Pago/Tipo de fondo</h2>
-        <>{console.log('patrimonial', patrimonial)}</>
-       <div className="flex items-center justify-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-1 rounded-md mb-4">
+        <h2 className="text-center font-bold text-lg mb-4">Nuevo Medio de Pago/Tipo de fondo</h2>
+        <div className="w-full flex flex-col gap-1 text-sm text-slate-600 mb-4 text-center">
+            <p>
+                <span className="font-semibold text-slate-700">Fecha de Acta:</span> {patrimonial.nminuta}
+            </p>
+        </div>
+       <div className="flex items-center justify-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-md mb-4 w-full">
         <TriangleAlert />
-        <p>Recuerde que su importe no puede exceder los {MONEDAS.find(moneda => patrimonial.idmon === moneda.idmon)?.simbolo || ''} {notExceedImport}</p>
+        <p>Recuerde que su importe no puede exceder los {simboloPatrimonial} {notExceedImport}</p>
        </div>
         <div className="grid grid-cols-2 gap-8 my-4">
             <SimpleSelector 
