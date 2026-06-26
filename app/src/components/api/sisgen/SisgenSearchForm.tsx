@@ -110,8 +110,6 @@ const SisgenSearchForm = ({
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        console.log('selectedEstado', selectedEstado)
-
         getSisgenDocs({
             instrumentType,
             selectedFromDate,

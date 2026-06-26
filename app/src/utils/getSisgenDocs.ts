@@ -63,19 +63,21 @@ const getSisgenDocs = ({
         return;
     }
 
-    console.log('selectedEstado', selectedEstado)
-
     setLoading(true)
+
+    const sisgenBase = {
+        tipoInstrumento: instrumentType,
+        fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
+        fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
+        estado: selectedEstado,
+        codigoActo: 0,
+    }
 
     const variables: SearchSisgenData = {
         access,
         sisgen: {
-            tipoInstrumento: instrumentType,
-            fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
-            fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
-            estado: selectedEstado,
-            codigoActo: 0,
-            page: page,
+            ...sisgenBase,
+            page: 1,
         },
     }
 
@@ -84,8 +86,51 @@ const getSisgenDocs = ({
         variables,
     )
 
+    const finish = () => {
+        searchHandlers.setLoading(false)
+    }
+
     searchSisgen.mutate(variables, {
         onSuccess: (data) => {
+            if (data.error !== 0) {
+                searchHandlers.setErrorDisplay(
+                    data.message || "Error al buscar documentos SISGEN.",
+                )
+                return
+            }
+
+            const searchId = data.pagination.search_id
+            const targetPage = page > 1 ? page : 1
+
+            if (targetPage > 1 && searchId) {
+                const pageVariables: SearchSisgenData = {
+                    access,
+                    sisgen: {
+                        ...sisgenBase,
+                        page: targetPage,
+                        search_id: searchId,
+                    },
+                }
+
+                cacheLastSisgenSearchRequest(
+                    queryClient.setQueryData.bind(queryClient),
+                    pageVariables,
+                )
+
+                searchSisgen.mutate(pageVariables, {
+                    onSuccess: (pageData) => {
+                        applySisgenSearchResponse(pageData, searchHandlers)
+                    },
+                    onError: (error) => {
+                        searchHandlers.setErrorDisplay(
+                            error.message || "Error al buscar documentos SISGEN.",
+                        )
+                    },
+                    onSettled: finish,
+                })
+                return
+            }
+
             applySisgenSearchResponse(data, searchHandlers)
         },
         onError: (error) => {
@@ -93,8 +138,15 @@ const getSisgenDocs = ({
                 error.message || "Error al buscar documentos SISGEN.",
             )
         },
-        onSettled: () => {
-            searchHandlers.setLoading(false)
+        onSettled: (data) => {
+            const needsPageFetch =
+                data?.error === 0 &&
+                page > 1 &&
+                Boolean(data.pagination.search_id)
+
+            if (!needsPageFetch) {
+                finish()
+            }
         },
     })
 
