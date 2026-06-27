@@ -11,6 +11,9 @@ import {
 } from "recharts"
 import useGetComplianceUsers from "../../../../hooks/compliance/useGetComplianceUsers"
 import useAuthStore from "../../../../store/useAuthStore"
+import getTitleCase from "../../../../utils/getTitleCase"
+import type { ComplianceUser } from "../../../../services/compliance/complianceService"
+import ComplianceUserKardexModal from "./ComplianceUserKardexModal"
 
 const MONTH_OPTIONS = [
   { value: 1, label: "Enero" },
@@ -32,6 +35,7 @@ const formatPercent = (rate: number) => `${Math.round(rate * 100)}%`
 const KardexErrors = () => {
   const access = useAuthStore((s) => s.access_token) || ""
   const [month, setMonth] = useState(() => new Date().getMonth() + 1)
+  const [selectedUser, setSelectedUser] = useState<ComplianceUser | null>(null)
 
   const { data, isLoading, isError, error } = useGetComplianceUsers({
     access,
@@ -41,7 +45,7 @@ const KardexErrors = () => {
   const chartData = useMemo(
     () =>
       (data?.users ?? []).map((user) => ({
-        name: user.name || user.username,
+        name: getTitleCase(user.name || user.username),
         sisgen: user.counts.sisgen,
         uif: user.counts.uif,
         pdt: user.counts.pdt,
@@ -192,7 +196,13 @@ const KardexErrors = () => {
                 }`}
               >
                 <div>
-                  <p className="font-medium">{user.name}</p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedUser(user)}
+                    className="text-left font-medium text-sky-700 hover:text-sky-900 hover:underline"
+                  >
+                    {getTitleCase(user.name || user.username)}
+                  </button>
                   <p className="text-xs text-slate-500">{user.username}</p>
                 </div>
                 <p>{user.total_kardex}</p>
@@ -211,6 +221,13 @@ const KardexErrors = () => {
           <p className="mt-3 text-xs text-slate-500">{summary.pdt_note}</p>
         )}
       </div>
+
+      <ComplianceUserKardexModal
+        user={selectedUser}
+        year={year}
+        month={month}
+        onClose={() => setSelectedUser(null)}
+      />
     </div>
   )
 }
