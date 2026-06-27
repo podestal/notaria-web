@@ -1,4 +1,5 @@
 import SisgenClient from "./sisgenClient"
+import type { SisgenSubmissionError } from "../../utils/sisgenSubmissionErrors"
 
 
 export interface SISGENDocument {
@@ -56,7 +57,7 @@ export interface SisgenLastSubmission {
     document_status?: string;
     status_ui?: string;
     remote_status_ui?: string;
-    errors?: string[];
+    errors?: SisgenSubmissionError[];
     has_errors?: boolean;
     can_send?: boolean;
     needs_resubmit?: boolean;
