@@ -6,6 +6,8 @@ export interface SISGENDocument {
     idkardex: number;
     kardex: string;
     numescritura: string;
+    numero_instrumento?: string;
+    numinstrmento?: string;
     fechaescritura: string;
     estado_sisgen: string;
     estado_sisgen_code?: number;

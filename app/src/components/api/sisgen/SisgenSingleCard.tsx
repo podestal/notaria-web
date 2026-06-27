@@ -13,6 +13,7 @@ import {
 } from "../../../utils/sisgenSendState"
 import SisgenValidationCountsCell from "./SisgenValidationCountsCell"
 import SisgenLastSubmissionView from "./SisgenLastSubmissionView"
+import { SISGEN_TABLE_GRID, sisgenCol } from "./sisgenTableGrid"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -65,17 +66,23 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     <>
     <div 
         key={sisgenDoc.idkardex} 
-        className="grid grid-cols-7 gap-4 p-2 border-b text-xs align-middle"
+        className={`${SISGEN_TABLE_GRID} border-b py-2 text-xs align-middle`}
     >
-        <p>{idx}</p>
+        <p className={sisgenCol.idx}>{idx}</p>
         <p 
-            className="col-span-2 text-blue-500 cursor-pointer hover:text-blue-700"
+            className={`${sisgenCol.kardex} cursor-pointer text-blue-500 hover:text-blue-700`}
+            title={sisgenDoc?.kardex || ''}
             onClick={() => setIsOpen(true)}
         >
             {sisgenDoc?.kardex || ''}
         </p>
-        <p>{getTitleCase(sisgenDoc?.contrato || '')}</p>
-        <div className="flex flex-col gap-1">
+        <p className={sisgenCol.instrumento}>
+            {sisgenDoc?.numero_instrumento || sisgenDoc?.numinstrmento || '—'}
+        </p>
+        <p className={sisgenCol.acto} title={sisgenDoc?.contrato || ''}>
+            {getTitleCase(sisgenDoc?.contrato || '')}
+        </p>
+        <div className={`${sisgenCol.estado} flex flex-col gap-1`}>
           <p>{sisgenStatus}</p>
           {sisgenLastSubmission?.exists && (
             <button
@@ -87,12 +94,15 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
             </button>
           )}
         </div>
-        <SisgenValidationCountsCell doc={sisgenDoc} />
+        <div className={sisgenCol.validacion}>
+          <SisgenValidationCountsCell doc={sisgenDoc} />
+        </div>
+        <div className={sisgenCol.action}>
         {canSend 
         ? 
         <button 
           onClick={handleSend}
-          className="bg-blue-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-pointer hover:bg-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-[28px] w-full max-w-[6.5rem] rounded-md bg-blue-500 px-2 py-1 text-white transition-all duration-300 hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={loading}
         >
           {loading ? 'Enviando...' : sisgenLastSubmission?.exists ? 'Reenviar' : 'Enviar'}
@@ -100,12 +110,13 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
         :
         <button 
         type="button"
-        className="bg-green-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-not-allowed "
+        className="h-[28px] w-full max-w-[6.5rem] cursor-not-allowed rounded-md bg-green-500 px-2 py-1 text-white"
         disabled
       >
         Guardado
       </button>
         }
+        </div>
     </div>
     <SisgenKardexModal
         isOpen={isOpen}

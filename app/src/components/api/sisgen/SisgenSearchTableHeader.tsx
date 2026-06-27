@@ -7,6 +7,7 @@ import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import useAuthStore from "../../../store/useAuthStore"
 import useRefreshLastSisgenSearch from "../../../hooks/sisgen/useRefreshLastSisgenSearch"
 import SisgenSendAllPreviewModal from "./SisgenSendAllPreviewModal"
+import { SISGEN_TABLE_GRID, sisgenCol } from "./sisgenTableGrid"
 
 interface Props {
   setPage: React.Dispatch<React.SetStateAction<number>>
@@ -70,12 +71,13 @@ const SisgenSearchTableHeader = ({
 
   return (
     <>
-      <div className="grid grid-cols-7 gap-4 bg-slate-200 text-black text-xs font-semibold p-2 mb-4 items-center">
-        <p>Nº</p>
-        <p className="col-span-2">Nº Kardex</p>
-        <p>Acto</p>
-        <p>Estado</p>
-        <p className="leading-tight">
+      <div className={`${SISGEN_TABLE_GRID} mb-4 bg-slate-200 py-2 text-xs font-semibold text-black`}>
+        <p className={sisgenCol.idx}>Nº</p>
+        <p className={sisgenCol.kardex}>Nº Kardex</p>
+        <p className={sisgenCol.instrumento}>Nº Inst.</p>
+        <p className={sisgenCol.acto}>Acto</p>
+        <p className={sisgenCol.estado}>Estado</p>
+        <p className={`${sisgenCol.validacion} leading-tight`}>
           Validación
           <span className="block text-[10px] font-normal text-slate-600">
             Err. / Obs. / Pers.
@@ -83,7 +85,7 @@ const SisgenSearchTableHeader = ({
         </p>
         <button
           type="button"
-          className="bg-orange-500 text-white px-2 py-2 rounded-md cursor-pointer hover:bg-orange-600 transition-all duration-300 flex items-center justify-center disabled:opacity-60"
+          className={`${sisgenCol.action} rounded-md bg-orange-500 px-2 py-2 text-white transition-all duration-300 hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60`}
           onClick={handleOpenSendAllPreview}
           disabled={sisgenDocs.length === 0}
         >
