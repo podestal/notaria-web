@@ -3,6 +3,7 @@ import MainPage from "../pages/MainPage";
 import Login from "../components/auth/Login";
 import PrivateRoutes from "../components/auth/PrivateRoutes";
 import KardexMain from "../components/api/kardex/KardexMain";
+import PanelGeneralMain from "../components/api/panelGeneral/PanelGeneralMain";
 import ExtraprotocolaresMain from "../components/api/extraprotocolares/ExtraprotocolaresMain";
 import ReportesMain from "../components/api/reportes/ReportesMain";
 import CajaMain from "../components/api/caja/CajaMain";
@@ -163,6 +164,14 @@ const routes = createBrowserRouter([
         element:<MainPage />,
         errorElement: <div>404</div>,
         children: [
+            {
+                path: "panel-general",
+                element: (
+                    <PrivateRoutes>
+                        <PanelGeneralMain />
+                    </PrivateRoutes>
+                ),
+            },
             {
                 path: "protocolares",
                 element: 

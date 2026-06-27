@@ -13,6 +13,7 @@ interface Props {
     dateFrom?: Date;
     dateTo?: Date;
     access: string
+    enabled?: boolean
 }
 
 const useGetKardexList = ({ 
@@ -25,7 +26,8 @@ const useGetKardexList = ({
     indexReport, 
     access,
     dateFrom,
-    dateTo
+    dateTo,
+    enabled = true,
 }: Props): UseQueryResult<KardexPage, Error> => {
     let kardexService = getKardexService()
 
@@ -59,7 +61,7 @@ const useGetKardexList = ({
         queryKey: ['kardex list', page, idtipkar],
         queryFn: () => kardexService.get(access, params),
         refetchOnWindowFocus: false,
-        
+        enabled: enabled && idtipkar > 0,
     })
 }
 

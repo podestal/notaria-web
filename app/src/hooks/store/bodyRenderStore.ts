@@ -5,7 +5,7 @@ interface BodyRenderState {
     setBodyRender: (bodyRender: number) => void
 }
 const useBodyRenderStore = create<BodyRenderState>(set => ({
-    bodyRender: 0,
+    bodyRender: 1,
     setBodyRender: (bodyRender) => {
         set({ bodyRender })
     }

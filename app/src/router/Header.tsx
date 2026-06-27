@@ -69,7 +69,7 @@ const Header = ({ kardexTypes }: Props) => {
 
     const resolveOptionTo = (item: MenuItem, option: MenuOptions): string | null => {
       if (option.path) return option.path
-      if (option.docType && item.label === 'Protocolares') {
+      if (option.docType != null && item.label === 'Protocolares') {
         return `/app/protocolares?tipkar=${option.docType}`
       }
       return null
@@ -77,7 +77,7 @@ const Header = ({ kardexTypes }: Props) => {
 
     const handleNavLinkClick = (option: MenuOptions) => {
       resetNavigationState()
-      if (option.docType) setBodyRender(option.docType)
+      if (option.docType != null) setBodyRender(option.docType)
     }
 
     const menuItems: MenuItem[] = [
@@ -283,6 +283,13 @@ const Header = ({ kardexTypes }: Props) => {
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 py-3">
+          <Link
+            to="/app/panel-general"
+            className="mb-3 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
+            onClick={resetNavigationState}
+          >
+            Panel General
+          </Link>
           {menuItems.map((item, index) => (
             <div key={item.label} className="mb-2">
               <button
@@ -336,7 +343,7 @@ const Header = ({ kardexTypes }: Props) => {
                                     className={navLinkClass}
                                     onClick={() => {
                                       resetNavigationState()
-                                      if (option.docType) setBodyRender(option.docType)
+                                      if (option.docType != null) setBodyRender(option.docType)
                                     }}
                                   >
                                     {subOption.name}

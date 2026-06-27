@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
-import KardexErrors from "./kardexErrors/KardexErrors"
 import KardexFilters from "./KardexFilters"
 import KardexHeader from "./KardexHeader"
 import KardexTable from "./KardexTable"
@@ -48,39 +47,41 @@ const KardexMain = () => {
         setNumescritura('')
     }, [bodyRender])
 
-    const { data: kardexPage, isLoading, isError, error, isSuccess, refetch } = useGetKardexList({ page: page.toString(), idtipkar, access, correlative, name, document, numescritura })
+    const { data: kardexPage, isLoading, isError, error, isSuccess, refetch } = useGetKardexList({
+        page: page.toString(),
+        idtipkar,
+        access,
+        correlative,
+        name,
+        document,
+        numescritura,
+    })
 
     if (isLoading) return <p className="text-sm animate-pulse text-center my-10">Un momento</p>
   
     if (isError) return <p className="text-center my-8">{`Error: ${error.message}`}</p>
   
-    if (isSuccess)
+    if (!isSuccess) return null
 
   return (
     <div className="mx-auto w-[92%] max-w-[1400px] bg-white rounded-2xl shadow-sm border border-slate-200 text-black mt-4 mb-4 overflow-hidden">
-        {bodyRender !== 0 
-        ?
-        <>
-          <KardexHeader />
-          <KardexFilters 
-            setCorrelative={setCorrelative}
-            setName={setName}
-            setDocument={setDocument}
-            setNumescritura={setNumescritura}
-            correlative={correlative}
-            name={name}
-            document={document}
-            numescritura={numescritura}
-            refetch={refetch}
-          />
-          <KardexTable 
-            kardexPage={kardexPage}
-            setPage={setPage}
-            page={page}
-          />
-        </>
-        :
-        <KardexErrors />}
+        <KardexHeader />
+        <KardexFilters 
+          setCorrelative={setCorrelative}
+          setName={setName}
+          setDocument={setDocument}
+          setNumescritura={setNumescritura}
+          correlative={correlative}
+          name={name}
+          document={document}
+          numescritura={numescritura}
+          refetch={refetch}
+        />
+        <KardexTable 
+          kardexPage={kardexPage}
+          setPage={setPage}
+          page={page}
+        />
     </div>
   )
 }
