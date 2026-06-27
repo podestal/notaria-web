@@ -19,6 +19,11 @@ import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useGetSedesRegistrales from "../../../hooks/api/sedesRegistrales/useGetSedesRegistrales"
 import { UpdateVehicleData } from "../../../hooks/api/vehiculares/useUpdateVehicular"
+import {
+    FOUR_DIGIT_YEAR_ERROR,
+    isValidFourDigitYearOrEmpty,
+    sanitizeFourDigitYearInput,
+} from "../../../utils/fourDigitYear"
 
 interface Props {
     createVehicle?: UseMutationResult<Vehicle, Error, CreateVehicularData>
@@ -56,6 +61,7 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
     const [plateError, setPlateError] = useState('')
     const [motorError, setMotorError] = useState('')
     const [fechaInscripcionError, setFechaInscripcionError] = useState('')
+    const [anioFabricacionError, setAnioFabricacionError] = useState('')
 
     const setCilindrosSafe = (value: string) => setCilindros(sanitizeThreeDigitIntInput(value))
     const setRuedasSafe = (value: string) => setRuedas(sanitizeThreeDigitIntInput(value))
@@ -99,6 +105,12 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
             setMotorError('El campo Motor es obligatorio')
             return
         }
+
+        if (!isValidFourDigitYearOrEmpty(anioFabricacion)) {
+            setAnioFabricacionError(FOUR_DIGIT_YEAR_ERROR)
+            return
+        }
+        setAnioFabricacionError('')
 
         if (!isValidFecInsc(fechaInscripcion)) {
             setFechaInscripcionError('Use el formato DD/MM/YYYY')
@@ -272,9 +284,14 @@ const VehicleForm = ({ createVehicle, updateVehicular, kardex, idtipoacto, vehic
         <div className="grid grid-cols-2 gap-4">
             <SimpleInput 
                 value={anioFabricacion}
-                setValue={setAnioFabricacion}
+                setValue={(value) => {
+                    setAnioFabricacionError('')
+                    setAnioFabricacion(sanitizeFourDigitYearInput(value))
+                }}
                 label="Año fabricación"
                 horizontal
+                error={anioFabricacionError}
+                setError={setAnioFabricacionError}
             />
             <SimpleInput 
                 value={numeroSerie}

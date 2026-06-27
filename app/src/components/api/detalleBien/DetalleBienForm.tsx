@@ -5,7 +5,6 @@ import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelectorStr from "../../ui/SimpleSelectosStr"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
 import { DetalleBien } from "../../../services/api/detalleBienService"
-import DateInput from "../../ui/DateInput"
 import { Ubigeo } from "../../../services/api/ubigeoService"
 import { UseMutationResult } from "@tanstack/react-query"
 import { DetalleBienCreateData } from "../../../hooks/api/detalleBien/useCreateDetalleBienes"
@@ -15,7 +14,11 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import TopModal from "../../ui/TopModal"
 import { DetalleBienUpdateData } from "../../../hooks/api/detalleBien/useUpdateDetalleBien"
 import PrediosMain from "../predios/PrediosMain"
-// import useAuthStore from "../../../store/useAuthStore"
+import {
+    FOUR_DIGIT_YEAR_ERROR,
+    isValidFourDigitYearOrEmpty,
+    sanitizeFourDigitYearInput,
+} from "../../../utils/fourDigitYear"
 
 interface Props {
     kardex: string
@@ -67,6 +70,7 @@ const DetalleBienForm = ({
     const [otherSpecific, setOtherSpecific] = useState(detalleBien ? detalleBien.oespecific : '')
 
     const [loading, setLoading] = useState(false)
+    const [fechaError, setFechaError] = useState('')
 
     useEffect(() => {
         if (tipoBienJuridico === 4 && !detalleBien) {
@@ -78,6 +82,16 @@ const DetalleBienForm = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isValidFourDigitYearOrEmpty(fecha)) {
+            setFechaError(FOUR_DIGIT_YEAR_ERROR)
+            setMessage(FOUR_DIGIT_YEAR_ERROR)
+            setShow(true)
+            setType('error')
+            return
+        }
+
+        setFechaError('')
         setLoading(true)
 
         createDetalleBien && createDetalleBien.mutate({
@@ -252,11 +266,16 @@ const DetalleBienForm = ({
         />
         </div>
         <div className="grid grid-cols-2 gap-4">
-            <DateInput 
+            <SimpleInput 
                 label="Fecha de Inscripción"
                 value={fecha}
-                setValue={setFecha}
+                setValue={(value) => {
+                    setFechaError('')
+                    setFecha(sanitizeFourDigitYearInput(value))
+                }}
                 horizontal
+                error={fechaError}
+                setError={setFechaError}
             />
             <div className="flex items-center justify-center">
                 <button
