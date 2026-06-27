@@ -244,7 +244,6 @@ const KardexForm = ({
                     setKardex && setKardex(newKardex)
                     setKardexId(newKardex.idkardex)
                     setDoneCreate(true)
-                    // setKardex && setKardex(res.)
                 }, 
                 onError: (error) => {
                     notify("error", `Error al crear el kardex: ${error.message}`)
@@ -253,13 +252,15 @@ const KardexForm = ({
                     setLoading(false)
                 }
             })
+            return
         }
 
-        if (doneCreate) {
-            updateKardexInternal.mutate({
+        if (kardex || doneCreate) {
+            const mutation = updateKardex ?? updateKardexInternal
+            mutation.mutate({
                 kardex: {
                     idtipkar: selectedKardexType,
-                    fechaingreso: formatKardexFechaIngreso(date),
+                    fechaingreso: formatKardexFechaIngreso(date) || kardex?.fechaingreso || '',
                     referencia: karedexReference,
                     codactos: contratos.join(''),
                     idusuario: Number(responsible.id),
@@ -284,62 +285,19 @@ const KardexForm = ({
                     notify("success", "Kardex actualizado exitosamente")
                 }, 
                 onError: (error) => {
-                    let errorMessage = ''
-                    if ((error as any)?.response?.data?.error ) {
+                    if ((error as { response?: { data?: { error?: string } } })?.response?.data?.error) {
                         setCannotUpdateKardex(true)
-                        setCannotUpdateKardexMessage((error as any)?.response?.data?.error)
+                        setCannotUpdateKardexMessage((error as { response?: { data?: { error?: string } } }).response!.data!.error!)
                     } else {
-                        notify("error", `Error al actualizar el kardex: ${errorMessage}`)
+                        notify("error", `Error al actualizar el kardex: ${error.message}`)
                     }
                 },
                 onSettled: () => {
                     setLoading(false)
                 }
             })
-        } 
-
-        if (kardex && updateKardex && !doneCreate) {
-            updateKardex.mutate({
-                kardex: {
-                    // idkardex: kardex?.idkardex || 0,
-                    idtipkar: selectedKardexType,
-                    fechaingreso: formatKardexFechaIngreso(date) || kardex.fechaingreso,
-                    referencia: karedexReference,
-                    codactos: contratos.join(''),
-                    idusuario: Number(responsible.id),
-                    responsable: Number(responsible.id),
-                    retenido: 0,
-                    desistido: 0,
-                    autorizado: 0,
-                    idrecogio: 0,
-                    pagado: 0,
-                    visita: 0,
-                    idnotario: 1,
-                    contrato: `${formattedContratoDes} / `, 
-                    fktemplate: selectedTemplate,
-                    recepcion: recepcion,
-                    estado_sisgen: kardex.estado_sisgen ?? 0,
-                    nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
-                    ...preservedKardexFields(kardex),
-                },
-                access
-            }, {
-                onSuccess: () => {
-                    notify("success", "Kardex actualizado exitosamente")
-                }, 
-                onError: (error) => {
-                    let errorMessage = ''
-                    if ((error as any)?.response?.data?.error ) {
-                        setCannotUpdateKardex(true)
-                        setCannotUpdateKardexMessage((error as any)?.response?.data?.error)
-                    } else {
-                        notify("error", `Error al actualizar el kardex: ${errorMessage}`)
-                    }
-                },
-                onSettled: () => {
-                    setLoading(false)
-                }
-            })
+        } else {
+            setLoading(false)
         }
 
     }
