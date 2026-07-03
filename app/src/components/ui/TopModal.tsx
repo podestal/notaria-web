@@ -56,7 +56,7 @@ const TopModal = ({ isOpen, onClose, children, deepth, portal = false, wide = fa
             <div
               className={
                 wide
-                  ? "mt-1 flex min-h-0 flex-1 flex-col overflow-hidden"
+                  ? "mt-1 flex min-h-0 flex-1 flex-col overflow-y-auto"
                   : "mt-2 max-h-[75vh] overflow-y-auto"
               }
             >
