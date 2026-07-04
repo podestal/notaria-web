@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient, type UseMutationResult } from "@tanstack/react-query"
 import {
-    getRecibosServiceSingle,
+    getRecibosCreateService,
+    type CreateReciboResponse,
     type CreateUpdateRecibo,
-    type Recibo,
 } from "../../../services/taxes/recibosService"
 
 export interface CreateReciboData {
@@ -10,9 +10,13 @@ export interface CreateReciboData {
     recibo: CreateUpdateRecibo
 }
 
-const useCreateRecibo = (): UseMutationResult<Recibo, Error, CreateReciboData> => {
+const useCreateRecibo = (): UseMutationResult<
+    CreateReciboResponse,
+    Error,
+    CreateReciboData
+> => {
     const queryClient = useQueryClient()
-    const service = getRecibosServiceSingle()
+    const service = getRecibosCreateService()
 
     return useMutation({
         mutationFn: (data: CreateReciboData) =>

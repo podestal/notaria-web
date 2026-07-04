@@ -1,5 +1,6 @@
 import TaxesClient from "./taxesCliente"
 import type { Recibo, RecibosPage } from "./recibosService"
+import type { SunatStatus } from "./sunatStatus"
 
 export interface Resumen {
     id_resumen: number
@@ -12,6 +13,7 @@ export interface Resumen {
     denominacion: string | null
     enviada_sunat: boolean
     aceptada_sunat: boolean
+    error_sunat?: string | null
 }
 
 export interface ResumenesPage {
@@ -28,11 +30,18 @@ export interface CreateResumenPayload {
     recibo_ids: number[]
 }
 
+export interface CreateResumenResponse {
+    resumen: Resumen
+    recibos: Recibo[]
+    sunat?: SunatStatus
+}
+
 export const resumenesService = new TaxesClient<ResumenesPage>("/resumenes/")
 
-export const resumenesCreateService = new TaxesClient<Resumen, CreateResumenPayload>(
-    "/resumenes/",
-)
+export const resumenesCreateService = new TaxesClient<
+    CreateResumenResponse,
+    CreateResumenPayload
+>("/resumenes/")
 
 export const resumenesRecibosPendientesService = new TaxesClient<
     Recibo[] | RecibosPage

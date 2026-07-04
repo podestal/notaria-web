@@ -3,6 +3,11 @@ import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useConsultarResumenTicket from "../../../hooks/taxes/resumenes/useConsultarResumenTicket"
 import type { Resumen } from "../../../services/taxes/resumenesService"
+import {
+    getResumenSunatLabel,
+    getSunatDetailMessage,
+    inferSunatDisplayFromResumen,
+} from "../../../services/taxes/sunatStatus"
 import getTitleCase from "../../../utils/getTitleCase"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
 import { getIngresoBackendError } from "../controlInterno/ingresoFormShared"
@@ -16,22 +21,42 @@ const displayValue = (value: string | null | undefined) => {
     return value
 }
 
-const SunatBadge = ({ ok, label }: { ok: boolean; label: string }) => (
-    <span
-        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-            ok ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-800"
-        }`}
-    >
-        {label}
-    </span>
-)
+const SunatBadge = ({
+    label,
+    tone,
+}: {
+    label: string
+    tone: "success" | "warning" | "danger"
+}) => {
+    const toneClasses = {
+        success: "bg-emerald-100 text-emerald-700",
+        warning: "bg-amber-100 text-amber-800",
+        danger: "bg-red-100 text-red-800",
+    }
+
+    return (
+        <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${toneClasses[tone]}`}
+        >
+            {label}
+        </span>
+    )
+}
 
 const ResumenCard = ({ resumen }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
     const consultarTicket = useConsultarResumenTicket({ id_resumen: resumen.id_resumen })
 
-    const ticketPendiente = resumen.enviada_sunat && !resumen.aceptada_sunat
+    const sunatDisplay = inferSunatDisplayFromResumen(resumen)
+    const sunatDetail = getSunatDetailMessage(null, resumen)
+    const ticketPendiente = sunatDisplay === "ticket_pending"
+    const sunatBadgeTone =
+        sunatDisplay === "accepted"
+            ? "success"
+            : sunatDisplay === "rejected"
+              ? "danger"
+              : "warning"
 
     const handleConsultarTicket = async () => {
         try {
@@ -74,18 +99,12 @@ const ResumenCard = ({ resumen }: Props) => {
                         </div>
                     </div>
                     <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-                        <SunatBadge
-                            ok={resumen.enviada_sunat}
-                            label={resumen.enviada_sunat ? "Enviada SUNAT" : "Pendiente envío"}
-                        />
-                        <SunatBadge
-                            ok={resumen.aceptada_sunat}
-                            label={
-                                resumen.aceptada_sunat
-                                    ? "Aceptada SUNAT"
-                                    : "Pendiente aceptación"
-                            }
-                        />
+                        {sunatDisplay && (
+                            <SunatBadge
+                                label={getResumenSunatLabel(sunatDisplay)}
+                                tone={sunatBadgeTone}
+                            />
+                        )}
                     </div>
                 </div>
 
@@ -113,6 +132,19 @@ const ResumenCard = ({ resumen }: Props) => {
                         <dd className="font-medium text-slate-800">{resumen.lote}</dd>
                     </div>
                 </dl>
+
+                {sunatDetail && sunatDisplay === "rejected" && (
+                    <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-2.5 py-2 text-[11px] text-red-800">
+                        {sunatDetail}
+                    </p>
+                )}
+
+                {sunatDisplay === "sunat_down" && (
+                    <p className="mt-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-[11px] text-amber-900">
+                        SUNAT no disponible. El resumen fue generado; el sistema reintentará el
+                        envío automáticamente.
+                    </p>
+                )}
 
                 {ticketPendiente && (
                     <div className="mt-3 flex justify-end border-t border-slate-100 pt-3">

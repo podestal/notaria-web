@@ -3,6 +3,7 @@ import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateRecibo from "../../../hooks/taxes/recibos/useCreateRecibo"
 import type { CreateUpdateRecibo } from "../../../services/taxes/recibosService"
+import { getSunatNotification } from "../../../services/taxes/sunatStatus"
 import IngresoForm from "../controlInterno/IngresoForm"
 import {
     getEmptyIngresoFormValues,
@@ -27,22 +28,22 @@ const CreateRecibo = ({ variant, onDone, kardex }: Props) => {
     const initialValues = useMemo(() => getEmptyIngresoFormValues(), [])
 
     const handleCreate = async (values: CreateUpdateRecibo) => {
-        await createRecibo.mutateAsync(
-            { access, recibo: values },
-            {
-                onSuccess: () => {
-                    setMessage(config.createSuccessMessage)
-                    setType("success")
-                    setShow(true)
-                    onDone?.()
-                },
-                onError: (error) => {
-                    setMessage(getIngresoBackendError(error))
-                    setType("error")
-                    setShow(true)
-                },
-            },
-        )
+        try {
+            const response = await createRecibo.mutateAsync({ access, recibo: values })
+            const isBoleta = variant === "boleta"
+            const notification = isBoleta
+                ? { message: config.createSuccessMessage, type: "success" as const }
+                : getSunatNotification(response.sunat, config.createSuccessMessage)
+
+            setMessage(notification.message)
+            setType(notification.type)
+            setShow(true)
+            onDone?.()
+        } catch (error) {
+            setMessage(getIngresoBackendError(error))
+            setType("error")
+            setShow(true)
+        }
     }
 
     return (

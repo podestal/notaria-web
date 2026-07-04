@@ -2,7 +2,7 @@ import { useMutation, useQueryClient, type UseMutationResult } from "@tanstack/r
 import {
     resumenesCreateService,
     type CreateResumenPayload,
-    type Resumen,
+    type CreateResumenResponse,
 } from "../../../services/taxes/resumenesService"
 
 export interface CreateResumenData {
@@ -10,7 +10,11 @@ export interface CreateResumenData {
     payload: CreateResumenPayload
 }
 
-const useCreateResumen = (): UseMutationResult<Resumen, Error, CreateResumenData> => {
+const useCreateResumen = (): UseMutationResult<
+    CreateResumenResponse,
+    Error,
+    CreateResumenData
+> => {
     const queryClient = useQueryClient()
 
     return useMutation({

@@ -1,7 +1,9 @@
 import type { ReactNode } from "react"
-import { ArrowLeftRight, Ban, Printer, Receipt } from "lucide-react"
+import { ArrowLeftRight, Ban, Printer, Receipt, RefreshCw } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useLookupPersonas from "../../../hooks/taxes/personas/useLookupPersonas"
+import useEnviarReciboSunat from "../../../hooks/taxes/recibos/useEnviarReciboSunat"
+import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import getTitleCase from "../../../utils/getTitleCase"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
 import {
@@ -11,7 +13,18 @@ import {
     isIngreso,
     isRecibo,
 } from "./comprobanteTypes"
-import { RECIBO_COMPROBANTE_BOLETA } from "../../../services/taxes/recibosService"
+import {
+    RECIBO_COMPROBANTE_BOLETA,
+    type Recibo,
+} from "../../../services/taxes/recibosService"
+import {
+    getSunatDetailMessage,
+    getSunatNotification,
+    inferSunatStatusFromRecibo,
+    reciboUsesDirectSunat,
+} from "../../../services/taxes/sunatStatus"
+import SunatStatusBadge from "../sunat/SunatStatusBadge"
+import { getIngresoBackendError } from "../controlInterno/ingresoFormShared"
 
 interface Props {
     variant: ComprobanteVariant
@@ -96,15 +109,43 @@ const ActionButton = ({
     )
 }
 
-const SunatBadge = ({ ok, label }: { ok: boolean; label: string }) => (
-    <span
-        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-            ok ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-800"
-        }`}
-    >
-        {label}
-    </span>
-)
+const ComprobanteSunatRetry = ({ recibo }: { recibo: Recibo }) => {
+    const access = useAuthStore((s) => s.access_token) || ""
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    const enviarSunat = useEnviarReciboSunat({ id_recibo: recibo.id_recibo })
+
+    const handleRetry = async () => {
+        try {
+            const response = await enviarSunat.mutateAsync({ access })
+            const notification = getSunatNotification(
+                response,
+                "Reenvío a SUNAT procesado.",
+            )
+            setMessage(notification.message)
+            setType(notification.type)
+            setShow(true)
+        } catch (error) {
+            setMessage(getIngresoBackendError(error))
+            setType("error")
+            setShow(true)
+        }
+    }
+
+    return (
+        <button
+            type="button"
+            onClick={handleRetry}
+            disabled={enviarSunat.isPending}
+            className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-800 hover:bg-amber-100 disabled:opacity-60"
+        >
+            <RefreshCw
+                className={`h-3 w-3 ${enviarSunat.isPending ? "animate-spin" : ""}`}
+                aria-hidden
+            />
+            {enviarSunat.isPending ? "Enviando…" : "Reenviar a SUNAT"}
+        </button>
+    )
+}
 
 const ComprobanteCard = ({
     variant,
@@ -140,6 +181,19 @@ const ComprobanteCard = ({
         item.persona_nombres,
         resolvedPersonaName,
     )
+    const sunatStatus =
+        recibo && reciboUsesDirectSunat(recibo.comprobante)
+            ? inferSunatStatusFromRecibo(recibo)
+            : null
+    const sunatDetail =
+        recibo && sunatStatus === "rejected"
+            ? getSunatDetailMessage(null, recibo)
+            : null
+    const showSunatRetry =
+        recibo
+        && !recibo.anulada
+        && reciboUsesDirectSunat(recibo.comprobante)
+        && !recibo.aceptada_sunat
 
     return (
         <article
@@ -176,25 +230,11 @@ const ComprobanteCard = ({
                                         Canjeada
                                     </span>
                                 )}
-                                {recibo && !recibo.anulada && (
-                                    <>
-                                        <SunatBadge
-                                            ok={recibo.enviada_sunat}
-                                            label={
-                                                recibo.enviada_sunat
-                                                    ? "Enviada SUNAT"
-                                                    : "Pend. SUNAT"
-                                            }
-                                        />
-                                        <SunatBadge
-                                            ok={recibo.aceptada_sunat}
-                                            label={
-                                                recibo.aceptada_sunat
-                                                    ? "Aceptada"
-                                                    : "No aceptada"
-                                            }
-                                        />
-                                    </>
+                                {recibo && reciboUsesDirectSunat(recibo.comprobante) && sunatStatus && (
+                                    <SunatStatusBadge status={sunatStatus} compact />
+                                )}
+                                {recibo && showSunatRetry && (
+                                    <ComprobanteSunatRetry recibo={recibo} />
                                 )}
                             </div>
                             <h3 className="mt-1 text-sm font-medium leading-snug text-slate-900">
@@ -309,6 +349,12 @@ const ComprobanteCard = ({
                         </>
                     )}
                 </dl>
+
+                {sunatDetail && (
+                    <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-2.5 py-2 text-[11px] text-red-800">
+                        {sunatDetail}
+                    </p>
+                )}
             </div>
 
             <div

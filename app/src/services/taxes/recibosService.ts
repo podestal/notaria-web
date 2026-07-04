@@ -1,6 +1,7 @@
 import TaxesClient from "./taxesCliente"
 import taxesHttp from "./taxesHttpClient"
 import { authHeaderValue } from "../http/attachAxiosAuthRequestInterceptor"
+import type { SunatStatus } from "./sunatStatus"
 
 export const RECIBO_COMPROBANTE_FACTURA = 1
 export const RECIBO_COMPROBANTE_BOLETA = 2
@@ -24,9 +25,28 @@ export interface Recibo {
     anulada: boolean
     enviada_sunat: boolean
     aceptada_sunat: boolean
+    error_sunat?: string | null
     motivo_baja: string | null
     fecha_baja: string | null
     resumen_id: number | null
+}
+
+export interface ReciboLinea {
+    id?: number
+    catalogo_id: number
+    cantidad: number
+    descripcion: string
+    total: string
+}
+
+export interface CreateReciboResponse {
+    recibo: Recibo
+    items: ReciboLinea[]
+    sunat?: SunatStatus
+}
+
+export interface EnviarReciboSunatResponse extends SunatStatus {
+    recibo: Recibo
 }
 
 export interface RecibosPage {
@@ -73,11 +93,19 @@ export const fetchReciboPdfBlob = async (
 export const getReciboAnularService = (id_recibo: number) =>
     new TaxesClient<Recibo, AnularReciboPayload>(`/recibos/${id_recibo}/anular/`)
 
+export const getReciboEnviarSunatService = (id_recibo: number) =>
+    new TaxesClient<EnviarReciboSunatResponse, Record<string, never>>(
+        `/recibos/${id_recibo}/enviar-sunat/`,
+    )
+
 export const recibosService = new TaxesClient<RecibosPage>("/recibos/")
 
 export const getRecibosServiceSingle = (id_recibo?: number) =>
-    new TaxesClient<Recibo, CreateUpdateRecibo>(
+    new TaxesClient<CreateReciboResponse | Recibo, CreateUpdateRecibo>(
         id_recibo ? `/recibos/${id_recibo}/` : "/recibos/",
     )
+
+export const getRecibosCreateService = () =>
+    new TaxesClient<CreateReciboResponse, CreateUpdateRecibo>("/recibos/")
 
 export default recibosService
