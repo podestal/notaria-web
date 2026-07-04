@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import {
     postSisgenSendDocuments,
     type SisgenSendDocumentsRequest,
-    type SisgenSendDocumentsResponse,
+    type SisgenSendEnqueueResponse,
 } from "../../services/sisgen/processDocumentService"
 
 export interface SisgenSendDocumentsData {
@@ -11,7 +11,7 @@ export interface SisgenSendDocumentsData {
 }
 
 const useSisgenSendDocuments = () => {
-    return useMutation<SisgenSendDocumentsResponse, Error, SisgenSendDocumentsData>({
+    return useMutation<SisgenSendEnqueueResponse, Error, SisgenSendDocumentsData>({
         mutationFn: ({ body, access }) => postSisgenSendDocuments(body, access),
     })
 }

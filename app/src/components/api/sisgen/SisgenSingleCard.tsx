@@ -43,13 +43,35 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
               idkardex: sisgenDoc.idkardex.toString()
             }
           ],
-          all: 0
         }
       }, {
-        onSuccess: () => {
-          setMessage('Documento enviado correctamente')
+        onSuccess: (job) => {
+          if (job.status === "failed") {
+            setMessage(job.failure_message || "Error al enviar el documento")
+            setShow(true)
+            setType("error")
+            return
+          }
+
+          const result = job.result
+          if (result && result.error !== 0) {
+            setMessage(result.messageDescription || result.message || "Error al enviar el documento")
+            setShow(true)
+            setType("error")
+            return
+          }
+
+          const fallidos = result?.fallidos ?? 0
+          if (fallidos > 0) {
+            setMessage(`Envío con errores: ${fallidos} fallido(s)`)
+            setShow(true)
+            setType("error")
+            return
+          }
+
+          setMessage("Documento enviado correctamente")
           setShow(true)
-          setType('success')
+          setType("success")
         },
         onError: () => {
           setMessage('Error al enviar el documento')

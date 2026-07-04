@@ -1,25 +1,41 @@
 import SisgenClient from "./sisgenClient"
+import type { SisgenSearchFilters } from "../../utils/buildSisgenSearchFilters"
+import type {
+    SisgenSendJobDocument,
+    SisgenSendJobResponse,
+    SisgenSendJobStatus,
+    SisgenSendResult,
+} from "./sisgenSendJobService"
 
 export interface SisgenSendDocumentItem {
     kardex: string
     idkardex: string
 }
 
-export interface SisgenSendDocumentsRequest {
+export type SisgenSendDocumentsRequest = SisgenSearchFilters & {
     documents: SisgenSendDocumentItem[]
 }
 
-export interface SisgenSendDocumentsResponse {
+/** @deprecated Use SisgenSendResult from sisgenSendJobService for completed job results. */
+export type SisgenSendDocumentsResponse = SisgenSendResult
+
+export interface SisgenSendEnqueueResponse {
     error: number
-    messageDescription?: string
     message?: string
-    guardados?: number
-    fallidos?: number
-    observados?: number
-    processed_kardex?: string[]
-    data?: unknown[]
-    errores_sisgen_usuario?: string[]
-    dry_run?: boolean
+    job_id: number
+    status: SisgenSendJobStatus
+    celery_task_id?: string
+    progress_processed?: number
+    progress_total?: number
+    progress?: string
+    payload?: SisgenSendJobResponse["payload"]
+    result: SisgenSendResult | null
+    failure_message?: string
+    created_at?: string
+    updated_at?: string
+    finished_at?: string | null
+    status_url?: string
+    documents: SisgenSendJobDocument[]
 }
 
 /** @deprecated Legacy single/batch payload; prefer SisgenSendDocumentsRequest without `all`. */
@@ -63,14 +79,34 @@ export interface SisgenResponse {
     total: number
 }
 
-const sendClient = new SisgenClient<
-    SisgenSendDocumentsResponse,
-    SisgenSendDocumentsRequest
->("send-sisgen/")
+const parseEnqueueResponse = (data: unknown): SisgenSendEnqueueResponse => {
+    const raw = data as Record<string, unknown>
+    const failureMessage =
+        typeof raw.error === "string"
+            ? raw.error
+            : typeof raw.failure_message === "string"
+              ? raw.failure_message
+              : undefined
 
-export const postSisgenSendDocuments = (
+    return {
+        ...(raw as SisgenSendEnqueueResponse),
+        error: typeof raw.error === "number" ? raw.error : 0,
+        failure_message: failureMessage,
+        documents: Array.isArray(raw.documents) ? raw.documents as SisgenSendJobDocument[] : [],
+        result: (raw.result as SisgenSendResult | null) ?? null,
+    }
+}
+
+const sendClient = new SisgenClient<SisgenSendEnqueueResponse, SisgenSendDocumentsRequest>(
+    "send-sisgen/",
+)
+
+export const postSisgenSendDocuments = async (
     body: SisgenSendDocumentsRequest,
     access: string,
-) => sendClient.post(body, access)
+): Promise<SisgenSendEnqueueResponse> => {
+    const data = await sendClient.post(body, access)
+    return parseEnqueueResponse(data)
+}
 
 export default sendClient
