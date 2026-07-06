@@ -61,6 +61,22 @@ export interface ComplianceUserKardexResponse {
     kardex: ComplianceUserKardexItem[]
 }
 
+export interface ComplianceMeKardexResponse extends ComplianceUserKardexResponse {
+    year: number
+    month: number
+    total_kardex: number
+    kardex_with_errors: number
+    error_rate: number
+}
+
+export const getCurrentCompliancePeriod = () => {
+    const now = new Date()
+    return {
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+    }
+}
+
 export interface ComplianceSisgenErrors {
     errores: string[]
     personas: string[]
@@ -139,6 +155,23 @@ export const getComplianceUserKardex = (
             },
         })
         .then((res) => res.data)
+
+export const getComplianceMeKardex = (
+    access: string,
+    year?: number,
+    month?: number,
+): Promise<ComplianceMeKardexResponse> => {
+    const period = getCurrentCompliancePeriod()
+    return complianceAxios
+        .get<ComplianceMeKardexResponse>("me/kardex/", {
+            headers: authHeaders(access),
+            params: {
+                year: String(year ?? period.year),
+                month: String(month ?? period.month),
+            },
+        })
+        .then((res) => res.data)
+}
 
 export const getComplianceKardexErrors = (
     access: string,

@@ -10,6 +10,7 @@ import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
 import { Link } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
 import { isFacturacionEnabled } from '../utils/isFacturacionEnabled'
+import ComplianceMeReminder from '../components/api/kardex/kardexErrors/ComplianceMeReminder'
 
 interface SubOption {
   name: string
@@ -283,6 +284,7 @@ const Header = ({ kardexTypes }: Props) => {
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 py-3">
+          <ComplianceMeReminder />
           <Link
             to="/app/panel-general"
             className="mb-3 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"

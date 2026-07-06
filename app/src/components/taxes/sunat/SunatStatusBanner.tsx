@@ -1,5 +1,5 @@
-import type { SunatStatus } from "../../services/taxes/sunatStatus"
-import { formatSunatNextRetry, getSunatStatusLabel } from "../../services/taxes/sunatStatus"
+import type { SunatStatus } from "../../../services/taxes/sunatStatus"
+import { formatSunatNextRetry, getSunatStatusLabel } from "../../../services/taxes/sunatStatus"
 
 interface Props {
     sunat?: SunatStatus | null
