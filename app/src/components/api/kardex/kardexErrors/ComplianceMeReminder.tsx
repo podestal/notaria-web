@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import useGetComplianceMeKardex from "../../../../hooks/compliance/useGetComplianceMeKardex"
 import useAuthStore from "../../../../store/useAuthStore"
 import ComplianceMeKardexModal from "./ComplianceMeKardexModal"
@@ -23,6 +23,11 @@ const MONTH_LABELS = [
 const ComplianceMeReminder = () => {
     const access = useAuthStore((s) => s.access_token) || ""
     const [modalOpen, setModalOpen] = useState(false)
+    const { pathname } = useLocation()
+
+    useEffect(() => {
+        setModalOpen(false)
+    }, [pathname])
 
     const { data, isLoading, isError, refetch, isFetching } = useGetComplianceMeKardex({
         access,
@@ -106,6 +111,7 @@ const ComplianceMeReminder = () => {
                                 </button>
                                 <Link
                                     to="/app/panel-general"
+                                    onClick={() => setModalOpen(false)}
                                     className="rounded-md border border-amber-500/30 px-2 py-1 text-[10px] font-semibold text-amber-100/90 transition hover:bg-amber-500/15"
                                 >
                                     Panel general
@@ -141,6 +147,7 @@ const ComplianceMeReminder = () => {
                                 </button>
                                 <Link
                                     to="/app/panel-general"
+                                    onClick={() => setModalOpen(false)}
                                     className="rounded-md border border-emerald-500/20 px-2 py-1 text-[10px] font-semibold text-emerald-200/80 transition hover:bg-emerald-500/10"
                                 >
                                     Panel general
