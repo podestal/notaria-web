@@ -3,6 +3,9 @@ import PreKardexForm from "../../reportes/registrosUif/PreKardexForm"
 import useGetComplianceKardexErrors from "../../../../hooks/compliance/useGetComplianceKardexErrors"
 import useAuthStore from "../../../../store/useAuthStore"
 import ComplianceKardexErrorsPanel from "./ComplianceKardexErrorsPanel"
+import { useEffect } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { invalidateComplianceQueries } from "../../../../hooks/compliance/invalidateComplianceQueries"
 
 interface Props {
     isOpen: boolean
@@ -13,6 +16,21 @@ interface Props {
 
 const ComplianceKardexModal = ({ isOpen, onClose, idkardex, kardex }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const queryClient = useQueryClient()
+
+    useEffect(() => {
+        if (!isOpen) return
+
+        return queryClient.getMutationCache().subscribe((event) => {
+            if (
+                event.type === "updated" &&
+                event.action.type === "success" &&
+                event.mutation.state.status === "success"
+            ) {
+                void invalidateComplianceQueries(queryClient)
+            }
+        })
+    }, [isOpen, queryClient])
 
     const {
         data,
@@ -30,7 +48,7 @@ const ComplianceKardexModal = ({ isOpen, onClose, idkardex, kardex }: Props) => 
     const isRefreshing = isFetching && !isLoading
 
     return (
-        <TopModal isOpen={isOpen} onClose={onClose} wide portal deepth={50}>
+        <TopModal isOpen={isOpen} onClose={onClose} wide portal deepth={45}>
             <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-0">
                 <div className="flex max-h-[32vh] shrink-0 flex-col lg:max-h-none lg:w-72">
                     {isLoading && (

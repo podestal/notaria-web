@@ -35,8 +35,8 @@ const TopModal = ({ isOpen, onClose, children, deepth, portal = false, wide = fa
           <motion.div
             className={
               wide
-                ? "fixed top-12 right-3 left-56 z-50 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-4 shadow-lg sm:p-6"
-                : `fixed top-20 right-0 left-56 z-50 mx-auto w-full max-h-screen overflow-y-auto rounded-b-2xl bg-white p-6 shadow-lg max-w-5xl`
+                ? "fixed top-12 right-3 left-56 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-4 shadow-lg sm:p-6"
+                : `fixed top-20 right-0 left-56 mx-auto w-full max-h-screen overflow-y-auto rounded-b-2xl bg-white p-6 shadow-lg max-w-5xl`
             }
             style={{ zIndex: contentZIndex }}
             initial={{ y: '-100%' }}

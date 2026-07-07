@@ -36,7 +36,7 @@ const MainPage = () => {
           </div>
         )}
         {notifications.length > 0 && (
-          <div className="fixed right-4 top-8 z-60 flex flex-col gap-3 pointer-events-none">
+          <div className="fixed right-4 top-8 z-[70] flex flex-col gap-3 pointer-events-none">
             {[...notifications].reverse().map((n) => (
               <div key={n.id} className="pointer-events-auto">
                 <NotificationCard

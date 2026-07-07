@@ -1,10 +1,12 @@
 import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import TopModal from "../../../ui/TopModal"
 import useGetComplianceMeKardex from "../../../../hooks/compliance/useGetComplianceMeKardex"
 import useAuthStore from "../../../../store/useAuthStore"
 import getTitleCase from "../../../../utils/getTitleCase"
 import type { ComplianceErrorCounts } from "../../../../services/compliance/complianceService"
 import ComplianceKardexModal from "./ComplianceKardexModal"
+import { invalidateComplianceQueries } from "../../../../hooks/compliance/invalidateComplianceQueries"
 
 const MONTH_LABELS = [
     "Enero",
@@ -44,6 +46,7 @@ interface Props {
 
 const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const queryClient = useQueryClient()
     const [kardexId, setKardexId] = useState(0)
     const [kardexCode, setKardexCode] = useState("")
     const [isKardexOpen, setIsKardexOpen] = useState(false)
@@ -64,6 +67,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
         setIsKardexOpen(false)
         setKardexId(0)
         setKardexCode("")
+        void invalidateComplianceQueries(queryClient)
     }
 
     const periodLabel =

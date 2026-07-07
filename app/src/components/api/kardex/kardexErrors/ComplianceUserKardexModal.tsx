@@ -1,10 +1,12 @@
 import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import TopModal from "../../../ui/TopModal"
 import useGetComplianceUserKardex from "../../../../hooks/compliance/useGetComplianceUserKardex"
 import useAuthStore from "../../../../store/useAuthStore"
 import getTitleCase from "../../../../utils/getTitleCase"
 import type { ComplianceUser, ComplianceErrorCounts } from "../../../../services/compliance/complianceService"
 import ComplianceKardexModal from "./ComplianceKardexModal"
+import { invalidateComplianceQueries } from "../../../../hooks/compliance/invalidateComplianceQueries"
 
 const ErrorCountsHeader = () => (
     <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-600">
@@ -31,6 +33,7 @@ interface Props {
 
 const ComplianceUserKardexModal = ({ user, year, month, onClose }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const queryClient = useQueryClient()
     const isOpen = user != null
     const [kardexId, setKardexId] = useState(0)
     const [kardexCode, setKardexCode] = useState("")
@@ -55,6 +58,7 @@ const ComplianceUserKardexModal = ({ user, year, month, onClose }: Props) => {
         setIsKardexOpen(false)
         setKardexId(0)
         setKardexCode("")
+        void invalidateComplianceQueries(queryClient)
     }
 
     return (
