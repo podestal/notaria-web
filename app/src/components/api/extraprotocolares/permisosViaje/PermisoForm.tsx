@@ -220,7 +220,7 @@ con quien permanecerá hasta su retorno.`);
     <>
     <div>
         {noCorre && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center mt-12 backdrop-blur-xs rounded-lg">
+            <div className="absolute inset-0 z-10 flex items-center justify-center mt-12 backdrop-blur-xs rounded-lg">
                 <div className="text-center">
                     <div className="bg-amber-600 text-white px-8 py-4 rounded-lg shadow-2xl transform -rotate-12 scale-110">
                         <h3 className="text-2xl font-bold tracking-wider">NO CORRESPONDE</h3>
@@ -262,6 +262,7 @@ con quien permanecerá hasta su retorno.`);
             {permisoViaje && <PermisoNoCorre 
                 page={1}
                 permisoViaje={permisoViaje}
+                noCorre={noCorre}
                 setNoCorre={setNoCorre}
             />}
         </div>
