@@ -3,6 +3,10 @@ import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import useGetComplianceMeKardex from "../../../../hooks/compliance/useGetComplianceMeKardex"
 import useAuthStore from "../../../../store/useAuthStore"
+import {
+    getComplianceMeTone,
+    type ComplianceMeTone,
+} from "../../../../services/compliance/complianceService"
 import ComplianceMeKardexModal from "./ComplianceMeKardexModal"
 
 const MONTH_LABELS = [
@@ -19,6 +23,49 @@ const MONTH_LABELS = [
     "Nov",
     "Dic",
 ]
+
+const toneStyles: Record<
+    ComplianceMeTone,
+    {
+        card: string
+        icon: string
+        title: string
+        body: string
+        primaryBtn: string
+        secondaryBtn: string
+    }
+> = {
+    amber: {
+        card: "border-amber-500/40 bg-amber-950/60",
+        icon: "text-amber-400",
+        title: "text-amber-100",
+        body: "text-amber-200/90",
+        primaryBtn:
+            "rounded-md bg-amber-500/25 px-2 py-1 text-[10px] font-semibold text-amber-50 transition hover:bg-amber-500/35",
+        secondaryBtn:
+            "rounded-md border border-amber-500/30 px-2 py-1 text-[10px] font-semibold text-amber-100/90 transition hover:bg-amber-500/15",
+    },
+    red: {
+        card: "compliance-red-glow border-rose-500/55 bg-rose-950/55",
+        icon: "text-rose-400",
+        title: "text-rose-100",
+        body: "text-rose-200/90",
+        primaryBtn:
+            "rounded-md bg-rose-500/25 px-2 py-1 text-[10px] font-semibold text-rose-50 transition hover:bg-rose-500/35",
+        secondaryBtn:
+            "rounded-md border border-rose-500/30 px-2 py-1 text-[10px] font-semibold text-rose-100/90 transition hover:bg-rose-500/15",
+    },
+    green: {
+        card: "border-emerald-600/35 bg-emerald-950/40",
+        icon: "text-emerald-400",
+        title: "text-emerald-100",
+        body: "text-emerald-200/80",
+        primaryBtn:
+            "rounded-md border border-emerald-500/25 px-2 py-1 text-[10px] font-semibold text-emerald-100/90 transition hover:bg-emerald-500/15",
+        secondaryBtn:
+            "rounded-md border border-emerald-500/20 px-2 py-1 text-[10px] font-semibold text-emerald-200/80 transition hover:bg-emerald-500/10",
+    },
+}
 
 const ComplianceMeReminder = () => {
     const access = useAuthStore((s) => s.access_token) || ""
@@ -42,8 +89,8 @@ const ComplianceMeReminder = () => {
     const periodFallback = `${MONTH_LABELS[now.getMonth()]} ${now.getFullYear()}`
     const periodLabel = periodFromData ?? periodFallback
 
-    const hasErrors =
-        data != null && (data.kardex_with_errors > 0 || data.counts.total > 0)
+    const tone: ComplianceMeTone = data ? getComplianceMeTone(data) : "green"
+    const styles = toneStyles[tone]
 
     if (!access) {
         return (
@@ -84,79 +131,109 @@ const ComplianceMeReminder = () => {
         )
     }
 
+    const title =
+        tone === "amber"
+            ? "Pendientes del mes"
+            : tone === "red"
+              ? "Errores de meses anteriores"
+              : "Sin pendientes"
+
+    const months = data?.months?.length
+        ? [...data.months].sort((a, b) => a.year - b.year || a.month - b.month)
+        : data
+          ? [
+                {
+                    year: data.year,
+                    month: data.month,
+                    counts: data.counts,
+                    kardex: data.kardex,
+                    total_kardex: data.total_kardex,
+                    kardex_with_errors: data.kardex_with_errors,
+                },
+            ]
+          : []
+
+    const monthLines = months.map((m) => {
+        const count =
+            m.kardex_with_errors ??
+            m.kardex?.length ??
+            (m.year === data?.year && m.month === data?.month
+                ? (data.total_kardex ?? 0)
+                : 0)
+        const label = `${MONTH_LABELS[m.month - 1] ?? m.month} ${m.year}`
+        const isFocus = m.year === data?.year && m.month === data?.month
+        return isFocus
+            ? `${count} kardex este mes · ${label}`
+            : `${count} kardex ${label}`
+    })
+
     return (
         <>
-            {hasErrors ? (
-                <div className="mb-3 rounded-lg border border-amber-500/40 bg-amber-950/60 px-3 py-2.5">
-                    <div className="flex items-start gap-2">
-                        <AlertTriangle
-                            className="mt-0.5 h-4 w-4 shrink-0 text-amber-400"
-                            aria-hidden
-                        />
-                        <div className="min-w-0 flex-1">
-                            <p className="text-[11px] font-semibold text-amber-100">
-                                Pendientes de cumplimiento
-                            </p>
-                            <p className="mt-0.5 text-[10px] leading-snug text-amber-200/90">
-                                {data!.kardex_with_errors} kardex · {data!.counts.total}{" "}
-                                error{data!.counts.total === 1 ? "" : "es"} · {periodLabel}
-                            </p>
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setModalOpen(true)}
-                                    className="rounded-md bg-amber-500/25 px-2 py-1 text-[10px] font-semibold text-amber-50 transition hover:bg-amber-500/35"
-                                >
-                                    Ver mis kardex
-                                </button>
-                                <Link
-                                    to="/app/panel-general"
-                                    onClick={() => setModalOpen(false)}
-                                    className="rounded-md border border-amber-500/30 px-2 py-1 text-[10px] font-semibold text-amber-100/90 transition hover:bg-amber-500/15"
-                                >
-                                    Panel general
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="mb-3 rounded-lg border border-emerald-600/35 bg-emerald-950/40 px-3 py-2.5">
-                    <div className="flex items-start gap-2">
+            <style>{`
+                @keyframes compliance-red-glow {
+                    0%, 100% {
+                        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.15),
+                            0 0 8px 0 rgba(244, 63, 94, 0.2);
+                        border-color: rgba(244, 63, 94, 0.45);
+                    }
+                    50% {
+                        box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.12),
+                            0 0 18px 2px rgba(244, 63, 94, 0.45);
+                        border-color: rgba(251, 113, 133, 0.8);
+                    }
+                }
+                .compliance-red-glow {
+                    animation: compliance-red-glow 2.4s ease-in-out infinite;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .compliance-red-glow {
+                        animation: none;
+                        box-shadow: 0 0 12px 1px rgba(244, 63, 94, 0.35);
+                    }
+                }
+            `}</style>
+            <div className={`mb-3 rounded-lg border px-3 py-2.5 ${styles.card}`}>
+                <div className="flex items-start gap-2">
+                    {tone === "green" ? (
                         <CheckCircle2
-                            className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400"
+                            className={`mt-0.5 h-4 w-4 shrink-0 ${styles.icon}`}
                             aria-hidden
                         />
-                        <div className="min-w-0 flex-1">
-                            <p className="text-[11px] font-semibold text-emerald-100">
-                                Sin pendientes
-                            </p>
-                            <p className="mt-0.5 text-[10px] leading-snug text-emerald-200/80">
-                                {data?.total_kardex ?? 0} kardex este mes · {periodLabel}
-                                {isFetching && (
-                                    <span className="ml-1 text-emerald-300/60">· actualizando…</span>
-                                )}
-                            </p>
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setModalOpen(true)}
-                                    className="rounded-md border border-emerald-500/25 px-2 py-1 text-[10px] font-semibold text-emerald-100/90 transition hover:bg-emerald-500/15"
-                                >
-                                    Ver detalle
-                                </button>
-                                <Link
-                                    to="/app/panel-general"
-                                    onClick={() => setModalOpen(false)}
-                                    className="rounded-md border border-emerald-500/20 px-2 py-1 text-[10px] font-semibold text-emerald-200/80 transition hover:bg-emerald-500/10"
-                                >
-                                    Panel general
-                                </Link>
-                            </div>
+                    ) : (
+                        <AlertTriangle
+                            className={`mt-0.5 h-4 w-4 shrink-0 ${styles.icon}`}
+                            aria-hidden
+                        />
+                    )}
+                    <div className="min-w-0 flex-1">
+                        <p className={`text-[11px] font-semibold ${styles.title}`}>{title}</p>
+                        <div className={`mt-0.5 space-y-0.5 text-[10px] leading-snug ${styles.body}`}>
+                            {monthLines.map((line) => (
+                                <p key={line}>{line}</p>
+                            ))}
+                            {isFetching && (
+                                <p className="opacity-70">actualizando…</p>
+                            )}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setModalOpen(true)}
+                                className={styles.primaryBtn}
+                            >
+                                {tone === "green" ? "Ver detalle" : "Ver mis kardex"}
+                            </button>
+                            <Link
+                                to="/app/panel-general"
+                                onClick={() => setModalOpen(false)}
+                                className={styles.secondaryBtn}
+                            >
+                                Panel general
+                            </Link>
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
 
             <ComplianceMeKardexModal
                 isOpen={modalOpen}

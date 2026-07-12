@@ -61,12 +61,51 @@ export interface ComplianceUserKardexResponse {
     kardex: ComplianceUserKardexItem[]
 }
 
-export interface ComplianceMeKardexResponse extends ComplianceUserKardexResponse {
+export interface ComplianceMeMonthBucket {
     year: number
     month: number
-    total_kardex: number
-    kardex_with_errors: number
-    error_rate: number
+    counts: ComplianceErrorCounts
+    kardex: ComplianceUserKardexItem[]
+    total_kardex?: number
+    kardex_with_errors?: number
+}
+
+export interface ComplianceRollingSummary {
+    months_included: number
+    counts: ComplianceErrorCounts
+}
+
+export type ComplianceMeTone = "green" | "amber" | "red"
+
+export interface ComplianceMeKardexResponse {
+    year: number
+    month: number
+    counts: ComplianceErrorCounts
+    kardex: ComplianceUserKardexItem[]
+    months: ComplianceMeMonthBucket[]
+    rolling_summary: ComplianceRollingSummary
+    user?: ComplianceUserRef
+    kardex_count?: number
+    total_kardex?: number
+    kardex_with_errors?: number
+    error_rate?: number
+}
+
+const monthHasErrors = (bucket: Pick<ComplianceMeMonthBucket, "counts" | "kardex">) =>
+    (bucket.counts?.total ?? 0) > 0 || (bucket.kardex?.length ?? 0) > 0
+
+/** Red = past months have errors (priority); amber = current month only; green = clean. */
+export const getComplianceMeTone = (data: ComplianceMeKardexResponse): ComplianceMeTone => {
+    const months = data.months?.length
+        ? data.months
+        : [{ year: data.year, month: data.month, counts: data.counts, kardex: data.kardex }]
+
+    const focus = months.find((m) => m.year === data.year && m.month === data.month) ?? months[0]
+    const past = months.filter((m) => !(m.year === data.year && m.month === data.month))
+
+    if (past.some(monthHasErrors)) return "red"
+    if (focus && monthHasErrors(focus)) return "amber"
+    return "green"
 }
 
 export const getCurrentCompliancePeriod = () => {
