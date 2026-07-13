@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Input from '../ui/Input';
 import useLogin from '../../hooks/auth/useLogin';
+import useUserInfoStore from '../../hooks/store/useGetUserInfo';
+import { queryClient } from '../../queryClient';
 
 interface DecodedToken {
     user_id: number;
@@ -15,6 +17,7 @@ const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const {setTokens, setUserId, clearTokens} = useAuthStore()
+    const setUser = useUserInfoStore(s => s.setUser)
     const navigate = useNavigate()
 
     const login = useLogin()
@@ -50,6 +53,8 @@ const Login = () => {
             onSuccess: (jwtData) => {
                 const decoded = jwtDecode<DecodedToken>(jwtData.access)
                 clearTokens()
+                setUser(null)
+                queryClient.clear()
                 setTokens(jwtData.access, jwtData.refresh)
                 setUserId(decoded.user_id)
                 navigate('/app/panel-general')
@@ -59,9 +64,9 @@ const Login = () => {
                 setMessageError('Usuario o contraseña incorrectos');
             },
             onSettled: () => {
-              setLoading(false);
+                setLoading(false);
             }
-      })
+        })
     }
 
   return (

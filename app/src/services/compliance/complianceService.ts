@@ -51,6 +51,8 @@ export interface ComplianceUserKardexItem {
     kardex: string
     contrato?: string
     fechaingreso?: string
+    numescritura?: number | string
+    fechaescritura?: string
     counts: ComplianceErrorCounts
 }
 
@@ -61,52 +63,60 @@ export interface ComplianceUserKardexResponse {
     kardex: ComplianceUserKardexItem[]
 }
 
+/** Month summary bucket from GET /me/kardex/ (no kardex list). */
 export interface ComplianceMeMonthBucket {
     year: number
     month: number
     counts: ComplianceErrorCounts
-    kardex: ComplianceUserKardexItem[]
-    total_kardex?: number
-    kardex_with_errors?: number
-}
-
-export interface ComplianceRollingSummary {
-    months_included: number
-    counts: ComplianceErrorCounts
+    total_kardex: number
+    kardex_with_errors: number
 }
 
 export type ComplianceMeTone = "green" | "amber" | "red"
 
+/** Rolling summary from GET /compliance/me/kardex/ */
 export interface ComplianceMeKardexResponse {
     year: number
     month: number
-    counts: ComplianceErrorCounts
-    kardex: ComplianceUserKardexItem[]
+    idusuario?: number
     months: ComplianceMeMonthBucket[]
-    rolling_summary: ComplianceRollingSummary
     user?: ComplianceUserRef
-    kardex_count?: number
-    total_kardex?: number
-    kardex_with_errors?: number
-    error_rate?: number
 }
 
-const monthHasErrors = (bucket: Pick<ComplianceMeMonthBucket, "counts" | "kardex">) =>
-    (bucket.counts?.total ?? 0) > 0 || (bucket.kardex?.length ?? 0) > 0
+/** Detail from GET /compliance/me/kardex/month/ */
+export interface ComplianceMeKardexMonthResponse {
+    year: number
+    month: number
+    user: ComplianceUserRef
+    total_kardex: number
+    kardex_with_errors: number
+    counts: ComplianceErrorCounts
+    kardex: ComplianceUserKardexItem[]
+}
+
+const monthHasErrors = (
+    bucket: Pick<ComplianceMeMonthBucket, "counts" | "kardex_with_errors">,
+) => (bucket.counts?.total ?? 0) > 0 || (bucket.kardex_with_errors ?? 0) > 0
 
 /** Red = past months have errors (priority); amber = current month only; green = clean. */
 export const getComplianceMeTone = (data: ComplianceMeKardexResponse): ComplianceMeTone => {
-    const months = data.months?.length
-        ? data.months
-        : [{ year: data.year, month: data.month, counts: data.counts, kardex: data.kardex }]
-
-    const focus = months.find((m) => m.year === data.year && m.month === data.month) ?? months[0]
+    const months = data.months ?? []
+    const focus =
+        months.find((m) => m.year === data.year && m.month === data.month) ?? months[0]
     const past = months.filter((m) => !(m.year === data.year && m.month === data.month))
 
     if (past.some(monthHasErrors)) return "red"
     if (focus && monthHasErrors(focus)) return "amber"
     return "green"
 }
+
+export const getCompliancePastMonthsWithErrors = (
+    data: ComplianceMeKardexResponse,
+): ComplianceMeMonthBucket[] =>
+    (data.months ?? []).filter(
+        (m) =>
+            !(m.year === data.year && m.month === data.month) && monthHasErrors(m),
+    )
 
 export const getCurrentCompliancePeriod = () => {
     const now = new Date()
@@ -211,6 +221,21 @@ export const getComplianceMeKardex = (
         })
         .then((res) => res.data)
 }
+
+export const getComplianceMeKardexMonth = (
+    access: string,
+    year: number,
+    month: number,
+): Promise<ComplianceMeKardexMonthResponse> =>
+    complianceAxios
+        .get<ComplianceMeKardexMonthResponse>("me/kardex/month/", {
+            headers: authHeaders(access),
+            params: {
+                year: String(year),
+                month: String(month),
+            },
+        })
+        .then((res) => res.data)
 
 export const getComplianceKardexErrors = (
     access: string,

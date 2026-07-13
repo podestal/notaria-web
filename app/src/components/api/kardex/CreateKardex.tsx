@@ -4,7 +4,8 @@ import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import TopModal from "../../ui/TopModal"
 import { Kardex } from "../../../services/api/kardexService"
-
+import KardexCompliancePastMonthsAlert from "./KardexCompliancePastMonthsAlert"
+import { useCompliancePastMonthsUrgent } from "./useCompliancePastMonthsUrgent"
 
 const CreateKardex = () => {
 
@@ -12,6 +13,7 @@ const CreateKardex = () => {
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const createKardex = useCreateKardex({ idtipkar: bodyRender }) 
     const [kardex, setKardex] = useState<Kardex | null>(null)
+    const { show: pastUrgent } = useCompliancePastMonthsUrgent()
 
   return (
     <>
@@ -29,6 +31,10 @@ const CreateKardex = () => {
             setOpen(false)
             setKardex(null)
         }}
+        tone={pastUrgent ? "danger" : "default"}
+        banner={
+            pastUrgent ? <KardexCompliancePastMonthsAlert sticky /> : null
+        }
     >
         <KardexForm 
             createKardex={createKardex} 

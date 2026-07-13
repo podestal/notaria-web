@@ -2,6 +2,7 @@ import { useMemo, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import TopModal from "../../../ui/TopModal"
 import useGetComplianceMeKardex from "../../../../hooks/compliance/useGetComplianceMeKardex"
+import useGetComplianceMeKardexMonth from "../../../../hooks/compliance/useGetComplianceMeKardexMonth"
 import useAuthStore from "../../../../store/useAuthStore"
 import getTitleCase from "../../../../utils/getTitleCase"
 import type {
@@ -78,20 +79,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
         enabled: isOpen,
     })
 
-    const months = useMemo((): ComplianceMeMonthBucket[] => {
-        if (!data) return []
-        if (data.months?.length) return data.months
-        return [
-            {
-                year: data.year,
-                month: data.month,
-                counts: data.counts,
-                kardex: data.kardex,
-                total_kardex: data.total_kardex,
-                kardex_with_errors: data.kardex_with_errors,
-            },
-        ]
-    }, [data])
+    const months = useMemo((): ComplianceMeMonthBucket[] => data?.months ?? [], [data])
 
     const focusKey = data ? monthKey(data) : null
     const activeKey =
@@ -101,6 +89,19 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
 
     const activeMonth =
         months.find((m) => monthKey(m) === activeKey) ?? months[0] ?? null
+
+    const {
+        data: monthDetail,
+        isLoading: isMonthLoading,
+        isError: isMonthError,
+        error: monthError,
+        isFetching: isMonthFetching,
+    } = useGetComplianceMeKardexMonth({
+        access,
+        year: activeMonth?.year ?? null,
+        month: activeMonth?.month ?? null,
+        enabled: isOpen && activeMonth != null,
+    })
 
     const handleClose = () => {
         setIsKardexOpen(false)
@@ -117,7 +118,18 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
         void invalidateComplianceQueries(queryClient)
     }
 
-    const rolling = data?.rolling_summary
+    const displayCounts = monthDetail?.counts ?? activeMonth?.counts
+    const displayKardexWithErrors =
+        monthDetail?.kardex_with_errors ?? activeMonth?.kardex_with_errors ?? 0
+    const kardexList = monthDetail?.kardex ?? []
+    const userName =
+        monthDetail?.user?.name ||
+        monthDetail?.user?.username ||
+        data?.user?.name ||
+        data?.user?.username ||
+        ""
+
+    const rollingTotal = months.reduce((sum, m) => sum + (m.counts?.total ?? 0), 0)
 
     return (
         <>
@@ -128,13 +140,12 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                             Mis kardex con errores
                         </p>
                         <h3 className="text-lg font-semibold text-slate-800">
-                            {getTitleCase(data?.user?.name || data?.user?.username || "")}
+                            {getTitleCase(userName)}
                         </h3>
-                        {rolling && (
+                        {months.length > 0 && (
                             <p className="text-xs text-slate-500">
-                                Últimos {rolling.months_included} meses ·{" "}
-                                {rolling.counts.total} error
-                                {rolling.counts.total === 1 ? "" : "es"} en total
+                                Últimos {months.length} meses · {rollingTotal} error
+                                {rollingTotal === 1 ? "" : "es"} en total
                             </p>
                         )}
                     </header>
@@ -151,7 +162,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                         </p>
                     )}
 
-                    {data && activeMonth && (
+                    {data && activeMonth && displayCounts && (
                         <>
                             {months.length > 1 && (
                                 <nav className="flex flex-wrap gap-2" aria-label="Meses">
@@ -161,7 +172,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                         const isFocus = key === focusKey
                                         const hasErrors =
                                             (m.counts?.total ?? 0) > 0 ||
-                                            (m.kardex?.length ?? 0) > 0
+                                            (m.kardex_with_errors ?? 0) > 0
                                         return (
                                             <button
                                                 key={key}
@@ -193,8 +204,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                         Con errores
                                     </p>
                                     <p className="text-xl font-bold text-rose-700">
-                                        {activeMonth.kardex_with_errors ??
-                                            activeMonth.kardex.length}
+                                        {displayKardexWithErrors}
                                     </p>
                                 </div>
                                 <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
@@ -202,7 +212,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                         SISGEN
                                     </p>
                                     <p className="text-xl font-bold text-sky-700">
-                                        {activeMonth.counts.sisgen}
+                                        {displayCounts.sisgen}
                                     </p>
                                 </div>
                                 <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
@@ -210,7 +220,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                         UIF
                                     </p>
                                     <p className="text-xl font-bold text-indigo-700">
-                                        {activeMonth.counts.uif}
+                                        {displayCounts.uif}
                                     </p>
                                 </div>
                                 <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
@@ -218,7 +228,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                         PDT
                                     </p>
                                     <p className="text-xl font-bold text-violet-700">
-                                        {activeMonth.counts.pdt}
+                                        {displayCounts.pdt}
                                     </p>
                                 </div>
                                 <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
@@ -226,7 +236,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                         Total
                                     </p>
                                     <p className="text-xl font-bold text-rose-700">
-                                        {activeMonth.counts.total}
+                                        {displayCounts.total}
                                     </p>
                                 </div>
                             </div>
@@ -238,22 +248,34 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                 {monthKey(activeMonth) === focusKey
                                     ? " (mes actual)"
                                     : " (mes anterior)"}
+                                {isMonthFetching && !isMonthLoading ? " · actualizando…" : ""}
                             </p>
 
                             <div className="overflow-x-auto rounded-xl border border-slate-200">
                                 <div className="grid min-w-[720px] grid-cols-6 gap-2 bg-slate-100 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
                                     <p>Kardex</p>
-                                    <p className="col-span-2">Contrato</p>
-                                    <p>Fecha ingreso</p>
+                                    <p>Nº escritura</p>
+                                    <p className="col-span-2">Fecha escritura</p>
                                     <ErrorCountsHeader />
                                     <p className="text-center">Total</p>
                                 </div>
-                                {activeMonth.kardex.length === 0 ? (
+                                {isMonthLoading && (
+                                    <p className="px-3 py-6 text-center text-sm text-slate-500 animate-pulse">
+                                        Cargando kardex del mes...
+                                    </p>
+                                )}
+                                {isMonthError && !monthDetail && (
+                                    <p className="px-3 py-6 text-center text-sm text-red-600">
+                                        Error al cargar kardex: {monthError.message}
+                                    </p>
+                                )}
+                                {!isMonthLoading && !isMonthError && kardexList.length === 0 && (
                                     <p className="px-3 py-6 text-center text-sm text-slate-500">
                                         No hay kardex con errores en este periodo.
                                     </p>
-                                ) : (
-                                    activeMonth.kardex.map((item, index) => (
+                                )}
+                                {!isMonthLoading &&
+                                    kardexList.map((item, index) => (
                                         <div
                                             key={item.idkardex}
                                             className={`grid min-w-[720px] grid-cols-6 gap-2 px-3 py-2 text-sm text-slate-700 ${
@@ -271,20 +293,18 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                             >
                                                 {item.kardex}
                                             </button>
-                                            <p
-                                                className="col-span-2 truncate"
-                                                title={item.contrato}
-                                            >
-                                                {item.contrato || "—"}
+                                            <p>{item.numescritura ?? "—"}</p>
+                                            <p className="col-span-2">
+                                                {item.fechaescritura ||
+                                                    item.fechaingreso ||
+                                                    "—"}
                                             </p>
-                                            <p>{item.fechaingreso || "—"}</p>
                                             <ErrorCountsRow counts={item.counts} />
                                             <p className="text-center font-medium">
                                                 {item.counts.total}
                                             </p>
                                         </div>
-                                    ))
-                                )}
+                                    ))}
                             </div>
                         </>
                     )}

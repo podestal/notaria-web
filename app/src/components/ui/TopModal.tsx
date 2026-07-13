@@ -11,16 +11,56 @@ interface TopModalProps {
   portal?: boolean;
   /** Wider modal for split layouts (e.g. SISGEN kardex + errors). */
   wide?: boolean;
+  /** Sticky content above the scrollable body (always visible). */
+  banner?: ReactNode;
+  /** Visual frame tone — danger adds a glowing red border. */
+  tone?: "default" | "danger";
 }
 
-const TopModal = ({ isOpen, onClose, children, deepth, portal = false, wide = false }: TopModalProps) => {
+const TopModal = ({
+  isOpen,
+  onClose,
+  children,
+  deepth,
+  portal = false,
+  wide = false,
+  banner,
+  tone = "default",
+}: TopModalProps) => {
   const overlayZIndex = deepth ?? 40
   const contentZIndex = overlayZIndex + 10
+  const dangerFrame =
+    tone === "danger"
+      ? "kardex-modal-danger-glow border-2 border-rose-500"
+      : ""
 
   const modal = (
     <AnimatePresence>
       {isOpen && (
         <>
+          {tone === "danger" && (
+            <style>{`
+              @keyframes kardex-modal-danger-glow {
+                0%, 100% {
+                  box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.2),
+                    0 0 14px 0 rgba(244, 63, 94, 0.35);
+                }
+                50% {
+                  box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.12),
+                    0 0 28px 4px rgba(244, 63, 94, 0.55);
+                }
+              }
+              .kardex-modal-danger-glow {
+                animation: kardex-modal-danger-glow 2.2s ease-in-out infinite;
+              }
+              @media (prefers-reduced-motion: reduce) {
+                .kardex-modal-danger-glow {
+                  animation: none;
+                  box-shadow: 0 0 18px 2px rgba(244, 63, 94, 0.4);
+                }
+              }
+            `}</style>
+          )}
           {/* Overlay */}
           <motion.div
             className="fixed inset-y-0 right-0 left-56 bg-black/40"
@@ -35,8 +75,8 @@ const TopModal = ({ isOpen, onClose, children, deepth, portal = false, wide = fa
           <motion.div
             className={
               wide
-                ? "fixed top-12 right-3 left-56 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-4 shadow-lg sm:p-6"
-                : `fixed top-20 right-0 left-56 mx-auto w-full max-h-screen overflow-y-auto rounded-b-2xl bg-white p-6 shadow-lg max-w-5xl`
+                ? `fixed top-12 right-3 left-56 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-4 shadow-lg sm:p-6 ${dangerFrame}`
+                : `fixed top-20 right-0 left-56 mx-auto flex w-full max-h-[calc(100vh-5rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-6 shadow-lg max-w-5xl ${dangerFrame}`
             }
             style={{ zIndex: contentZIndex }}
             initial={{ y: '-100%' }}
@@ -52,12 +92,13 @@ const TopModal = ({ isOpen, onClose, children, deepth, portal = false, wide = fa
                 ✕
               </button>
             </div>
+            {banner ? <div className="shrink-0">{banner}</div> : null}
             {/* Modal content */}
             <div
               className={
                 wide
                   ? "mt-1 flex min-h-0 flex-1 flex-col overflow-y-auto"
-                  : "mt-2 max-h-[75vh] overflow-y-auto"
+                  : "mt-2 min-h-0 flex-1 overflow-y-auto"
               }
             >
               {children}

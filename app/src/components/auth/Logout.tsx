@@ -1,15 +1,20 @@
 // import salir from '../../assets/icons/salir.png'
 import useAuthStore from '../../store/useAuthStore'
+import useUserInfoStore from '../../hooks/store/useGetUserInfo'
 import { useNavigate } from 'react-router-dom'
+import { queryClient } from '../../queryClient'
 
 const Logout = () => {
 
     const clearTokens = useAuthStore(s => s.clearTokens)
+    const setUser = useUserInfoStore(s => s.setUser)
     const navigate = useNavigate()
 
     const handleLogout = () => {
-        navigate('/')
         clearTokens()
+        setUser(null)
+        queryClient.clear()
+        navigate('/')
     }
 
   return (

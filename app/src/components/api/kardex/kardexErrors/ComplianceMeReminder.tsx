@@ -140,26 +140,10 @@ const ComplianceMeReminder = () => {
 
     const months = data?.months?.length
         ? [...data.months].sort((a, b) => a.year - b.year || a.month - b.month)
-        : data
-          ? [
-                {
-                    year: data.year,
-                    month: data.month,
-                    counts: data.counts,
-                    kardex: data.kardex,
-                    total_kardex: data.total_kardex,
-                    kardex_with_errors: data.kardex_with_errors,
-                },
-            ]
-          : []
+        : []
 
     const monthLines = months.map((m) => {
-        const count =
-            m.kardex_with_errors ??
-            m.kardex?.length ??
-            (m.year === data?.year && m.month === data?.month
-                ? (data.total_kardex ?? 0)
-                : 0)
+        const count = m.kardex_with_errors ?? 0
         const label = `${MONTH_LABELS[m.month - 1] ?? m.month} ${m.year}`
         const isFocus = m.year === data?.year && m.month === data?.month
         return isFocus

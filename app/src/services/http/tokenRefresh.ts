@@ -1,6 +1,7 @@
 import axios from "axios"
 import useAuthStore from "../../store/useAuthStore"
 import useUserInfoStore from "../../hooks/store/useGetUserInfo"
+import { queryClient } from "../../queryClient"
 
 const AUTH_BASE = (import.meta.env.VITE_AUTH_URL as string | undefined)?.replace(/\/$/, "") ?? ""
 
@@ -21,6 +22,7 @@ export function redirectToLoginAfterAuthFailure() {
     sessionRedirectScheduled = true
     useAuthStore.getState().clearTokens()
     useUserInfoStore.getState().setUser(null)
+    queryClient.clear()
     window.location.replace("/")
 }
 

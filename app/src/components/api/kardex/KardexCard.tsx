@@ -6,6 +6,8 @@ import TopModal from "../../ui/TopModal"
 import useUpdateKardex from "../../../hooks/api/kardex/useUpdateKardex"
 import useRetrieveKardex from "../../../hooks/api/kardex/useRetrieveKardex"
 import useAuthStore from "../../../store/useAuthStore"
+import KardexCompliancePastMonthsAlert from "./KardexCompliancePastMonthsAlert"
+import { useCompliancePastMonthsUrgent } from "./useCompliancePastMonthsUrgent"
 
 interface Props {
     kardex: Kardex
@@ -17,6 +19,7 @@ const KardexCard = ({ kardex, readyOnly }: Props) => {
     const [open, setOpen] = useState(false)
     const [getKardex, setGetKardex] = useState(false)
     const updateKardex = useUpdateKardex({ kardexId: kardex.idkardex })
+    const { show: pastUrgent } = useCompliancePastMonthsUrgent()
 
   return (
     <>
@@ -46,6 +49,10 @@ const KardexCard = ({ kardex, readyOnly }: Props) => {
     <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}
+        tone={pastUrgent ? "danger" : "default"}
+        banner={
+            pastUrgent ? <KardexCompliancePastMonthsAlert sticky /> : null
+        }
     >
         <>
         {(() => {
