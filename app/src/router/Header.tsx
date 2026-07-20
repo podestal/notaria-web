@@ -212,6 +212,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Crear Usuario", path: "/app/configuracion/create-user"},
                 {name: "Abogados Manager", path: "/app/configuracion/abogados-manager"},
                 {name: "Plantillas", path: "/app/configuracion/plantillas"},
+                {name: "Reservaciones", path: "/app/configuracion/reservaciones"},
                 {name: "Enlazar Usuarios", path: "/app/configuracion/user-mapping"},
             ]},
         { label: "Sisgen", options:
