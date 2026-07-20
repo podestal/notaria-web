@@ -16,6 +16,18 @@ export interface AdminReservation {
   held_by: number
   held_by_username: string
   created_at: string
+  admin_action?: {
+    action: string
+    reason: string
+    by_user_id: number
+  }
+}
+
+export type AdminReservationReleaseStatus = "EX" | "CA"
+
+export interface ReleaseAdminReservationBody {
+  status: AdminReservationReleaseStatus
+  reason: string
 }
 
 export interface AdminReservationsPage {
@@ -58,4 +70,15 @@ export const getAdminReservations = (
   if (filters.page != null) params.page = String(filters.page)
   if (filters.page_size != null) params.page_size = String(filters.page_size)
   return adminReservationsService.get(access, params)
+}
+
+export const releaseAdminReservation = (
+  access: string,
+  id: number,
+  body: ReleaseAdminReservationBody
+): Promise<AdminReservation> => {
+  const client = new APIClient<AdminReservation, ReleaseAdminReservationBody>(
+    `admin/reservations/${id}/release/`
+  )
+  return client.post(body, access)
 }
