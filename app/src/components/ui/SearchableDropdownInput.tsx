@@ -16,6 +16,10 @@ interface Props {
   defaultValue?: string;
   error?: string;
   setError?: (val: string) => void;
+  /** When true, the user must pick an option from the list before they can freely edit the text. */
+  requireSelectionFirst?: boolean;
+  /** Message shown (in Spanish) when the user types without having selected an option first. */
+  requireSelectionMessage?: string;
 }
 
 const shakeAnimation = {
@@ -33,6 +37,8 @@ const SearchableDropdownInput: React.FC<Props> = ({
   defaultValue,
   error,
   setError,
+  requireSelectionFirst,
+  requireSelectionMessage,
 }) => {
   const [inputValue, setInputValue] = useState(selected?.label || defaultValue || '');
   const [open, setOpen] = useState(false);
@@ -83,14 +89,39 @@ const SearchableDropdownInput: React.FC<Props> = ({
           value={inputValue}
           onFocus={() => {
             setOpen(true);
-            setError?.('');
+            // Keep reminding the user to pick from the list if they already have
+            // text but never actually selected a valid option.
+            if (requireSelectionFirst && !selected && inputValue.trim()) {
+              setError?.(
+                requireSelectionMessage ||
+                  'Debe seleccionar una opción de la lista primero'
+              );
+            } else {
+              setError?.('');
+            }
           }}
           onChange={(e) => {
             const nextValue = e.target.value;
             setInputValue(nextValue);
             onInputChange?.(nextValue);
             setOpen(true);
-            setError?.('');
+            // If the user clears the field, drop the previous selection so an empty
+            // field can never be saved with a stale (previously picked) value.
+            if (requireSelectionFirst && !nextValue.trim() && selected) {
+              setSelected(null);
+            }
+            // The user must pick an option from the list before the value is valid.
+            // We still let them type (to search/filter and keep the field in sync),
+            // but we keep warning them until a real selection is made — this applies
+            // both when creating and when editing an existing record.
+            if (requireSelectionFirst && (!selected || !nextValue.trim())) {
+              setError?.(
+                requireSelectionMessage ||
+                  'Debe seleccionar una opción de la lista primero'
+              );
+            } else {
+              setError?.('');
+            }
           }}
         />
         {required && <span className="text-red-500">*</span>}
