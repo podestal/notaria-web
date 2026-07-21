@@ -25,6 +25,9 @@ import ClienteContratanteFormLayout, {
 } from '../clientes/shared/ClienteContratanteFormLayout'
 import { isRequiredTextMissing, isRequiredValueMissing } from '../../../utils/clienteFormValidation'
 
+const PROFESION_SELECT_MESSAGE = "Debe seleccionar una profesión de la lista antes de escribir o modificar el texto"
+const CARGO_SELECT_MESSAGE = "Debe seleccionar un cargo de la lista antes de escribir o modificar el texto"
+
 interface Props {
     dni: string
     setShowContratanteForm: React.Dispatch<React.SetStateAction<boolean>>
@@ -130,43 +133,49 @@ const Cliente2Form = ({
     
         const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(() => {
             const detalleProf = (cliente2?.detaprofesion || '').trim()
-            if (detalleProf) {
-                const match = profesiones.find(
-                    profesion => profesion.desprofesion.trim().toLowerCase() === detalleProf.toLowerCase()
-                )
-                return {
-                    id: match ? match.idprofesion.toString() : (cliente2?.idprofesion ? cliente2.idprofesion.toString() : '0'),
-                    label: detalleProf,
-                }
-            }
+            // A valid selection requires a real profesion id that exists in the list.
             if (cliente2?.idprofesion) {
                 const match = profesiones.find(profesion => profesion.idprofesion === cliente2.idprofesion)
                 if (match) {
                     return {
                         id: (match.idprofesion).toString(),
-                        label: match.desprofesion,
+                        label: detalleProf || match.desprofesion,
                     }
                 }
             }
+            if (detalleProf) {
+                const match = profesiones.find(
+                    profesion => profesion.desprofesion.trim().toLowerCase() === detalleProf.toLowerCase()
+                )
+                if (match) {
+                    return {
+                        id: (match.idprofesion).toString(),
+                        label: detalleProf,
+                    }
+                }
+            }
+            // There is text but it does not map to a real option → force the user to select again.
             return null
           })
         const [cargo, setCargo] = useState<{ id: string; label: string } | null>(() => {
             const detalleCargo = (cliente2?.profocupa || '').trim()
-            if (detalleCargo) {
-                const match = cargos.find(
-                    c => c.descripcrapro.trim().toLowerCase() === detalleCargo.toLowerCase()
-                )
-                return {
-                    id: match ? match.idcargoprofe.toString() : (cliente2?.idcargoprofe ? cliente2.idcargoprofe.toString() : '0'),
-                    label: detalleCargo,
-                }
-            }
             if (cliente2?.idcargoprofe) {
                 const match = cargos.find(c => c.idcargoprofe === cliente2.idcargoprofe)
                 if (match) {
                     return {
                         id: (match.idcargoprofe).toString(),
-                        label: match.descripcrapro,
+                        label: detalleCargo || match.descripcrapro,
+                    }
+                }
+            }
+            if (detalleCargo) {
+                const match = cargos.find(
+                    c => c.descripcrapro.trim().toLowerCase() === detalleCargo.toLowerCase()
+                )
+                if (match) {
+                    return {
+                        id: (match.idcargoprofe).toString(),
+                        label: detalleCargo,
                     }
                 }
             }
@@ -359,10 +368,29 @@ const Cliente2Form = ({
                 const profesionText = (profesionInput.trim() || profesion?.label?.trim() || '')
                 const cargoText = (cargoInput.trim() || cargo?.label?.trim() || '')
 
+                const matchedProfesion = profesiones.find(
+                    p => p.desprofesion.trim().toLowerCase() === profesionText.toLowerCase()
+                )
+                const matchedCargo = cargos.find(
+                    c => c.descripcrapro.trim().toLowerCase() === cargoText.toLowerCase()
+                )
+                const profesionIdFromSelected = profesion?.id ? Number.parseInt(profesion.id, 10) : Number.NaN
+                const cargoIdFromSelected = cargo?.id ? Number.parseInt(cargo.id, 10) : Number.NaN
+                const hasValidProfesion = Boolean(matchedProfesion) || (!Number.isNaN(profesionIdFromSelected) && profesionIdFromSelected > 0)
+                const hasValidCargo = Boolean(matchedCargo) || (!Number.isNaN(cargoIdFromSelected) && cargoIdFromSelected > 0)
+
                 if (!profesionText) {
                     setProfesionError('Profesión es requerida')
                     setType('error')
                     setMessage('Profesión es requerida')
+                    setShow(true)
+                    return
+                }
+
+                if (!hasValidProfesion) {
+                    setProfesionError(PROFESION_SELECT_MESSAGE)
+                    setType('error')
+                    setMessage(PROFESION_SELECT_MESSAGE)
                     setShow(true)
                     return
                 }
@@ -374,14 +402,14 @@ const Cliente2Form = ({
                     setShow(true)
                     return
                 }
-                const matchedProfesion = profesiones.find(
-                    p => p.desprofesion.trim().toLowerCase() === profesionText.toLowerCase()
-                )
-                const matchedCargo = cargos.find(
-                    c => c.descripcrapro.trim().toLowerCase() === cargoText.toLowerCase()
-                )
-                const profesionIdFromSelected = profesion?.id ? Number.parseInt(profesion.id, 10) : Number.NaN
-                const cargoIdFromSelected = cargo?.id ? Number.parseInt(cargo.id, 10) : Number.NaN
+
+                if (!hasValidCargo) {
+                    setCargoError(CARGO_SELECT_MESSAGE)
+                    setType('error')
+                    setMessage(CARGO_SELECT_MESSAGE)
+                    setShow(true)
+                    return
+                }
                 const cargoId = matchedCargo
                     ? matchedCargo.idcargoprofe
                     : !Number.isNaN(cargoIdFromSelected)
@@ -760,8 +788,11 @@ const Cliente2Form = ({
                         onInputChange={setProfesionInput}
                         placeholder="Buscar profesión"
                         required
+                        defaultValue={profesionInput}
                         error={profesionError}
                         setError={setProfesionError}
+                        requireSelectionFirst
+                        requireSelectionMessage={PROFESION_SELECT_MESSAGE}
                     />
                 </ClienteDropdownField>
                 <ClienteDropdownField label="Cargo" required error={cargoError}>
@@ -775,8 +806,11 @@ const Cliente2Form = ({
                         onInputChange={setCargoInput}
                         placeholder="Buscar cargo"
                         required
+                        defaultValue={cargoInput}
                         error={cargoError}
                         setError={setCargoError}
+                        requireSelectionFirst
+                        requireSelectionMessage={CARGO_SELECT_MESSAGE}
                     />
                 </ClienteDropdownField>
             </div>
