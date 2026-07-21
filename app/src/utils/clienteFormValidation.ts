@@ -7,6 +7,17 @@ export const isRequiredValueMissing = (value?: string | null): boolean => {
 export const isRequiredTextMissing = (value?: string | null): boolean =>
     String(value ?? '').trim() === ''
 
+/**
+ * Removes disallowed characters, keeping letters (incl. accents/ñ), spaces and the
+ * connectors apostrophe (') and hyphen (-) used in compound surnames.
+ */
+export const sanitizeNameInput = (value: string): string =>
+    value.replace(/[^A-Za-zÀ-ÿ\s'-]/g, '')
+
+/** True when the value contains no letters (e.g. only spaces or connectors like "-"). */
+export const hasNoLetters = (value?: string | null): boolean =>
+    !/[A-Za-zÀ-ÿ]/.test(String(value ?? ''))
+
 /** Persona jurídica (tipo 2): residente vacío; natural: 1/0 según selector. */
 export const residenteForClientePayload = (
     selectedTipoPersona: number,

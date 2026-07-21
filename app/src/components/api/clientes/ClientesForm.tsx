@@ -21,9 +21,11 @@ import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
 import ClienteContratanteFormLayout, { clienteFormBackButtonClass } from "./shared/ClienteContratanteFormLayout"
 import {
+    hasNoLetters,
     isRequiredTextMissing,
     isRequiredValueMissing,
     residenteForClientePayload,
+    sanitizeNameInput,
 } from "../../../utils/clienteFormValidation"
 
 const PROFESION_SELECT_MESSAGE = "Debe seleccionar una profesión de la lista antes de escribir o modificar el texto"
@@ -303,14 +305,14 @@ const ClientesForm = ({
                 return
             }
     
-            if (isRequiredTextMissing(apemat)) {
-                setApematError('Apellido Materno es requerido')
+            if (apemat.trim() && hasNoLetters(apemat)) {
+                setApematError('Apellido Materno debe contener letras')
                 setType('error')
-                setMessage('Apellido Materno es requerido')
+                setMessage('Apellido Materno debe contener letras')
                 setShow(true)
                 return
             }
-    
+
             setNombre(`${apepat} ${apemat}, ${prinom} ${segnom}`)
     
             if (isRequiredTextMissing(direccion)) {
@@ -824,9 +826,8 @@ const ClientesForm = ({
             <SimpleInput 
                 label="Apellido Materno"
                 value={apemat}
-                setValue={setApemat}
+                setValue={(val) => setApemat(sanitizeNameInput(val))}
                 horizontal={true}
-                required={true}
                 error={apematError}
                 setError={setApematError}
             />

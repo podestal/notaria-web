@@ -23,7 +23,7 @@ import ClienteContratanteFormLayout, {
     ClienteFormSection,
     clienteFormBackButtonClass,
 } from '../clientes/shared/ClienteContratanteFormLayout'
-import { isRequiredTextMissing, isRequiredValueMissing } from '../../../utils/clienteFormValidation'
+import { hasNoLetters, isRequiredTextMissing, isRequiredValueMissing, sanitizeNameInput } from '../../../utils/clienteFormValidation'
 
 const PROFESION_SELECT_MESSAGE = "Debe seleccionar una profesión de la lista antes de escribir o modificar el texto"
 const CARGO_SELECT_MESSAGE = "Debe seleccionar un cargo de la lista antes de escribir o modificar el texto"
@@ -273,14 +273,14 @@ const Cliente2Form = ({
                     return
                 }
         
-                if (isRequiredTextMissing(apemat)) {
-                    setApematError('Apellido Materno es requerido')
+                if (apemat.trim() && hasNoLetters(apemat)) {
+                    setApematError('Apellido Materno debe contener letras')
                     setType('error')
-                    setMessage('Apellido Materno es requerido')
+                    setMessage('Apellido Materno debe contener letras')
                     setShow(true)
                     return
                 }
-        
+
                 const nombreNatural = `${apepat} ${apemat}, ${prinom} ${segnom}`.trim()
         
                 if (isRequiredTextMissing(direccion)) {
@@ -662,8 +662,7 @@ const Cliente2Form = ({
                 <SimpleInput
                     label="Apellido Materno"
                     value={apemat}
-                    setValue={setApemat}
-                    required
+                    setValue={(val) => setApemat(sanitizeNameInput(val))}
                     error={apematError}
                     setError={setApematError}
                     fullWidth
