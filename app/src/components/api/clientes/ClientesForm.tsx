@@ -26,6 +26,7 @@ import {
     isRequiredValueMissing,
     residenteForClientePayload,
     sanitizeNameInput,
+    sanitizePlainTextInput,
 } from "../../../utils/clienteFormValidation"
 
 const PROFESION_SELECT_MESSAGE = "Debe seleccionar una profesión de la lista antes de escribir o modificar el texto"
@@ -1117,12 +1118,11 @@ const ClientesForm = ({
                 setError={setCiiuError}
             />
         </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
+        <div className="w-full mb-4">
             <SimpleInput 
                 label="Objeto Social"
                 value={contacEmpresa}
-                setValue={setContacEmpresa}
-                horizontal={true}
+                setValue={(val) => setContacEmpresa(sanitizePlainTextInput(val))}
                 required
                 fullWidth
                 error={contacEmpresaError}

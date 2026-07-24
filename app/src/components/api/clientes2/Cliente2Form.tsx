@@ -23,7 +23,7 @@ import ClienteContratanteFormLayout, {
     ClienteFormSection,
     clienteFormBackButtonClass,
 } from '../clientes/shared/ClienteContratanteFormLayout'
-import { hasNoLetters, isRequiredTextMissing, isRequiredValueMissing, sanitizeNameInput } from '../../../utils/clienteFormValidation'
+import { hasNoLetters, isRequiredTextMissing, isRequiredValueMissing, sanitizeNameInput, sanitizePlainTextInput } from '../../../utils/clienteFormValidation'
 
 const PROFESION_SELECT_MESSAGE = "Debe seleccionar una profesión de la lista antes de escribir o modificar el texto"
 const CARGO_SELECT_MESSAGE = "Debe seleccionar un cargo de la lista antes de escribir o modificar el texto"
@@ -922,7 +922,7 @@ const Cliente2Form = ({
                     <SimpleInput
                         label="Objeto Social"
                         value={contacEmpresa}
-                        setValue={setContacEmpresa}
+                        setValue={(val) => setContacEmpresa(sanitizePlainTextInput(val))}
                         required
                         fullWidth
                         error={contacEmpresaError}

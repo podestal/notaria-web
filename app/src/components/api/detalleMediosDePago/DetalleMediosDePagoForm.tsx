@@ -32,7 +32,11 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
     const [banco, setBanco] = useState(detalleMedioDePago ? detalleMedioDePago.idbancos : 0)
     const [moneda, setMoneda] = useState(detalleMedioDePago ? parseInt(detalleMedioDePago.idmon) : 0)
     const [documentos, setDocumentos] = useState( detalleMedioDePago ? detalleMedioDePago.documentos : "")
-    const [fechaOperacion, setFechaOperacion] = useState( detalleMedioDePago ? moment(detalleMedioDePago.foperacion, 'DD/MM/YYYY').toDate() : moment().toDate())
+    const [fechaOperacion, setFechaOperacion] = useState<Date | undefined>(() => {
+        if (!detalleMedioDePago?.foperacion?.trim()) return undefined
+        const parsed = moment(detalleMedioDePago.foperacion, 'DD/MM/YYYY', true)
+        return parsed.isValid() ? parsed.toDate() : undefined
+    })
     const totalImporte = Number(patrimonial.importetrans) || 0
     const totalMediosPago = detalleMediosDePago
         ? detalleMediosDePago.reduce((sum, detail) => sum + (Number(detail.importemp) || 0), 0)
@@ -45,18 +49,32 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
 
     // ERRORS
     const [importeError, setImporteError] = useState('')
+    const [fechaOperacionError, setFechaOperacionError] = useState('')
 
     const handleSubmit = () => {
+        let hasError = false
 
         if (!importe) {
             setImporteError("El importe es requerido")
-            return
+            hasError = true
         }
+
+        if (!fechaOperacion || !moment(fechaOperacion).isValid()) {
+            setFechaOperacionError("La fecha de operación es requerida")
+            setMessage("La fecha de operación es requerida")
+            setShow(true)
+            setType("error")
+            hasError = true
+        }
+
+        if (hasError) return
 
         if (parseInt(importe) > notExceedImport) {
             setImporteError(`El importe no puede exceder los ${simboloPatrimonial} ${notExceedImport}`)
             return
         }
+
+        const foperacion = moment(fechaOperacion).format('DD/MM/YYYY')
 
         setLoading(true)
 
@@ -71,7 +89,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 idbancos: banco, // Replace with actual idbancos
                 importemp: importe, // Replace with actual importemp
                 idmon: moneda.toString(), // Replace with actual idmon
-                foperacion: moment(fechaOperacion).format('DD/MM/YYYY'), // Replace with actual foperacion
+                foperacion,
                 documentos // Replace with actual documentos
             }
         }, {
@@ -86,7 +104,8 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 setBanco(0)
                 setMoneda(0)
                 setDocumentos("")
-                setFechaOperacion("")
+                setFechaOperacion(undefined)
+                setFechaOperacionError('')
             },
             onError: (error) => {
                 setMessage("Error al crear medio de pago")
@@ -110,7 +129,7 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 idbancos: banco, // Replace with actual idbancos
                 importemp: importe, // Replace with actual importemp
                 idmon: moneda.toString(), // Replace with actual idmon
-                foperacion: moment(fechaOperacion).format('DD/MM/YYYY'), // Replace with actual foperacion
+                foperacion,
                 documentos // Replace with actual documentos
             },
         }, {
@@ -181,13 +200,24 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 horizontal
                 label="Fecha de operación"
             /> */}
-            <div className="flex items-center justify-center gap-2">
-                <p className=" text-xs font-semibold text-slate-700 pr-4">Fecha de operación</p>
-                <Calendar 
-                    selectedDate={fechaOperacion}
-                    setSelectedDate={setFechaOperacion}
-                    horizontal
-                />
+            <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-center gap-2">
+                    <p className=" text-xs font-semibold text-slate-700 pr-4">Fecha de operación</p>
+                    <Calendar 
+                        selectedDate={fechaOperacion}
+                        setSelectedDate={(value) => {
+                            setFechaOperacion((prev) => {
+                                const next = typeof value === 'function' ? value(prev) : value
+                                if (next) setFechaOperacionError('')
+                                return next
+                            })
+                        }}
+                    />
+                    <span className="text-red-500">*</span>
+                </div>
+                {fechaOperacionError && (
+                    <p className="text-xs text-red-500 text-center">{fechaOperacionError}</p>
+                )}
             </div>
         </div>
         <div className="grid grid-cols-2 gap-8 my-4">

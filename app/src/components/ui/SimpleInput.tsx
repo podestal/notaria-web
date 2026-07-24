@@ -13,6 +13,8 @@ interface SimpleInputProps {
   disabled?: boolean;
   type?: string;
   suffix?: ReactNode;
+  /** When set, renders a textarea instead of a single-line input. */
+  rows?: number;
 }
 
 const shakeAnimation = {
@@ -32,7 +34,20 @@ const SimpleInput = ({
   disabled,
   type = 'text',
   suffix,
+  rows,
 }: SimpleInputProps) => {
+  const fieldClassName = `bg-white text-slate-700 border ${
+    fullWidth ? 'w-full' : 'min-w-64'
+  } ${
+    horizontal && 'col-span-2'
+  } ${
+    error ? 'border-red-500' : 'border-slate-300'
+  } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
+    error ? 'focus:ring-red-300' : 'focus:ring-blue-300'
+  }
+  ${disabled ? 'cursor-not-allowed' : ''}
+  ${rows ? 'resize-y min-h-[5rem]' : ''}`
+
   return (
     <div
       className={`flex w-full ${
@@ -45,9 +60,23 @@ const SimpleInput = ({
         </label>
       )}
 
-        <div className='col-span-2'>
-            <div className='flex items-center gap-2'>
-                <motion.input
+        <div className={`col-span-2 ${fullWidth && !horizontal ? 'w-full' : ''}`}>
+            <div className='flex items-start gap-2'>
+                {rows ? (
+                  <motion.textarea
+                    {...(error ? shakeAnimation : {})}
+                    value={value}
+                    disabled={disabled}
+                    rows={rows}
+                    onChange={(e) => {
+                      setError && setError('')
+                      setValue(e.target.value)
+                    }}
+                    placeholder={label}
+                    className={fieldClassName}
+                  />
+                ) : (
+                  <motion.input
                     {...(error ? shakeAnimation : {})}
                     type={type}
                     value={value}
@@ -57,18 +86,10 @@ const SimpleInput = ({
                       setValue(e.target.value)
                     }}
                     placeholder={label}
-                    className={`bg-white text-slate-700 border ${
-                    fullWidth ? 'w-full' : 'min-w-64'
-                    } ${
-                    horizontal && 'col-span-2'
-                    } ${
-                    error ? 'border-red-500' : 'border-slate-300'
-                    } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
-                    error ? 'focus:ring-red-300' : 'focus:ring-blue-300'
-                    }
-                    ${disabled ? 'cursor-not-allowed' : ''}`}
-                />
-                {required && <span className="text-red-500">*</span>}
+                    className={fieldClassName}
+                  />
+                )}
+                {required && <span className="text-red-500 mt-2">*</span>}
                 {suffix}
             </div>
             {error && (

@@ -18,6 +18,13 @@ export const sanitizeNameInput = (value: string): string =>
 export const hasNoLetters = (value?: string | null): boolean =>
     !/[A-Za-zÀ-ÿ]/.test(String(value ?? ''))
 
+/**
+ * Removes special characters, keeping letters (incl. accents/ñ), digits and spaces.
+ * Used for fields like Objeto Social.
+ */
+export const sanitizePlainTextInput = (value: string): string =>
+    value.replace(/[^A-Za-zÀ-ÿ0-9\s]/g, '')
+
 /** Persona jurídica (tipo 2): residente vacío; natural: 1/0 según selector. */
 export const residenteForClientePayload = (
     selectedTipoPersona: number,
