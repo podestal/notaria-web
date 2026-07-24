@@ -50,12 +50,34 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
         return percentageRegex.test(value)
     }
 
+    /** Total importe from patrimonial. Must be > 0 to derive % from monto (avoids Infinity). */
+    const getImporteTotal = (): number | null => {
+        const importe = Number(monto)
+        if (!Number.isFinite(importe) || importe <= 0) return null
+        return importe
+    }
+
     const debouncedUpdateMonto = useCallback(
         debounce(async (newMonto: string) => {
             try {
                 setIsUpdating(true)
-                // const newMonto = (Number(newPorcentaje) / 100) * Number(monto)
-                const newPorcentaje = (Number(newMonto) / Number(monto)) * 100
+                const importeTotal = getImporteTotal()
+                if (importeTotal === null) {
+                    setMessage('No se puede calcular el porcentaje: el importe del acto es 0 o no está definido')
+                    setShow(true)
+                    setType('error')
+                    return
+                }
+                const parsedMonto = Number(newMonto)
+                const newPorcentaje = Number.isFinite(parsedMonto)
+                    ? (parsedMonto / importeTotal) * 100
+                    : 0
+                if (!Number.isFinite(newPorcentaje)) {
+                    setMessage('No se puede calcular el porcentaje con el monto ingresado')
+                    setShow(true)
+                    setType('error')
+                    return
+                }
                 updateContratantePorActo.mutate({
                     access,
                     contratantePorActo: {
@@ -83,7 +105,7 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
                 setIsUpdating(false)
             }
         }, 700),
-        []
+        [monto, contratante, access]
     )
 
     // Debounced update function
@@ -92,13 +114,18 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
             
             try {
                 setIsUpdating(true)
-                const newMonto = (Number(newPorcentaje) / 100) * Number(monto)
+                const importeTotal = getImporteTotal()
+                const parsedPorcentaje = Number(newPorcentaje)
+                const newMonto =
+                    importeTotal !== null && Number.isFinite(parsedPorcentaje)
+                        ? (parsedPorcentaje / 100) * importeTotal
+                        : 0
                 updateContratantePorActo.mutate({
                     access,
                     contratantePorActo: {
                         ...contratante,
                         porcentaje: newPorcentaje,
-                        monto: newMonto.toFixed(2),
+                        monto: Number.isFinite(newMonto) ? newMonto.toFixed(2) : '0.00',
                         ofondo: newOrigenDeFondos
                     }
                 }, {
@@ -121,7 +148,7 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
                 setIsUpdating(false)
             }
         }, 700),
-        [contratante.id]
+        [monto, contratante, access]
     )
 
     const handleChangePorcentaje = (e: React.ChangeEvent<HTMLInputElement>) => {
