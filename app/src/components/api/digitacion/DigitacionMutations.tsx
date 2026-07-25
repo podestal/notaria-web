@@ -5,17 +5,17 @@ import UpdateDocumento from "./UpdateDocumento"
 
 interface Props {
     kardex: Kardex
-    enableCreate: boolean
+    hasExistingDocument: boolean
 }
 
 
-const DigitacionMutations = ({ kardex, enableCreate }: Props) => {
+const DigitacionMutations = ({ kardex, hasExistingDocument }: Props) => {
 
   return (
     <div className="w-full flex items-center justify-center mb-6 gap-12">
-        {/* {enableCreate && >} */}
         <CreateDocumento 
           kardex={kardex}
+          hasExistingDocument={hasExistingDocument}
         />
         <UpdateDocumento 
           kardex={kardex}

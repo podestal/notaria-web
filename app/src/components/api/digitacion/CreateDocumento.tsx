@@ -9,17 +9,19 @@ import { Loader } from "lucide-react";
 
 interface Props {
   kardex: Kardex
+  hasExistingDocument?: boolean
 }
 
-const CreateDocumento = ({ kardex }: Props) => {
+const CreateDocumento = ({ kardex, hasExistingDocument = false }: Props) => {
 
     const docsURL = import.meta.env.VITE_DOC_URL
     const access = useAuthStore((s) => s.access_token) || ''
     const queryClient = useQueryClient()
     const [open, setOpen] = useState(false)
+    const [openWarning, setOpenWarning] = useState(false)
     const [loading, setLoading] = useState(false)
-    
-    const handleOpenDocument = async () => {
+
+    const generateDocument = async () => {
       if (kardex.fktemplate === 0) {
         setOpen(true);
         return;
@@ -59,6 +61,19 @@ const CreateDocumento = ({ kardex }: Props) => {
         setLoading(false)
       }
     };
+    
+    const handleOpenDocument = () => {
+      if (hasExistingDocument) {
+        setOpenWarning(true);
+        return;
+      }
+      void generateDocument();
+    };
+
+    const handleConfirmRegenerate = () => {
+      setOpenWarning(false);
+      void generateDocument();
+    };
 
   return (
   <>
@@ -75,6 +90,18 @@ const CreateDocumento = ({ kardex }: Props) => {
         <ExplanationMessage
           message="Este kardex no cuenta con una plantilla asignada, por favor asigne una plantilla para generar el proyecto."
           onClick={() => setOpen(false)}
+        />
+      </TopModal>
+      <TopModal
+        isOpen={openWarning}
+        onClose={() => setOpenWarning(false)}
+      >
+        <ExplanationMessage
+          message="Ya existe un proyecto para este kardex. Si genera uno nuevo, se reemplazará el documento actual. ¿Desea continuar?"
+          onClick={handleConfirmRegenerate}
+          onClickMessage="Continuar"
+          onClickSecondary={() => setOpenWarning(false)}
+          onClickSecondaryMessage="Cancelar"
         />
       </TopModal>
     </>

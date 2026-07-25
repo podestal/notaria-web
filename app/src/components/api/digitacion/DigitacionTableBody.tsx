@@ -6,21 +6,19 @@ import DigitacionDocumentCard from "./DigitacionDocumentCard"
 
 interface Props {
     kardex: Kardex
-    setEnableCreate: React.Dispatch<React.SetStateAction<boolean>>
+    setHasExistingDocument: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const DigitacionTableBody = ({ kardex, setEnableCreate }: Props) => {
+const DigitacionTableBody = ({ kardex, setHasExistingDocument }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { data: documents, isLoading, isError, error, isSuccess } = useGetDocumentsByKardex({ access, kardex: kardex.kardex })
 
     useEffect(() => {
-        if (isSuccess && documents.length > 0) {
-            setEnableCreate(false)
-        } else {
-            setEnableCreate(true)
+        if (isSuccess) {
+            setHasExistingDocument(documents.length > 0)
         }
-    }, [isSuccess, documents, setEnableCreate])
+    }, [isSuccess, documents, setHasExistingDocument])
 
     if (isLoading) return <div>Loading...</div>
     if (isError) return <div>Error: {error.message}</div>

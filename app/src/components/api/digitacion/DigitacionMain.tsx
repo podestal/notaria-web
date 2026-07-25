@@ -9,17 +9,17 @@ interface Props {
 
 const DigitacionMain = ({ kardex }: Props) => {
 
-  const [enableCreate, setEnableCreate] = useState(false)
+  const [hasExistingDocument, setHasExistingDocument] = useState(false)
 
   return (
     <div>
         <DigitacionMutations 
             kardex={kardex}
-            enableCreate={enableCreate}
+            hasExistingDocument={hasExistingDocument}
         />
         <DigitacionTable 
             kardex={kardex}
-            setEnableCreate={setEnableCreate}
+            setHasExistingDocument={setHasExistingDocument}
         />
     </div>
   )

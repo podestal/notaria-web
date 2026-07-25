@@ -4,11 +4,11 @@ import DigitacionTableHeader from "./DigitacionTableHeader"
 
 interface Props {
     kardex: Kardex
-    setEnableCreate: React.Dispatch<React.SetStateAction<boolean>>
+    setHasExistingDocument: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-const DigitacionTable = ({ kardex, setEnableCreate }: Props) => {
+const DigitacionTable = ({ kardex, setHasExistingDocument }: Props) => {
 
     console.log(kardex);
     
@@ -17,7 +17,7 @@ const DigitacionTable = ({ kardex, setEnableCreate }: Props) => {
         <DigitacionTableHeader />
         <DigitacionTableBody 
             kardex={kardex}
-            setEnableCreate={setEnableCreate}
+            setHasExistingDocument={setHasExistingDocument}
         />
     </>
   )
