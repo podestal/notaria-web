@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react"
 import useGetActoCondicionByTipoActo from "../../../hooks/api/actoCondicion/useGetActoCondicionByTipoActo"
 import useGetDetalleActosByKardexAndTipoActo from "../../../hooks/api/detalleActos/useGetDetalleActosByKardexAndTipoActo"
 import useAuthStore from "../../../store/useAuthStore"
@@ -8,9 +9,21 @@ interface Props {
     kardex: string
     selectedActos: string[]
     setSelectedActos: React.Dispatch<React.SetStateAction<string[]>>
+    autoSelectRepresentanteCondicion?: boolean
+    clearRepresentanteCondicion?: boolean
 }
 
-const FilteredActoCondiciones = ({ idtipoacto, kardex, selectedActos, setSelectedActos }: Props) => {
+const isRepresentanteCondicion = (label: string) =>
+    label.trim().toUpperCase() === "REPRESENTANTE"
+
+const FilteredActoCondiciones = ({
+    idtipoacto,
+    kardex,
+    selectedActos,
+    setSelectedActos,
+    autoSelectRepresentanteCondicion = false,
+    clearRepresentanteCondicion = false,
+}: Props) => {
     const access = useAuthStore((state) => state.access_token) || ""
     const {
         data: actoCondiciones,
@@ -24,6 +37,44 @@ const FilteredActoCondiciones = ({ idtipoacto, kardex, selectedActos, setSelecte
         isError: isErrorDetalleActos,
         isSuccess: isSuccessDetalleActos,
     } = useGetDetalleActosByKardexAndTipoActo({ access, kardex, tipoacto: idtipoacto })
+
+    const options = useMemo(() => {
+        if (!isSuccessCondicion || !isSuccessDetalleActos || !actoCondiciones?.length || !detalleActo) {
+            return []
+        }
+        return actoCondiciones.map((condicion) => ({
+            id: `${condicion.idcondicion}.${detalleActo.item}`,
+            label: condicion.condicion,
+        }))
+    }, [isSuccessCondicion, isSuccessDetalleActos, actoCondiciones, detalleActo])
+
+    const representanteOptionIds = useMemo(
+        () => options.filter((option) => isRepresentanteCondicion(option.label)).map((option) => option.id),
+        [options]
+    )
+
+    useEffect(() => {
+        if (representanteOptionIds.length === 0) return
+
+        setSelectedActos((prev) => {
+            if (autoSelectRepresentanteCondicion) {
+                const missing = representanteOptionIds.filter((id) => !prev.includes(id))
+                return missing.length > 0 ? [...prev, ...missing] : prev
+            }
+
+            if (clearRepresentanteCondicion) {
+                const next = prev.filter((id) => !representanteOptionIds.includes(id))
+                return next.length === prev.length ? prev : next
+            }
+
+            return prev
+        })
+    }, [
+        representanteOptionIds,
+        autoSelectRepresentanteCondicion,
+        clearRepresentanteCondicion,
+        setSelectedActos,
+    ])
 
     if (isLoadingCondicion || isLoadingDetalleActos) {
         return (
@@ -51,11 +102,7 @@ const FilteredActoCondiciones = ({ idtipoacto, kardex, selectedActos, setSelecte
         )
     }
 
-    if (isSuccessCondicion && isSuccessDetalleActos && actoCondiciones.length > 0) {
-        const options = actoCondiciones.map((condicion) => ({
-            id: `${condicion.idcondicion}.${detalleActo.item}`,
-            label: condicion.condicion,
-        }))
+    if (isSuccessCondicion && isSuccessDetalleActos && options.length > 0) {
         const selectedInActo = options.filter((option) => selectedActos.includes(option.id)).length
 
         return (

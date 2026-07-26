@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion"
+import { motion } from "framer-motion"
 import { ChevronDown, ListChecks } from "lucide-react"
 import FilteredActoCondiciones from "../actoCondicion/FilteredActoCondiciones"
 import getTipoActoIdArray from "../../../utils/getTipoActoIdArray"
@@ -10,6 +10,8 @@ interface Props {
     setSelectedActos: React.Dispatch<React.SetStateAction<string[]>>
     expanded: boolean
     onToggle: () => void
+    autoSelectRepresentanteCondicion?: boolean
+    clearRepresentanteCondicion?: boolean
 }
 
 const ContratantesConditionFilter = ({
@@ -19,6 +21,8 @@ const ContratantesConditionFilter = ({
     kardex,
     expanded,
     onToggle,
+    autoSelectRepresentanteCondicion = false,
+    clearRepresentanteCondicion = false,
 }: Props) => {
     const tiposActos = getTipoActoIdArray(idtipoacto)
     const selectedCount = selectedActos.length
@@ -56,35 +60,37 @@ const ContratantesConditionFilter = ({
                 </div>
             </button>
 
-            <AnimatePresence initial={false}>
-                {expanded && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="overflow-hidden border-t border-slate-100 bg-slate-50/60"
-                    >
-                        <div className="space-y-3 p-4">
-                            {tiposActos.length === 0 ? (
-                                <p className="rounded-lg border border-dashed border-slate-200 bg-white px-4 py-6 text-center text-xs text-slate-500">
-                                    No hay tipos de acto configurados para este kardex.
-                                </p>
-                            ) : (
-                                tiposActos.map((tipo) => (
-                                    <FilteredActoCondiciones
-                                        key={tipo}
-                                        kardex={kardex}
-                                        idtipoacto={tipo}
-                                        selectedActos={selectedActos}
-                                        setSelectedActos={setSelectedActos}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Keep mounted while collapsed so representante ↔ condición sync still runs */}
+            <motion.div
+                initial={false}
+                animate={{
+                    height: expanded ? "auto" : 0,
+                    opacity: expanded ? 1 : 0,
+                }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden border-t border-slate-100 bg-slate-50/60"
+                aria-hidden={!expanded}
+            >
+                <div className="space-y-3 p-4">
+                    {tiposActos.length === 0 ? (
+                        <p className="rounded-lg border border-dashed border-slate-200 bg-white px-4 py-6 text-center text-xs text-slate-500">
+                            No hay tipos de acto configurados para este kardex.
+                        </p>
+                    ) : (
+                        tiposActos.map((tipo) => (
+                            <FilteredActoCondiciones
+                                key={tipo}
+                                kardex={kardex}
+                                idtipoacto={tipo}
+                                selectedActos={selectedActos}
+                                setSelectedActos={setSelectedActos}
+                                autoSelectRepresentanteCondicion={autoSelectRepresentanteCondicion}
+                                clearRepresentanteCondicion={clearRepresentanteCondicion}
+                            />
+                        ))
+                    )}
+                </div>
+            </motion.div>
         </div>
     )
 }

@@ -17,6 +17,7 @@ import SingleSelect from "../../ui/SingleSelect"
 import CreateRepresentante from "../representantes/CreateRepresentante"
 import { UpdateContratanteData } from "../../../hooks/api/contratantes/useUpdateContratante"
 import { Cliente2 } from "../../../services/api/clienteService"
+import useGetCliente2ByContratante from "../../../hooks/api/cliente2/useGetCliente2ByContratante"
 
 interface Props {
     cliente1: Cliente | null
@@ -121,6 +122,23 @@ const ContratantesForm = ({
         facultades: contratante?.facultades ?? "",
         inscrito: contratante?.inscrito ?? "1",
     }))
+
+    const { data: linkedRepresentedCliente } = useGetCliente2ByContratante({
+        access,
+        idcontratante: contratanteRepresented,
+    })
+
+    const linkedIsPersonaJuridica =
+        Boolean(contratanteRepresented) &&
+        Boolean(linkedRepresentedCliente) &&
+        linkedRepresentedCliente.tipper !== "N"
+
+    const autoSelectRepresentanteCondicion =
+        selectedTipoPersona === 1 &&
+        (selectedRepresentation === "1" || selectedRepresentation === "2") &&
+        linkedIsPersonaJuridica
+
+    const clearRepresentanteCondicion = selectedRepresentation === "0"
 
     const buildComparableSnapshot = useCallback(() => {
         const base = {
@@ -590,6 +608,8 @@ const ContratantesForm = ({
                         setSelectedActos={setSelectedActos}
                         expanded={condicionesExpanded}
                         onToggle={() => setCondicionesExpanded((prev) => !prev)}
+                        autoSelectRepresentanteCondicion={autoSelectRepresentanteCondicion}
+                        clearRepresentanteCondicion={clearRepresentanteCondicion}
                     />
                 </div>
 
