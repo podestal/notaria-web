@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Loader2 } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import SimpleInput from "../../ui/SimpleInput"
 import { Cliente } from "../../../services/api/cliente1Service"
@@ -634,7 +634,8 @@ const ContratantesForm = ({
                 <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-slate-200 pt-4">
                     <button
                         type="button"
-                        className="rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-xs transition duration-300 hover:bg-gray-300"
+                        disabled={isLoading}
+                        className="rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-xs transition duration-300 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
                         onClick={() =>
                             requestDiscard(() => {
                                 setShowContratanteForm(false)
@@ -647,8 +648,9 @@ const ContratantesForm = ({
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="rounded-md bg-blue-600 text-white px-4 py-2 text-xs transition duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex min-w-[11.5rem] items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs text-white transition duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
+                        {isLoading && <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" aria-hidden />}
                         {isLoading
                             ? "Guardando..."
                             : contratante

@@ -79,9 +79,11 @@ const CreateDocumento = ({ kardex, hasExistingDocument = false }: Props) => {
   <>
       <button
         onClick={handleOpenDocument}
-        className="mt-8 bg-red-600 text-white flex items-center justify-center gap-2 px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300 text-xs cursor-pointer"
+        disabled={loading}
+        className="mt-8 inline-flex min-w-[9.5rem] items-center justify-center gap-2 rounded-md bg-red-600 px-4 py-2 text-xs text-white transition-colors duration-300 hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? <Loader className="animate-spin w-20 h-4" /> : 'Generar Proyecto'}
+        {loading && <Loader className="h-4 w-4 shrink-0 animate-spin" aria-hidden />}
+        {loading ? "Generando..." : "Generar Proyecto"}
       </button>
       <TopModal
         isOpen={open}

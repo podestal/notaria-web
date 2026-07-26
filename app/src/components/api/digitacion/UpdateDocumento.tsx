@@ -83,10 +83,13 @@ const UpdateDocumento = ({ kardex }: Props) => {
 
   return (
     <button 
-        className={`mt-8 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 text-xs cursor-pointer ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className="mt-8 inline-flex min-w-[10.5rem] items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs text-white transition-colors duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={isLoading}
         onClick={handleUpdate}
-    >{isLoading ? <Loader2 className="animate-spin w-20 h-4" /> : 'Actualizar Proyecto'}</button>
+    >
+        {isLoading && <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />}
+        {isLoading ? "Actualizando..." : "Actualizar Proyecto"}
+    </button>
   )
 }
 
