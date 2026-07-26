@@ -512,15 +512,6 @@ const ContratantesForm = ({
                         </div>
                     )}
 
-                    <ContratantesConditionFilter
-                        idtipoacto={idtipoacto}
-                        kardex={kardex}
-                        selectedActos={selectedActos}
-                        setSelectedActos={setSelectedActos}
-                        expanded={condicionesExpanded}
-                        onToggle={() => setCondicionesExpanded((prev) => !prev)}
-                    />
-
                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                         <p className="mb-3 text-xs font-semibold text-slate-700">Opciones del contratante</p>
                         <div className="flex flex-wrap items-center gap-8">
@@ -591,6 +582,15 @@ const ContratantesForm = ({
                             </motion.div>
                         )}
                     </AnimatePresence>
+
+                    <ContratantesConditionFilter
+                        idtipoacto={idtipoacto}
+                        kardex={kardex}
+                        selectedActos={selectedActos}
+                        setSelectedActos={setSelectedActos}
+                        expanded={condicionesExpanded}
+                        onToggle={() => setCondicionesExpanded((prev) => !prev)}
+                    />
                 </div>
 
                 <AnimatePresence>
