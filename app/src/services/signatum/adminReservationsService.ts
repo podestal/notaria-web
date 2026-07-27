@@ -30,6 +30,12 @@ export interface ReleaseAdminReservationBody {
   reason: string
 }
 
+export interface ReverseAdminReservationBody {
+  reason: string
+  clear_kardex: boolean
+  hard_delete: boolean
+}
+
 export interface AdminReservationsPage {
   count: number
   next: string | null
@@ -79,6 +85,17 @@ export const releaseAdminReservation = (
 ): Promise<AdminReservation> => {
   const client = new APIClient<AdminReservation, ReleaseAdminReservationBody>(
     `admin/reservations/${id}/release/`
+  )
+  return client.post(body, access)
+}
+
+export const reverseAdminReservation = (
+  access: string,
+  id: number,
+  body: ReverseAdminReservationBody
+): Promise<AdminReservation> => {
+  const client = new APIClient<AdminReservation, ReverseAdminReservationBody>(
+    `admin/reservations/${id}/reverse/`
   )
   return client.post(body, access)
 }

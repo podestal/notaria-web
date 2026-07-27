@@ -1,4 +1,4 @@
-import { CalendarDays, FileText, Scale, Sparkles, Users } from "lucide-react"
+import { CalendarDays, FileText, Loader2, Scale, Sparkles, Users } from "lucide-react"
 import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import getTitleCase from "../../../utils/getTitleCase"
 import { useEffect, useMemo, useState } from "react"
@@ -448,9 +448,13 @@ const KardexForm = ({
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                                className="inline-flex min-w-[10.5rem] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
                             >
-                                <Sparkles className="h-4 w-4" aria-hidden />
+                                {loading ? (
+                                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+                                ) : (
+                                    <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+                                )}
                                 {loading ? "Generando…" : "Generar kardex"}
                             </button>
                         </div>
@@ -633,9 +637,13 @@ const KardexForm = ({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                        className="inline-flex min-w-[11.5rem] items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                        <Sparkles className="h-4 w-4" aria-hidden />
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+                        ) : (
+                            <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+                        )}
                         {loading ? "Guardando…" : "Grabar cambios"}
                     </button>
                 </div>

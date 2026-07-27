@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { Loader2, RefreshCw, Unlock } from "lucide-react"
+import { Loader2, RefreshCw, RotateCcw, Unlock } from "lucide-react"
 import useAuthStore from "../../../../store/useAuthStore"
 import useKardexTypesStore from "../../../../hooks/store/useKardexTypesStore"
 import useGetAdminReservations from "../../../../hooks/signatum/useGetAdminReservations"
@@ -10,10 +10,12 @@ import type {
 import getTitleCase from "../../../../utils/getTitleCase"
 import Paginator from "../../../ui/Paginator"
 import ReleaseReservationModal from "./ReleaseReservationModal"
+import ReverseReservationModal from "./ReverseReservationModal"
 
 const STATUS_OPTIONS = [
   { value: "", label: "Todos" },
   { value: "PE", label: "Pendiente (PE)" },
+  { value: "CO", label: "Comprometida (CO)" },
   { value: "EX", label: "Expirada (EX)" },
   { value: "CA", label: "Cancelada (CA)" },
 ]
@@ -55,6 +57,7 @@ const ReservacionesList = () => {
   const [heldBy, setHeldBy] = useState("")
   const [page, setPage] = useState(1)
   const [releasing, setReleasing] = useState<AdminReservation | null>(null)
+  const [reversing, setReversing] = useState<AdminReservation | null>(null)
   const [appliedFilters, setAppliedFilters] = useState<
     Omit<AdminReservationsFilters, "page" | "page_size">
   >({})
@@ -112,7 +115,7 @@ const ReservacionesList = () => {
         <div>
           <h2 className="text-lg font-semibold text-slate-900">Reservaciones</h2>
           <p className="mt-0.5 text-sm text-slate-500">
-            Listado de reservaciones notariales y liberación forzada.
+            Listado de reservaciones notariales, liberación y reversión.
           </p>
         </div>
         <button
@@ -302,6 +305,15 @@ const ReservacionesList = () => {
                             <Unlock className="h-3.5 w-3.5" aria-hidden />
                             Liberar
                           </button>
+                        ) : item.status === "CO" ? (
+                          <button
+                            type="button"
+                            onClick={() => setReversing(item)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-semibold text-amber-800 transition hover:bg-amber-100"
+                          >
+                            <RotateCcw className="h-3.5 w-3.5" aria-hidden />
+                            Revertir
+                          </button>
                         ) : (
                           <span className="text-[11px] text-slate-400">—</span>
                         )}
@@ -325,6 +337,10 @@ const ReservacionesList = () => {
       <ReleaseReservationModal
         reservation={releasing}
         onClose={() => setReleasing(null)}
+      />
+      <ReverseReservationModal
+        reservation={reversing}
+        onClose={() => setReversing(null)}
       />
     </div>
   )
