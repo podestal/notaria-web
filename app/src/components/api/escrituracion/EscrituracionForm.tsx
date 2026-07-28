@@ -21,6 +21,7 @@ import {
     SERIE_NOTARIAL_VTA_SUFFIX,
 } from "../../../utils/serieNotarialFormat"
 import TopModal from "../../ui/TopModal"
+import ExplanationMessage from "../../ui/ExplanationMessage"
 import SerieNotarialMain from "./serieNotarial/SerieNotarialMani"
 import FechaConclusionGate from "./FechaConclusionGate"
 
@@ -196,6 +197,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const [loading, setLoading] = useState(false)
     const [signatumReservationId, setSignatumReservationId] = useState<number | undefined>(undefined)
     const [openSerieNotarial, setOpenSerieNotarial] = useState(false)
+    const [openClearConfirm, setOpenClearConfirm] = useState(false)
 
 
     // ERRORS
@@ -366,6 +368,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const handleClearEscrituracion = () => {
         if (loading) return
 
+        setOpenClearConfirm(false)
         setLoading(true)
 
         updateKardex.mutate({
@@ -760,7 +763,9 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 <div className="mt-8 flex items-center justify-center gap-3">
                     <button
                         type="button"
-                        onClick={handleClearEscrituracion}
+                        onClick={() => {
+                            if (!loading) setOpenClearConfirm(true)
+                        }}
                         className={`bg-red-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-white text-xs px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300`}
                         disabled={loading}
                     >
@@ -777,6 +782,16 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
             <TopModal isOpen={openSerieNotarial} onClose={() => setOpenSerieNotarial(false)}>
                 <SerieNotarialMain />
+            </TopModal>
+
+            <TopModal isOpen={openClearConfirm} onClose={() => setOpenClearConfirm(false)} portal>
+                <ExplanationMessage
+                    message="¿Está seguro de que desea borrar los datos de escrituración? Esta acción limpiará escritura, minuta, folios y series notariales."
+                    onClick={() => setOpenClearConfirm(false)}
+                    onClickMessage="Cancelar"
+                    onClickSecondary={handleClearEscrituracion}
+                    onClickSecondaryMessage="Borrar"
+                />
             </TopModal>
 
     </form>

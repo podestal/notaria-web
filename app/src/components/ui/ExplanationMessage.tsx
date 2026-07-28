@@ -22,6 +22,7 @@ const ExplanationMessage = ({
         <h2 className="text-lg text-center font-bold text-black">{message}</h2>
         <div className="my-6 flex justify-center items-center gap-12">
             <button 
+                type="button"
                 onClick={onClick}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition-colors cursor-pointer"
             >
@@ -29,6 +30,7 @@ const ExplanationMessage = ({
             </button>
             {onClickSecondary &&
             <button 
+                type="button"
                 onClick={onClickSecondary}
                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition-colors cursor-pointer"
             >
