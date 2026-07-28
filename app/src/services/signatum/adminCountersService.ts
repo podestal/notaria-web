@@ -15,6 +15,24 @@ export interface AdminCounter {
   }
 }
 
+export interface AdminFreedSlot {
+  num_escritura: number
+  folio: string
+}
+
+export interface AdminCounterFreedSlots {
+  year: number
+  idtipkar: number
+  next_num_escritura: number
+  last_folio: string
+  freed_slots: AdminFreedSlot[]
+}
+
+export interface AdminFreedSlotsPage {
+  count: number
+  results: AdminCounterFreedSlots[]
+}
+
 export interface AdminCountersFilters {
   year?: string
   idtipkar?: string
@@ -64,6 +82,17 @@ export const getAdminCounterByKey = (
     year: String(year),
     idtipkar: String(idtipkar),
   })
+}
+
+export const getAdminFreedSlots = (
+  access: string,
+  filters: AdminCountersFilters = {}
+): Promise<AdminFreedSlotsPage> => {
+  const params: Record<string, string> = {}
+  if (filters.year?.trim()) params.year = filters.year.trim()
+  if (filters.idtipkar?.trim()) params.idtipkar = filters.idtipkar.trim()
+  const client = new APIClient<AdminFreedSlotsPage>("admin/counters/freed-slots/")
+  return client.get(access, params)
 }
 
 export const setAdminCounter = (

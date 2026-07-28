@@ -25,6 +25,9 @@ const useReverseAdminReservation = (): UseMutationResult<
       void queryClient.invalidateQueries({
         queryKey: ["signatum", "admin", "reservations"],
       })
+      void queryClient.invalidateQueries({
+        queryKey: ["signatum", "admin", "counters"],
+      })
     },
     onError: (error) => {
       console.error("Error reversing admin reservation:", error)
