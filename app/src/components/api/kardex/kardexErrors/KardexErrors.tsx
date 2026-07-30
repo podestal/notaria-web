@@ -46,9 +46,9 @@ const KardexErrors = () => {
     () =>
       (data?.users ?? []).map((user) => ({
         name: getTitleCase(user.name || user.username),
-        sisgen: user.counts.sisgen,
-        uif: user.counts.uif,
-        pdt: user.counts.pdt,
+        sisgen: user.counts?.sisgen ?? 0,
+        uif: user.counts?.uif ?? 0,
+        pdt: user.counts?.pdt ?? 0,
       })),
     [data?.users],
   )
@@ -71,37 +71,53 @@ const KardexErrors = () => {
 
   if (!data) return null
 
-  const { summary, period, users, year } = data
-  const cleanKardex = summary.total_kardex - summary.kardex_with_errors
+  const summary = data.summary
+  const period = data.period
+  const users = data.users ?? []
+  const year = data.year
+
+  if (!summary || !period) {
+    return (
+      <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+        No hay resumen de kardex disponible para este periodo.
+      </div>
+    )
+  }
+
+  const totalKardex = summary.total_kardex ?? 0
+  const kardexWithErrors = summary.kardex_with_errors ?? 0
+  const totalUsers = summary.total_users ?? 0
+  const counts = summary.counts ?? { sisgen: 0, uif: 0, pdt: 0, total: 0 }
+  const cleanKardex = totalKardex - kardexWithErrors
 
   const summaryCards = [
     {
       title: "Kardex del periodo",
-      value: String(summary.total_kardex),
-      trend: `${summary.total_users} usuarios`,
+      value: String(totalKardex),
+      trend: `${totalUsers} usuarios`,
       tone: "text-slate-600",
     },
     {
       title: "Kardex con errores",
-      value: String(summary.kardex_with_errors),
+      value: String(kardexWithErrors),
       trend: `${cleanKardex} sin errores`,
       tone: "text-rose-600",
     },
     {
       title: "Errores SISGEN",
-      value: String(summary.counts.sisgen),
+      value: String(counts.sisgen),
       trend: "solo errores",
       tone: "text-amber-600",
     },
     {
       title: "Errores UIF",
-      value: String(summary.counts.uif),
-      trend: `${summary.counts.pdt} PDT`,
+      value: String(counts.uif),
+      trend: `${counts.pdt} PDT`,
       tone: "text-indigo-600",
     },
     {
       title: "Total errores",
-      value: String(summary.counts.total),
+      value: String(counts.total),
       trend: "SISGEN + UIF + PDT",
       tone: "text-rose-600",
     },
@@ -115,7 +131,8 @@ const KardexErrors = () => {
             <p className="text-[11px] uppercase tracking-wider text-slate-300">Panel General</p>
             <h2 className="text-lg font-semibold">Resumen de Operaciones Notariales</h2>
             <p className="mt-1 text-xs text-slate-300">
-              {period.start} — {period.end} · {period.date_field}
+              {period.start ?? "—"} — {period.end ?? "—"}
+              {period.date_field ? ` · ${period.date_field}` : ""}
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs">
@@ -205,14 +222,14 @@ const KardexErrors = () => {
                   </button>
                   <p className="text-xs text-slate-500">{user.username}</p>
                 </div>
-                <p>{user.total_kardex}</p>
-                <p>{user.kardex_with_errors}</p>
-                <p>{user.kardex_clean}</p>
-                <p>{formatPercent(user.error_rate)}</p>
+                <p>{user.total_kardex ?? 0}</p>
+                <p>{user.kardex_with_errors ?? 0}</p>
+                <p>{user.kardex_clean ?? 0}</p>
+                <p>{formatPercent(user.error_rate ?? 0)}</p>
                 <p>
-                  {user.counts.sisgen} / {user.counts.uif} / {user.counts.pdt}
+                  {user.counts?.sisgen ?? 0} / {user.counts?.uif ?? 0} / {user.counts?.pdt ?? 0}
                 </p>
-                <p>{user.counts.total}</p>
+                <p>{user.counts?.total ?? 0}</p>
               </div>
             ))
           )}

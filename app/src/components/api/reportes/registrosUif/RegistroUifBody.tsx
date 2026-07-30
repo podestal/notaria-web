@@ -36,8 +36,8 @@ const RegistroUifBody = ({
   return (
     <div className="w-[85%] mx-auto mb-10 text-black">
        <RegistroUifSummary
-            count={kardexRO.summary.total_kardex}
-            totalErrors={kardexRO.summary.total_errors}
+            count={kardexRO.summary?.total_kardex ?? 0}
+            totalErrors={kardexRO.summary?.total_errors ?? 0}
             dateFrom={dateFrom}
             dateTo={dateTo}
             reportPolicy={reportPolicy}
