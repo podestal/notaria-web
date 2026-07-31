@@ -81,7 +81,7 @@ const PendienteReciboRow = ({
 
 const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
-    const { setMessage, setShow, setType } = useNotificationsStore()
+    const notify = useNotificationsStore((s) => s.notify)
     const createResumen = useCreateResumen()
 
     const [fechaComunicacion, setFechaComunicacion] = useState(
@@ -171,9 +171,7 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
             ok = false
         }
         if (selectedIds.length === 0) {
-            setMessage("Seleccione al menos un comprobante para el resumen")
-            setType("error")
-            setShow(true)
+            notify("error", "Seleccione al menos un comprobante para el resumen")
             ok = false
         }
         if (!ok) return
@@ -193,9 +191,9 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
                 response.sunat,
                 "Resumen generado correctamente.",
             )
-            setMessage(notification.message)
-            setType(notification.type)
-            setShow(true)
+            notify(notification.type, notification.message, {
+                persistent: Boolean(notification.persistent),
+            })
 
             if (response.sunat && response.sunat.status !== "accepted") {
                 setLastSunat(response.sunat)
@@ -204,9 +202,7 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
                 onClose()
             }
         } catch (err) {
-            setMessage(getIngresoBackendError(err))
-            setType("error")
-            setShow(true)
+            notify("error", getIngresoBackendError(err))
         }
     }
 

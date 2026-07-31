@@ -111,7 +111,7 @@ const ActionButton = ({
 
 const ComprobanteSunatRetry = ({ recibo }: { recibo: Recibo }) => {
     const access = useAuthStore((s) => s.access_token) || ""
-    const { setMessage, setShow, setType } = useNotificationsStore()
+    const notify = useNotificationsStore((s) => s.notify)
     const enviarSunat = useEnviarReciboSunat({ id_recibo: recibo.id_recibo })
 
     const handleRetry = async () => {
@@ -121,13 +121,11 @@ const ComprobanteSunatRetry = ({ recibo }: { recibo: Recibo }) => {
                 response,
                 "Reenvío a SUNAT procesado.",
             )
-            setMessage(notification.message)
-            setType(notification.type)
-            setShow(true)
+            notify(notification.type, notification.message, {
+                persistent: Boolean(notification.persistent),
+            })
         } catch (error) {
-            setMessage(getIngresoBackendError(error))
-            setType("error")
-            setShow(true)
+            notify("error", getIngresoBackendError(error))
         }
     }
 

@@ -5,6 +5,7 @@ import useKardexTypesStore from '../hooks/store/useKardexTypesStore'
 import useNotificationsStore from '../hooks/store/useNotificationsStore'
 import NotificationCard from '../components/ui/NotificationCard'
 import { Outlet } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const MainPage = () => {
 
@@ -13,6 +14,8 @@ const MainPage = () => {
   const { notifications, removeNotification } = useNotificationsStore()
   const isTestApp = import.meta.env.MODE === 'test'
   const visibleKardexTypes = (kardexTypes || []).filter(kardexType => kardexType.idtipkar <= 5)
+  const persistentNotification = [...notifications].reverse().find((n) => n.persistent) ?? null
+  const toastNotifications = notifications.filter((n) => !n.persistent)
 
   useEffect(() => {
     if (isSuccess) {
@@ -35,9 +38,28 @@ const MainPage = () => {
             ENTORNO DE PRUEBAS: Esta aplicación es de test y no corresponde al sistema real de producción.
           </div>
         )}
-        {notifications.length > 0 && (
+        <AnimatePresence mode="wait" initial={false}>
+          {persistentNotification && (
+            <motion.div
+              key={persistentNotification.id}
+              className="sticky top-0 z-[70] border-b border-amber-200/80 bg-slate-100/95 px-4 py-2 backdrop-blur"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <NotificationCard
+                type={persistentNotification.type}
+                message={persistentNotification.message}
+                persistent
+                onClose={() => removeNotification(persistentNotification.id)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {toastNotifications.length > 0 && (
           <div className="fixed right-4 top-8 z-[70] flex flex-col gap-3 pointer-events-none">
-            {[...notifications].reverse().map((n) => (
+            {[...toastNotifications].reverse().map((n) => (
               <div key={n.id} className="pointer-events-auto">
                 <NotificationCard
                   type={n.type}

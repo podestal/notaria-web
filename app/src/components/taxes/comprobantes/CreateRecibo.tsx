@@ -22,7 +22,7 @@ interface Props {
 
 const CreateRecibo = ({ variant, onDone, kardex }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
-    const { setMessage, setShow, setType } = useNotificationsStore()
+    const notify = useNotificationsStore((s) => s.notify)
     const createRecibo = useCreateRecibo()
     const config = EMISION_FORM_VARIANT_CONFIG[variant]
     const initialValues = useMemo(() => getEmptyIngresoFormValues(), [])
@@ -32,17 +32,15 @@ const CreateRecibo = ({ variant, onDone, kardex }: Props) => {
             const response = await createRecibo.mutateAsync({ access, recibo: values })
             const isBoleta = variant === "boleta"
             const notification = isBoleta
-                ? { message: config.createSuccessMessage, type: "success" as const }
+                ? { message: config.createSuccessMessage, type: "success" as const, persistent: false }
                 : getSunatNotification(response.sunat, config.createSuccessMessage)
 
-            setMessage(notification.message)
-            setType(notification.type)
-            setShow(true)
+            notify(notification.type, notification.message, {
+                persistent: Boolean(notification.persistent),
+            })
             onDone?.()
         } catch (error) {
-            setMessage(getIngresoBackendError(error))
-            setType("error")
-            setShow(true)
+            notify("error", getIngresoBackendError(error))
         }
     }
 

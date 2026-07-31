@@ -4,6 +4,12 @@ export interface NotificationItem {
     id: string
     type: string
     message: string
+    /** When true, stays until the user closes it (no auto-dismiss). */
+    persistent?: boolean
+}
+
+interface NotifyOptions {
+    persistent?: boolean
 }
 
 interface NotificationsState {
@@ -13,7 +19,7 @@ interface NotificationsState {
     setMessage: (value: string) => void
     show: boolean
     setShow: (value: boolean) => void
-    notify: (type: string, message: string) => void
+    notify: (type: string, message: string, options?: NotifyOptions) => void
     notifications: NotificationItem[]
     removeNotification: (id: string) => void
     reset: () => void
@@ -21,7 +27,11 @@ interface NotificationsState {
 
 const PATCH_WINDOW_MS = 160
 
-const createNotification = (type: string, message: string): NotificationItem | null => {
+const createNotification = (
+    type: string,
+    message: string,
+    options?: NotifyOptions,
+): NotificationItem | null => {
     const trimmed = message.trim()
     if (!trimmed) return null
 
@@ -29,6 +39,7 @@ const createNotification = (type: string, message: string): NotificationItem | n
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         type: type || "info",
         message: trimmed,
+        persistent: Boolean(options?.persistent),
     }
 }
 
@@ -83,16 +94,22 @@ const useNotificationsStore = create<NotificationsState>((set, get) => ({
             notifications: [...state.notifications, notification],
         }))
     },
-    notify: (type, message) => {
-        const notification = createNotification(type, message)
+    notify: (type, message, options) => {
+        const notification = createNotification(type, message, options)
         if (!notification) return
 
-        set((state) => ({
-            type,
-            message: notification.message,
-            show: true,
-            notifications: [...state.notifications, notification],
-        }))
+        set((state) => {
+            const withoutOldPersistent = notification.persistent
+                ? state.notifications.filter((n) => !n.persistent)
+                : state.notifications
+
+            return {
+                type,
+                message: notification.message,
+                show: true,
+                notifications: [...withoutOldPersistent, notification],
+            }
+        })
     },
     notifications: [],
     removeNotification: (id) =>

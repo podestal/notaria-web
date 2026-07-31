@@ -21,6 +21,8 @@ export interface SunatStatus {
 export interface SunatNotification {
     message: string
     type: "success" | "info" | "error"
+    /** Stay until the user closes it (used for sunat_down). */
+    persistent?: boolean
 }
 
 export const formatSunatNextRetry = (nextRetryAt?: string | null) => {
@@ -67,9 +69,15 @@ export const getSunatNotification = (
             const base =
                 sunat.message
                 || "SUNAT no está disponible. El comprobante fue generado; el sistema reintentará el envío automáticamente."
+            const retryPart = retry ? ` Próximo reintento: ${retry}.` : ""
+            const attemptPart =
+                sunat.retry_count != null && sunat.retry_count > 0
+                    ? ` (intento ${sunat.retry_count})`
+                    : ""
             return {
-                message: retry ? `${base} Próximo reintento: ${retry}.` : base,
+                message: `${base}${retryPart}${attemptPart}`,
                 type: "info",
+                persistent: true,
             }
         }
         case "rejected":
