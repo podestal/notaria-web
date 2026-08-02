@@ -4,7 +4,12 @@ import { buildAppDateTimePayload, getTodayDateInputValue } from "../../../utils/
 import type { Catalog } from "../../../services/taxes/catalogService"
 import type { CreateUpdateIngreso, Ingreso } from "../../../services/taxes/ingresosService"
 import type { IngresoLineaPayload } from "../../../services/taxes/ingresosService"
-import type { CreateUpdateRecibo, Recibo } from "../../../services/taxes/recibosService"
+import type {
+    CreateUpdateRecibo,
+    ItemRecibo,
+    Recibo,
+    ReciboLinea,
+} from "../../../services/taxes/recibosService"
 import type { Moneda } from "../../../services/taxes/monedaService"
 import type { SerieControlInterno } from "../../../services/taxes/seriesService"
 
@@ -258,12 +263,13 @@ export interface IngresoPayloadOptions {
     anulada?: boolean
     canjeada?: boolean
     kardex?: string
+    recibo_modifica?: number
 }
 
 export const formValuesToReciboPayload = (
     values: IngresoFormValues,
     series: SerieControlInterno[] = [],
-    options: Pick<IngresoPayloadOptions, "kardex"> = {},
+    options: Pick<IngresoPayloadOptions, "kardex" | "recibo_modifica"> = {},
 ): CreateUpdateRecibo => {
     const kardex = options.kardex?.trim()
 
@@ -274,6 +280,9 @@ export const formValuesToReciboPayload = (
         direccion: values.direccion.trim(),
         fecha_emision: buildAppDateTimePayload(values.fecha_emision),
         ...(kardex ? { kardex } : {}),
+        ...(options.recibo_modifica
+            ? { recibo_modifica: options.recibo_modifica }
+            : {}),
         lineas: values.lineas.map((linea) => ({
             catalogo_id: linea.catalogo_id,
             cantidad: linea.cantidad,
@@ -283,29 +292,59 @@ export const formValuesToReciboPayload = (
     }
 }
 
+const reciboLineaToIngresoLinea = (
+    linea: ItemRecibo | ReciboLinea,
+): CreateUpdateIngreso["lineas"][number] => {
+    const qty = linea.cantidad >= 1 ? linea.cantidad : 1
+    const total = Number(linea.total)
+    const explicitPrecio = Number(linea.precio_unitario)
+    const unit = !Number.isNaN(explicitPrecio)
+        ? explicitPrecio
+        : Number.isNaN(total) || qty <= 0
+          ? 0
+          : Math.round((total / qty) * 100) / 100
+
+    return {
+        catalogo_id: linea.catalogo_id,
+        cantidad: qty,
+        descripcion: linea.descripcion || "",
+        detalles: linea.detalles?.trim() || "-",
+        precio_unitario: unit.toFixed(2),
+        total: Number.isNaN(total) ? "0.00" : total.toFixed(2),
+    }
+}
+
 export const reciboToFormValues = (
     recibo: Recibo,
     series: SerieControlInterno[] = [],
     monedas: Moneda[] = [],
+    options: {
+        /** Keep original serie (edit) vs leave empty for NC/ND default serie */
+        keepSerie?: boolean
+        items?: Array<ItemRecibo | ReciboLinea>
+        persona_id?: number
+        direccion?: string
+        fecha_emision?: string
+        observaciones?: string
+    } = {},
 ): IngresoFormValues => ({
-    id_serie: resolveIngresoSerieId(
-        {
-            serie: recibo.serie,
-        } as Ingreso,
-        series,
-    ),
+    id_serie: options.keepSerie
+        ? resolveIngresoSerieId({ serie: recibo.serie } as Ingreso, series)
+        : 0,
     moneda_id: resolveIngresoMonedaId(
         { moneda: recibo.moneda } as Ingreso,
         monedas,
     ),
-    persona_id: 0,
+    persona_id: options.persona_id ?? 0,
     persona_documento: recibo.persona_documento || "",
     persona_nombre: recibo.persona_nombres || "",
-    direccion: "",
-    observaciones: "",
-    fecha_emision: parseIngresoFechaEmisionToForm(recibo.fecha_emision),
+    direccion: options.direccion ?? recibo.direccion ?? "",
+    observaciones: options.observaciones ?? recibo.observaciones ?? "",
+    fecha_emision:
+        options.fecha_emision ??
+        parseIngresoFechaEmisionToForm(recibo.fecha_emision),
     total: recibo.total || "",
-    lineas: [],
+    lineas: (options.items ?? []).map(reciboLineaToIngresoLinea),
 })
 
 export const formValuesToIngresoPayload = (

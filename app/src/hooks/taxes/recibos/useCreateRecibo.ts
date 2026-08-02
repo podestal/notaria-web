@@ -23,6 +23,7 @@ const useCreateRecibo = (): UseMutationResult<
             service.post(data.recibo, data.access),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["taxes-recibos"] })
+            queryClient.invalidateQueries({ queryKey: ["taxes-recibos-modificables"] })
         },
     })
 }

@@ -13,6 +13,7 @@ import {
     EMISION_FORM_VARIANT_CONFIG,
     type EmisionFormVariant,
 } from "./comprobanteFormConfig"
+import RecibosModificablesList from "./RecibosModificablesList"
 
 interface Props {
     variant: Extract<EmisionFormVariant, "boleta" | "factura" | "nota_credito" | "nota_debito">
@@ -26,6 +27,8 @@ const CreateRecibo = ({ variant, onDone, kardex }: Props) => {
     const createRecibo = useCreateRecibo()
     const config = EMISION_FORM_VARIANT_CONFIG[variant]
     const initialValues = useMemo(() => getEmptyIngresoFormValues(), [])
+    const showModificables =
+        variant === "nota_credito" || variant === "nota_debito"
 
     const handleCreate = async (values: CreateUpdateRecibo) => {
         try {
@@ -42,6 +45,19 @@ const CreateRecibo = ({ variant, onDone, kardex }: Props) => {
         } catch (error) {
             notify("error", getIngresoBackendError(error))
         }
+    }
+
+    if (showModificables) {
+        return (
+            <RecibosModificablesList
+                title={
+                    variant === "nota_credito"
+                        ? "Comprobantes para nota de crédito"
+                        : "Comprobantes para nota de débito"
+                }
+                description="Elija un comprobante y emita la nota de crédito o débito con los datos precargados."
+            />
+        )
     }
 
     return (

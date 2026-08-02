@@ -44,6 +44,9 @@ interface Props {
     anulada?: boolean
     canjeada?: boolean
     kardex?: string
+    /** When false, kardex is still sent on save but contratante UI is hidden. */
+    useKardexPersona?: boolean
+    reciboModificaId?: number
 }
 
 const IngresoForm = ({
@@ -56,6 +59,8 @@ const IngresoForm = ({
     anulada = false,
     canjeada = false,
     kardex,
+    useKardexPersona,
+    reciboModificaId,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -63,7 +68,8 @@ const IngresoForm = ({
     const defaultSerieCode = variantConfig.defaultSerie
     const isRecibo = variantConfig.isRecibo
     const isFactura = variant === "factura"
-    const showFacturaPersonaSource = Boolean(kardex) && isFactura
+    const kardexPersonaEnabled = useKardexPersona ?? Boolean(kardex)
+    const showFacturaPersonaSource = kardexPersonaEnabled && isFactura
 
     const { data: series = [], isLoading: loadingSeries } = useGetSeriesForVariant({
         access,
@@ -258,7 +264,12 @@ const IngresoForm = ({
         )
 
         if (isRecibo) {
-            await onSubmit(formValuesToReciboPayload(normalized, series, { kardex }))
+            await onSubmit(
+                formValuesToReciboPayload(normalized, series, {
+                    kardex,
+                    recibo_modifica: reciboModificaId,
+                }),
+            )
             return
         }
 
@@ -272,9 +283,9 @@ const IngresoForm = ({
     }
 
     const showContratanteSelector =
-        Boolean(kardex) && (!isFactura || facturaPersonaSource === "contratante")
+        kardexPersonaEnabled && (!isFactura || facturaPersonaSource === "contratante")
     const showPersonaLooker =
-        !kardex || !isFactura || facturaPersonaSource === "manual"
+        !kardexPersonaEnabled || !isFactura || facturaPersonaSource === "manual"
 
     const loadingOptions = loadingSeries || loadingMonedas
 
