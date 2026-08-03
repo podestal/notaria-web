@@ -259,37 +259,89 @@ export const ingresoToFormValues = (
     lineas: [],
 })
 
+export interface DocumentoModificadoPayload {
+    tipo_recibo_modificado_id: number
+    serie_documento_modificado_id: number
+    numero_documento_modificado: string
+}
+
 export interface IngresoPayloadOptions {
     anulada?: boolean
     canjeada?: boolean
     kardex?: string
-    recibo_modifica?: number
+    /** When set, used as payload `serie` instead of resolving from form id_serie. */
+    serie?: string
+    comprobante_id?: number
+    tipo_nota_credito_id?: number
+    tipo_nota_debito_id?: number
+    motivo_modificacion?: string
+    documento_modificado?: DocumentoModificadoPayload
 }
 
 export const formValuesToReciboPayload = (
     values: IngresoFormValues,
     series: SerieControlInterno[] = [],
-    options: Pick<IngresoPayloadOptions, "kardex" | "recibo_modifica"> = {},
+    options: Pick<
+        IngresoPayloadOptions,
+        | "serie"
+        | "kardex"
+        | "comprobante_id"
+        | "tipo_nota_credito_id"
+        | "tipo_nota_debito_id"
+        | "motivo_modificacion"
+        | "documento_modificado"
+    > = {},
 ): CreateUpdateRecibo => {
     const kardex = options.kardex?.trim()
+    const motivo = options.motivo_modificacion?.trim() ?? ""
+    const doc = options.documento_modificado
+    const serieOverride = options.serie?.trim()
 
     return {
-        serie: resolveSerieFromId(values.id_serie, series),
+        serie: serieOverride || resolveSerieFromId(values.id_serie, series),
+        ...(options.comprobante_id != null && options.comprobante_id > 0
+            ? { comprobante_id: options.comprobante_id }
+            : {}),
         moneda_id: values.moneda_id,
         persona_id: values.persona_id,
         direccion: values.direccion.trim(),
         fecha_emision: buildAppDateTimePayload(values.fecha_emision),
+        observaciones: values.observaciones.trim(),
         ...(kardex ? { kardex } : {}),
-        ...(options.recibo_modifica
-            ? { recibo_modifica: options.recibo_modifica }
+        ...(options.tipo_nota_credito_id
+            ? { tipo_nota_credito_id: options.tipo_nota_credito_id }
             : {}),
+        ...(options.tipo_nota_debito_id
+            ? { tipo_nota_debito_id: options.tipo_nota_debito_id }
+            : {}),
+        ...(doc
+            ? {
+                  tipo_recibo_modificado_id: doc.tipo_recibo_modificado_id,
+                  serie_documento_modificado_id: doc.serie_documento_modificado_id,
+                  numero_documento_modificado: doc.numero_documento_modificado,
+              }
+            : {}),
+        motivo_modificacion: motivo,
         lineas: values.lineas.map((linea) => ({
             catalogo_id: linea.catalogo_id,
             cantidad: linea.cantidad,
             descripcion: linea.descripcion,
+            detalles: linea.detalles?.trim() || "-",
             total: linea.total,
         })),
     }
+}
+
+export const resolveSerieIdByCode = (
+    serieCode: string,
+    series: SerieControlInterno[] = [],
+): number => {
+    const normalized = serieCode.trim().toUpperCase()
+    if (!normalized) return 0
+    const match = series.find(
+        (item) => item.serie.trim().toUpperCase() === normalized,
+    )
+    return match?.id_serie ?? 0
 }
 
 const reciboLineaToIngresoLinea = (

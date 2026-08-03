@@ -92,18 +92,26 @@ export interface ReciboLineaPayload {
     catalogo_id: number
     cantidad: number
     descripcion: string
+    detalles?: string
     total: string
 }
 
 export interface CreateUpdateRecibo {
     serie: string
+    /** 1 factura, 2 boleta, 3 nota crédito, 4 nota débito */
+    comprobante_id?: number
     moneda_id: number
     persona_id: number
     direccion: string
     fecha_emision: string
+    observaciones?: string
     kardex?: string
-    /** Factura/boleta que esta nota modifica */
-    recibo_modifica?: number
+    tipo_nota_credito_id?: number
+    tipo_nota_debito_id?: number
+    tipo_recibo_modificado_id?: number
+    serie_documento_modificado_id?: number
+    numero_documento_modificado?: string
+    motivo_modificacion?: string
     lineas: ReciboLineaPayload[]
 }
 

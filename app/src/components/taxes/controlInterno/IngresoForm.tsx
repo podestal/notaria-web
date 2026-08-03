@@ -5,7 +5,11 @@ import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
 import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
 import useGetSeriesForVariant from "../../../hooks/taxes/series/useGetSeriesForVariant"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
-import type { CreateUpdateRecibo } from "../../../services/taxes/recibosService"
+import {
+    RECIBO_COMPROBANTE_NOTA_CREDITO,
+    RECIBO_COMPROBANTE_NOTA_DEBITO,
+    type CreateUpdateRecibo,
+} from "../../../services/taxes/recibosService"
 import type { CreateUpdatePersona, Persona } from "../../../services/taxes/personasService"
 import CreatePersona from "../personas/CreatePersona"
 import { emptyPersonaFormValues, resolveDocumentoIdByKind, resolvePersonaDireccion } from "../personas/personaFormShared"
@@ -21,6 +25,8 @@ import {
 } from "../comprobantes/comprobanteFormConfig"
 import { extractLeadingDocumentNumber } from "../../../services/taxes/findPersonaByNumeroDocumento"
 import { lookupSunatByRuc } from "../../../utils/sunatLookup"
+import useGetTiposNotaCredito from "../../../hooks/taxes/tiposNota/useGetTiposNotaCredito"
+import useGetTiposNotaDebito from "../../../hooks/taxes/tiposNota/useGetTiposNotaDebito"
 import {
     applyIngresoFormDefaults,
     computeIngresoTotalFromLineas,
@@ -29,6 +35,7 @@ import {
     isValidIngresoFechaEmision,
     resolveDefaultMonedaId,
     resolveDefaultSerieId,
+    type DocumentoModificadoPayload,
     type IngresoFormValues,
 } from "./ingresoFormShared"
 
@@ -46,7 +53,9 @@ interface Props {
     kardex?: string
     /** When false, kardex is still sent on save but contratante UI is hidden. */
     useKardexPersona?: boolean
-    reciboModificaId?: number
+    documentoModificado?: DocumentoModificadoPayload | null
+    /** Original document serie (F001/B001…); required for NC/ND payload `serie`. */
+    serieOrigen?: string
 }
 
 const IngresoForm = ({
@@ -60,7 +69,8 @@ const IngresoForm = ({
     canjeada = false,
     kardex,
     useKardexPersona,
-    reciboModificaId,
+    documentoModificado = null,
+    serieOrigen,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const { setMessage, setShow, setType } = useNotificationsStore()
@@ -68,6 +78,9 @@ const IngresoForm = ({
     const defaultSerieCode = variantConfig.defaultSerie
     const isRecibo = variantConfig.isRecibo
     const isFactura = variant === "factura"
+    const isNotaCredito = variant === "nota_credito"
+    const isNotaDebito = variant === "nota_debito"
+    const isNota = isNotaCredito || isNotaDebito
     const kardexPersonaEnabled = useKardexPersona ?? Boolean(kardex)
     const showFacturaPersonaSource = kardexPersonaEnabled && isFactura
 
@@ -78,6 +91,16 @@ const IngresoForm = ({
 
     const { data: monedas = [], isLoading: loadingMonedas } = useGetMonedas({ access })
     const { data: documentos = [] } = useGetDocumentos({ access })
+    const { data: tiposNotaCredito = [], isLoading: loadingTiposNc } =
+        useGetTiposNotaCredito({
+            access,
+            enabled: isNotaCredito,
+        })
+    const { data: tiposNotaDebito = [], isLoading: loadingTiposNd } =
+        useGetTiposNotaDebito({
+            access,
+            enabled: isNotaDebito,
+        })
 
     const [form, setForm] = useState<IngresoFormValues>(initialValues)
     const [serieError, setSerieError] = useState("")
@@ -86,6 +109,10 @@ const IngresoForm = ({
     const [fechaEmisionError, setFechaEmisionError] = useState("")
     const [direccionError, setDireccionError] = useState("")
     const [lineasError, setLineasError] = useState("")
+    const [tipoNotaId, setTipoNotaId] = useState(0)
+    const [tipoNotaError, setTipoNotaError] = useState("")
+    const [motivoModificacion, setMotivoModificacion] = useState("")
+    const [documentoModificadoError, setDocumentoModificadoError] = useState("")
     const [openCreatePersonaModal, setOpenCreatePersonaModal] = useState(false)
     const [personaFormSeed, setPersonaFormSeed] = useState(emptyPersonaFormValues)
     const [facturaPersonaSource, setFacturaPersonaSource] = useState<
@@ -131,6 +158,31 @@ const IngresoForm = ({
 
         return [{ value: 0, label: "Seleccione…" }, ...items]
     }, [monedas, defaultMonedaId])
+
+    const tipoNotaOptions = useMemo(() => {
+        if (isNotaCredito) {
+            const items = tiposNotaCredito.map((item) => ({
+                value: item.id_tipo_nota_credito,
+                label: `${item.codigo} — ${item.descripcion}`,
+            }))
+            return [{ value: 0, label: "Seleccione…" }, ...items]
+        }
+        if (isNotaDebito) {
+            const items = tiposNotaDebito.map((item) => ({
+                value: item.id_tipo_nota_debito,
+                label: `${item.codigo} — ${item.descripcion}`,
+            }))
+            return [{ value: 0, label: "Seleccione…" }, ...items]
+        }
+        return [{ value: 0, label: "Seleccione…" }]
+    }, [isNotaCredito, isNotaDebito, tiposNotaCredito, tiposNotaDebito])
+
+    useEffect(() => {
+        setTipoNotaId(0)
+        setTipoNotaError("")
+        setMotivoModificacion("")
+        setDocumentoModificadoError("")
+    }, [variant])
 
     useEffect(() => {
         setForm((prev) =>
@@ -225,8 +277,14 @@ const IngresoForm = ({
     const validate = () => {
         let ok = true
 
-        if (form.id_serie <= 0) {
+        if (form.id_serie <= 0 && !(isNota && serieOrigen?.trim())) {
             setSerieError("Seleccione una serie")
+            ok = false
+        }
+        if (isNota && !serieOrigen?.trim()) {
+            setSerieError(
+                "No se pudo resolver la serie del comprobante. Cierre y vuelva a abrir desde el listado.",
+            )
             ok = false
         }
         if (form.moneda_id <= 0) {
@@ -249,6 +307,26 @@ const IngresoForm = ({
             setLineasError("Agregue al menos un concepto del catálogo")
             ok = false
         }
+        if (isNota && tipoNotaId <= 0) {
+            setTipoNotaError(
+                isNotaCredito
+                    ? "Seleccione el tipo de nota de crédito"
+                    : "Seleccione el tipo de nota de débito",
+            )
+            ok = false
+        }
+        if (
+            isNota &&
+            (!documentoModificado ||
+                documentoModificado.tipo_recibo_modificado_id <= 0 ||
+                documentoModificado.serie_documento_modificado_id <= 0 ||
+                !documentoModificado.numero_documento_modificado.trim())
+        ) {
+            setDocumentoModificadoError(
+                "No se pudo resolver el comprobante modificado. Cierre y vuelva a abrir desde el listado.",
+            )
+            ok = false
+        }
 
         return ok
     }
@@ -267,7 +345,23 @@ const IngresoForm = ({
             await onSubmit(
                 formValuesToReciboPayload(normalized, series, {
                     kardex,
-                    recibo_modifica: reciboModificaId,
+                    ...(isNota && serieOrigen?.trim()
+                        ? { serie: serieOrigen.trim() }
+                        : {}),
+                    ...(isNotaCredito
+                        ? {
+                              comprobante_id: RECIBO_COMPROBANTE_NOTA_CREDITO,
+                              tipo_nota_credito_id: tipoNotaId,
+                          }
+                        : {}),
+                    ...(isNotaDebito
+                        ? {
+                              comprobante_id: RECIBO_COMPROBANTE_NOTA_DEBITO,
+                              tipo_nota_debito_id: tipoNotaId,
+                          }
+                        : {}),
+                    motivo_modificacion: motivoModificacion,
+                    documento_modificado: documentoModificado ?? undefined,
                 }),
             )
             return
@@ -292,44 +386,94 @@ const IngresoForm = ({
     return (
         <>
         <form onSubmit={handleSubmit} className="space-y-4">
-            {loadingSeries ? (
-                <p className="text-xs text-slate-500 animate-pulse">
-                    Cargando series…
-                </p>
-            ) : (
-                <SimpleSelector
-                    key={`serie-${form.id_serie}-${serieOptions.length}`}
-                    label="Serie"
-                    options={serieOptions}
-                    defaultValue={form.id_serie > 0 ? form.id_serie : defaultSerieId}
-                    setter={(value) => {
-                        setForm((prev) => ({ ...prev, id_serie: value }))
-                        setSerieError("")
-                    }}
-                    error={serieError}
-                    required
-                    disabled={series.length <= 1}
-                />
+            {!isNota && (
+                <>
+                    {loadingSeries ? (
+                        <p className="text-xs text-slate-500 animate-pulse">
+                            Cargando series…
+                        </p>
+                    ) : (
+                        <SimpleSelector
+                            key={`serie-${form.id_serie}-${serieOptions.length}`}
+                            label="Serie"
+                            options={serieOptions}
+                            defaultValue={form.id_serie > 0 ? form.id_serie : defaultSerieId}
+                            setter={(value) => {
+                                setForm((prev) => ({ ...prev, id_serie: value }))
+                                setSerieError("")
+                            }}
+                            error={serieError}
+                            required
+                            disabled={series.length <= 1}
+                        />
+                    )}
+
+                    {loadingMonedas ? (
+                        <p className="text-xs text-slate-500 animate-pulse">
+                            Cargando monedas…
+                        </p>
+                    ) : (
+                        <SimpleSelector
+                            key={`moneda-${form.moneda_id}-${monedaOptions.length}`}
+                            label="Moneda"
+                            options={monedaOptions}
+                            defaultValue={form.moneda_id > 0 ? form.moneda_id : defaultMonedaId}
+                            setter={(value) => {
+                                setForm((prev) => ({ ...prev, moneda_id: value }))
+                                setMonedaError("")
+                            }}
+                            error={monedaError}
+                            required
+                            disabled={monedas.length <= 1}
+                        />
+                    )}
+                </>
             )}
 
-            {loadingMonedas ? (
-                <p className="text-xs text-slate-500 animate-pulse">
-                    Cargando monedas…
-                </p>
-            ) : (
-                <SimpleSelector
-                    key={`moneda-${form.moneda_id}-${monedaOptions.length}`}
-                    label="Moneda"
-                    options={monedaOptions}
-                    defaultValue={form.moneda_id > 0 ? form.moneda_id : defaultMonedaId}
-                    setter={(value) => {
-                        setForm((prev) => ({ ...prev, moneda_id: value }))
-                        setMonedaError("")
-                    }}
-                    error={monedaError}
-                    required
-                    disabled={monedas.length <= 1}
-                />
+            {isNota && (
+                <>
+                    {loadingTiposNc || loadingTiposNd ? (
+                        <p className="text-xs text-slate-500 animate-pulse">
+                            Cargando tipos de nota…
+                        </p>
+                    ) : (
+                        <SimpleSelector
+                            key={`tipo-nota-${variant}-${tipoNotaOptions.length}`}
+                            label={
+                                isNotaCredito
+                                    ? "Tipo nota crédito"
+                                    : "Tipo nota débito"
+                            }
+                            options={tipoNotaOptions}
+                            defaultValue={tipoNotaId}
+                            setter={(value) => {
+                                setTipoNotaId(value)
+                                setTipoNotaError("")
+                            }}
+                            error={tipoNotaError}
+                            required
+                        />
+                    )}
+
+                    <div className="space-y-2">
+                        <label className="block pl-2 text-xs font-semibold text-slate-700">
+                            Motivo modificación
+                        </label>
+                        <textarea
+                            value={motivoModificacion}
+                            onChange={(e) => setMotivoModificacion(e.target.value)}
+                            rows={4}
+                            placeholder="Describa el motivo de la modificación…"
+                            className="w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                        />
+                    </div>
+
+                    {documentoModificadoError && (
+                        <p className="px-2 text-xs text-red-500">
+                            {documentoModificadoError}
+                        </p>
+                    )}
+                </>
             )}
 
             <div className="grid w-full grid-cols-3 items-center gap-6">

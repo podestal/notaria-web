@@ -5,8 +5,14 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateRecibo from "../../../hooks/taxes/recibos/useCreateRecibo"
 import useGetReciboDetail from "../../../hooks/taxes/recibos/useGetReciboDetail"
 import useGetMonedas from "../../../hooks/taxes/moneda/useGetMonedas"
+import useGetSeriesBoleta from "../../../hooks/taxes/series/useGetSeriesBoleta"
+import useGetSeriesFactura from "../../../hooks/taxes/series/useGetSeriesFactura"
 import { findPersonaByNumeroDocumento } from "../../../services/taxes/findPersonaByNumeroDocumento"
-import type { CreateUpdateRecibo, Recibo } from "../../../services/taxes/recibosService"
+import {
+    RECIBO_COMPROBANTE_FACTURA,
+    type CreateUpdateRecibo,
+    type Recibo,
+} from "../../../services/taxes/recibosService"
 import { getSunatNotification } from "../../../services/taxes/sunatStatus"
 import { resolvePersonaDireccion } from "../personas/personaFormShared"
 import IngresoForm from "../controlInterno/IngresoForm"
@@ -15,6 +21,8 @@ import {
     getEmptyIngresoFormValues,
     getIngresoBackendError,
     reciboToFormValues,
+    resolveSerieIdByCode,
+    type DocumentoModificadoPayload,
     type IngresoFormValues,
 } from "../controlInterno/ingresoFormShared"
 import {
@@ -39,6 +47,10 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
     const { data: monedas = [], isLoading: loadingMonedas } = useGetMonedas({
         access,
     })
+    const { data: seriesFactura = [], isLoading: loadingSeriesFactura } =
+        useGetSeriesFactura({ access })
+    const { data: seriesBoleta = [], isLoading: loadingSeriesBoleta } =
+        useGetSeriesBoleta({ access })
 
     const { data, isLoading, isError, error, isSuccess } = useGetReciboDetail({
         access,
@@ -52,8 +64,31 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
     const [ready, setReady] = useState(false)
     const [personaError, setPersonaError] = useState("")
 
+    const detailRecibo = data?.recibo ?? recibo
+    const loadingSeriesOrigen = loadingSeriesFactura || loadingSeriesBoleta
+
+    const documentoModificado = useMemo((): DocumentoModificadoPayload | null => {
+        const origenSeries =
+            detailRecibo.comprobante === RECIBO_COMPROBANTE_FACTURA
+                ? seriesFactura
+                : seriesBoleta
+        const serieId = resolveSerieIdByCode(detailRecibo.serie, origenSeries)
+        if (
+            detailRecibo.comprobante <= 0 ||
+            serieId <= 0 ||
+            detailRecibo.numero == null
+        ) {
+            return null
+        }
+        return {
+            tipo_recibo_modificado_id: detailRecibo.comprobante,
+            serie_documento_modificado_id: serieId,
+            numero_documento_modificado: String(detailRecibo.numero),
+        }
+    }, [detailRecibo, seriesBoleta, seriesFactura])
+
     useEffect(() => {
-        if (!isSuccess || !data || loadingMonedas) return
+        if (!isSuccess || !data || loadingMonedas || loadingSeriesOrigen) return
 
         let cancelled = false
 
@@ -61,22 +96,22 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
             setReady(false)
             setPersonaError("")
 
-            const detailRecibo = data.recibo
+            const sourceRecibo = data.recibo
             const items = data.items ?? []
             let personaId = 0
-            let direccion = detailRecibo.direccion?.trim() || ""
+            let direccion = sourceRecibo.direccion?.trim() || ""
 
             try {
                 const persona = await findPersonaByNumeroDocumento(
                     access,
-                    detailRecibo.persona_documento || "",
+                    sourceRecibo.persona_documento || "",
                 )
                 if (persona) {
                     personaId = persona.id_persona
                     if (!direccion) {
                         direccion = resolvePersonaDireccion(persona)
                     }
-                } else if (detailRecibo.persona_documento) {
+                } else if (sourceRecibo.persona_documento) {
                     setPersonaError(
                         "No se encontró la persona del comprobante. Búsquela o regístrela en el formulario.",
                     )
@@ -90,7 +125,7 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
             if (cancelled) return
 
             setInitialValues(
-                reciboToFormValues(detailRecibo, [], monedas, {
+                reciboToFormValues(sourceRecibo, [], monedas, {
                     keepSerie: false,
                     items,
                     persona_id: personaId,
@@ -105,12 +140,19 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
         return () => {
             cancelled = true
         }
-    }, [access, data, isSuccess, loadingMonedas, monedas.length])
+    }, [
+        access,
+        data,
+        isSuccess,
+        loadingMonedas,
+        loadingSeriesOrigen,
+        monedas.length,
+    ])
 
     const formKey = useMemo(
         () =>
-            `${variant}-${recibo.id_recibo}-${ready ? "ready" : "loading"}-${initialValues.persona_id}-${initialValues.lineas.length}-${initialValues.moneda_id}`,
-        [variant, recibo.id_recibo, ready, initialValues],
+            `${variant}-${recibo.id_recibo}-${ready ? "ready" : "loading"}-${initialValues.persona_id}-${initialValues.lineas.length}-${initialValues.moneda_id}-${documentoModificado?.serie_documento_modificado_id ?? 0}`,
+        [variant, recibo.id_recibo, ready, initialValues, documentoModificado],
     )
 
     const handleCreate = async (values: CreateUpdateRecibo) => {
@@ -130,7 +172,7 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
         }
     }
 
-    if (isLoading || loadingMonedas || !ready) {
+    if (isLoading || loadingMonedas || loadingSeriesOrigen || !ready) {
         return (
             <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-8">
                 <p className="flex items-center justify-center gap-2 text-sm text-slate-500">
@@ -160,8 +202,6 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
         )
     }
 
-    const detailRecibo = data?.recibo ?? recibo
-
     return (
         <div>
             <div className="mb-4 border-b border-slate-100 pb-3">
@@ -179,6 +219,12 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
                 {personaError && (
                     <p className="mt-2 text-xs text-amber-700">{personaError}</p>
                 )}
+                {!documentoModificado && (
+                    <p className="mt-2 text-xs text-rose-700">
+                        No se pudo resolver la serie del comprobante modificado (
+                        {detailRecibo.serie}).
+                    </p>
+                )}
             </div>
 
             <IngresoForm
@@ -191,7 +237,8 @@ const CreateNotaFromRecibo = ({ recibo, variant, onClose, onDone }: Props) => {
                 onCancel={onClose}
                 kardex={detailRecibo.kardex || undefined}
                 useKardexPersona={false}
-                reciboModificaId={detailRecibo.id_recibo}
+                documentoModificado={documentoModificado}
+                serieOrigen={detailRecibo.serie}
             />
         </div>
     )
