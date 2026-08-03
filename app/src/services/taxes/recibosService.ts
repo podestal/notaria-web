@@ -8,6 +8,14 @@ export const RECIBO_COMPROBANTE_BOLETA = 2
 export const RECIBO_COMPROBANTE_NOTA_CREDITO = 3
 export const RECIBO_COMPROBANTE_NOTA_DEBITO = 4
 
+export const getReciboComprobanteLabel = (comprobante: number): string => {
+    if (comprobante === RECIBO_COMPROBANTE_FACTURA) return "Factura"
+    if (comprobante === RECIBO_COMPROBANTE_BOLETA) return "Boleta"
+    if (comprobante === RECIBO_COMPROBANTE_NOTA_CREDITO) return "Nota de crédito"
+    if (comprobante === RECIBO_COMPROBANTE_NOTA_DEBITO) return "Nota de débito"
+    return `Tipo ${comprobante}`
+}
+
 export interface Recibo {
     id_recibo: number
     fecha_emision: string

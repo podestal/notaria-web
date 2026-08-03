@@ -3,6 +3,7 @@ import type { Recibo } from "../../../services/taxes/recibosService"
 import {
     RECIBO_COMPROBANTE_BOLETA,
     RECIBO_COMPROBANTE_FACTURA,
+    getReciboComprobanteLabel,
 } from "../../../services/taxes/recibosService"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
 import getTitleCase from "../../../utils/getTitleCase"
@@ -20,12 +21,6 @@ const formatAmount = (value: string, moneda: string) => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })}`
-}
-
-const comprobanteLabel = (comprobante: number) => {
-    if (comprobante === RECIBO_COMPROBANTE_FACTURA) return "Factura"
-    if (comprobante === RECIBO_COMPROBANTE_BOLETA) return "Boleta"
-    return `Tipo ${comprobante}`
 }
 
 const accentByComprobante = (comprobante: number) => {
@@ -89,7 +84,7 @@ const ReciboModificableCard = ({
                                 <span
                                     className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ${accent.badge}`}
                                 >
-                                    {comprobanteLabel(recibo.comprobante)}
+                                    {getReciboComprobanteLabel(recibo.comprobante)}
                                 </span>
                                 <span className="font-mono text-sm font-semibold text-slate-900">
                                     {recibo.serie}-{recibo.numero}

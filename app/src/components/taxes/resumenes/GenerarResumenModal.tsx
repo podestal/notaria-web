@@ -4,7 +4,10 @@ import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useCreateResumen from "../../../hooks/taxes/resumenes/useCreateResumen"
 import useGetResumenRecibosPendientes from "../../../hooks/taxes/resumenes/useGetResumenRecibosPendientes"
-import { RECIBO_COMPROBANTE_BOLETA } from "../../../services/taxes/recibosService"
+import {
+    RECIBO_COMPROBANTE_BOLETA,
+    getReciboComprobanteLabel,
+} from "../../../services/taxes/recibosService"
 import type { Recibo } from "../../../services/taxes/recibosService"
 import type { SunatStatus } from "../../../services/taxes/sunatStatus"
 import { getSunatNotification } from "../../../services/taxes/sunatStatus"
@@ -56,7 +59,7 @@ const PendienteReciboRow = ({
                     {recibo.serie}-{recibo.numero}
                 </span>
                 <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                    {recibo.comprobante === 2 ? "Boleta" : "Factura"}
+                    {getReciboComprobanteLabel(recibo.comprobante)}
                 </span>
                 {recibo.anulada && (
                     <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-700">
