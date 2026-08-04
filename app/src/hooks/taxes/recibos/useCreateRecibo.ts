@@ -25,6 +25,9 @@ const useCreateRecibo = (): UseMutationResult<
             queryClient.invalidateQueries({ queryKey: ["taxes-recibos"] })
             queryClient.invalidateQueries({ queryKey: ["taxes-recibos-modificables"] })
         },
+        onError: (error) => {
+            console.error(error)
+        },
     })
 }
 

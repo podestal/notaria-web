@@ -6,6 +6,8 @@ import useGetDocumentos from "../../../hooks/taxes/documentos/useGetDocumentos"
 import useGetSeriesForVariant from "../../../hooks/taxes/series/useGetSeriesForVariant"
 import type { CreateUpdateIngreso } from "../../../services/taxes/ingresosService"
 import {
+    RECIBO_COMPROBANTE_BOLETA,
+    RECIBO_COMPROBANTE_FACTURA,
     RECIBO_COMPROBANTE_NOTA_CREDITO,
     RECIBO_COMPROBANTE_NOTA_DEBITO,
     type CreateUpdateRecibo,
@@ -81,6 +83,16 @@ const IngresoForm = ({
     const isNotaCredito = variant === "nota_credito"
     const isNotaDebito = variant === "nota_debito"
     const isNota = isNotaCredito || isNotaDebito
+    const reciboComprobanteId =
+        variant === "factura"
+            ? RECIBO_COMPROBANTE_FACTURA
+            : variant === "boleta"
+              ? RECIBO_COMPROBANTE_BOLETA
+              : isNotaCredito
+                ? RECIBO_COMPROBANTE_NOTA_CREDITO
+                : isNotaDebito
+                  ? RECIBO_COMPROBANTE_NOTA_DEBITO
+                  : 0
     const kardexPersonaEnabled = useKardexPersona ?? Boolean(kardex)
     const showFacturaPersonaSource = kardexPersonaEnabled && isFactura
 
@@ -345,20 +357,15 @@ const IngresoForm = ({
             await onSubmit(
                 formValuesToReciboPayload(normalized, series, {
                     kardex,
+                    comprobante_id: reciboComprobanteId,
                     ...(isNota && serieOrigen?.trim()
                         ? { serie: serieOrigen.trim() }
                         : {}),
                     ...(isNotaCredito
-                        ? {
-                              comprobante_id: RECIBO_COMPROBANTE_NOTA_CREDITO,
-                              tipo_nota_credito_id: tipoNotaId,
-                          }
+                        ? { tipo_nota_credito_id: tipoNotaId }
                         : {}),
                     ...(isNotaDebito
-                        ? {
-                              comprobante_id: RECIBO_COMPROBANTE_NOTA_DEBITO,
-                              tipo_nota_debito_id: tipoNotaId,
-                          }
+                        ? { tipo_nota_debito_id: tipoNotaId }
                         : {}),
                     motivo_modificacion: motivoModificacion,
                     documento_modificado: documentoModificado ?? undefined,
