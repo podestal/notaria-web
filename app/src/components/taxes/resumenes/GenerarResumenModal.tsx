@@ -9,12 +9,10 @@ import {
     getReciboComprobanteLabel,
 } from "../../../services/taxes/recibosService"
 import type { Recibo } from "../../../services/taxes/recibosService"
-import type { SunatStatus } from "../../../services/taxes/sunatStatus"
 import { getSunatNotification } from "../../../services/taxes/sunatStatus"
 import getTitleCase from "../../../utils/getTitleCase"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
 import TopModal from "../../ui/TopModal"
-import SunatStatusBanner from "../sunat/SunatStatusBanner"
 import {
     getDefaultIngresoFechaEmision,
     getIngresoBackendError,
@@ -94,7 +92,6 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
     const [fechaComunicacionError, setFechaComunicacionError] = useState("")
     const [fechaEmisionError, setFechaEmisionError] = useState("")
     const [selectedIds, setSelectedIds] = useState<number[]>([])
-    const [lastSunat, setLastSunat] = useState<SunatStatus | null>(null)
     const selectionInitializedForFecha = useRef("")
 
     useEffect(() => {
@@ -106,7 +103,6 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
             setFechaEmisionError("")
             setSelectedIds([])
             selectionInitializedForFecha.current = ""
-            setLastSunat(null)
         }
     }, [isOpen])
 
@@ -197,13 +193,8 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
             notify(notification.type, notification.message, {
                 persistent: Boolean(notification.persistent),
             })
-
-            if (response.sunat && response.sunat.status !== "accepted") {
-                setLastSunat(response.sunat)
-            } else {
-                onCreated?.()
-                onClose()
-            }
+            onCreated?.()
+            onClose()
         } catch (err) {
             notify("error", getIngresoBackendError(err))
         }
@@ -232,26 +223,6 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
                     </div>
                 </header>
 
-                {lastSunat && (
-                    <div className="mb-4 shrink-0">
-                        <SunatStatusBanner sunat={lastSunat} />
-                        <div className="mt-3 flex justify-end">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    onCreated?.()
-                                    onClose()
-                                }}
-                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                            >
-                                Cerrar
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {!lastSunat && (
-                <>
                 <div className="mb-4 grid shrink-0 gap-4 sm:grid-cols-2">
                     <div className="grid grid-cols-3 items-center gap-3">
                         <label
@@ -391,8 +362,6 @@ const GenerarResumenModal = ({ isOpen, onClose, onCreated }: Props) => {
                         {createResumen.isPending ? "Generando…" : "Generar resumen"}
                     </button>
                 </div>
-                </>
-                )}
             </form>
         </TopModal>
     )
