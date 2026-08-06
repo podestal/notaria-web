@@ -111,8 +111,7 @@ export const inferSunatStatusFromRecibo = (
         return recibo.enviada_sunat ? "rejected" : "sunat_down"
     }
 
-    if (!recibo.enviada_sunat) return "sunat_down"
-
+    // Not sent yet / pending — no badge (do not treat as "SUNAT no disponible")
     return null
 }
 

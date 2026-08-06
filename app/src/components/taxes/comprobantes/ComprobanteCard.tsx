@@ -180,7 +180,7 @@ const ComprobanteCard = ({
         resolvedPersonaName,
     )
     const sunatStatus =
-        recibo && reciboUsesDirectSunat(recibo.comprobante)
+        recibo && !recibo.anulada && reciboUsesDirectSunat(recibo.comprobante)
             ? inferSunatStatusFromRecibo(recibo)
             : null
     const sunatDetail =
@@ -192,6 +192,7 @@ const ComprobanteCard = ({
         && !recibo.anulada
         && reciboUsesDirectSunat(recibo.comprobante)
         && !recibo.aceptada_sunat
+        && Boolean(recibo.error_sunat?.trim() || recibo.enviada_sunat)
 
     return (
         <article
