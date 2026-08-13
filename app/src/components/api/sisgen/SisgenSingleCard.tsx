@@ -5,6 +5,7 @@ import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService"
 import useAuthStore from "../../../store/useAuthStore"
 import getTitleCase from "../../../utils/getTitleCase"
+import { formatLocalDate, toDateInputValue } from "../../../utils/formatLocalDate"
 import TopModal from "../../ui/TopModal"
 import SisgenKardexModal from "./SisgenKardexModal"
 import {
@@ -30,6 +31,10 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const sisgenLastSubmission = sisgenDoc.sisgen_last_submission
     const sisgenStatus = getSisgenDisplayStatus(sisgenDoc)
     const canSend = canSendSisgenDocument(sisgenDoc)
+    const fechaRaw = sisgenDoc.fecha_ingreso || ""
+    const fechaLabel = fechaRaw
+        ? formatLocalDate(toDateInputValue(fechaRaw) || fechaRaw)
+        : "—"
   
     const handleSend = () => {
       setLoading(true)
@@ -101,6 +106,7 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
         <p className={sisgenCol.instrumento}>
             {sisgenDoc?.numero_instrumento || sisgenDoc?.numinstrmento || '—'}
         </p>
+        <p className={sisgenCol.fecha}>{fechaLabel}</p>
         <p className={sisgenCol.acto} title={sisgenDoc?.contrato || ''}>
             {getTitleCase(sisgenDoc?.contrato || '')}
         </p>

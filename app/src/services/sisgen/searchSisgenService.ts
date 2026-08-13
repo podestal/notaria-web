@@ -18,7 +18,7 @@ export interface SISGENDocument {
     contrato: string;
     folioini: string;
     foliofin: string;
-    fechaconclusion: string;
+    fecha_ingreso?: string;
     cod_ancert: string;
     actouif: string;
     actosunat: string;

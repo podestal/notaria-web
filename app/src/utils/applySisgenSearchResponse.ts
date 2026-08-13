@@ -6,6 +6,7 @@ export const applySisgenSearchResponse = (
     handlers: SisgenSearchHandlers,
 ) => {
     if (data.error === 0) {
+        console.log("[SISGEN search] docs from backend", data.data)
         handlers.setSisgenDocs(data.data)
         handlers.setItemsCount(data.pagination.total_documents)
         handlers.setSearchId(data.pagination.search_id)
