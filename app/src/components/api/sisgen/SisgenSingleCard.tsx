@@ -31,7 +31,7 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const sisgenLastSubmission = sisgenDoc.sisgen_last_submission
     const sisgenStatus = getSisgenDisplayStatus(sisgenDoc)
     const canSend = canSendSisgenDocument(sisgenDoc)
-    const fechaRaw = sisgenDoc.fecha_ingreso || ""
+    const fechaRaw = sisgenDoc.fecha_escritura || ""
     const fechaLabel = fechaRaw
         ? formatLocalDate(toDateInputValue(fechaRaw) || fechaRaw)
         : "—"
