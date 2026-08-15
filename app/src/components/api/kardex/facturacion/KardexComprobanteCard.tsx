@@ -17,6 +17,12 @@ import {
     isIngreso,
     isRecibo,
 } from "../../../taxes/comprobantes/comprobanteTypes"
+import {
+    inferBoletaSunatDisplay,
+    inferSunatStatusFromRecibo,
+    reciboUsesDirectSunat,
+} from "../../../../services/taxes/sunatStatus"
+import SunatStatusBadge, { BoletaSunatBadge } from "../../../taxes/sunat/SunatStatusBadge"
 
 interface Props {
     variant: ComprobanteVariant
@@ -173,6 +179,12 @@ const KardexComprobanteCard = ({
         ingreso != null &&
         !ingreso.anulada &&
         !ingreso.canjeada
+    const isBoleta = Boolean(recibo && recibo.comprobante === RECIBO_COMPROBANTE_BOLETA)
+    const sunatStatus =
+        recibo && !recibo.anulada && reciboUsesDirectSunat(recibo.comprobante)
+            ? inferSunatStatusFromRecibo(recibo)
+            : null
+    const boletaSunatDisplay = recibo && isBoleta ? inferBoletaSunatDisplay(recibo) : null
 
     const shouldResolvePersonaName = isPlaceholderPersonaName(item.persona_nombres)
     const { data: personaMatches = [] } = useLookupPersonas({
@@ -241,14 +253,12 @@ const KardexComprobanteCard = ({
                             Canjeada
                         </span>
                     )}
-                    {recibo &&
-                        item.anulada &&
-                        recibo.comprobante === RECIBO_COMPROBANTE_BOLETA &&
-                        recibo.resumen_id == null && (
-                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-800">
-                                Pend. resumen
-                            </span>
-                        )}
+                    {sunatStatus && (
+                        <SunatStatusBadge status={sunatStatus} compact />
+                    )}
+                    {boletaSunatDisplay && (
+                        <BoletaSunatBadge display={boletaSunatDisplay} compact />
+                    )}
                 </div>
 
                 <p className="mt-1.5 truncate text-sm font-semibold text-slate-900">

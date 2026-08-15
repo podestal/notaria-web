@@ -148,6 +148,27 @@ export const getResumenSunatLabel = (display: ResumenSunatDisplay): string => {
 export const reciboUsesDirectSunat = (comprobante: number) =>
     comprobante !== 2
 
+export type BoletaSunatDisplay = "accepted" | "rejected" | "enviada" | "pend_resumen"
+
+export const inferBoletaSunatDisplay = (
+    recibo: ReciboSunatFields & { resumen_id?: number | null },
+): BoletaSunatDisplay => {
+    if (recibo.aceptada_sunat) return "accepted"
+
+    const error = recibo.error_sunat?.trim()
+    if (error && recibo.enviada_sunat) return "rejected"
+
+    if (recibo.enviada_sunat || recibo.resumen_id != null) return "enviada"
+
+    return "pend_resumen"
+}
+
+export const getBoletaSunatLabel = (display: BoletaSunatDisplay): string => {
+    if (display === "enviada") return "Enviado a SUNAT"
+    if (display === "pend_resumen") return "Pend. resumen"
+    return getSunatStatusLabel(display)
+}
+
 export const getSunatDetailMessage = (
     sunat?: SunatStatus | null,
     recibo?: ReciboSunatFields | null,

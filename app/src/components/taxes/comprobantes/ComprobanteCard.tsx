@@ -20,10 +20,11 @@ import {
 import {
     getSunatDetailMessage,
     getSunatNotification,
+    inferBoletaSunatDisplay,
     inferSunatStatusFromRecibo,
     reciboUsesDirectSunat,
 } from "../../../services/taxes/sunatStatus"
-import SunatStatusBadge from "../sunat/SunatStatusBadge"
+import SunatStatusBadge, { BoletaSunatBadge } from "../sunat/SunatStatusBadge"
 import { getIngresoBackendError } from "../controlInterno/ingresoFormShared"
 
 interface Props {
@@ -179,12 +180,14 @@ const ComprobanteCard = ({
         item.persona_nombres,
         resolvedPersonaName,
     )
+    const isBoleta = Boolean(recibo && recibo.comprobante === RECIBO_COMPROBANTE_BOLETA)
     const sunatStatus =
         recibo && !recibo.anulada && reciboUsesDirectSunat(recibo.comprobante)
             ? inferSunatStatusFromRecibo(recibo)
             : null
+    const boletaSunatDisplay = recibo && isBoleta ? inferBoletaSunatDisplay(recibo) : null
     const sunatDetail =
-        recibo && sunatStatus === "rejected"
+        recibo && (sunatStatus === "rejected" || boletaSunatDisplay === "rejected")
             ? getSunatDetailMessage(null, recibo)
             : null
     const showSunatRetry =
@@ -216,14 +219,6 @@ const ComprobanteCard = ({
                                         Anulada
                                     </span>
                                 )}
-                                {item.anulada &&
-                                    recibo &&
-                                    recibo.comprobante === RECIBO_COMPROBANTE_BOLETA &&
-                                    recibo.resumen_id == null && (
-                                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
-                                        Pend. resumen
-                                    </span>
-                                )}
                                 {ingreso?.canjeada && (
                                     <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
                                         Canjeada
@@ -231,6 +226,9 @@ const ComprobanteCard = ({
                                 )}
                                 {recibo && reciboUsesDirectSunat(recibo.comprobante) && sunatStatus && (
                                     <SunatStatusBadge status={sunatStatus} compact />
+                                )}
+                                {boletaSunatDisplay && (
+                                    <BoletaSunatBadge display={boletaSunatDisplay} compact />
                                 )}
                                 {recibo && showSunatRetry && (
                                     <ComprobanteSunatRetry recibo={recibo} />
