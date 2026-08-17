@@ -50,4 +50,21 @@ export const resumenesRecibosPendientesService = new TaxesClient<
 export const getResumenConsultarTicketService = (id_resumen: number) =>
     new TaxesClient<Resumen>(`/resumenes/${id_resumen}/consultar-ticket/`)
 
+export interface EnviarBoletaPayload {
+    recibo_id: number
+}
+
+export interface EnviarBoletaResponse {
+    resumen?: Resumen
+    recibo?: Recibo
+    recibos?: Recibo[]
+    sunat?: SunatStatus
+    message?: string
+}
+
+export const resumenesEnviarBoletaService = new TaxesClient<
+    EnviarBoletaResponse,
+    EnviarBoletaPayload
+>("/resumenes/enviar-boleta/")
+
 export default resumenesService

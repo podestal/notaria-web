@@ -1,8 +1,9 @@
 import type { ReactNode } from "react"
-import { ArrowLeftRight, Ban, Printer, Receipt, RefreshCw } from "lucide-react"
+import { ArrowLeftRight, Ban, FileStack, Loader2, Printer, Receipt, RefreshCw } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useLookupPersonas from "../../../hooks/taxes/personas/useLookupPersonas"
 import useEnviarReciboSunat from "../../../hooks/taxes/recibos/useEnviarReciboSunat"
+import useEnviarBoletaResumen from "../../../hooks/taxes/resumenes/useEnviarBoletaResumen"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import getTitleCase from "../../../utils/getTitleCase"
 import { formatLocalDate } from "../../../utils/formatLocalDate"
@@ -155,6 +156,8 @@ const ComprobanteCard = ({
     onCanjear,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const notify = useNotificationsStore((s) => s.notify)
+    const enviarBoleta = useEnviarBoletaResumen()
     const comprobante = getComprobanteSerieNumero(item)
     const canAnular = !item.anulada && Boolean(onAnular)
     const showAnular = Boolean(onAnular)
@@ -196,13 +199,45 @@ const ComprobanteCard = ({
         && reciboUsesDirectSunat(recibo.comprobante)
         && !recibo.aceptada_sunat
         && Boolean(recibo.error_sunat?.trim() || recibo.enviada_sunat)
+    const showEnviarBoleta = Boolean(
+        recibo && isBoleta && !recibo.anulada && boletaSunatDisplay === "pend_resumen",
+    )
+    const enviandoBoleta = showEnviarBoleta && enviarBoleta.isPending
+    const actionCols =
+        (showCanjear ? 1 : 0) + (showAnular ? 1 : 0) + (showEnviarBoleta ? 1 : 0) + 1
+
+    const handleEnviarBoleta = async () => {
+        if (!recibo) return
+        try {
+            const response = await enviarBoleta.mutateAsync({
+                access,
+                payload: { recibo_id: recibo.id_recibo },
+            })
+            const notification = getSunatNotification(
+                response.sunat,
+                "Boleta enviada a SUNAT.",
+            )
+            notify(notification.type, notification.message, {
+                persistent: Boolean(notification.persistent),
+            })
+        } catch (error) {
+            notify("error", getIngresoBackendError(error))
+        }
+    }
 
     return (
         <article
-            className={`overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md ${
+            className={`relative overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md ${
                 item.anulada ? "border-red-200" : "border-slate-200"
             }`}
         >
+            {enviandoBoleta && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-white/85 backdrop-blur-[1px]">
+                    <Loader2 className="h-6 w-6 animate-spin text-sky-600" aria-hidden />
+                    <p className="text-sm font-semibold text-slate-800">Un momento…</p>
+                    <p className="text-xs text-slate-500">Enviando boleta a SUNAT</p>
+                </div>
+            )}
             <div className="px-4 py-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex min-w-0 flex-1 gap-3">
@@ -356,11 +391,13 @@ const ComprobanteCard = ({
 
             <div
                 className={`grid gap-1 border-t border-slate-100 bg-slate-50/80 px-2 py-2 ${
-                    showCanjear
-                        ? "grid-cols-3"
-                        : showAnular
-                          ? "grid-cols-2"
-                          : "grid-cols-1"
+                    actionCols >= 4
+                        ? "grid-cols-4"
+                        : actionCols === 3
+                          ? "grid-cols-3"
+                          : actionCols === 2
+                            ? "grid-cols-2"
+                            : "grid-cols-1"
                 }`}
             >
                 <ActionButton
@@ -368,6 +405,15 @@ const ComprobanteCard = ({
                     icon={<Printer className="h-4 w-4" aria-hidden />}
                     onClick={() => onImprimir?.(item)}
                 />
+                {showEnviarBoleta && recibo && (
+                    <ActionButton
+                        label="Enviar SUNAT"
+                        icon={<FileStack className="h-4 w-4" aria-hidden />}
+                        onClick={handleEnviarBoleta}
+                        disabled={enviandoBoleta}
+                        tone="success"
+                    />
+                )}
                 {showAnular && (
                     <ActionButton
                         label="Anular"
