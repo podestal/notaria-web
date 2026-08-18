@@ -68,6 +68,7 @@ import ResumenesMain from "../components/taxes/resumenes/ResumenesMain";
 import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
 import ReservacionesMain from "../components/api/configuracion/reservaciones/ReservacionesMain";
 import TaxesUsuariosMain from "../components/api/configuracion/taxesUsuarios/TaxesUsuariosMain";
+import TareasMain from "../components/api/configuracion/tareas/TareasMain";
 import PersonasMain from "../components/taxes/personas/PersonasMain";
 import { isFacturacionEnabled } from "../utils/isFacturacionEnabled";
 import ControlInternoMain from "../components/taxes/controlInterno/ControlInternoMain";
@@ -434,6 +435,10 @@ const routes = createBrowserRouter([
                     {
                         path: "usuarios-taxes",
                         element: <PrivateRoutes><TaxesUsuariosMain /></PrivateRoutes>
+                    },
+                    {
+                        path: "tareas",
+                        element: <PrivateRoutes><TareasMain /></PrivateRoutes>
                     },
                     {
                         path: "reservaciones",

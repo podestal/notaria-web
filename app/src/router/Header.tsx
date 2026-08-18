@@ -215,6 +215,7 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Reservaciones", path: "/app/configuracion/reservaciones"},
                 {name: "Enlazar Usuarios", path: "/app/configuracion/user-mapping"},
                 {name: "Usuarios Taxes", path: "/app/configuracion/usuarios-taxes"},
+                {name: "Tareas", path: "/app/configuracion/tareas"},
             ]},
         { label: "Sisgen", options:
             [   {name: "SISGEN", path: "/app/sisgen"}
