@@ -1,5 +1,5 @@
-import type { ReactNode } from "react"
-import { ArrowLeftRight, Ban, FileStack, Loader2, Printer, Receipt, RefreshCw } from "lucide-react"
+import { useState, type ReactNode } from "react"
+import { ArrowLeftRight, Ban, FileCode, FileStack, Loader2, Printer, Receipt, RefreshCw } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useLookupPersonas from "../../../hooks/taxes/personas/useLookupPersonas"
 import useEnviarReciboSunat from "../../../hooks/taxes/recibos/useEnviarReciboSunat"
@@ -17,6 +17,7 @@ import {
 import {
     RECIBO_COMPROBANTE_BOLETA,
     type Recibo,
+    downloadReciboXml,
 } from "../../../services/taxes/recibosService"
 import {
     getSunatDetailMessage,
@@ -158,6 +159,7 @@ const ComprobanteCard = ({
     const access = useAuthStore((s) => s.access_token) || ""
     const notify = useNotificationsStore((s) => s.notify)
     const enviarBoleta = useEnviarBoletaResumen()
+    const [downloadingXml, setDownloadingXml] = useState(false)
     const comprobante = getComprobanteSerieNumero(item)
     const canAnular = !item.anulada && Boolean(onAnular)
     const showAnular = Boolean(onAnular)
@@ -203,8 +205,25 @@ const ComprobanteCard = ({
         recibo && isBoleta && !recibo.anulada && boletaSunatDisplay === "pend_resumen",
     )
     const enviandoBoleta = showEnviarBoleta && enviarBoleta.isPending
+    const showXml = Boolean(recibo)
     const actionCols =
-        (showCanjear ? 1 : 0) + (showAnular ? 1 : 0) + (showEnviarBoleta ? 1 : 0) + 1
+        (showCanjear ? 1 : 0)
+        + (showAnular ? 1 : 0)
+        + (showEnviarBoleta ? 1 : 0)
+        + (showXml ? 1 : 0)
+        + 1
+
+    const handleDownloadXml = async () => {
+        if (!recibo) return
+        setDownloadingXml(true)
+        try {
+            await downloadReciboXml(recibo, access)
+        } catch (error) {
+            notify("error", getIngresoBackendError(error))
+        } finally {
+            setDownloadingXml(false)
+        }
+    }
 
     const handleEnviarBoleta = async () => {
         if (!recibo) return
@@ -391,13 +410,15 @@ const ComprobanteCard = ({
 
             <div
                 className={`grid gap-1 border-t border-slate-100 bg-slate-50/80 px-2 py-2 ${
-                    actionCols >= 4
-                        ? "grid-cols-4"
-                        : actionCols === 3
-                          ? "grid-cols-3"
-                          : actionCols === 2
-                            ? "grid-cols-2"
-                            : "grid-cols-1"
+                    actionCols >= 5
+                        ? "grid-cols-5"
+                        : actionCols >= 4
+                          ? "grid-cols-4"
+                          : actionCols === 3
+                            ? "grid-cols-3"
+                            : actionCols === 2
+                              ? "grid-cols-2"
+                              : "grid-cols-1"
                 }`}
             >
                 <ActionButton
@@ -405,6 +426,20 @@ const ComprobanteCard = ({
                     icon={<Printer className="h-4 w-4" aria-hidden />}
                     onClick={() => onImprimir?.(item)}
                 />
+                {showXml && recibo && (
+                    <ActionButton
+                        label="XML"
+                        icon={
+                            downloadingXml ? (
+                                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                            ) : (
+                                <FileCode className="h-4 w-4" aria-hidden />
+                            )
+                        }
+                        onClick={handleDownloadXml}
+                        disabled={downloadingXml}
+                    />
+                )}
                 {showEnviarBoleta && recibo && (
                     <ActionButton
                         label="Enviar SUNAT"

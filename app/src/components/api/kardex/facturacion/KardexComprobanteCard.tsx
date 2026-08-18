@@ -1,12 +1,14 @@
-import type { LucideIcon, ReactNode } from "react"
-import { ArrowLeftRight, Ban, ClipboardList, FileText, Printer, Receipt } from "lucide-react"
+import { useState, type LucideIcon, type ReactNode } from "react"
+import { ArrowLeftRight, Ban, ClipboardList, FileCode, FileText, Loader2, Printer, Receipt } from "lucide-react"
 import useAuthStore from "../../../../store/useAuthStore"
 import useLookupPersonas from "../../../../hooks/taxes/personas/useLookupPersonas"
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 import {
     RECIBO_COMPROBANTE_BOLETA,
     RECIBO_COMPROBANTE_FACTURA,
     RECIBO_COMPROBANTE_NOTA_CREDITO,
     RECIBO_COMPROBANTE_NOTA_DEBITO,
+    downloadReciboXml,
 } from "../../../../services/taxes/recibosService"
 import getTitleCase from "../../../../utils/getTitleCase"
 import { formatLocalDate } from "../../../../utils/formatLocalDate"
@@ -23,6 +25,7 @@ import {
     reciboUsesDirectSunat,
 } from "../../../../services/taxes/sunatStatus"
 import SunatStatusBadge, { BoletaSunatBadge } from "../../../taxes/sunat/SunatStatusBadge"
+import { getIngresoBackendError } from "../../../taxes/controlInterno/ingresoFormShared"
 
 interface Props {
     variant: ComprobanteVariant
@@ -167,6 +170,8 @@ const KardexComprobanteCard = ({
     onCanjear,
 }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
+    const notify = useNotificationsStore((s) => s.notify)
+    const [downloadingXml, setDownloadingXml] = useState(false)
     const comprobante = getComprobanteSerieNumero(item)
     const ingreso = isIngreso(item) ? item : null
     const recibo = isRecibo(item) ? item : null
@@ -203,6 +208,18 @@ const KardexComprobanteCard = ({
         item.persona_nombres,
         resolvedPersonaName,
     )
+
+    const handleDownloadXml = async () => {
+        if (!recibo) return
+        setDownloadingXml(true)
+        try {
+            await downloadReciboXml(recibo, access)
+        } catch (error) {
+            notify("error", getIngresoBackendError(error))
+        } finally {
+            setDownloadingXml(false)
+        }
+    }
 
     return (
         <article
@@ -275,6 +292,20 @@ const KardexComprobanteCard = ({
                         icon={<Printer className="h-3.5 w-3.5" aria-hidden />}
                         onClick={() => onImprimir?.(item)}
                     />
+                    {recibo && (
+                        <CompactAction
+                            label="XML"
+                            icon={
+                                downloadingXml ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                                ) : (
+                                    <FileCode className="h-3.5 w-3.5" aria-hidden />
+                                )
+                            }
+                            onClick={handleDownloadXml}
+                            disabled={downloadingXml}
+                        />
+                    )}
                     {onAnular && (
                         <CompactAction
                             label="Anular"

@@ -130,6 +130,8 @@ export interface ReciboDetail {
 
 export const getReciboPdfPath = (id_recibo: number) => `/recibos/${id_recibo}/pdf/`
 
+export const getReciboXmlPath = (id_recibo: number) => `/recibos/${id_recibo}/xml/`
+
 export const fetchReciboPdfBlob = async (
     id_recibo: number,
     access: string,
@@ -139,6 +141,32 @@ export const fetchReciboPdfBlob = async (
         headers: { Authorization: authHeaderValue(access) },
     })
     return new Blob([response.data], { type: "application/pdf" })
+}
+
+export const fetchReciboXmlBlob = async (
+    id_recibo: number,
+    access: string,
+): Promise<Blob> => {
+    const response = await taxesHttp.get(getReciboXmlPath(id_recibo), {
+        responseType: "blob",
+        headers: { Authorization: authHeaderValue(access) },
+    })
+    return new Blob([response.data], { type: "application/xml" })
+}
+
+export const downloadReciboXml = async (
+    recibo: Pick<Recibo, "id_recibo" | "serie" | "numero">,
+    access: string,
+): Promise<void> => {
+    const blob = await fetchReciboXmlBlob(recibo.id_recibo, access)
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `${recibo.serie}-${recibo.numero}.xml`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
 }
 
 export const getReciboAnularService = (id_recibo: number) =>
