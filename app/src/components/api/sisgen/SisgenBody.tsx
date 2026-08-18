@@ -61,6 +61,7 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
           instrumentType={instrumentType}
           setSisgenDocs={setSisgenDocs}
           page={page}
+          setPage={setPage}
           setItemsCount={setItemsCount}
           searchId={searchId}
           setSearchId={setSearchId}

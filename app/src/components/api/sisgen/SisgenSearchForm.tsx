@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import Calendar from "../../ui/Calendar";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import SimpleSelector from "../../ui/SimpleSelector";
 import {
     cacheLastSisgenSearchRequest,
@@ -26,6 +26,7 @@ interface Props {
     instrumentType: number
     setSisgenDocs: React.Dispatch<React.SetStateAction<SISGENDocument[]>>
     page: number
+    setPage: React.Dispatch<React.SetStateAction<number>>
     setItemsCount: React.Dispatch<React.SetStateAction<number>>
     searchId: string
     setSearchId: React.Dispatch<React.SetStateAction<string>>
@@ -47,6 +48,7 @@ const SisgenSearchForm = ({
     instrumentType, 
     setSisgenDocs, 
     page, 
+    setPage,
     setItemsCount, 
     searchId,
     setSearchId,
@@ -67,8 +69,46 @@ const SisgenSearchForm = ({
     const access = useAuthStore(s => s.access_token) || ''
     const queryClient = useQueryClient()
     const searchSisgen = useSearchSisgen()
+    const prevInstrumentTypeRef = useRef(instrumentType)
+    const skipPageFetchRef = useRef(false)
 
     useEffect(() => {
+        const instrumentChanged = prevInstrumentTypeRef.current !== instrumentType
+        if (instrumentChanged) {
+            prevInstrumentTypeRef.current = instrumentType
+
+            if (page !== 1) {
+                skipPageFetchRef.current = true
+                setPage(1)
+            }
+
+            if (selectedFromDate && selectedToDate) {
+                getSisgenDocs({
+                    instrumentType,
+                    selectedFromDate,
+                    selectedToDate,
+                    selectedEstado,
+                    page: 1,
+                    setSisgenDocs,
+                    setItemsCount,
+                    setSearchId,
+                    setNoDocsMessage,
+                    setErrorDisplay,
+                    setLoading,
+                    access,
+                    searchSisgen,
+                    queryClient,
+                    searchHandlers,
+                })
+            }
+            return
+        }
+
+        if (skipPageFetchRef.current) {
+            skipPageFetchRef.current = false
+            return
+        }
+
         if (searchId) {
             setLoading(true)
             setNoDocsMessage('')
@@ -104,7 +144,7 @@ const SisgenSearchForm = ({
                 },
             })
         }
-    }, [page])
+    }, [page, instrumentType])
 
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
