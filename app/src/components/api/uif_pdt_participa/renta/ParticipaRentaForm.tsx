@@ -1,4 +1,4 @@
-import { BrushCleaning, Loader2 } from "lucide-react"
+import { BrushCleaning, FileText, Loader2, Save } from "lucide-react"
 import SingleSelect from "../../../ui/SingleSelect"
 import { useEffect, useState } from "react"
 import useAuthStore from "../../../../store/useAuthStore"
@@ -7,15 +7,32 @@ import useNotificationsStore from "../../../../hooks/store/useNotificationsStore
 import { ContratantesPorActo } from "../../../../services/api/contratantesPorActoService"
 import useUpdateRenta from "../../../../hooks/api/renta/useUpdateRenta"
 import { Renta } from "../../../../services/api/rentaService"
+import getTitleCase from "../../../../utils/getTitleCase"
 import ParticipaFormularioForm from "./ParticipaFormularioForm"
 import TopModal from "../../../ui/TopModal"
 
-
-
 const options = [
-    { value: '1', label: 'Si' },
+    { value: '1', label: 'Sí' },
     { value: '0', label: 'No' },
 ]
+
+const QUESTIONS = [
+    {
+        id: 'pregu1',
+        number: 1,
+        text: '¿La enajenación generó renta de 3ra categoría?',
+    },
+    {
+        id: 'pregu2',
+        number: 2,
+        text: '¿El bien enajenado era la casa habitación del enajenante?',
+    },
+    {
+        id: 'pregu3',
+        number: 3,
+        text: '¿El impuesto por pagar es cero?',
+    },
+] as const
 
 interface Props {
     kardex: string
@@ -52,10 +69,19 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
         setPregu3(contratante.renta?.pregu3 || '')
     }, [contratante.renta])
 
+    const questionState = {
+        pregu1: { value: pregu1, set: setPregu1, error: pregu1Error, setError: setPregu1Error },
+        pregu2: { value: pregu2, set: setPregu2, error: pregu2Error, setError: setPregu2Error },
+        pregu3: { value: pregu3, set: setPregu3, error: pregu3Error, setError: setPregu3Error },
+    }
+
     const handleLimpiarPreguntas = () => {
         setPregu1('')
         setPregu2('')
         setPregu3('')
+        setPregu1Error(false)
+        setPregu2Error(false)
+        setPregu3Error(false)
     }
 
     const handleGrabar = () => {
@@ -66,7 +92,7 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
         if (pregu1 === '') {
             setPregu1Error(true)
             return
-        } 
+        }
         if (pregu2 === '') {
             setPregu2Error(true)
             return
@@ -132,86 +158,127 @@ const ParticipaRentaForm = ({ kardex, contratante }: Props) => {
                 }
             })
         }
-
-        
     }
 
-  return (
-    <>
-        <div className="w-full max-w-3xl">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">Datos de la Renta</h2>
-            <button
-                type="button"
-                onClick={handleLimpiarPreguntas}
-                className="flex items-center gap-2 text-sm font-bold text-gray-900 hover:text-gray-500 transition-all duration-300"
-            >
-                <BrushCleaning className="w-4 h-4 text-blue-600" />
-                Limpiar preguntas
-            </button>
-        </div>
-        <div className="my-6 flex flex-col gap-4">
-            <p className="font-semibold text-sm">
-                Presentó comunicación con carácter de DECLARACIÓN JURADA indicando:
-            </p>
-            <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm">¿La enajenación generó renta de 3ra Categoría?</p>
-                    <SingleSelect name="pregunta1" options={options} selected={pregu1} onChange={(value) => {
-                        setPregu1(value)
-                        setPregu1Error(false)
-                    }} />
-                </div>
-                {pregu1Error && <p className="text-red-500 text-[10px]">Esta pregunta es requerida</p>}
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm">¿El bien enajenado era la casa habitación del enajenante?</p>
-                    <SingleSelect name="pregunta2" options={options} selected={pregu2} onChange={(value) => {
-                        setPregu2(value)
-                        setPregu2Error(false)
-                    }} />
-                </div>
-                {pregu2Error && <p className="text-red-500 text-[10px]">Esta pregunta es requerida</p>}
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm">¿El impuesto por pagar es cero?</p>
-                    <SingleSelect name="pregunta3" options={options} selected={pregu3} onChange={(value) => {
-                        setPregu3(value)
-                        setPregu3Error(false)
-                    }} />
-                </div>
-                {pregu3Error && <p className="text-red-500 text-[10px]">Esta pregunta es requerida</p>}
+    return (
+        <>
+            <div className="mx-auto w-full max-w-3xl space-y-6">
+                <header className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                            Renta — 3ra categoría
+                        </p>
+                        <h2 className="mt-1 text-xl font-semibold text-slate-900">
+                            Datos de la renta
+                        </h2>
+                        <p className="mt-1.5 text-sm text-slate-600">
+                            {getTitleCase(contratante.cliente || '')}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                            Kardex {kardex}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleLimpiarPreguntas}
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                    >
+                        <BrushCleaning className="h-4 w-4 text-sky-600" aria-hidden />
+                        Limpiar preguntas
+                    </button>
+                </header>
+
+                <section className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 sm:p-5">
+                    <p className="text-sm leading-relaxed text-slate-700">
+                        Presentó comunicación con carácter de{' '}
+                        <span className="font-semibold text-slate-900">DECLARACIÓN JURADA</span>
+                        indicando:
+                    </p>
+
+                    <div className="mt-4 space-y-3">
+                        {QUESTIONS.map((question) => {
+                            const state = questionState[question.id]
+                            return (
+                                <div
+                                    key={question.id}
+                                    className={`rounded-lg border bg-white p-4 shadow-sm transition ${
+                                        state.error
+                                            ? 'border-rose-300 ring-1 ring-rose-100'
+                                            : 'border-slate-200'
+                                    }`}
+                                >
+                                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                                        <div className="flex min-w-0 gap-3">
+                                            <span
+                                                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-100 text-xs font-bold text-sky-700"
+                                                aria-hidden
+                                            >
+                                                {question.number}
+                                            </span>
+                                            <p className="text-sm leading-snug text-slate-700">
+                                                {question.text}
+                                            </p>
+                                        </div>
+                                        <SingleSelect
+                                            compact
+                                            name={question.id}
+                                            options={options}
+                                            selected={state.value}
+                                            onChange={(value) => {
+                                                state.set(value)
+                                                state.setError(false)
+                                            }}
+                                        />
+                                    </div>
+                                    {state.error && (
+                                        <p className="mt-2 text-xs font-medium text-rose-600">
+                                            Esta pregunta es requerida
+                                        </p>
+                                    )}
+                                </div>
+                            )
+                        })}
+                    </div>
+                </section>
+
+                <footer className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
+                    <button
+                        type="button"
+                        onClick={handleGrabar}
+                        disabled={loading}
+                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60"
+                    >
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        ) : (
+                            <Save className="h-4 w-4" aria-hidden />
+                        )}
+                        {loading ? 'Guardando…' : 'Grabar'}
+                    </button>
+                    {renta?.pregu3 === '0' && (
+                        <button
+                            type="button"
+                            onClick={() => setShowFormulario(true)}
+                            className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-100"
+                        >
+                            <FileText className="h-4 w-4" aria-hidden />
+                            Ingresar formulario
+                        </button>
+                    )}
+                </footer>
             </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-            <button
-                type="button"
-                onClick={handleGrabar}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-all duration-300"
+
+            <TopModal
+                isOpen={showFormulario}
+                onClose={() => setShowFormulario(false)}
+                portal
             >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Grabar'}
-            </button>
-            {renta?.pregu3 === '0' && (
-                <button
-                    type="button"
-                    onClick={() => setShowFormulario(true)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-all duration-300"
-                >
-                    Ingresar formulario
-                </button>
-            )}
-        </div>
-    </div>
-    <TopModal
-        isOpen={showFormulario}
-        onClose={() => setShowFormulario(false)}
-        wide
-        portal
-    >
-        <ParticipaFormularioForm
-            idrenta={renta?.idrenta || ''}
-        />
-    </TopModal>
-    </>
-  )
+                <ParticipaFormularioForm
+                    idrenta={renta?.idrenta || ''}
+                />
+            </TopModal>
+        </>
+    )
 }
 
 export default ParticipaRentaForm

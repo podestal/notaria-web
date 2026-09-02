@@ -4,8 +4,7 @@ import ParticipaFormularioTable from "./ParticipaFormularioTable"
 import useCreateFormulario from "../../../../hooks/api/formulario/useCreateFormulario"
 import useAuthStore from "../../../../store/useAuthStore"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
-import { Loader2 } from "lucide-react"
-
+import { Loader2, Plus } from "lucide-react"
 
 interface Props {
     idrenta: string
@@ -26,7 +25,6 @@ const ParticipaFormularioForm = ({ idrenta }: Props) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const handleGrabar = () => {
-
         setNumOpError('')
         setMontoError('')
 
@@ -41,7 +39,7 @@ const ParticipaFormularioForm = ({ idrenta }: Props) => {
         }
 
         setIsLoading(true)
-        
+
         createFormulario.mutate({
             access: access,
             formulario: {
@@ -68,45 +66,69 @@ const ParticipaFormularioForm = ({ idrenta }: Props) => {
         })
     }
 
-  return (
-    <div className="w-full flex flex-col gap-6 lg:flex-row lg:gap-8">
-        <div className="w-full shrink-0 lg:w-80">
-            <h2 className="text-md font-bold">Ingrese formulario</h2>
-            <div className="my-4 flex flex-col gap-4">
-                <SimpleInput
-                    value={numOp}
-                    setValue={setNumOp}
-                    label="N° Op. Sunat /N° de Orden"
-                    horizontal
-                    error={numOpError}
-                    setError={setNumOpError}
-                />
-                <SimpleInput
-                    value={monto}
-                    setValue={setMonto}
-                    label="Monto"
-                    horizontal
-                    error={montoError}
-                    setError={setMontoError}
-                />
-                <div className="flex justify-end pt-2">
-                    <button
-                        type="button"
-                        onClick={handleGrabar}
-                        disabled={isLoading}
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-all duration-300"
-                    >
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Grabar'}
-                    </button>
-                </div>
+    return (
+        <div className="mx-auto w-full max-w-5xl space-y-6">
+            <header className="border-b border-slate-200 pb-4">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    Formulario SUNAT
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-slate-900">
+                    Ingresar formulario de renta
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                    Registre el número de operación y el monto del formulario presentado.
+                </p>
+            </header>
+
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_1fr]">
+                <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h3 className="text-sm font-semibold text-slate-800">
+                        Nuevo formulario
+                    </h3>
+                    <div className="mt-4 flex flex-col gap-4">
+                        <SimpleInput
+                            value={numOp}
+                            setValue={setNumOp}
+                            label="N° Op. Sunat / N° de Orden"
+                            horizontal
+                            error={numOpError}
+                            setError={setNumOpError}
+                        />
+                        <SimpleInput
+                            value={monto}
+                            setValue={setMonto}
+                            label="Monto"
+                            horizontal
+                            error={montoError}
+                            setError={setMontoError}
+                        />
+                        <button
+                            type="button"
+                            onClick={handleGrabar}
+                            disabled={isLoading}
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            {isLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                            ) : (
+                                <Plus className="h-4 w-4" aria-hidden />
+                            )}
+                            {isLoading ? 'Guardando…' : 'Agregar formulario'}
+                        </button>
+                    </div>
+                </section>
+
+                <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h3 className="text-sm font-semibold text-slate-800">
+                        Formularios registrados
+                    </h3>
+                    <div className="mt-4">
+                        <ParticipaFormularioTable idrenta={idrenta} />
+                    </div>
+                </section>
             </div>
         </div>
-        <div className="w-full min-w-0 flex-1">
-            <h2 className="text-md font-bold mb-4">Formularios</h2>
-            <ParticipaFormularioTable idrenta={idrenta} />
-        </div>
-    </div>
-  )
+    )
 }
 
 export default ParticipaFormularioForm

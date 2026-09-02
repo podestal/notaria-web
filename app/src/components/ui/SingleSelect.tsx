@@ -13,9 +13,11 @@ interface SingleSelectProps {
     onSelect?: (value: string) => void;
     disabled?: boolean;
     name?: string; // Add name prop to make each radio group unique
+    /** Tighter spacing between Si/No options */
+    compact?: boolean;
 }
 
-const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange, onSelect, disabled, name='single-select' }) => {
+const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange, onSelect, disabled, name='single-select', compact = false }) => {
   const handleSelect = (value: string) => {
     if (disabled) return
     onChange(value)
@@ -23,12 +25,12 @@ const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange
   }
 
   return (
-    <div className="flex justify-baseline items-center gap-10">
+    <div className={`flex items-center ${compact ? 'gap-2' : 'gap-10'}`}>
       {options.map((option) => (
         <label
           key={option.value}
-          className={`flex items-center space-x-3 p-2 border rounded-lg cursor-pointer transition
-            ${selected === option.value ? "bg-blue-100 border-blue-500" : "border-gray-300 hover:bg-gray-100"}
+          className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition
+            ${selected === option.value ? "border-sky-500 bg-sky-50 ring-1 ring-sky-200" : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"}
             ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <input
@@ -41,7 +43,7 @@ const SingleSelect: React.FC<SingleSelectProps> = ({ options, selected, onChange
             className="form-radio text-blue-600"
             disabled={disabled}
           />
-          <span className="text-sm font-medium text-gray-700">{option.label}</span>
+          <span className="text-sm font-medium text-slate-700">{option.label}</span>
         </label>
       ))}
     </div>

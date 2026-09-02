@@ -27,7 +27,6 @@ const ParticipaRenta = ({ kardex, contratante }: Props) => {
     <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        wide
         portal
     >
         <ParticipaRentaForm kardex={kardex} contratante={contratante} />

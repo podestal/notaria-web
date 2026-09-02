@@ -16,7 +16,7 @@ const ParticipaFormularioCard = ({ formulario }: Props) => {
     const removeFormulario = useRemoveFormulario({ idformulario: formulario.idformulario, idrenta: formulario.idrenta })
 
     const [isLoading, setIsLoading] = useState(false)
-    
+
     const handleRemove = () => {
         setIsLoading(true)
         removeFormulario.mutate({
@@ -38,21 +38,43 @@ const ParticipaFormularioCard = ({ formulario }: Props) => {
         })
     }
 
-  return (
-<       div
-            className="grid grid-cols-9 gap-4 border-b-2 border-gray-200 pb-2"
-            >
-            <p className="col-span-4">{formulario.numformu}</p>
-            <p className="col-span-4">{formulario.monto}</p>
-            <button 
-                onClick={handleRemove}
-                disabled={isLoading}
-                className="col-span-1"
-            >
-                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4 text-red-500 hover:text-red-700 cursor-pointer transition-all duration-300" />}
-            </button>
+    return (
+        <div
+            className="grid grid-cols-1 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/80 px-3 py-3 sm:grid-cols-[1fr_1fr_auto] sm:gap-3"
+        >
+            <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 sm:hidden">
+                    N° Op. Sunat / Orden
+                </p>
+                <p className="truncate text-sm font-medium text-slate-800">
+                    {formulario.numformu}
+                </p>
+            </div>
+            <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 sm:hidden">
+                    Monto
+                </p>
+                <p className="text-sm text-slate-700">
+                    {formulario.monto}
+                </p>
+            </div>
+            <div className="flex justify-end sm:justify-center">
+                <button
+                    type="button"
+                    onClick={handleRemove}
+                    disabled={isLoading}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-rose-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
+                    aria-label="Eliminar formulario"
+                >
+                    {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    ) : (
+                        <Trash2 className="h-4 w-4" aria-hidden />
+                    )}
+                </button>
+            </div>
         </div>
-  )
+    )
 }
 
 export default ParticipaFormularioCard
