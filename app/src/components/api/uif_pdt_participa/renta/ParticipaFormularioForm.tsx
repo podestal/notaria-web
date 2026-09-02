@@ -32,10 +32,12 @@ const ParticipaFormularioForm = ({ idrenta }: Props) => {
 
         if (numOp.length === 0) {
             setNumOpError('El número de operación es requerido')
+            return
         }
-        
+
         if (monto.length === 0) {
             setMontoError('El monto es requerido')
+            return
         }
 
         setIsLoading(true)
@@ -67,10 +69,10 @@ const ParticipaFormularioForm = ({ idrenta }: Props) => {
     }
 
   return (
-    <div className="w-full grid grid-cols-2 gap-4">
-        <div className="w-full">
+    <div className="w-full flex flex-col gap-6 lg:flex-row lg:gap-8">
+        <div className="w-full shrink-0 lg:w-80">
             <h2 className="text-md font-bold">Ingrese formulario</h2>
-            <div className="my-6 flex flex-col gap-4">
+            <div className="my-4 flex flex-col gap-4">
                 <SimpleInput
                     value={numOp}
                     setValue={setNumOp}
@@ -87,20 +89,20 @@ const ParticipaFormularioForm = ({ idrenta }: Props) => {
                     error={montoError}
                     setError={setMontoError}
                 />
-               <div className="w-full flex items-center justify-center mt-6">
-                    <button 
+                <div className="flex justify-end pt-2">
+                    <button
+                        type="button"
                         onClick={handleGrabar}
                         disabled={isLoading}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer transition-all duration-300"
+                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-all duration-300"
                     >
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Grabar'}
-                        Grabar
                     </button>
-               </div>
+                </div>
             </div>
         </div>
-        <div className="w-full">
-            <h2 className="text-md font-bold mb-6">Formularios</h2>
+        <div className="w-full min-w-0 flex-1">
+            <h2 className="text-md font-bold mb-4">Formularios</h2>
             <ParticipaFormularioTable idrenta={idrenta} />
         </div>
     </div>

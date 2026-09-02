@@ -10,23 +10,25 @@ interface Props {
 
 const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props) => {
 
-  console.log('contratantes from participa', contratantes)
-  console.log('detalleActo from participa', detalleActo)
+  if (contratantes.length === 0) {
+    return (
+        <p className="text-center text-xs text-gray-500 my-4">
+            No hay contratantes participantes
+        </p>
+    )
+  }
+
   return (
     <>
-    {contratantes.length > 0 ? 
-    contratantes.map((contratante) => (
-        <ParticipaGenerateCard 
-          key={contratante.idcontratante} 
-          contratante={contratante} 
-          detalleActo={detalleActo} 
-          monto={monto} 
-          kardex={kardex} 
-        />
-    ))
-    :
-    <p className="text-md text-center my-2 text-xs text-gray-500">No hay contratantes participantes</p>
-    }
+        {contratantes.map((contratante) => (
+            <ParticipaGenerateCard 
+                key={`${contratante.idcontratante}-${contratante.porcentaje}-${contratante.monto}`}
+                contratante={contratante} 
+                detalleActo={detalleActo} 
+                monto={monto} 
+                kardex={kardex} 
+            />
+        ))}
     </>
   )
 }

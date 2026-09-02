@@ -25,8 +25,7 @@ const ParticipaGenerate = ({ kardex, item }: Props) => {
         Authorization: `JWT ${access}`,
       },
     })
-    .then(res => {
-      console.log(res)
+    .then(() => {
       queryClient.invalidateQueries({ queryKey: ['contratantesPorActoByKardex', kardex] })
     })
     .catch(err => {
@@ -36,11 +35,13 @@ const ParticipaGenerate = ({ kardex, item }: Props) => {
       setIsLoading(false)
     })
   }
+
   return (
     <button
         className="gap-1 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors cursor-pointer flex flex-col my-4 justify-center items-center"
         type="button"
         onClick={handleCalculate}
+        disabled={isLoading}
     >
         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <p className="text-xs">Calcular</p>}
     </button>

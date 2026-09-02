@@ -15,15 +15,20 @@ const ParticipaRenta = ({ kardex, contratante }: Props) => {
     const [open, setOpen] = useState(false)
   return (
     <>
-    <div className="flex items-center justify-center">
-        <NotebookText 
-            className="w-4 h-4 text-blue-600 hover:text-blue-800 cursor-pointer transition-all duration-300" 
-            onClick={() => setOpen(true)}
-        />
-    </div>
+    <button
+        type="button"
+        className="flex items-center justify-center rounded-md p-1 text-blue-600 transition hover:bg-blue-50 hover:text-blue-800"
+        onClick={() => setOpen(true)}
+        title="Abrir datos de renta"
+        aria-label="Abrir datos de renta"
+    >
+        <NotebookText className="h-4 w-4 shrink-0" aria-hidden />
+    </button>
     <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}
+        wide
+        portal
     >
         <ParticipaRentaForm kardex={kardex} contratante={contratante} />
     </TopModal>

@@ -27,16 +27,28 @@ const ParticipaMain = ({ kardex }: Props) => {
 
   if (isSuccessDetalleActos && isSuccessContratantes && isSuccessPatrimonial) 
   return (
-    <div className="my-6">
+    <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-4 shadow-sm">
+            <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-slate-800">
+                    Participación UIF/PDT
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-500">
+                    Calcule porcentajes y montos según el importe patrimonial del acto.
+                </p>
+            </div>
+            <div className="[&_button]:inline-flex [&_button]:items-center [&_button]:gap-2 [&_button]:rounded-lg [&_button]:bg-emerald-600 [&_button]:px-5 [&_button]:py-2.5 [&_button]:text-sm [&_button]:font-semibold [&_button]:text-white [&_button]:shadow-md [&_button]:transition [&_button]:hover:bg-emerald-700 [&_button]:my-0">
+                <ParticipaGenerate 
+                    kardex={kardex.kardex}
+                    item={detalleActoObj.item}
+                />
+            </div>
+        </div>
         <ParticipaTable 
             contratantes={contratantes}
             detalleActo={detalleActoDescripcion}
             monto={patrimonial[0]?.importetrans || '0'}
             kardex={kardex.kardex}
-        />
-        <ParticipaGenerate 
-            kardex={kardex.kardex}
-            item={detalleActoObj.item}
         />
     </div>
   )
