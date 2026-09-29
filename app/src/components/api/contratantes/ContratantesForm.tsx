@@ -352,11 +352,6 @@ const ContratantesForm = ({
                 return
             }
 
-            if (!apeMaterno) {
-                notify("error", "El apellido materno es obligatorio.")
-                return
-            }
-
             if (!address) {
                 notify("error", "La dirección es obligatoria.")
                 return
@@ -457,7 +452,6 @@ const ContratantesForm = ({
                                 value={apeMaterno}
                                 setValue={setApeMaterno}
                                 horizontal
-                                required
                                 disabled
                             />
                             <SimpleInput
