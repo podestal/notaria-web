@@ -8,6 +8,7 @@ interface DateInputProps {
   setError?: (val: string) => void;
   required?: boolean;
   horizontal?: boolean;
+  fullWidth?: boolean;
 }
 
 const shakeAnimation = {
@@ -35,6 +36,7 @@ const DateInput = ({
   setError,
   required = false,
   horizontal = false,
+  fullWidth = false,
 }: DateInputProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.currentTarget.value; // Get the raw input value
@@ -63,7 +65,7 @@ const DateInput = ({
         placeholder="DD/MM/AAAA"
         value={value}
         onChange={handleChange}
-        className={`col-span-2 bg-white text-slate-700 border ${
+        className={`col-span-2 ${fullWidth ? 'w-full' : ''} bg-white text-slate-700 border ${
           error ? 'border-red-500' : 'border-slate-300'
         } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
           error ? 'focus:ring-red-300' : 'focus:ring-blue-300'

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, type ReactNode } from "react"
 import { Kardex } from "../../../services/api/kardexService"
 import DateInput from "../../ui/DateInput"
 import SimpleInput from "../../ui/SimpleInput"
@@ -7,7 +7,7 @@ import { UpdateKardexData } from "../../../hooks/api/kardex/useUpdateKardex"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import moment from "moment"
-import { ChevronDown, ChevronUp, Loader2 } from "lucide-react"
+import { ChevronDown, ChevronUp, DownloadCloud, Layers, Loader2, Save, Trash2 } from "lucide-react"
 import { useCreateNotarizationReservation } from "../../../hooks/signatum/useCreateNotarizationReservation"
 import type { NotarizationReservation } from "../../../services/signatum/notarizationReservationService"
 import useGetSeriesNotariales from "../../../hooks/signatum/useGetSeriesNotariales"
@@ -106,6 +106,37 @@ const dateInputToApiYmd = (ddmmyyyy: string): string => {
     const m = moment(ddmmyyyy.trim(), 'DD/MM/YYYY', true)
     return m.isValid() ? m.format('YYYY-MM-DD') : ''
 }
+
+interface SectionProps {
+    title: string
+    description?: string
+    actions?: ReactNode
+    children: ReactNode
+}
+
+const EscrituracionSection = ({ title, description, actions, children }: SectionProps) => (
+    <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/60 px-5 py-3">
+            <div className="min-w-0">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-600">{title}</h3>
+                {description && <p className="mt-0.5 text-xs text-slate-400">{description}</p>}
+            </div>
+            {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+        </header>
+        <div className="grid gap-x-6 gap-y-4 p-5 sm:grid-cols-2">{children}</div>
+    </section>
+)
+
+const PageCountBadge = ({ label, count }: { label: string; count: number }) =>
+    count > 0 ? (
+        <span
+            className={`rounded-md px-2 py-1 text-[11px] font-semibold ring-1 ${
+                count > 10 ? "bg-amber-50 text-amber-800 ring-amber-200" : "bg-sky-50 text-sky-700 ring-sky-100"
+            }`}
+        >
+            {label}: {count} {count === 1 ? "página" : "páginas"}
+        </span>
+    ) : null
 
 const FolioSerieIncDec = ({ onInc, onDec }: { onInc: () => void; onDec: () => void }) => (
     <div className="flex shrink-0 flex-col rounded border border-slate-200 bg-slate-50/90 p-px shadow-sm">
@@ -273,8 +304,6 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        console.log('Submitting EscrituracionForm with values:');
-
 
         const isTip15 = kardex.idtipkar === 1 || kardex.idtipkar === 5
         if (isTip15) {
@@ -348,8 +377,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             access,
             signatumReservationId
         }, {
-            onSuccess: (res) => {
-                console.log('Escrituración actualizada:', res);
+            onSuccess: () => {
                 setMessage('Escrituración actualizada correctamente')
                 setShow(true)
                 setType('success')
@@ -491,309 +519,222 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         )
     }
 
+    const isEscrituraType = kardex.idtipkar === 1 || kardex.idtipkar === 5
+
+    const fechaField = isEscrituraType ? (
+        <DateInput
+            label="Fecha de escritura"
+            value={fechaEscritura}
+            setValue={(v) => {
+                setFechaEscritura(v)
+                setFechaActa(v)
+                setErrorFechaEscritura('')
+                setErrorFechaActa('')
+            }}
+            required
+            fullWidth
+            error={errorFechaEscritura}
+            setError={setErrorFechaEscritura}
+        />
+    ) : (
+        <DateInput
+            label="Fecha"
+            value={fechaActa}
+            setValue={(v) => {
+                setFechaActa(v)
+                setErrorFechaActa('')
+            }}
+            required
+            fullWidth
+            error={errorFechaActa}
+            setError={setErrorFechaActa}
+        />
+    )
+
+    const fechaMinutaField = (
+        <DateInput
+            label="Fecha minuta"
+            value={fechaMinuta}
+            setValue={(v) => {
+                setFechaMinuta(v)
+                setErrorFechaMinuta('')
+            }}
+            fullWidth
+            error={errorFechaMinuta}
+            setError={setErrorFechaMinuta}
+        />
+    )
+
   return (
-    <form 
-        onSubmit={handleSubmit}
-        className="flex flex-col justify-center items-center gap-6 w-full my-6">
-            <div className=" w-[80%]">
-                {noActiveSeriesForCurrentType && (
-                    <div className="mb-4 rounded-md border border-slate-300 bg-slate-100 px-4 py-3 text-xs text-slate-700">
-                        No hay series notariales activas para {kardexTypeLabel}.
-                    </div>
+    <form onSubmit={handleSubmit} className="mx-auto my-6 w-full max-w-5xl space-y-5 text-black">
+        <header className="flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                    {kardexTypeLabel}
+                </p>
+                <h2 className="mt-0.5 text-lg font-semibold text-slate-900">Escrituración</h2>
+                <p className="text-xs text-slate-500">Kardex {kardex.kardex}</p>
+            </div>
+            <button
+                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70"
+                type="button"
+                onClick={handleFetchNotarizationReservation}
+                disabled={createNotarizationReservation.isPending}
+            >
+                {createNotarizationReservation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                    <DownloadCloud className="h-4 w-4" aria-hidden />
                 )}
-                {/* {lowActiveSeriesForCurrentType && (
-                    <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
-                        Series notariales bajas para {kardexTypeLabel}: hay rangos activos con 20 paginas o menos.
-                    </div>
-                )} */}
-                <div className="mb-4 flex items-center justify-end">
-                    <button
-                        type="button"
-                        onClick={() => setOpenSerieNotarial(true)}
-                        className="group inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50/80 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm transition-all hover:-translate-y-px hover:border-indigo-300 hover:bg-indigo-100 cursor-pointer"
-                    >
-                        <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 transition-transform group-hover:scale-125" />
-                        Gestionar serie notarial
-                    </button>
-                </div>
-                <FechaConclusionGate kardex={kardex} />
-                {exceedsPageLimit && (
-                    <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
-                        Recuerde: más de 10 páginas es una cantidad alta. Verifique cuidadosamente el rango antes de guardar.
-                    </div>
-                )}
-                
-                {(kardex.idtipkar === 1 || kardex.idtipkar === 5) && 
+                Obtener datos
+            </button>
+        </header>
+
+        {noActiveSeriesForCurrentType && (
+            <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-xs text-slate-700">
+                No hay series notariales activas para {kardexTypeLabel}.
+            </div>
+        )}
+        <FechaConclusionGate kardex={kardex} />
+        {exceedsPageLimit && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+                Recuerde: más de 10 páginas es una cantidad alta. Verifique cuidadosamente el rango antes de guardar.
+            </div>
+        )}
+
+        <EscrituracionSection title="Instrumento" description="Numeración y fechas del documento">
+            {isEscrituraType && (
                 <>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput 
-                        setValue={setNumMinuta}
-                        value={numMinuta}
-                        horizontal
-                        label="N° de Minuta"
-                    />
-                    <SimpleInput 
-                        setValue={setNumEscritura}
-                        value={numEscritura}
-                        horizontal
-                        label="N° de Escritura"
-                        required
-                    />
-                </div>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <DateInput
-                        label="Fecha de escritura"
-                        value={fechaEscritura}
-                        setValue={(v) => {
-                            setFechaEscritura(v)
-                            setFechaActa(v)
-                            setErrorFechaEscritura('')
-                            setErrorFechaActa('')
-                        }}
-                        horizontal
-                        required
-                        error={errorFechaEscritura}
-                        setError={setErrorFechaEscritura}
-                    />
-                    <div />
-                </div>
+                    <SimpleInput setValue={setNumMinuta} value={numMinuta} label="N° de Minuta" fullWidth />
+                    <SimpleInput setValue={setNumEscritura} value={numEscritura} label="N° de Escritura" required fullWidth />
+                    {fechaField}
                 </>
-                }
-                {kardex.idtipkar === 2 && 
+            )}
+            {kardex.idtipkar === 2 && (
                 <>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput 
-                        setValue={setNumMinuta}
-                        value={numMinuta}
-                        horizontal
-                        label="N° de minuta/sol"
-                    />
-                    <SimpleInput 
-                        setValue={setNumEscritura}
-                        value={numEscritura}
-                        horizontal
-                        label="N° instrumento"
-                        required
-                    />
-                </div>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <DateInput
-                        label="Fecha minuta"
-                        value={fechaMinuta}
-                        setValue={(v) => {
-                            setFechaMinuta(v)
-                            setErrorFechaMinuta('')
-                        }}
-                        horizontal
-                        error={errorFechaMinuta}
-                        setError={setErrorFechaMinuta}
-                    />
-                    <div />
-                </div>
+                    <SimpleInput setValue={setNumMinuta} value={numMinuta} label="N° de minuta/sol" fullWidth />
+                    <SimpleInput setValue={setNumEscritura} value={numEscritura} label="N° instrumento" required fullWidth />
+                    {fechaMinutaField}
+                    {fechaField}
                 </>
-                }
-                {kardex.idtipkar === 3 && 
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput 
+            )}
+            {kardex.idtipkar === 3 && (
+                <>
+                    <SimpleInput
                         setValue={setNumActa}
                         value={numActa}
-                        horizontal
                         label="N° de Acta"
                         required
+                        fullWidth
                         error={errorNumActa}
                         setError={setErrorNumActa}
                     />
-                </div>}
-                {kardex.idtipkar === 4 && 
-                <>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <div></div>
-                    <SimpleInput 
-                        setValue={setNumEscritura}
-                        value={numEscritura}
-                        horizontal
-                        label="N° Acta"
-                        required
-                    />
-                </div>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <DateInput
-                        label="Fecha minuta"
-                        value={fechaMinuta}
-                        setValue={(v) => {
-                            setFechaMinuta(v)
-                            setErrorFechaMinuta('')
-                        }}
-                        horizontal
-                        error={errorFechaMinuta}
-                        setError={setErrorFechaMinuta}
-                    />
-                    <div />
-                </div>
+                    {fechaField}
                 </>
-                }
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput
-                        setValue={setFolioIni}
-                        value={follioIni}
-                        horizontal
-                        label="N° de Folio del"
-                    />
-                    <div className="flex items-center gap-1.5">
-                        <div className="min-w-0 flex-1">
-                            <SimpleInput
-                                setValue={setFolioFin}
-                                value={folioFin}
-                                horizontal
-                                label="Al"
-                            />
-                        </div>
-                        <FolioSerieIncDec
-                            onInc={() => setFolioFin(incrementFolioSerieValue(folioFin))}
-                            onDec={() => setFolioFin(decrementFolioSerieValueWithMin(folioFin, follioIni))}
-                        />
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput
-                        setValue={setSerieNotarialIniGuarded}
-                        value={serieNotarialIni}
-                        horizontal
-                        label="Serie Notarial del"
-                    />
-                    <div className="flex items-center gap-1.5">
-                        <div className="min-w-0 flex-1">
-                            <SimpleInput
-                                setValue={setSerieNotarialFinGuarded}
-                                value={serieNotarialFin}
-                                horizontal
-                                label="Al"
-                            />
-                        </div>
-                        <FolioSerieIncDec
-                            onInc={() => {
-                                const next = incrementFolioSerieValue(serieNotarialFin)
-                                if (serieNotarialCeiling && exceedsSerieNotarialCeiling(next, serieNotarialCeiling)) {
-                                    notifySerieNotarialLimit()
-                                    return
-                                }
-                                setSerieNotarialFin(next)
-                            }}
-                            onDec={() => setSerieNotarialFin(decrementFolioSerieValueWithMin(serieNotarialFin, serieNotarialIni))}
-                        />
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput 
-                        setValue={setTomo}
-                        value={tomo}
-                        horizontal
-                        label="Tomo"
-                    />
-                    <SimpleInput 
-                        setValue={setRegistro}
-                        value={registro}
-                        horizontal
-                        label="Registro"
-                    />
-                </div>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <SimpleInput 
-                        setValue={setPapelTraslNotarialIni}
-                        value={papelTraslNotarialIni}
-                        horizontal
-                        label="Papel de trasl notarial"
-                    />
-                    <SimpleInput 
-                        setValue={setPapelTraslNotarialFin}
-                        value={papelTraslNotarialFin}
-                        horizontal
-                        label="Al"
-                    />
-                </div>
-                <div className="grid grid-cols-2 gap-8 my-4">
-                    <DateInput
-                        setValue={
-                            kardex.idtipkar === 1 || kardex.idtipkar === 5
-                                ? (v) => {
-                                      setFechaEscritura(v)
-                                      setFechaActa(v)
-                                      setErrorFechaEscritura('')
-                                      setErrorFechaActa('')
-                                  }
-                                : (v) => {
-                                      setFechaActa(v)
-                                      setErrorFechaActa('')
-                                  }
-                        }
-                        value={
-                            kardex.idtipkar === 1 || kardex.idtipkar === 5
-                                ? fechaEscritura
-                                : fechaActa
-                        }
-                        horizontal
-                        label="Fecha"
-                        required
-                        error={
-                            kardex.idtipkar === 1 || kardex.idtipkar === 5
-                                ? errorFechaEscritura
-                                : errorFechaActa
-                        }
-                        setError={
-                            kardex.idtipkar === 1 || kardex.idtipkar === 5
-                                ? setErrorFechaEscritura
-                                : setErrorFechaActa
-                        }
-                    />
-                    <div className="flex items-center justify-start gap-2">
-                        <button
-                            className={`gap-1 px-3 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors flex items-center justify-center min-w-[120px] my-4 ${createNotarizationReservation.isPending ? 'opacity-70 cursor-wait' : 'cursor-pointer'}`}
-                            type="button"
-                            onClick={handleFetchNotarizationReservation}
-                            disabled={createNotarizationReservation.isPending}
-                        >
-                            {createNotarizationReservation.isPending ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <p className="text-xs font-semibold">Obtener datos</p>
-                            )}
-                        </button>
-                    </div>
-                </div>
-                <div className="mt-8 flex items-center justify-center gap-3">
+            )}
+            {kardex.idtipkar === 4 && (
+                <>
+                    <SimpleInput setValue={setNumEscritura} value={numEscritura} label="N° Acta" required fullWidth />
+                    {fechaMinutaField}
+                    {fechaField}
+                </>
+            )}
+        </EscrituracionSection>
+
+        <EscrituracionSection
+            title="Folios y serie notarial"
+            actions={
+                <>
+                    <PageCountBadge label="Folios" count={folioPageCount} />
+                    <PageCountBadge label="Serie" count={seriePageCount} />
                     <button
                         type="button"
-                        onClick={() => {
-                            if (!loading) setOpenClearConfirm(true)
+                        onClick={() => setOpenSerieNotarial(true)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100"
+                    >
+                        <Layers className="h-3.5 w-3.5" aria-hidden />
+                        Gestionar serie notarial
+                    </button>
+                </>
+            }
+        >
+            <SimpleInput setValue={setFolioIni} value={follioIni} label="N° de Folio del" fullWidth />
+            <SimpleInput
+                setValue={setFolioFin}
+                value={folioFin}
+                label="Al"
+                fullWidth
+                suffix={
+                    <FolioSerieIncDec
+                        onInc={() => setFolioFin(incrementFolioSerieValue(folioFin))}
+                        onDec={() => setFolioFin(decrementFolioSerieValueWithMin(folioFin, follioIni))}
+                    />
+                }
+            />
+            <SimpleInput setValue={setSerieNotarialIniGuarded} value={serieNotarialIni} label="Serie Notarial del" fullWidth />
+            <SimpleInput
+                setValue={setSerieNotarialFinGuarded}
+                value={serieNotarialFin}
+                label="Al"
+                fullWidth
+                suffix={
+                    <FolioSerieIncDec
+                        onInc={() => {
+                            const next = incrementFolioSerieValue(serieNotarialFin)
+                            if (serieNotarialCeiling && exceedsSerieNotarialCeiling(next, serieNotarialCeiling)) {
+                                notifySerieNotarialLimit()
+                                return
+                            }
+                            setSerieNotarialFin(next)
                         }}
-                        className={`bg-red-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-white text-xs px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-300`}
-                        disabled={loading}
-                    >
-                        Borrar
-                    </button>
-                    <button
-                        className={`bg-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-white text-xs px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300 `}
-                        disabled={loading}
-                    >
-                        {loading ? <Loader2 className="animate-spin text-white text-xs w-4 h-4" /> : 'Guardar'}
-                    </button>
-                </div>
-            </div>
+                        onDec={() => setSerieNotarialFin(decrementFolioSerieValueWithMin(serieNotarialFin, serieNotarialIni))}
+                    />
+                }
+            />
+        </EscrituracionSection>
 
-            <TopModal isOpen={openSerieNotarial} onClose={() => setOpenSerieNotarial(false)}>
-                <SerieNotarialMain />
-            </TopModal>
+        <EscrituracionSection title="Registro y traslado">
+            <SimpleInput setValue={setTomo} value={tomo} label="Tomo" fullWidth />
+            <SimpleInput setValue={setRegistro} value={registro} label="Registro" fullWidth />
+            <SimpleInput setValue={setPapelTraslNotarialIni} value={papelTraslNotarialIni} label="Papel de traslado notarial del" fullWidth />
+            <SimpleInput setValue={setPapelTraslNotarialFin} value={papelTraslNotarialFin} label="Al" fullWidth />
+        </EscrituracionSection>
 
-            <TopModal isOpen={openClearConfirm} onClose={() => setOpenClearConfirm(false)} portal>
-                <ExplanationMessage
-                    message="¿Está seguro de que desea borrar los datos de escrituración? Esta acción limpiará escritura, minuta, folios y series notariales."
-                    onClick={() => setOpenClearConfirm(false)}
-                    onClickMessage="Cancelar"
-                    onClickSecondary={handleClearEscrituracion}
-                    onClickSecondaryMessage="Borrar"
-                />
-            </TopModal>
+        <footer className="flex flex-wrap items-center justify-end gap-3 border-t border-slate-200 pt-4">
+            <button
+                type="button"
+                onClick={() => {
+                    if (!loading) setOpenClearConfirm(true)
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={loading}
+            >
+                <Trash2 className="h-4 w-4" aria-hidden />
+                Borrar
+            </button>
+            <button
+                type="submit"
+                className="inline-flex min-w-[110px] items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={loading}
+            >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Save className="h-4 w-4" aria-hidden />}
+                {loading ? 'Guardando…' : 'Guardar'}
+            </button>
+        </footer>
 
+        <TopModal isOpen={openSerieNotarial} onClose={() => setOpenSerieNotarial(false)}>
+            <SerieNotarialMain />
+        </TopModal>
+
+        <TopModal isOpen={openClearConfirm} onClose={() => setOpenClearConfirm(false)} portal>
+            <ExplanationMessage
+                message="¿Está seguro de que desea borrar los datos de escrituración? Esta acción limpiará escritura, minuta, folios y series notariales."
+                onClick={() => setOpenClearConfirm(false)}
+                onClickMessage="Cancelar"
+                onClickSecondary={handleClearEscrituracion}
+                onClickSecondaryMessage="Borrar"
+            />
+        </TopModal>
     </form>
   )
 }
