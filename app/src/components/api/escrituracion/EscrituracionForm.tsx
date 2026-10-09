@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { Kardex } from "../../../services/api/kardexService"
 import DateInput from "../../ui/DateInput"
 import SimpleInput from "../../ui/SimpleInput"
@@ -229,7 +229,23 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
     const [loading, setLoading] = useState(false)
     const [signatumReservationId, setSignatumReservationId] = useState<number | undefined>(undefined)
     const [reservationExpiresAt, setReservationExpiresAt] = useState<number | null>(null)
+    const [reservationExpired, setReservationExpired] = useState(false)
     const [openSerieNotarial, setOpenSerieNotarial] = useState(false)
+
+    useEffect(() => {
+        if (reservationExpiresAt === null) {
+            setReservationExpired(false)
+            return
+        }
+        const remaining = reservationExpiresAt - Date.now()
+        if (remaining <= 0) {
+            setReservationExpired(true)
+            return
+        }
+        setReservationExpired(false)
+        const timeout = setTimeout(() => setReservationExpired(true), remaining)
+        return () => clearTimeout(timeout)
+    }, [reservationExpiresAt])
     const [openClearConfirm, setOpenClearConfirm] = useState(false)
 
 
@@ -306,6 +322,14 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (reservationExpiresAt !== null && Date.now() >= reservationExpiresAt) {
+            setReservationExpired(true)
+            setMessage('La reserva expiró. Vuelva a obtener datos antes de guardar.')
+            setType('error')
+            setShow(true)
+            return
+        }
 
         const isTip15 = kardex.idtipkar === 1 || kardex.idtipkar === 5
         if (isTip15) {
@@ -604,6 +628,12 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 No hay series notariales activas para {kardexTypeLabel}.
             </div>
         )}
+        {reservationExpired && (
+            <div className="rounded-lg border border-rose-300 bg-rose-50 px-4 py-3 text-xs text-rose-800">
+                La reserva expiró y estos datos pueden haber sido asignados a otro usuario. Haga clic en
+                <span className="font-semibold"> Obtener datos</span> para obtener una nueva reserva antes de guardar.
+            </div>
+        )}
         <FechaConclusionGate kardex={kardex} />
         {exceedsPageLimit && (
             <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-900">
@@ -724,7 +754,8 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             <button
                 type="submit"
                 className="inline-flex min-w-[110px] items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={loading}
+                disabled={loading || reservationExpired}
+                title={reservationExpired ? 'La reserva expiró. Vuelva a obtener datos.' : undefined}
             >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Save className="h-4 w-4" aria-hidden />}
                 {loading ? 'Guardando…' : 'Guardar'}
