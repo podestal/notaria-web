@@ -25,7 +25,13 @@ const ParticipaMain = ({ kardex }: Props) => {
 
   if (isErrorDetalleActos || isErrorContratantes || isErrorPatrimonial) return <p className="text-center text-red-500 text-xs">Error al cargar los actos: ${errorDetalleActos?.message}</p>
 
-  if (isSuccessDetalleActos && isSuccessContratantes && isSuccessPatrimonial) 
+  if (isSuccessDetalleActos && isSuccessContratantes && isSuccessPatrimonial) {
+  // Only parte 1 (vendedor/otorgante) and 2 (comprador/beneficiario) take part in the distribution.
+  const participantes = (Array.isArray(contratantes) ? contratantes : []).filter((c) => {
+    const parte = (c.parte || '').trim()
+    return parte === '1' || parte === '2'
+  })
+
   return (
     <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-4 shadow-sm">
@@ -45,13 +51,14 @@ const ParticipaMain = ({ kardex }: Props) => {
             </div>
         </div>
         <ParticipaTable 
-            contratantes={contratantes}
+            contratantes={participantes}
             detalleActo={detalleActoDescripcion}
             monto={patrimonial[0]?.importetrans || '0'}
             kardex={kardex.kardex}
         />
     </div>
   )
+  }
 }
 
 export default ParticipaMain
