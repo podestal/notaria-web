@@ -14,6 +14,7 @@ export interface NotarizationReservation {
     fecha_escritura: string;
     status: string;
     created_at: string;
+    expires_at?: string | null;
     held_by: number;
 }
 

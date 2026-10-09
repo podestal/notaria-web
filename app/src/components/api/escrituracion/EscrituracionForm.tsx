@@ -24,6 +24,7 @@ import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
 import SerieNotarialMain from "./serieNotarial/SerieNotarialMani"
 import FechaConclusionGate from "./FechaConclusionGate"
+import ReservationCountdown from "./ReservationCountdown"
 
 interface Props {
     kardex: Kardex
@@ -227,6 +228,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
 
     const [loading, setLoading] = useState(false)
     const [signatumReservationId, setSignatumReservationId] = useState<number | undefined>(undefined)
+    const [reservationExpiresAt, setReservationExpiresAt] = useState<number | null>(null)
     const [openSerieNotarial, setOpenSerieNotarial] = useState(false)
     const [openClearConfirm, setOpenClearConfirm] = useState(false)
 
@@ -378,6 +380,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             signatumReservationId
         }, {
             onSuccess: () => {
+                if (signatumReservationId !== undefined) setReservationExpiresAt(null)
                 setMessage('Escrituración actualizada correctamente')
                 setShow(true)
                 setType('success')
@@ -452,6 +455,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 setErrorFechaActa('')
                 setErrorFechaEscritura('')
                 setErrorFechaMinuta('')
+                setReservationExpiresAt(null)
 
                 setMessage('Datos de escrituracion borrados correctamente')
                 setShow(true)
@@ -486,6 +490,8 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             {
                 onSuccess: (data) => {
                     setSignatumReservationId(data.id)
+                    const expiresAt = data.expires_at ? Date.parse(data.expires_at) : NaN
+                    setReservationExpiresAt(Number.isNaN(expiresAt) ? null : expiresAt)
                     applyReservationToForm(data, kardex.idtipkar, {
                         setNumMinuta,
                         setNumEscritura,
@@ -575,6 +581,8 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 <h2 className="mt-0.5 text-lg font-semibold text-slate-900">Escrituración</h2>
                 <p className="text-xs text-slate-500">Kardex {kardex.kardex}</p>
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+            {reservationExpiresAt !== null && <ReservationCountdown expiresAt={reservationExpiresAt} />}
             <button
                 className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70"
                 type="button"
@@ -588,6 +596,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 )}
                 Obtener datos
             </button>
+            </div>
         </header>
 
         {noActiveSeriesForCurrentType && (
