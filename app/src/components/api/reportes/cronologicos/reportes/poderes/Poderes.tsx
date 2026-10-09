@@ -39,10 +39,10 @@ const Poderes = () => {
           refetch={refetch}
           generatesWord={false}
           generatesExcel={false}
-          url='permi_viaje/reporte'
+          url='poderes_fuerareg/reporte'
           params={{
-            fechade: moment(dateFrom).format('YYYY-MM-DD') || '',
-            fechaa: moment(dateTo).format('YYYY-MM-DD') || '',
+            fechade: moment(dateFrom).format('DD/MM/YYYY') || '',
+            fechaa: moment(dateTo).format('DD/MM/YYYY') || '',
           }}
           name='reporte_ingreso_poderes'
         />

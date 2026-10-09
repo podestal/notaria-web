@@ -70,36 +70,52 @@ const SisgenSearchForm = ({
     const queryClient = useQueryClient()
     const searchSisgen = useSearchSisgen()
     const prevInstrumentTypeRef = useRef(instrumentType)
+    const prevEstadoRef = useRef(selectedEstado)
     const skipPageFetchRef = useRef(false)
+
+    const startNewSearch = (estado: number = selectedEstado) => {
+        const started = getSisgenDocs({
+            instrumentType,
+            selectedFromDate,
+            selectedToDate,
+            selectedEstado: estado,
+            setSisgenDocs,
+            setItemsCount,
+            setSearchId,
+            setNoDocsMessage,
+            setErrorDisplay,
+            setLoading,
+            access,
+            searchSisgen,
+            queryClient,
+            searchHandlers,
+        })
+
+        if (started && page !== 1) {
+            skipPageFetchRef.current = true
+            setPage(1)
+        }
+    }
+
+    useEffect(() => {
+        if (prevEstadoRef.current === selectedEstado) return
+        prevEstadoRef.current = selectedEstado
+
+        if (selectedFromDate && selectedToDate) {
+            startNewSearch(selectedEstado)
+        }
+    }, [selectedEstado])
 
     useEffect(() => {
         const instrumentChanged = prevInstrumentTypeRef.current !== instrumentType
         if (instrumentChanged) {
             prevInstrumentTypeRef.current = instrumentType
 
-            if (page !== 1) {
+            if (selectedFromDate && selectedToDate) {
+                startNewSearch()
+            } else if (page !== 1) {
                 skipPageFetchRef.current = true
                 setPage(1)
-            }
-
-            if (selectedFromDate && selectedToDate) {
-                getSisgenDocs({
-                    instrumentType,
-                    selectedFromDate,
-                    selectedToDate,
-                    selectedEstado,
-                    page: 1,
-                    setSisgenDocs,
-                    setItemsCount,
-                    setSearchId,
-                    setNoDocsMessage,
-                    setErrorDisplay,
-                    setLoading,
-                    access,
-                    searchSisgen,
-                    queryClient,
-                    searchHandlers,
-                })
             }
             return
         }
@@ -149,25 +165,7 @@ const SisgenSearchForm = ({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-
-        getSisgenDocs({
-            instrumentType,
-            selectedFromDate,
-            selectedToDate,
-            selectedEstado,
-            page,
-            setSisgenDocs,
-            setItemsCount,
-            setSearchId,
-            setNoDocsMessage,
-            setErrorDisplay,
-            setLoading,
-            access,
-            searchSisgen,
-            queryClient,
-            searchHandlers,
-        })
-
+        startNewSearch()
     }
 
   return (

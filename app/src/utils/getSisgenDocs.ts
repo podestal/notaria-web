@@ -15,7 +15,6 @@ interface Props {
     selectedFromDate: Date | undefined
     selectedToDate: Date | undefined
     selectedEstado: number
-    page: number
     setSisgenDocs: React.Dispatch<React.SetStateAction<SISGENDocument[]>>
     setItemsCount: React.Dispatch<React.SetStateAction<number>>
     setSearchId: React.Dispatch<React.SetStateAction<string>>
@@ -28,55 +27,50 @@ interface Props {
     searchHandlers: SisgenSearchHandlers
 }
 
+/**
+ * Starts a new SISGEN search. New searches always request page 1.
+ * Returns false when validation fails and no request was sent.
+ */
 const getSisgenDocs = ({
     instrumentType,
     selectedFromDate,
     selectedToDate,
     selectedEstado,
-    page,
-    setSisgenDocs,
-    setItemsCount,
-    setSearchId,
-    setNoDocsMessage,
     setErrorDisplay,
     setLoading,
     access,
     searchSisgen,
     queryClient,
     searchHandlers,
-}: Props) => {
+}: Props): boolean => {
 
     setErrorDisplay('');
         
     if (!selectedFromDate) {
         setErrorDisplay('Por favor, seleccione una fecha de inicio.');
-        return;
+        return false;
     }
 
     if (!selectedToDate) {
         setErrorDisplay('Por favor, seleccione una fecha de fin.');
-        return;
+        return false;
     }
 
     if (selectedFromDate > selectedToDate) {
         setErrorDisplay('La fecha de inicio no puede ser posterior a la fecha de fin.');
-        return;
+        return false;
     }
 
     setLoading(true)
 
-    const sisgenBase = {
-        tipoInstrumento: instrumentType,
-        fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
-        fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
-        estado: selectedEstado,
-        codigoActo: 0,
-    }
-
     const variables: SearchSisgenData = {
         access,
         sisgen: {
-            ...sisgenBase,
+            tipoInstrumento: instrumentType,
+            fechaDesde: moment(selectedFromDate).format("YYYY-MM-DD"),
+            fechaHasta: moment(selectedToDate).format("YYYY-MM-DD"),
+            estado: selectedEstado,
+            codigoActo: 0,
             page: 1,
         },
     }
@@ -86,10 +80,6 @@ const getSisgenDocs = ({
         variables,
     )
 
-    const finish = () => {
-        searchHandlers.setLoading(false)
-    }
-
     searchSisgen.mutate(variables, {
         onSuccess: (data) => {
             if (data.error !== 0) {
@@ -98,39 +88,6 @@ const getSisgenDocs = ({
                 )
                 return
             }
-
-            const searchId = data.pagination.search_id
-            const targetPage = page > 1 ? page : 1
-
-            if (targetPage > 1 && searchId) {
-                const pageVariables: SearchSisgenData = {
-                    access,
-                    sisgen: {
-                        ...sisgenBase,
-                        page: targetPage,
-                        search_id: searchId,
-                    },
-                }
-
-                cacheLastSisgenSearchRequest(
-                    queryClient.setQueryData.bind(queryClient),
-                    pageVariables,
-                )
-
-                searchSisgen.mutate(pageVariables, {
-                    onSuccess: (pageData) => {
-                        applySisgenSearchResponse(pageData, searchHandlers)
-                    },
-                    onError: (error) => {
-                        searchHandlers.setErrorDisplay(
-                            error.message || "Error al buscar documentos SISGEN.",
-                        )
-                    },
-                    onSettled: finish,
-                })
-                return
-            }
-
             applySisgenSearchResponse(data, searchHandlers)
         },
         onError: (error) => {
@@ -138,18 +95,12 @@ const getSisgenDocs = ({
                 error.message || "Error al buscar documentos SISGEN.",
             )
         },
-        onSettled: (data) => {
-            const needsPageFetch =
-                data?.error === 0 &&
-                page > 1 &&
-                Boolean(data.pagination.search_id)
-
-            if (!needsPageFetch) {
-                finish()
-            }
+        onSettled: () => {
+            searchHandlers.setLoading(false)
         },
     })
 
+    return true
 }
 
 export default getSisgenDocs
