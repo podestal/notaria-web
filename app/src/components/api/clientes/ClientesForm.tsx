@@ -275,6 +275,26 @@ const ClientesForm = ({
             return
         }
 
+        const expectedTipper = selectedTipoPersona === 2 ? 'J' : 'N'
+        const currentTipper = (cliente1?.tipper || '').trim().toUpperCase()
+        if (currentTipper && currentTipper !== expectedTipper) {
+            setType('error')
+            setMessage(
+                currentTipper === 'N'
+                    ? 'Este cliente es persona natural; no puede guardarse como persona jurídica.'
+                    : 'Este cliente es persona jurídica; no puede guardarse como persona natural.'
+            )
+            setShow(true)
+            return
+        }
+
+        if (selectedTipoPersona === 2 && resolvedTipDoc !== 8 && resolvedTipDoc !== 10) {
+            setType('error')
+            setMessage('Persona jurídica solo admite RUC o Sin documento.')
+            setShow(true)
+            return
+        }
+
         if (resolvedTipDoc === 1 && dni.length !== 8) {
             setType('error')
             setMessage('El DNI debe tener 8 dígitos.')

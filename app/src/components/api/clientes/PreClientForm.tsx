@@ -37,6 +37,14 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
         setDocument('')
     }, [selectedTipoPersona])
 
+    // A cliente found under one tipo de persona must not be saved under the other.
+    const handleTipoPersonaChange = (value: number) => {
+        setSelectedTipoPersona(value)
+        setCliente1(null)
+        setShowClienteForm(false)
+        setShowContratanteForm(false)
+    }
+
     useEffect(() => {
         if (selectedTipoDocumento === 10) {
             setDocument('')
@@ -167,7 +175,7 @@ const PreClientForm = ({ idtipoacto, idtipkar, kardex, setClientesCheck }: Props
                     { value: 1, label: 'Persona Natural' },
                     { value: 2, label: 'Persona Jurídica' }
                 ]}
-                setter={setSelectedTipoPersona}
+                setter={handleTipoPersonaChange}
             />
             {selectedTipoPersona === 1 && 
             <>
