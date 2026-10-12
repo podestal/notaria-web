@@ -86,7 +86,7 @@ const KardexFilters = ({
             </div>
             <button 
                 disabled={loading} 
-                className="ml-auto rounded-lg border border-sky-700 bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition duration-300 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2">
+                className="ml-auto rounded-lg border border-blue-700 bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2">
                 {loading ? 'Buscando...' : 'Buscar'}
             </button>
         </div>
