@@ -5,6 +5,7 @@ import { useState } from "react"
 import useGetKardexList from "../../../../../../hooks/api/kardex/useGetKardexList"
 import useAuthStore from "../../../../../../store/useAuthStore"
 import KardexTable from "../../../../kardex/KardexTable"
+import LoadingState from "../../../../../ui/LoadingState"
 
 const EscriturasPublicas = () => {
 
@@ -20,7 +21,7 @@ const EscriturasPublicas = () => {
   const access = useAuthStore(s => s.access_token) || ''
   const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 1, indexReport: 'yes', access, dateFrom, dateTo})
 
-  if (isLoading) return <p className="text-sm animate-pulse text-center my-10">Un momento</p>
+  if (isLoading) return <LoadingState />
   if (isError) return <p>Error: {error.message}</p>
   if (isSuccess)
   return (

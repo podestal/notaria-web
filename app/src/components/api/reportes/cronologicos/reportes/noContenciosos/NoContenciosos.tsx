@@ -5,6 +5,7 @@ import KardexTable from "../../../../kardex/KardexTable"
 import moment from "moment"
 import ExtraProtocolaresHeader from "../../ExtraProtocolaresHeader"
 import ReportHeader from "../../../../../ui/ReportHeader"
+import LoadingState from "../../../../../ui/LoadingState"
 
 const NoContenciosos = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
@@ -19,7 +20,7 @@ const NoContenciosos = () => {
   const access = useAuthStore(s => s.access_token) || ''
   const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 2, indexReport: 'yes', access, dateFrom, dateTo})
 
-  if (isLoading) return <p className="text-sm animate-pulse text-center my-10">Un momento</p>
+  if (isLoading) return <LoadingState />
   if (isError) return <p>Error: {error.message}</p>
   if (isSuccess)
   return (

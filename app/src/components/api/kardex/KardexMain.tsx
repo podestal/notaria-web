@@ -6,6 +6,7 @@ import KardexHeader from "./KardexHeader"
 import KardexTable from "./KardexTable"
 import useGetKardexList from "../../../hooks/api/kardex/useGetKardexList"
 import useAuthStore from "../../../store/useAuthStore"
+import LoadingState from "../../ui/LoadingState"
 
 const kardexTypes: Record<number, string> = {
     1: import.meta.env.VITE_KARDEX_PREFIX_1 || 'KAR',
@@ -57,7 +58,7 @@ const KardexMain = () => {
         numescritura,
     })
 
-    if (isLoading) return <p className="text-sm animate-pulse text-center my-10">Un momento</p>
+    if (isLoading) return <LoadingState />
   
     if (isError) return <p className="text-center my-8">{`Error: ${error.message}`}</p>
   

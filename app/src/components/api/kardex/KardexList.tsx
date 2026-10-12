@@ -3,6 +3,7 @@ import useGetKardexList from "../../../hooks/api/kardex/useGetKardexList"
 import KardexTable from "./KardexTable"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import useAuthStore from "../../../store/useAuthStore"
+import LoadingState from "../../ui/LoadingState"
 
 const KardexList = () => {
     const access = useAuthStore(s => s.access_token) || ''
@@ -11,7 +12,7 @@ const KardexList = () => {
 
     const { data: kardexPage, isLoading, isError, error, isSuccess } = useGetKardexList({ page: page.toString(), idtipkar:bodyRender, access: '' })
 
-    if (isLoading) return <p className="text-sm animate-pulse text-center my-10">Un momento</p>
+    if (isLoading) return <LoadingState />
   
     if (isError) return <p>Error: {error.message}</p>
   

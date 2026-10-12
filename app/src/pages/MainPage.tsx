@@ -6,6 +6,7 @@ import useNotificationsStore from '../hooks/store/useNotificationsStore'
 import NotificationCard from '../components/ui/NotificationCard'
 import { Outlet } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import LoadingState from "../components/ui/LoadingState"
 
 const MainPage = () => {
 
@@ -23,7 +24,7 @@ const MainPage = () => {
     }
   }, [visibleKardexTypes, isSuccess, setKardexTypes])
 
-  if (isLoading) return <p>Un momento</p>
+  if (isLoading) return <LoadingState fullScreen />
   if (isError) return <p>Error: {error.message}</p>
   if (isSuccess) 
 
