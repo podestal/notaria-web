@@ -7,6 +7,7 @@ import { AlertCircle, Eye, EyeOff, FileSignature, Loader2, Lock, ShieldCheck, Us
 import useLogin from '../../hooks/auth/useLogin';
 import useUserInfoStore from '../../hooks/store/useGetUserInfo';
 import { queryClient } from '../../queryClient';
+import ThemeToggle from '../ui/ThemeToggle';
 
 interface DecodedToken {
     user_id: number;
@@ -118,7 +119,7 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen w-full bg-slate-50">
-        <aside className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-violet-700 via-indigo-700 to-indigo-900 lg:flex">
+        <aside className="keep-dark relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-violet-700 via-indigo-700 to-indigo-900 lg:flex">
             <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-fuchsia-500/30 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-32 -right-16 h-[28rem] w-[28rem] rounded-full bg-sky-400/20 blur-3xl" />
             <div
@@ -163,7 +164,8 @@ const Login = () => {
             </motion.div>
         </aside>
 
-        <main className="flex w-full items-center justify-center px-6 py-12 lg:w-1/2">
+        <main className="relative flex w-full items-center justify-center px-6 py-12 lg:w-1/2">
+            <ThemeToggle className="absolute right-5 top-5 border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-700" />
             <motion.div
                 className="w-full max-w-sm"
                 initial={{ opacity: 0, y: 20 }}

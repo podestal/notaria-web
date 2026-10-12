@@ -183,7 +183,7 @@ const SerieNotarialMain = () => {
 
   return (
     <div className="relative w-full rounded-2xl border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-700 px-4 py-3 text-slate-100">
+      <div className="keep-dark border-b border-slate-200 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-700 px-4 py-3 text-slate-100">
         {/* <p className="text-[11px] uppercase tracking-wider text-slate-300">Signatum</p> */}
         <h3 className="text-sm font-semibold">Serie notarial</h3>
       </div>

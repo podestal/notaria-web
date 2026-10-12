@@ -14,7 +14,7 @@ const GenericHeader = ({
 }: Props) => {
 
   return (
-    <div className="w-full flex justify-between items-center bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-4 text-slate-50">
+    <div className="keep-dark w-full flex justify-between items-center bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-4 text-slate-50">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-sky-500/15 p-2 border border-sky-400/30">
           <LibraryBig 

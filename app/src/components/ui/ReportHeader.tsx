@@ -6,7 +6,7 @@ interface Props {
 
 const ReportHeader = ({ title }: Props) => {
   return (
-    <div className="w-full flex justify-between items-center bg-slate-700 p-4 rounded-t-lg text-slate-50">
+    <div className="keep-dark w-full flex justify-between items-center bg-slate-700 p-4 rounded-t-lg text-slate-50">
         <div className="flex items-center gap-2">
           <LibraryBig 
             className="text-green-700"

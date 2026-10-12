@@ -47,7 +47,7 @@ const ReservacionesMain = () => {
               onClick={() => setTab(item.id)}
               className={`rounded-lg px-4 py-2 text-left transition ${
                 active
-                  ? "bg-slate-900 text-white shadow-sm"
+                  ? "keep-dark bg-slate-900 text-white shadow-sm"
                   : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >

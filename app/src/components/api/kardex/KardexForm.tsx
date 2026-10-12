@@ -381,7 +381,7 @@ const KardexForm = ({
         onSubmit={handleSubmit}
         className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md"
     >
-        <header className="flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-4">
+        <header className="keep-dark flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-5 py-4">
             <div className="flex items-center gap-3">
                 <div className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2.5">
                     <FileText className="h-5 w-5 text-sky-300" aria-hidden />

@@ -2,6 +2,7 @@ import moment from 'moment'
 import { daysInSpanish, monthsInSpanish } from '../utils/datesInSpanish'
 import { useState } from 'react'
 import Logout from '../components/auth/Logout'
+import ThemeToggle from '../components/ui/ThemeToggle'
 import { Tipokardex } from '../services/api/tipokardexService'
 import useBodyRenderStore from '../hooks/store/bodyRenderStore'
 import useCorrelativeStore from '../hooks/store/useCorrelativeStore'
@@ -262,7 +263,7 @@ const Header = ({ kardexTypes }: Props) => {
 
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-56 border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
+    <aside className="keep-dark fixed left-0 top-0 z-40 h-screen w-56 border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
       <div className="flex h-full flex-col">
         <div className="border-b border-slate-800 p-4">
           <div className="rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shadow-lg flex items-center gap-2 justify-center">
@@ -373,6 +374,7 @@ const Header = ({ kardexTypes }: Props) => {
         <div className="border-t border-slate-800 p-4">
           <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/95 px-3 py-2">
             <Logout />
+            <ThemeToggle className="border-slate-600 bg-slate-800 text-slate-100 hover:border-slate-400 hover:bg-slate-700" />
           </div>
         </div>
       </div>

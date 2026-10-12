@@ -125,7 +125,7 @@ const KardexErrors = () => {
 
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-800">
-      <div className="border-b border-slate-200 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-700 px-6 py-4 text-slate-100">
+      <div className="keep-dark border-b border-slate-200 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-700 px-6 py-4 text-slate-100">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-wider text-slate-300">Panel General</p>
@@ -174,9 +174,9 @@ const KardexErrors = () => {
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
-                  <XAxis dataKey="name" tick={{ fill: "#475569", fontSize: 11 }} />
-                  <YAxis tick={{ fill: "#475569", fontSize: 11 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-slate-300)" />
+                  <XAxis dataKey="name" tick={{ fill: "var(--color-slate-600)", fontSize: 11 }} />
+                  <YAxis tick={{ fill: "var(--color-slate-600)", fontSize: 11 }} />
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="sisgen" name="SISGEN" fill="#0ea5e9" radius={[4, 4, 0, 0]} />

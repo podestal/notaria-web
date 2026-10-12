@@ -120,7 +120,7 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate, fullWidth = 
                         left: popupPosition.left,
                         width: POPUP_WIDTH,
                         ["--rdp-accent-color" as string]: "#2563eb",
-                        ["--rdp-accent-background-color" as string]: "#dbeafe",
+                        ["--rdp-accent-background-color" as string]: "var(--color-blue-100)",
                     }}
                 >
                     <DayPicker
@@ -141,24 +141,24 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate, fullWidth = 
                                 spanishDays[day as unknown as keyof typeof spanishDays],
                         }}
                         styles={{
-                            caption: { color: "black" },
-                            caption_label: { color: "black" },
-                            dropdown: { color: "black", backgroundColor: "white" },
-                            dropdown_root: { color: "black" },
-                            dropdowns: { color: "black" },
-                            head: { color: "black" },
-                            head_cell: { color: "black" },
-                            cell: { color: "black" },
-                            day: { color: "black" },
-                            day_button: { color: "black" },
+                            caption: { color: "var(--color-slate-900)" },
+                            caption_label: { color: "var(--color-slate-900)" },
+                            dropdown: { color: "var(--color-slate-900)", backgroundColor: "transparent" },
+                            dropdown_root: { color: "var(--color-slate-900)" },
+                            dropdowns: { color: "var(--color-slate-900)" },
+                            head: { color: "var(--color-slate-900)" },
+                            head_cell: { color: "var(--color-slate-900)" },
+                            cell: { color: "var(--color-slate-900)" },
+                            day: { color: "var(--color-slate-900)" },
+                            day_button: { color: "var(--color-slate-900)" },
                             selected: { color: "#ffffff", backgroundColor: "#2563eb" },
-                            today: { color: "#0f172a", fontWeight: 700 },
-                            outside: { color: "#64748b" },
-                            button_next: { color: "black" },
-                            button_previous: { color: "black" },
-                            nav: { color: "black" },
+                            today: { color: "var(--color-slate-900)", fontWeight: 700 },
+                            outside: { color: "var(--color-slate-500)" },
+                            button_next: { color: "var(--color-slate-900)" },
+                            button_previous: { color: "var(--color-slate-900)" },
+                            nav: { color: "var(--color-slate-900)" },
                         }}
-                        className="!text-black [&_.rdp-day_button]:!text-slate-900 [&_.rdp-selected_.rdp-day_button]:!text-white"
+                        className="!text-slate-900 [&_.rdp-day_button]:!text-slate-900 [&_.rdp-selected_.rdp-day_button]:!text-white"
                     />
                 </motion.div>
             )}
