@@ -14,13 +14,25 @@ const KardexTable = ({ kardexPage, setPage, page, readyOnly }: Props) => {
 
 
   return (
-    <div>
-        <div className="px-2">
-          <KardexTableHeader />
-          <KardexTableBody 
-              kardexList={kardexPage.results }
-              readyOnly={readyOnly}
-          />
+    <div className="p-3 sm:p-4">
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-4 py-2.5">
+            <p className="text-xs text-slate-500">
+              <span className="font-semibold text-slate-800">{kardexPage.count}</span> kardex encontrados
+            </p>
+            {!readyOnly && (
+              <p className="text-[11px] text-slate-400">Haga clic en una fila para abrir el kardex</p>
+            )}
+          </div>
+          <div className="overflow-x-auto">
+            <div className="min-w-[1180px]">
+              <KardexTableHeader />
+              <KardexTableBody 
+                  kardexList={kardexPage.results }
+                  readyOnly={readyOnly}
+              />
+            </div>
+          </div>
           <KardexTableFooter 
               page={page}
               setPage={setPage}
