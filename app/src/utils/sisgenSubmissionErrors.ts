@@ -1,7 +1,20 @@
+export interface SisgenErrorField {
+    seccion: string
+    campo: string
+    referencia?: string
+    valor_actual?: string
+}
+
 export interface SisgenSubmissionErrorObject {
     kardex?: string
     estado?: string
+    codigo?: string
+    titulo?: string
     mensaje_usuario?: string
+    que_hacer?: string
+    campos?: SisgenErrorField[]
+    /** "dato" = fix in the kardex, "sistema" = contact IT, "lote" = blocked by another kardex */
+    origen?: "dato" | "sistema" | "lote"
     mensaje_tecnico?: string
     nota_contacto_it?: string
     batch?: number
@@ -29,11 +42,10 @@ export const normalizeSisgenSubmissionErrors = (
 export const formatSisgenSubmissionError = (error: SisgenSubmissionError): string => {
     if (typeof error === "string") return error
     const kardexPrefix = error.kardex ? `${error.kardex}: ` : ""
-    const body =
-        error.mensaje_usuario
-        || error.mensaje_tecnico
-        || error.estado
-        || JSON.stringify(error)
+    const message = error.mensaje_usuario || error.mensaje_tecnico || error.estado
+    const body = error.titulo
+        ? [error.titulo, message].filter(Boolean).join(". ")
+        : message || JSON.stringify(error)
     return `${kardexPrefix}${body}`
 }
 
@@ -41,6 +53,7 @@ export const formatSisgenSubmissionError = (error: SisgenSubmissionError): strin
 export const sisgenErrorDedupeKey = (error: SisgenSubmissionError): string => {
     if (isSisgenSubmissionErrorObject(error)) {
         return [
+            error.titulo ?? "",
             error.mensaje_usuario ?? "",
             error.mensaje_tecnico ?? "",
             error.estado ?? "",
