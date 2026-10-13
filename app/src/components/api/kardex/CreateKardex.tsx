@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { motion } from "framer-motion"
 import KardexForm from "./KardexForm"
 import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
@@ -18,12 +19,14 @@ const CreateKardex = () => {
   return (
     <>
     <div>
-        <button 
+        <motion.button 
             onClick={() => setOpen(true)}
-            className="cursor-pointer flex items-center justify-center gap-2 rounded-lg bg-emerald-500/15 px-3 py-2 border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/25 transition">
-            <span className="font-bold text-lg leading-none">+</span>
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.95 }}
+            className="group cursor-pointer flex items-center justify-center gap-2 rounded-lg bg-emerald-500/15 px-3 py-2 border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/25 transition-colors">
+            <span className="font-bold text-lg leading-none transition-transform duration-300 group-hover:rotate-90">+</span>
             <span className="text-xs font-semibold">Nuevo</span>
-        </button>
+        </motion.button>
     </div>
     <TopModal
         isOpen={open}

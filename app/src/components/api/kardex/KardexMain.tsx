@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
+import { motion } from "framer-motion"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import KardexFilters from "./KardexFilters"
 import KardexHeader from "./KardexHeader"
@@ -58,14 +59,13 @@ const KardexMain = () => {
         numescritura,
     })
 
-    if (isLoading) return <LoadingState />
-  
-    if (isError) return <p className="text-center my-8">{`Error: ${error.message}`}</p>
-  
-    if (!isSuccess) return null
-
   return (
-    <div className="mx-auto w-[92%] max-w-[1400px] bg-white rounded-2xl shadow-sm border border-slate-200 text-black mt-4 mb-4 overflow-hidden">
+    <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.35 }}
+        className="mx-auto w-[92%] max-w-[1400px] bg-white rounded-2xl shadow-sm border border-slate-200 text-black mt-4 mb-4 overflow-hidden"
+    >
         <KardexHeader />
         <KardexFilters 
           setCorrelative={setCorrelative}
@@ -78,12 +78,16 @@ const KardexMain = () => {
           numescritura={numescritura}
           refetch={refetch}
         />
-        <KardexTable 
-          kardexPage={kardexPage}
-          setPage={setPage}
-          page={page}
-        />
-    </div>
+        {isLoading && <LoadingState />}
+        {isError && <p className="text-center my-8">{`Error: ${error.message}`}</p>}
+        {isSuccess && (
+          <KardexTable 
+            kardexPage={kardexPage}
+            setPage={setPage}
+            page={page}
+          />
+        )}
+    </motion.div>
   )
 }
 

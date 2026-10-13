@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { motion } from "framer-motion"
 import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
 import KardexForm from "./KardexForm"
@@ -13,6 +14,7 @@ import { KARDEX_GRID_COLUMNS } from "./KardexTableHeader"
 interface Props {
     kardex: Kardex
     readyOnly?: boolean
+    index?: number
 }
 
 const Empty = () => <span className="text-slate-300">—</span>
@@ -30,7 +32,7 @@ const getInitials = (name: string) =>
         .map(part => part[0]?.toUpperCase() ?? '')
         .join('')
 
-const KardexCard = ({ kardex, readyOnly }: Props) => {
+const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
     const [open, setOpen] = useState(false)
     const [getKardex, setGetKardex] = useState(false)
@@ -48,8 +50,11 @@ const KardexCard = ({ kardex, readyOnly }: Props) => {
 
   return (
     <>
-    <div 
+    <motion.div 
         key={kardex.idkardex}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, delay: Math.min(index, 20) * 0.03, ease: "easeOut" }}
         role={readyOnly ? undefined : "button"}
         tabIndex={readyOnly ? undefined : 0}
         onClick={openKardex}
@@ -65,8 +70,8 @@ const KardexCard = ({ kardex, readyOnly }: Props) => {
         style={{ gridTemplateColumns: KARDEX_GRID_COLUMNS }}
     >
         <div>
-            <span className={`inline-flex rounded-md bg-sky-50 px-2 py-1 font-mono text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100 transition ${
-                readyOnly ? '' : 'group-hover:bg-sky-100 group-hover:ring-sky-200'
+            <span className={`inline-flex rounded-md bg-sky-50 px-2 py-1 font-mono text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100 transition duration-200 ${
+                readyOnly ? '' : 'group-hover:scale-105 group-hover:bg-sky-100 group-hover:ring-sky-200 group-hover:shadow-sm'
             }`}>
                 {kardex.kardex}
             </span>
@@ -95,7 +100,7 @@ const KardexCard = ({ kardex, readyOnly }: Props) => {
                 </>
             ) : <Empty />}
         </div>
-    </div>
+    </motion.div>
     <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}
