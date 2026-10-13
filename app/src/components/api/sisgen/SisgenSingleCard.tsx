@@ -15,6 +15,9 @@ import {
 import SisgenValidationCountsCell from "./SisgenValidationCountsCell"
 import SisgenLastSubmissionView from "./SisgenLastSubmissionView"
 import { SISGEN_TABLE_GRID, sisgenCol } from "./sisgenTableGrid"
+import SisgenStatusBadge from "./SisgenStatusBadge"
+import { motion } from "framer-motion"
+import { CheckCircle2, Loader2, MessageSquareText, RotateCw, Send } from "lucide-react"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -91,33 +94,40 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
 
   return (
     <>
-    <div 
+    <motion.div 
         key={sisgenDoc.idkardex} 
-        className={`${SISGEN_TABLE_GRID} border-b py-2 text-xs align-middle`}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, delay: Math.min(idx, 20) * 0.025, ease: "easeOut" }}
+        className={`${SISGEN_TABLE_GRID} py-3 text-xs text-slate-700 transition-colors hover:bg-slate-50`}
     >
-        <p className={sisgenCol.idx}>{idx}</p>
-        <p 
-            className={`${sisgenCol.kardex} cursor-pointer text-blue-500 hover:text-blue-700`}
-            title={sisgenDoc?.kardex || ''}
-            onClick={() => setIsOpen(true)}
-        >
-            {sisgenDoc?.kardex || ''}
+        <p className={`${sisgenCol.idx} tabular-nums text-slate-400`}>{idx}</p>
+        <div className={sisgenCol.kardex}>
+            <button
+                type="button"
+                className="max-w-full truncate rounded-md bg-sky-50 px-2 py-1 font-mono text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100 transition hover:bg-sky-100 hover:ring-sky-200"
+                title={sisgenDoc?.kardex || ''}
+                onClick={() => setIsOpen(true)}
+            >
+                {sisgenDoc?.kardex || ''}
+            </button>
+        </div>
+        <p className={`${sisgenCol.instrumento} font-mono tabular-nums text-slate-800`}>
+            {sisgenDoc?.numero_instrumento || sisgenDoc?.numinstrmento || <span className="text-slate-300">—</span>}
         </p>
-        <p className={sisgenCol.instrumento}>
-            {sisgenDoc?.numero_instrumento || sisgenDoc?.numinstrmento || '—'}
-        </p>
-        <p className={sisgenCol.fecha}>{fechaLabel}</p>
+        <p className={`${sisgenCol.fecha} tabular-nums text-slate-600`}>{fechaLabel}</p>
         <p className={sisgenCol.acto} title={sisgenDoc?.contrato || ''}>
             {getTitleCase(sisgenDoc?.contrato || '')}
         </p>
-        <div className={`${sisgenCol.estado} flex flex-col gap-1`}>
-          <p>{sisgenStatus}</p>
+        <div className={`${sisgenCol.estado} flex flex-col gap-1.5`}>
+          <SisgenStatusBadge status={sisgenStatus} />
           {sisgenLastSubmission?.exists && (
             <button
               type="button"
               onClick={() => setIsSisgenResponseOpen(true)}
-              className="text-[10px] bg-indigo-600 text-white px-2 py-1 rounded-md hover:bg-indigo-700 transition-colors w-fit"
+              className="inline-flex w-fit items-center gap-1 text-[10px] font-semibold text-indigo-600 transition hover:text-indigo-800"
             >
+              <MessageSquareText className="h-3 w-3" />
               Ver respuesta SISGEN
             </button>
           )}
@@ -128,24 +138,26 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
         <div className={sisgenCol.action}>
         {canSend 
         ? 
-        <button 
+        <motion.button 
           onClick={handleSend}
-          className="h-[28px] w-full max-w-[6.5rem] rounded-md bg-blue-500 px-2 py-1 text-white transition-all duration-300 hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+          whileHover={loading ? undefined : { y: -1 }}
+          whileTap={loading ? undefined : { scale: 0.95 }}
+          className="inline-flex h-8 w-full max-w-[7rem] items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={loading}
         >
+          {loading
+            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            : sisgenLastSubmission?.exists ? <RotateCw className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
           {loading ? 'Enviando...' : sisgenLastSubmission?.exists ? 'Reenviar' : 'Enviar'}
-        </button> 
+        </motion.button> 
         :
-        <button 
-        type="button"
-        className="h-[28px] w-full max-w-[6.5rem] cursor-not-allowed rounded-md bg-green-500 px-2 py-1 text-white"
-        disabled
-      >
-        Guardado
-      </button>
+        <span className="inline-flex h-8 w-full max-w-[7rem] items-center justify-center gap-1.5 rounded-lg bg-emerald-50 px-2 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Guardado
+        </span>
         }
         </div>
-    </div>
+    </motion.div>
     <SisgenKardexModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -156,6 +168,7 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     <TopModal
         isOpen={isSisgenResponseOpen}
         onClose={() => setIsSisgenResponseOpen(false)}
+        portal
     >
         <div className="p-5 text-sm max-w-2xl">
             <h3 className="text-base font-semibold mb-4">Ultima respuesta SISGEN</h3>

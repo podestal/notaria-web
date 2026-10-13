@@ -12,9 +12,9 @@ const SisgenBooksTableBody = ({ sisgenDocs, noDocsMessage }: Props) => {
     <>
     {sisgenDocs.length > 0 
     ? 
-    <>
+    <div className="divide-y divide-slate-100">
        {sisgenDocs.map((doc, idx) => <SisgenBookCard key={doc.libro} sisgenDoc={doc} idx={idx + 1} />)}
-    </>
+    </div>
     :
     <div className="text-center text-gray-500 p-4">{noDocsMessage}</div>}
  </>

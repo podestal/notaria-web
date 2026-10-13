@@ -1,4 +1,4 @@
-export const SISGEN_TABLE_GRID = "grid grid-cols-12 items-center gap-x-3 gap-y-2 px-2"
+export const SISGEN_TABLE_GRID = "grid grid-cols-12 items-center gap-x-3 gap-y-2 px-4"
 
 export const sisgenCol = {
     idx: "col-span-1 text-center",

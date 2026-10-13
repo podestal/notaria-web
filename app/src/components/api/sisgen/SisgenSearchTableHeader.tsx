@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { motion } from "framer-motion"
+import { SendHorizontal } from "lucide-react"
 import type { SisgenSearchHandlers } from "../../../hooks/sisgen/sisgenSearchKeys"
 import type { SisgenSearchFilters } from "../../../utils/buildSisgenSearchFilters"
 import { buildSisgenSearchFilters } from "../../../utils/buildSisgenSearchFilters"
@@ -71,7 +73,7 @@ const SisgenSearchTableHeader = ({
 
   return (
     <>
-      <div className={`${SISGEN_TABLE_GRID} mb-4 bg-slate-200 py-2 text-xs font-semibold text-black`}>
+      <div className={`${SISGEN_TABLE_GRID} sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 backdrop-blur`}>
         <p className={sisgenCol.idx}>Nº</p>
         <p className={sisgenCol.kardex}>Nº Kardex</p>
         <p className={sisgenCol.instrumento}>Nº Inst.</p>
@@ -80,18 +82,23 @@ const SisgenSearchTableHeader = ({
         <p className={sisgenCol.estado}>Estado</p>
         <p className={`${sisgenCol.validacion} leading-tight`}>
           Validación
-          <span className="block text-[10px] font-normal text-slate-600">
-            Err. / Obs. / Pers.
+          <span className="block text-[9px] font-normal normal-case tracking-normal text-slate-400">
+            Errores / Obs. / Personas
           </span>
         </p>
-        <button
-          type="button"
-          className={`${sisgenCol.action} rounded-md bg-orange-500 px-2 py-2 text-white transition-all duration-300 hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60`}
-          onClick={handleOpenSendAllPreview}
-          disabled={sisgenDocs.length === 0}
-        >
-          <p className="text-xs">Enviar Todos</p>
-        </button>
+        <div className={sisgenCol.action}>
+          <motion.button
+            type="button"
+            whileHover={sisgenDocs.length === 0 ? undefined : { y: -1 }}
+            whileTap={sisgenDocs.length === 0 ? undefined : { scale: 0.96 }}
+            className="inline-flex w-full max-w-[8.5rem] items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-2 text-[11px] font-semibold normal-case tracking-normal text-white shadow-sm shadow-orange-500/30 transition hover:from-orange-600 hover:to-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handleOpenSendAllPreview}
+            disabled={sisgenDocs.length === 0}
+          >
+            <SendHorizontal className="h-3.5 w-3.5" />
+            Enviar Todos
+          </motion.button>
+        </div>
       </div>
 
       <SisgenSendAllPreviewModal

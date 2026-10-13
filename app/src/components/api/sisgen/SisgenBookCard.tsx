@@ -12,6 +12,10 @@ import {
 } from "../../../utils/sisgenSendState"
 import SisgenValidationCountsCell from "./SisgenValidationCountsCell"
 import SisgenLastSubmissionView from "./SisgenLastSubmissionView"
+import SisgenStatusBadge from "./SisgenStatusBadge"
+import { SISGEN_BOOKS_GRID_COLUMNS } from "./SisgenBooksTableHeader"
+import { motion } from "framer-motion"
+import { CheckCircle2, Loader2, MessageSquareText, RotateCw, Send } from "lucide-react"
 
 interface Props {
     sisgenDoc: SISGENDocument
@@ -34,51 +38,75 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
   }
   return (
     <>
-      <div className="grid grid-cols-9 gap-4 p-2 border-b text-xs align-middle">
-        <p>{idx}</p>
-        <p 
-            onClick={() => setShowLibro(true)}
-            className="text-blue-500 cursor-pointer hover:text-blue-700 transition-all duration-300"
-        >
-            {sisgenDoc.libro}
-        </p>
-        <p>{sisgenDoc.tipoPersona === 'J' ? 'Jurídica' : sisgenDoc.tipoPersona === 'N' ? 'Natural' : ''}</p>
-        <p>{sisgenDoc.ruc}</p>
-        <p>{getTitleCase(sisgenDoc.empresa || '')}</p>
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, delay: Math.min(idx, 20) * 0.025, ease: "easeOut" }}
+        className="grid items-center gap-3 px-4 py-3 text-xs text-slate-700 transition-colors hover:bg-slate-50"
+        style={{ gridTemplateColumns: SISGEN_BOOKS_GRID_COLUMNS }}
+      >
+        <p className="text-center tabular-nums text-slate-400">{idx}</p>
+        <div className="min-w-0">
+            <button
+                type="button"
+                onClick={() => setShowLibro(true)}
+                className="max-w-full truncate rounded-md bg-sky-50 px-2 py-1 font-mono text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100 transition hover:bg-sky-100 hover:ring-sky-200"
+            >
+                {sisgenDoc.libro}
+            </button>
+        </div>
+        <div>
+            {sisgenDoc.tipoPersona === 'J' || sisgenDoc.tipoPersona === 'N' ? (
+                <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${
+                    sisgenDoc.tipoPersona === 'J'
+                        ? 'bg-violet-50 text-violet-700 ring-violet-200'
+                        : 'bg-teal-50 text-teal-700 ring-teal-200'
+                }`}>
+                    {sisgenDoc.tipoPersona === 'J' ? 'Jurídica' : 'Natural'}
+                </span>
+            ) : <span className="text-slate-300">—</span>}
+        </div>
+        <p className="font-mono tabular-nums text-slate-600">{sisgenDoc.ruc || <span className="text-slate-300">—</span>}</p>
+        <p className="font-medium text-slate-800">{getTitleCase(sisgenDoc.empresa || '')}</p>
         <p>{getTitleCase(sisgenDoc.descripcionTipoLibro || '')}</p>
-        <div className="flex flex-col gap-1">
-          <p>{getTitleCase(sisgenStatus)}</p>
+        <div className="flex flex-col gap-1.5">
+          <SisgenStatusBadge status={sisgenStatus} />
           {sisgenLastSubmission?.exists && (
             <button
               type="button"
               onClick={() => setIsSisgenResponseOpen(true)}
-              className="text-[10px] bg-indigo-600 text-white px-2 py-1 rounded-md hover:bg-indigo-700 transition-colors w-fit"
+              className="inline-flex w-fit items-center gap-1 text-[10px] font-semibold text-indigo-600 transition hover:text-indigo-800"
             >
+              <MessageSquareText className="h-3 w-3" />
               Ver respuesta SISGEN
             </button>
           )}
         </div>
         <SisgenValidationCountsCell doc={sisgenDoc} />
+        <div className="flex justify-center">
         {canSend 
         ? 
-        <button 
+        <motion.button 
           onClick={handleSend}
-          className="bg-blue-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-pointer hover:bg-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          whileHover={loading ? undefined : { y: -1 }}
+          whileTap={loading ? undefined : { scale: 0.95 }}
+          className="inline-flex h-8 w-full max-w-[7rem] items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-2 text-[11px] font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={loading}
         >
+          {loading
+            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            : sisgenLastSubmission?.exists ? <RotateCw className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
           {loading ? 'Enviando...' : sisgenLastSubmission?.exists ? 'Reenviar' : 'Enviar'}
-        </button> 
+        </motion.button> 
         :
-        <button 
-        type="button"
-        className="bg-green-500 w-[100px] h-[28px] text-white px-4 py-1 rounded-md cursor-not-allowed "
-        disabled
-      >
-        Guardado
-      </button>
+        <span className="inline-flex h-8 w-full max-w-[7rem] items-center justify-center gap-1.5 rounded-lg bg-emerald-50 px-2 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Guardado
+        </span>
         }
-    </div>
-        <TopModal isOpen={showLibro} onClose={() => setShowLibro(false)}>
+        </div>
+    </motion.div>
+        <TopModal isOpen={showLibro} onClose={() => setShowLibro(false)} portal>
         {(() => {
             const numlibro = sisgenDoc.libro.split('-')[0]
             const { data: libro, isLoading: isLoadingLibro, isError: isErrorLibro, isSuccess: isSuccessLibro } = useGetLibroByNumlibro({ access, numlibro })
@@ -92,7 +120,7 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
             )
         })()}
     </TopModal>
-    <TopModal isOpen={isSisgenResponseOpen} onClose={() => setIsSisgenResponseOpen(false)}>
+    <TopModal isOpen={isSisgenResponseOpen} onClose={() => setIsSisgenResponseOpen(false)} portal>
         <div className="p-5 text-sm max-w-2xl">
             <h3 className="text-base font-semibold mb-4">Ultima respuesta SISGEN</h3>
             {sisgenLastSubmission?.exists ? (
