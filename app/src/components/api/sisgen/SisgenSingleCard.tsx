@@ -177,6 +177,15 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
                     documentLabel="Kardex"
                     documentValue={sisgenDoc.kardex}
                     submission={sisgenLastSubmission}
+                    kardex={sisgenDoc.kardex}
+                    onResend={() => {
+                        setIsSisgenResponseOpen(false)
+                        handleSend()
+                    }}
+                    onOpenKardex={() => {
+                        setIsSisgenResponseOpen(false)
+                        setIsOpen(true)
+                    }}
                 />
             ) : (
                 <p>Este documento aun no tiene respuesta SISGEN.</p>

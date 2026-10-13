@@ -1,7 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import Calendar from "../../ui/Calendar";
 import { useEffect, useRef } from "react";
-import SimpleSelector from "../../ui/SimpleSelector";
 import {
     cacheLastSisgenSearchRequest,
     type SisgenSearchHandlers,
@@ -13,15 +12,52 @@ import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
 import getSisgenDocs from "../../../utils/getSisgenDocs";
 import { applySisgenSearchResponse } from "../../../utils/applySisgenSearchResponse";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, CalendarDays, Filter, Loader2, Search } from "lucide-react";
+import {
+    AlertCircle,
+    AlertTriangle,
+    CalendarDays,
+    CheckCircle2,
+    Clock,
+    FileQuestion,
+    Filter,
+    Layers,
+    Loader2,
+    Search,
+    XCircle,
+    type LucideIcon,
+} from "lucide-react";
 
-const estadoSisgenOptions = [
-    { value: -1, label: "Todos los Documentos" },
-    { value: 0, label: "No Enviado" },
-    { value: 1, label: "Enviado" },
-    { value: 2, label: "Enviado Observado" },
-    { value: 3, label: "No Enviado Fallido" },
-    { value: 4, label: "Sin Codigo Ancert" },
+const estadoSisgenOptions: {
+    value: number
+    label: string
+    description: string
+    icon: LucideIcon
+    tone: { icon: string; active: string; dot: string }
+}[] = [
+    {
+        value: -1, label: "Todos", description: "Todos los documentos", icon: Layers,
+        tone: { icon: "bg-blue-50 text-blue-600", active: "border-blue-500 ring-blue-500/20", dot: "bg-blue-500" },
+    },
+    {
+        value: 0, label: "No Enviado", description: "Pendientes de envío", icon: Clock,
+        tone: { icon: "bg-slate-100 text-slate-600", active: "border-slate-500 ring-slate-500/20", dot: "bg-slate-500" },
+    },
+    {
+        value: 1, label: "Enviado", description: "Aceptados por SISGEN", icon: CheckCircle2,
+        tone: { icon: "bg-emerald-50 text-emerald-600", active: "border-emerald-500 ring-emerald-500/20", dot: "bg-emerald-500" },
+    },
+    {
+        value: 2, label: "Enviado Observado", description: "Con observaciones", icon: AlertTriangle,
+        tone: { icon: "bg-amber-50 text-amber-600", active: "border-amber-500 ring-amber-500/20", dot: "bg-amber-500" },
+    },
+    {
+        value: 3, label: "No Enviado Fallido", description: "Envío con error", icon: XCircle,
+        tone: { icon: "bg-red-50 text-red-600", active: "border-red-500 ring-red-500/20", dot: "bg-red-500" },
+    },
+    {
+        value: 4, label: "Sin Código Ancert", description: "Acto sin código ANCERT", icon: FileQuestion,
+        tone: { icon: "bg-orange-50 text-orange-600", active: "border-orange-500 ring-orange-500/20", dot: "bg-orange-500" },
+    },
 ]
 
 interface Props {
@@ -187,17 +223,52 @@ const SisgenSearchForm = ({
                     </motion.div>
                 )}
             </AnimatePresence>
+            <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <Filter className="h-3.5 w-3.5" /> Estado
+            </p>
+            <div role="radiogroup" aria-label="Estado SISGEN" className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+                {estadoSisgenOptions.map((option, i) => {
+                    const isActive = selectedEstado === option.value
+                    const Icon = option.icon
+                    return (
+                        <motion.button
+                            key={option.value}
+                            type="button"
+                            role="radio"
+                            aria-checked={isActive}
+                            disabled={loading}
+                            onClick={() => setSelectedEstado(option.value)}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.25, delay: i * 0.04 }}
+                            whileHover={loading ? undefined : { y: -2 }}
+                            whileTap={loading ? undefined : { scale: 0.97 }}
+                            className={`relative flex flex-col items-start gap-2 rounded-xl border bg-white p-3 text-left transition-shadow disabled:cursor-not-allowed disabled:opacity-60 ${
+                                isActive
+                                    ? `${option.tone.active} shadow-md ring-4`
+                                    : "border-slate-200 shadow-sm hover:shadow-md"
+                            }`}
+                        >
+                            <div className="flex w-full items-center justify-between">
+                                <span className={`rounded-lg p-1.5 ${option.tone.icon}`}>
+                                    <Icon className="h-4 w-4" />
+                                </span>
+                                {isActive && (
+                                    <motion.span
+                                        layoutId={`sisgen-estado-dot-${instrumentType}`}
+                                        className={`h-2 w-2 rounded-full ${option.tone.dot}`}
+                                    />
+                                )}
+                            </div>
+                            <div>
+                                <p className="text-xs font-semibold text-slate-800">{option.label}</p>
+                                <p className="text-[10px] text-slate-500">{option.description}</p>
+                            </div>
+                        </motion.button>
+                    )
+                })}
+            </div>
             <div className="flex w-full flex-wrap items-end gap-4 overflow-visible">
-                <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
-                    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                        <Filter className="h-3.5 w-3.5" /> Estado
-                    </p>
-                    <SimpleSelector
-                        options={estadoSisgenOptions}
-                        setter={setSelectedEstado}
-                        defaultValue={selectedEstado}
-                    />
-                </div>
                 <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
                     <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                         <CalendarDays className="h-3.5 w-3.5" /> Desde

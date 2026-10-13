@@ -1,3 +1,6 @@
+import { useState } from "react"
+import { RotateCw } from "lucide-react"
+import useRefreshLastSisgenSearch from "../../../hooks/sisgen/useRefreshLastSisgenSearch"
 import type { SisgenLastSubmission } from "../../../services/sisgen/searchSisgenService"
 import {
     formatSisgenSubmissionError,
@@ -6,11 +9,23 @@ import {
     type SisgenSubmissionError,
     type SisgenSubmissionErrorObject,
 } from "../../../utils/sisgenSubmissionErrors"
+import SisgenFieldFix from "./SisgenFieldFix"
 
 interface Props {
     documentLabel: string
     documentValue: string
     submission: SisgenLastSubmission
+    /** Enables in-place fixes for the listed campos (kardex documents only). */
+    kardex?: string
+    onResend?: () => void
+    onOpenKardex?: () => void
+}
+
+interface FixHandlers {
+    kardex: string
+    onSaved: () => void
+    onResend?: () => void
+    onOpenKardex?: () => void
 }
 
 const ORIGEN_STYLES: Record<string, { box: string; title: string; label: string }> = {
@@ -31,7 +46,7 @@ const ORIGEN_STYLES: Record<string, { box: string; title: string; label: string 
     },
 }
 
-const StructuredErrorItem = ({ error }: { error: SisgenSubmissionErrorObject }) => {
+const StructuredErrorItem = ({ error, fix }: { error: SisgenSubmissionErrorObject; fix?: FixHandlers }) => {
     const style = ORIGEN_STYLES[error.origen ?? "dato"] ?? ORIGEN_STYLES.dato
     const campos = error.campos ?? []
 
@@ -62,6 +77,15 @@ const StructuredErrorItem = ({ error }: { error: SisgenSubmissionErrorObject }) 
                                     <span className="mt-0.5 block text-xs text-slate-600">
                                         Valor actual: <span className="font-mono">{campo.valor_actual}</span>
                                     </span>
+                                )}
+                                {fix && campo.accion && error.origen !== "lote" && (
+                                    <SisgenFieldFix
+                                        accion={campo.accion}
+                                        kardex={error.kardex || fix.kardex}
+                                        onSaved={fix.onSaved}
+                                        onResend={fix.onResend}
+                                        onOpenKardex={fix.onOpenKardex}
+                                    />
                                 )}
                             </li>
                         ))}
@@ -94,9 +118,9 @@ const StructuredErrorItem = ({ error }: { error: SisgenSubmissionErrorObject }) 
     )
 }
 
-const SisgenErrorItem = ({ error }: { error: SisgenSubmissionError }) => {
+const SisgenErrorItem = ({ error, fix }: { error: SisgenSubmissionError; fix?: FixHandlers }) => {
     if (isSisgenSubmissionErrorObject(error) && error.titulo) {
-        return <StructuredErrorItem error={error} />
+        return <StructuredErrorItem error={error} fix={fix} />
     }
     return (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 whitespace-pre-wrap text-red-700">
@@ -105,7 +129,20 @@ const SisgenErrorItem = ({ error }: { error: SisgenSubmissionError }) => {
     )
 }
 
-const SisgenLastSubmissionView = ({ documentLabel, documentValue, submission }: Props) => {
+const SisgenLastSubmissionView = ({ documentLabel, documentValue, submission, kardex, onResend, onOpenKardex }: Props) => {
+    const [hasFixes, setHasFixes] = useState(false)
+    const refreshLastSisgenSearch = useRefreshLastSisgenSearch()
+    const fix: FixHandlers | undefined = kardex
+        ? {
+              kardex,
+              onSaved: () => {
+                  setHasFixes(true)
+                  void refreshLastSisgenSearch()
+              },
+              onResend,
+              onOpenKardex,
+          }
+        : undefined
     const errors = normalizeSisgenSubmissionErrors(submission.errors)
     const firstObject = errors.find(isSisgenSubmissionErrorObject)
     const documentStatus = submission.document_status || firstObject?.estado || "-"
@@ -125,6 +162,22 @@ const SisgenLastSubmissionView = ({ documentLabel, documentValue, submission }: 
                 </p>
             </div>
 
+            {hasFixes && (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-900">
+                    <p className="text-sm">Datos corregidos. Reenvíe el documento para que SISGEN lo valide de nuevo.</p>
+                    {onResend && (
+                        <button
+                            type="button"
+                            onClick={onResend}
+                            className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-emerald-700"
+                        >
+                            <RotateCw className="h-3 w-3" />
+                            Reenviar a SISGEN
+                        </button>
+                    )}
+                </div>
+            )}
+
             <div>
                 <p className="mb-2 font-semibold">
                     {errors.length ? `Qué corregir (${errors.length})` : "Errores SISGEN"}
@@ -132,7 +185,7 @@ const SisgenLastSubmissionView = ({ documentLabel, documentValue, submission }: 
                 {errors.length ? (
                     <div className="space-y-2">
                         {errors.map((error, idx) => (
-                            <SisgenErrorItem key={idx} error={error} />
+                            <SisgenErrorItem key={idx} error={error} fix={fix} />
                         ))}
                     </div>
                 ) : (

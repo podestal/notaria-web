@@ -1,8 +1,26 @@
+export type SisgenKardexTab = "kardex" | "contratantes" | "patrimonial"
+
+/** How the user can fix a campo: quick fix on the card, edit pop-up, or open the kardex. */
+export type SisgenFieldAction =
+    | { tipo: "ir_kardex"; seccion: SisgenKardexTab }
+    | { tipo: "editar_contratante"; idcontratante: string }
+    | {
+          tipo: "cliente2_tipo_documento"
+          idcontratante: string
+          tipper: string
+          idtipdoc?: number | null
+          numdoc?: string
+      }
+    | { tipo: "cliente2_profesion"; idcontratante: string; idprofesion?: number | null }
+    | { tipo: "patrimonial_forma_pago"; itemmp: string; fpago?: string }
+    | { tipo: "patrimonial_oportunidad_pago"; itemmp: string; idoppago?: string; sugerido?: string }
+
 export interface SisgenErrorField {
     seccion: string
     campo: string
     referencia?: string
     valor_actual?: string
+    accion?: SisgenFieldAction
 }
 
 export interface SisgenSubmissionErrorObject {
