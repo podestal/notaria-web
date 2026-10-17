@@ -666,7 +666,7 @@ const ContratantesForm = ({
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+                            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 text-slate-700 shadow-xl"
                         >
                             <h3 className="text-lg font-semibold text-slate-900">Cambios sin guardar</h3>
                             <p className="mt-2 text-sm text-slate-600">

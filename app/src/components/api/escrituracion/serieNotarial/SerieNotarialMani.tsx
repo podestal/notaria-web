@@ -331,7 +331,7 @@ const SerieNotarialMain = () => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="serie-deactivate-title"
-            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-xl"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 text-slate-700 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h4 id="serie-deactivate-title" className="text-sm font-semibold text-slate-800">

@@ -590,6 +590,8 @@ html.dark .keep-dark {
     :where(html.dark) .hover\:bg-white\/70:hover { background-color: color-mix(in oklab, var(--dm-surface) 70%, transparent); }
     :where(html.dark) .hover\:bg-white\/60:hover { background-color: color-mix(in oklab, var(--dm-surface) 60%, transparent); }
     :where(html.dark) .hover\:bg-white\/50:hover { background-color: color-mix(in oklab, var(--dm-surface) 50%, transparent); }
+    :where(html.dark) .hover\:bg-black\/5:hover { background-color: color-mix(in oklab, white 8%, transparent); }
+    :where(html.dark) .hover\:bg-black\/10:hover { background-color: color-mix(in oklab, white 12%, transparent); }
   }
 
   :where(html.dark) .from-white { --tw-gradient-from: var(--dm-surface); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent); }
