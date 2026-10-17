@@ -62,7 +62,7 @@ interface FixFormProps {
 }
 
 const FixForm = ({ children, saving, error, disabled, onSave, canResend }: FixFormProps) => (
-    <div className="mt-2 space-y-2 rounded-md border border-indigo-100 bg-indigo-50/60 p-2">
+    <div className="mt-2 space-y-2 rounded-md border border-indigo-200 bg-indigo-50 p-2">
         {children}
         {error && <p className="text-xs text-red-600">{error}</p>}
         <div className="flex flex-wrap justify-end gap-2">
@@ -70,7 +70,7 @@ const FixForm = ({ children, saving, error, disabled, onSave, canResend }: FixFo
                 type="button"
                 disabled={saving || disabled}
                 onClick={() => onSave(false)}
-                className="inline-flex items-center gap-1 rounded-md border border-indigo-200 bg-white px-2.5 py-1 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-1 rounded-md border border-indigo-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 {saving && <Loader2 className="h-3 w-3 animate-spin" />}
                 Guardar

@@ -121,8 +121,8 @@ const SisgenBookCard = ({ sisgenDoc, idx }: Props) => {
         })()}
     </TopModal>
     <TopModal isOpen={isSisgenResponseOpen} onClose={() => setIsSisgenResponseOpen(false)} portal>
-        <div className="p-5 text-sm max-w-2xl">
-            <h3 className="text-base font-semibold mb-4">Ultima respuesta SISGEN</h3>
+        <div className="max-w-2xl p-5 text-sm text-slate-700">
+            <h3 className="mb-4 text-base font-semibold text-slate-800">Ultima respuesta SISGEN</h3>
             {sisgenLastSubmission?.exists ? (
                 <SisgenLastSubmissionView
                     documentLabel="Cronologico"
