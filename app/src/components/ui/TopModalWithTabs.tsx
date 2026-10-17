@@ -32,7 +32,7 @@ const TopModalWithTabs = ({ isOpen, onClose, tabs }: TopModalWithTabsProps) => {
 
           {/* Modal Container */}
           <motion.div
-            className="fixed top-20 right-0 left-56 z-50 mx-auto w-full max-w-6xl overflow-hidden rounded-b-2xl bg-white shadow-lg"
+            className="fixed top-20 right-0 left-56 z-50 mx-auto w-full max-w-6xl overflow-hidden rounded-b-2xl border border-slate-200 bg-white text-slate-700 shadow-lg"
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}

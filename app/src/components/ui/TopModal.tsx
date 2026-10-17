@@ -75,8 +75,8 @@ const TopModal = ({
           <motion.div
             className={
               wide
-                ? `fixed top-12 right-3 left-56 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-4 shadow-lg sm:p-6 ${dangerFrame}`
-                : `fixed top-20 right-0 left-56 mx-auto flex w-full max-h-[calc(100vh-5rem)] flex-col overflow-hidden rounded-b-2xl bg-white p-6 shadow-lg max-w-5xl ${dangerFrame}`
+                ? `fixed top-12 right-3 left-56 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-4 text-slate-700 shadow-lg sm:p-6 ${dangerFrame}`
+                : `fixed top-20 right-0 left-56 mx-auto flex w-full max-h-[calc(100vh-5rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-lg max-w-5xl ${dangerFrame}`
             }
             style={{ zIndex: contentZIndex }}
             initial={{ y: '-100%' }}

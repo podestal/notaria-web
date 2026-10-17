@@ -34,7 +34,7 @@ const TimePicker: React.FC<Props> = ({ selectedTime, setSelectedTime }) => {
 
   return (
     <div className="relative w-full">
-      <div className="flex items-center gap-2 border-2 border-neutral-400 rounded-lg px-3 py-2 bg-white text-sm focus-within:border-blue-700">
+      <div className="flex items-center gap-2 rounded-lg border-2 border-neutral-400 bg-white px-3 py-2 text-sm text-slate-800 focus-within:border-blue-700">
         <p className='font-bold text-md'>Hora</p>
         <Clock size={16} className="text-gray-500" />
         <input

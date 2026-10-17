@@ -49,7 +49,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         <label className="text-sm font-semibold text-slate-700 mb-1 block">{label}</label>
       )}
     <div
-        className="border border-slate-300 rounded-md mt-1 bg-white shadow-md max-h-60 overflow-auto"
+        className="mt-1 max-h-60 overflow-auto rounded-md border border-slate-300 bg-white text-slate-800 shadow-md"
         >
         {options.map(option => (
             <label

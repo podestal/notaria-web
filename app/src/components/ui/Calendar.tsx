@@ -114,7 +114,7 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate, fullWidth = 
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="fixed z-[200] max-h-[min(24rem,calc(100vh-1.5rem))] overflow-y-auto rounded-xl bg-white p-4 text-black shadow-xl ring-1 ring-slate-200"
+                    className="fixed z-[200] max-h-[min(24rem,calc(100vh-1.5rem))] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 text-slate-800 shadow-xl ring-1 ring-slate-200"
                     style={{
                         top: popupPosition.top,
                         left: popupPosition.left,
