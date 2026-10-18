@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import MainPage from "../pages/MainPage";
 import Login from "../components/auth/Login";
 import PrivateRoutes from "../components/auth/PrivateRoutes";
@@ -72,6 +72,7 @@ import TareasMain from "../components/api/configuracion/tareas/TareasMain";
 import PersonasMain from "../components/taxes/personas/PersonasMain";
 import { isFacturacionEnabled } from "../utils/isFacturacionEnabled";
 import ControlInternoMain from "../components/taxes/controlInterno/ControlInternoMain";
+import NotFoundPage from "../pages/NotFoundPage";
 
 const taxesRoutes = isFacturacionEnabled()
     ? [
@@ -163,9 +164,12 @@ const routes = createBrowserRouter([
     },
     {
         path: "/app",
-        element:<MainPage />,
-        errorElement: <div>404</div>,
+        element: <Outlet />,
+        errorElement: <NotFoundPage />,
         children: [
+            {
+                element: <MainPage />,
+                children: [
             {
                 path: "panel-general",
                 element: (
@@ -454,7 +458,17 @@ const routes = createBrowserRouter([
                 </PrivateRoutes>
             },
             ...taxesRoutes,
-        ]
+                ],
+            },
+            {
+                path: "*",
+                element: <NotFoundPage />,
+            },
+        ],
+    },
+    {
+        path: "*",
+        element: <NotFoundPage />,
     },
 ]);
 

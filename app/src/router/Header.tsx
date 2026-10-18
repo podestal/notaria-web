@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { daysInSpanish, monthsInSpanish } from '../utils/datesInSpanish'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import Logout from '../components/auth/Logout'
@@ -10,10 +10,47 @@ import useBodyRenderStore from '../hooks/store/bodyRenderStore'
 import useCorrelativeStore from '../hooks/store/useCorrelativeStore'
 import getTitleCase from '../utils/getTitleCase'
 import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
 import { isFacturacionEnabled } from '../utils/isFacturacionEnabled'
 import ComplianceMeReminder from '../components/api/kardex/kardexErrors/ComplianceMeReminder'
+
+const pathMatches = (currentPath: string, targetPath: string) => {
+  if (!targetPath) return false
+  if (currentPath === targetPath) return true
+  return currentPath.startsWith(`${targetPath}/`)
+}
+
+const SECTION_PREFIX: Record<string, string> = {
+  Protocolares: "/app/protocolares",
+  Extraprotocolares: "/app/extraprotocolares",
+  Reportes: "/app/reportes",
+  Configuracion: "/app/configuracion",
+  Facturacion: "/app/taxes",
+}
+
+const topLinkClass = (active: boolean) =>
+  `mb-2 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide transition ${
+    active
+      ? "bg-sky-600/25 text-sky-200 ring-1 ring-sky-500/40"
+      : "text-slate-200 hover:bg-slate-800 hover:text-white"
+  }`
+
+const sectionButtonClass = (active: boolean, open: boolean) =>
+  `flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide transition ${
+    active
+      ? "bg-sky-600/20 text-sky-200 ring-1 ring-sky-500/35"
+      : open
+        ? "bg-slate-800/80 text-white"
+        : "text-slate-200 hover:bg-slate-800 hover:text-white"
+  }`
+
+const childLinkClass = (active: boolean) =>
+  `block w-full rounded-md px-3 py-2 text-left text-xs transition ${
+    active
+      ? "bg-sky-600 text-white shadow-sm shadow-sky-900/40"
+      : "text-slate-300 hover:bg-sky-700 hover:text-white"
+  }`
 
 const dropdownVariants = {
   collapsed: {
@@ -39,6 +76,38 @@ const optionVariants = {
     opacity: 1,
     x: 0,
     transition: { duration: 0.22, ease: "easeOut" as const },
+  },
+}
+
+const sidebarVariants = {
+  hidden: { x: -28, opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.45,
+      ease: "easeOut" as const,
+      when: "beforeChildren" as const,
+      staggerChildren: 0.08,
+    },
+  },
+}
+
+const sidebarSectionVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: "easeOut" as const },
+  },
+}
+
+const navItemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.28, ease: "easeOut" as const },
   },
 }
 
@@ -70,6 +139,7 @@ const Header = ({ kardexTypes }: Props) => {
     const currentMonth = monthsInSpanish[moment().format('MMMM').toLocaleLowerCase()]
     const currentYear = moment().format('YYYY')
 
+    const location = useLocation()
     const [openDropdown, setOpenDropdown] = useState<number | null>(0);
     const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
     const user = useUserInfoStore( s => s.user)
@@ -95,15 +165,46 @@ const Header = ({ kardexTypes }: Props) => {
       setKardexFilter({ type: '', value: '' })
     }
 
-    const navLinkClass =
-      'block w-full rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white'
-
     const resolveOptionTo = (item: MenuItem, option: MenuOptions): string | null => {
       if (option.path) return option.path
       if (option.docType != null && item.label === 'Protocolares') {
         return `/app/protocolares?tipkar=${option.docType}`
       }
       return null
+    }
+
+    const isHrefActive = (href: string | null | undefined) => {
+      if (!href) return false
+      const [pathname, search = ""] = href.split("?")
+      if (!pathMatches(location.pathname, pathname)) return false
+      if (!search) return true
+      const wanted = new URLSearchParams(search)
+      const current = new URLSearchParams(location.search)
+      for (const [key, value] of wanted.entries()) {
+        if (current.get(key) !== value) return false
+      }
+      return true
+    }
+
+    const isOptionActive = (item: MenuItem, option: MenuOptions) => {
+      const href = resolveOptionTo(item, option)
+      if (isHrefActive(href)) return true
+      if (option.subOptions?.some((sub) => isHrefActive(sub.path))) return true
+      if (
+        item.label === "Protocolares" &&
+        option.docType != null &&
+        location.pathname.startsWith("/app/protocolares")
+      ) {
+        const tipkar = new URLSearchParams(location.search).get("tipkar")
+        return tipkar === String(option.docType)
+      }
+      return false
+    }
+
+    const isSectionActive = (item: MenuItem) => {
+      const prefix = SECTION_PREFIX[item.label]
+      if (prefix && pathMatches(location.pathname, prefix)) return true
+      return item.options.some((option) => isOptionActive(item, option))
     }
 
     const handleNavLinkClick = (option: MenuOptions) => {
@@ -284,177 +385,250 @@ const Header = ({ kardexTypes }: Props) => {
       };
     });
 
+    useEffect(() => {
+      const activeIndex = menuItems.findIndex((item) => isSectionActive(item))
+      if (activeIndex >= 0) {
+        setOpenDropdown(activeIndex)
+        const item = menuItems[activeIndex]
+        const subIdx = item.options.findIndex(
+          (option) =>
+            Boolean(option.subOptions) &&
+            (option.subOptions?.some((sub) => isHrefActive(sub.path)) || isHrefActive(option.path))
+        )
+        if (subIdx >= 0) {
+          setOpenSubDropdown(`${activeIndex}-${subIdx}`)
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- sync open section to route
+    }, [location.pathname, location.search])
 
   return (
-    <aside className="keep-dark fixed left-0 top-0 z-40 h-screen w-56 border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl">
+    <motion.aside
+      variants={sidebarVariants}
+      initial="hidden"
+      animate="visible"
+      className="keep-dark fixed left-0 top-0 z-40 h-screen w-56 border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl"
+    >
       <div className="flex h-full flex-col">
-        <div className="border-b border-slate-800 p-4">
-          <div className="rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shadow-lg flex items-center gap-2 justify-center">
-            <img
+        <motion.div variants={sidebarSectionVariants} className="border-b border-slate-800 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.12 }}
+            className="flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shadow-lg"
+          >
+            <motion.img
               src={notariaLogo}
               alt="Logo Notaria"
               className="mb-2 h-8 w-8 rounded-md border border-amber-300/50 object-cover shadow-sm"
               loading="lazy"
+              initial={{ rotate: -8, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.2 }}
             />
             <div>
               <p className="text-[10px] uppercase tracking-[0.18em] text-sky-300">Notaría</p>
               <p className="text-base font-semibold leading-5 text-white">{notariaName}</p>
             </div>
-          </div>
-          <div className="mt-3 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-3 shadow-lg">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.22, ease: "easeOut" }}
+            className="mt-3 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-3 shadow-lg"
+          >
             <p className="text-[11px] text-slate-400">
               {getTitleCase(currentDate)} {currentDay} de {getTitleCase(currentMonth)} del {currentYear}
             </p>
             <p className="mt-1 text-sm font-semibold text-white">Bienvenido, {welcomeName}</p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-3">
+        <motion.div
+          variants={sidebarSectionVariants}
+          className="flex-1 overflow-y-auto px-3 py-3"
+        >
           <ComplianceMeReminder />
-          <Link
-            to="/app/panel-general"
-            className="mb-2 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
-            onClick={resetNavigationState}
+          <motion.div
+            variants={{
+              hidden: {},
+              visible: {
+                transition: { staggerChildren: 0.045, delayChildren: 0.05 },
+              },
+            }}
+            initial="hidden"
+            animate="visible"
           >
-            Panel General
-          </Link>
-          {Number(user?.is_superuser) !== 0 && (
-            <Link
-              to="/app/sisgen"
-              className="mb-3 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
-              onClick={resetNavigationState}
-            >
-              Sisgen
-            </Link>
-          )}
-          {menuItems.map((item, index) => {
-            const isOpen = openDropdown === index
-            return (
-            <div key={item.label} className="mb-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const next = isOpen ? null : index
-                  setOpenDropdown(next)
-                  if (next === null) setOpenSubDropdown(null)
-                }}
-                aria-expanded={isOpen}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
+            <motion.div variants={navItemVariants}>
+              <Link
+                to="/app/panel-general"
+                className={topLinkClass(isHrefActive("/app/panel-general"))}
+                aria-current={isHrefActive("/app/panel-general") ? "page" : undefined}
+                onClick={resetNavigationState}
               >
-                <span>{item.label}</span>
-                <motion.span
-                  animate={{ rotate: isOpen ? 0 : -90 }}
-                  transition={{ duration: 0.22, ease: "easeOut" }}
-                  className="inline-flex text-slate-400"
+                Panel General
+              </Link>
+            </motion.div>
+            {Number(user?.is_superuser) !== 0 && (
+              <motion.div variants={navItemVariants}>
+                <Link
+                  to="/app/sisgen"
+                  className={`${topLinkClass(isHrefActive("/app/sisgen"))} mb-3`}
+                  aria-current={isHrefActive("/app/sisgen") ? "page" : undefined}
+                  onClick={resetNavigationState}
                 >
-                  <ChevronDown className="h-3.5 w-3.5" aria-hidden />
-                </motion.span>
-              </button>
-
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.ul
-                    key={`${item.label}-options`}
-                    variants={dropdownVariants}
-                    initial="collapsed"
-                    animate="open"
-                    exit="collapsed"
-                    className="mt-1 space-y-1 overflow-hidden border-l border-slate-800 pl-2"
+                  Sisgen
+                </Link>
+              </motion.div>
+            )}
+            {menuItems.map((item, index) => {
+              const isOpen = openDropdown === index
+              const sectionActive = isSectionActive(item)
+              return (
+              <motion.div key={item.label} variants={navItemVariants} className="mb-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = isOpen ? null : index
+                    setOpenDropdown(next)
+                    if (next === null) setOpenSubDropdown(null)
+                  }}
+                  aria-expanded={isOpen}
+                  aria-current={sectionActive ? "true" : undefined}
+                  className={sectionButtonClass(sectionActive, isOpen)}
+                >
+                  <span>{item.label}</span>
+                  <motion.span
+                    animate={{ rotate: isOpen ? 0 : -90 }}
+                    transition={{ duration: 0.22, ease: "easeOut" }}
+                    className={`inline-flex ${sectionActive ? "text-sky-300" : "text-slate-400"}`}
                   >
-                    {item.options.map((option, idx) => {
-                      const subKey = `${index}-${idx}`
-                      const subOpen = openSubDropdown === subKey
-                      return (
-                        <motion.li
-                          key={`${item.label}-${option.name}-${idx}`}
-                          variants={optionVariants}
-                        >
-                          {option.subOptions ? (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setOpenSubDropdown(subOpen ? null : subKey)
-                              }
-                              aria-expanded={subOpen}
-                              className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-xs text-slate-300 transition hover:bg-sky-700 hover:text-white"
-                            >
-                              <span>{getTitleCase(option.name)}</span>
-                              <motion.span
-                                animate={{ rotate: subOpen ? 0 : -90 }}
-                                transition={{ duration: 0.2, ease: "easeOut" }}
-                                className="inline-flex text-slate-500"
-                              >
-                                <ChevronDown className="h-3 w-3" aria-hidden />
-                              </motion.span>
-                            </button>
-                          ) : resolveOptionTo(item, option) ? (
-                            <Link
-                              to={resolveOptionTo(item, option)!}
-                              className={navLinkClass}
-                              onClick={() => handleNavLinkClick(option)}
-                            >
-                              {getTitleCase(option.name)}
-                            </Link>
-                          ) : (
-                            <span className="block rounded-md px-3 py-2 text-left text-xs text-slate-500">
-                              {getTitleCase(option.name)}
-                            </span>
-                          )}
-                          <AnimatePresence initial={false}>
-                            {option.subOptions && subOpen && (
-                              <motion.ul
-                                key={subKey}
-                                variants={dropdownVariants}
-                                initial="collapsed"
-                                animate="open"
-                                exit="collapsed"
-                                className="mt-1 space-y-1 overflow-hidden border-l border-slate-800 pl-3"
-                              >
-                                {option.subOptions.map((subOption, subIdx) => (
-                                  <motion.li
-                                    key={`${subKey}-${subOption.name}-${subIdx}`}
-                                    variants={optionVariants}
-                                  >
-                                    {subOption.path ? (
-                                      <Link
-                                        to={subOption.path}
-                                        className={navLinkClass}
-                                        onClick={() => {
-                                          resetNavigationState()
-                                          if (option.docType != null) setBodyRender(option.docType)
-                                        }}
-                                      >
-                                        {subOption.name}
-                                      </Link>
-                                    ) : (
-                                      <span className="block rounded-md px-3 py-2 text-left text-xs text-slate-500">
-                                        {subOption.name}
-                                      </span>
-                                    )}
-                                  </motion.li>
-                                ))}
-                              </motion.ul>
-                            )}
-                          </AnimatePresence>
-                        </motion.li>
-                      )
-                    })}
-                  </motion.ul>
-                )}
-              </AnimatePresence>
-            </div>
-            )
-          })}
-        </div>
+                    <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+                  </motion.span>
+                </button>
 
-        <div className="border-t border-slate-800 p-4">
-          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/95 px-3 py-2">
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.ul
+                      key={`${item.label}-options`}
+                      variants={dropdownVariants}
+                      initial="collapsed"
+                      animate="open"
+                      exit="collapsed"
+                      className="mt-1 space-y-1 overflow-hidden border-l border-slate-800 pl-2"
+                    >
+                      {item.options.map((option, idx) => {
+                        const subKey = `${index}-${idx}`
+                        const subOpen = openSubDropdown === subKey
+                        const optionActive = isOptionActive(item, option)
+                        const optionHref = resolveOptionTo(item, option)
+                        return (
+                          <motion.li
+                            key={`${item.label}-${option.name}-${idx}`}
+                            variants={optionVariants}
+                          >
+                            {option.subOptions ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenSubDropdown(subOpen ? null : subKey)
+                                }
+                                aria-expanded={subOpen}
+                                className={childLinkClass(optionActive)}
+                              >
+                                <span className="flex w-full items-center justify-between gap-2">
+                                  <span>{getTitleCase(option.name)}</span>
+                                  <motion.span
+                                    animate={{ rotate: subOpen ? 0 : -90 }}
+                                    transition={{ duration: 0.2, ease: "easeOut" }}
+                                    className={`inline-flex ${optionActive ? "text-sky-100" : "text-slate-500"}`}
+                                  >
+                                    <ChevronDown className="h-3 w-3" aria-hidden />
+                                  </motion.span>
+                                </span>
+                              </button>
+                            ) : optionHref ? (
+                              <Link
+                                to={optionHref}
+                                className={childLinkClass(optionActive)}
+                                aria-current={optionActive ? "page" : undefined}
+                                onClick={() => handleNavLinkClick(option)}
+                              >
+                                {getTitleCase(option.name)}
+                              </Link>
+                            ) : (
+                              <span className="block rounded-md px-3 py-2 text-left text-xs text-slate-500">
+                                {getTitleCase(option.name)}
+                              </span>
+                            )}
+                            <AnimatePresence initial={false}>
+                              {option.subOptions && subOpen && (
+                                <motion.ul
+                                  key={subKey}
+                                  variants={dropdownVariants}
+                                  initial="collapsed"
+                                  animate="open"
+                                  exit="collapsed"
+                                  className="mt-1 space-y-1 overflow-hidden border-l border-slate-800 pl-3"
+                                >
+                                  {option.subOptions.map((subOption, subIdx) => {
+                                    const subActive = isHrefActive(subOption.path)
+                                    return (
+                                    <motion.li
+                                      key={`${subKey}-${subOption.name}-${subIdx}`}
+                                      variants={optionVariants}
+                                    >
+                                      {subOption.path ? (
+                                        <Link
+                                          to={subOption.path}
+                                          className={childLinkClass(subActive)}
+                                          aria-current={subActive ? "page" : undefined}
+                                          onClick={() => {
+                                            resetNavigationState()
+                                            if (option.docType != null) setBodyRender(option.docType)
+                                          }}
+                                        >
+                                          {subOption.name}
+                                        </Link>
+                                      ) : (
+                                        <span className="block rounded-md px-3 py-2 text-left text-xs text-slate-500">
+                                          {subOption.name}
+                                        </span>
+                                      )}
+                                    </motion.li>
+                                    )
+                                  })}
+                                </motion.ul>
+                              )}
+                            </AnimatePresence>
+                          </motion.li>
+                        )
+                      })}
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+              )
+            })}
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          variants={sidebarSectionVariants}
+          className="border-t border-slate-800 p-4"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.35, ease: "easeOut" }}
+            className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/95 px-3 py-2"
+          >
             <Logout />
             <ThemeToggle className="border-slate-600 bg-slate-800 text-slate-100 hover:border-slate-400 hover:bg-slate-700" />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
-    </aside>
+    </motion.aside>
   )
 }
 
