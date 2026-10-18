@@ -1,8 +1,12 @@
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import { IngresoPoderesPage } from "../../../../services/api/extraprotocolares/ingresoPoderes"
 import Calendar from "../../../ui/Calendar";
-import { useEffect } from "react";
-import SingleSelect from "../../../ui/SingleSelect";
+import { useEffect, useState } from "react";
+import ExtraFiltersShell, {
+    ExtraFilterField,
+    ExtraFilterSearchButton,
+    ExtraFilterSelectField,
+} from "../ExtraFiltersShell";
 
 interface Props {
     refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<IngresoPoderesPage, Error>>
@@ -10,48 +14,55 @@ interface Props {
     setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>
     dateTo: Date | undefined;
     setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>;
-    dateType: string; // Optional, if you want to manage a date type
+    dateType: string;
     setDateType: React.Dispatch<React.SetStateAction<string>>;
     page: number;
 }
 
-const PoderesFueraDeRegistroFilters = ({ refetch, dateFrom, setDateFrom, dateTo, setDateTo, dateType, setDateType, page }: Props) => {
+const DATE_TYPE_OPTIONS = [
+    { value: '1', label: 'Fecha Ingreso' },
+    { value: '2', label: 'Fecha Crono' },
+]
 
+const PoderesFueraDeRegistroFilters = ({
+    refetch,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    dateType,
+    setDateType,
+    page,
+}: Props) => {
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         refetch()
     }, [page])
 
-    const handleRefetch = () => {
-        refetch()  // Refetching the data when filters are applied
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+        refetch().finally(() => setLoading(false))
     }
 
   return (
-    <div className="w-full grid grid-cols-4 gap-4 justify-center items-center text-center my-6">
-        <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-            <p>Fecha Inicio</p>
-            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
-        </div>
-        <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-            <p>Fecha Fin</p>
-            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
-        </div>
-        <div>
-            <SingleSelect 
-                options={[
-                    { value: '1', label: 'Fecha Ingreso' },
-                    { value: '2', label: 'Fecha Crono' },
-                ]}
-                selected={dateType}
-                onChange={setDateType}
-            />
-        </div>
-        <div>
-            <button 
-                onClick={handleRefetch}
-                className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
-        </div>
-    </div>
+    <ExtraFiltersShell onSubmit={handleSubmit} columns={2} title="Búsqueda por fecha:">
+        <ExtraFilterField label="Fecha inicio" index={0}>
+            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterField label="Fecha fin" index={1}>
+            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterSelectField
+            label="Tipo fecha"
+            value={dateType}
+            onChange={setDateType}
+            options={DATE_TYPE_OPTIONS}
+            index={2}
+        />
+        <ExtraFilterSearchButton loading={loading} index={3} colSpan={1} />
+    </ExtraFiltersShell>
   )
 }
 

@@ -1,4 +1,8 @@
 import Calendar from "../../../ui/Calendar";
+import ExtraFiltersShell, {
+    ExtraFilterField,
+    ExtraFilterSearchButton,
+} from "../ExtraFiltersShell";
 
 interface Props {
     dateFrom: Date | undefined;
@@ -8,28 +12,28 @@ interface Props {
 }
 
 const LegalizacionFilters = ({ dateFrom, setDateFrom, dateTo, setDateTo }: Props ) => {
-
     const handleCleanFilters = () => {
         setDateFrom(undefined);
         setDateTo(undefined);
     }
 
   return (
-    <div className="w-full grid grid-cols-3 gap-4 justify-center items-center text-center my-6">
-        <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-            <p>Fecha Inicio</p>
-            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
-        </div>
-        <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-            <p>Fecha Fin</p>
-            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
-        </div>
-        <div>
-            <button 
-                onClick={handleCleanFilters}
-                className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Limpiar</button>
-        </div>
-    </div>
+    <ExtraFiltersShell columns={2} title="Búsqueda por fecha:">
+        <ExtraFilterField label="Fecha inicio" index={0}>
+            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterField label="Fecha fin" index={1}>
+            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterSearchButton
+            type="button"
+            variant="clear"
+            label="Limpiar"
+            onClick={handleCleanFilters}
+            index={2}
+            colSpan={2}
+        />
+    </ExtraFiltersShell>
   )
 }
 

@@ -1,9 +1,13 @@
-import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { PermisoViajePage } from "../../../../services/api/extraprotocolares/permisoViajeService";
-import SimpleSelectorStr from "../../../ui/SimpleSelectosStr";
 import { useState } from "react";
+import ExtraFiltersShell, {
+    ExtraFilterField,
+    ExtraFilterSearchButton,
+    ExtraFilterSelectField,
+    ExtraFilterTextField,
+} from "../ExtraFiltersShell";
 
 const TIPO_PERMISO = [
     { value: '0', label: "Tipo Permiso" },
@@ -44,7 +48,8 @@ const PermisosFilter = ({
 
     const [loading, setLoading] = useState(false);
 
-    const handleFilter = () => {
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
         setLoading(true);
         refetch().finally(() => {
             setLoading(false);
@@ -52,60 +57,40 @@ const PermisosFilter = ({
     }
 
   return (
-    <div>
-        <div className="p-4 mb-4">
-            <h2 className="text-lg text-center font-semibold my-4">Busqueda por:</h2>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <SimpleInput
-                    label="Cronológico"
-                    value={crono}
-                    setValue={setCrono}
-                    horizontal
-                />
-                <SimpleSelectorStr
-                    label="Tipo de Permiso"
-                    options={TIPO_PERMISO}
-                    defaultValue={tipoPermiso}
-                    setter={setTipoPermiso}
-                />
-
-            </div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <SimpleInput
-                    label="Nombre del Participante"
-                    value={nombreParticipante}
-                    setValue={setNombreParticipante}
-                    horizontal
-                />
-                <SimpleInput
-                    label="Nro Control"
-                    value={numeroControl}
-                    setValue={setNumeroControl}
-                    horizontal
-                />
-            </div>
-            <h2 className="text-lg text-center font-semibold my-4">Busqueda por Fecha Cronologico:</h2>
-            <div className="w-full grid grid-cols-3 gap-4 justify-center items-center text-center my-6">
-                <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-                    <p>Fecha Inicio</p>
-                    <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
-                </div>
-                <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-                    <p>Fecha Fin</p>
-                    <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
-                </div>
-                <div>
-                    <button 
-                        onClick={handleFilter}
-                        className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer"
-                        disabled={loading}
-                    >
-                        {loading ? 'Buscando...' : 'Buscar'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ExtraFiltersShell onSubmit={handleSubmit} columns={2}>
+        <ExtraFilterTextField
+            label="Cronológico"
+            value={crono}
+            onChange={setCrono}
+            index={0}
+        />
+        <ExtraFilterSelectField
+            label="Tipo permiso"
+            value={tipoPermiso}
+            onChange={setTipoPermiso}
+            options={TIPO_PERMISO}
+            index={1}
+        />
+        <ExtraFilterTextField
+            label="Participante"
+            value={nombreParticipante}
+            onChange={setNombreParticipante}
+            index={2}
+        />
+        <ExtraFilterTextField
+            label="Nro control"
+            value={numeroControl}
+            onChange={setNumeroControl}
+            index={3}
+        />
+        <ExtraFilterField label="Fecha inicio" index={4}>
+            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterField label="Fecha fin" index={5}>
+            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterSearchButton loading={loading} index={6} colSpan={2} />
+    </ExtraFiltersShell>
   )
 }
 

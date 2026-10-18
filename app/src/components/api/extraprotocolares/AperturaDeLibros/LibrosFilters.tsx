@@ -1,7 +1,12 @@
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import Calendar from "../../../ui/Calendar";
-import SimpleInput from "../../../ui/SimpleInput";
 import { LibrosPage } from "../../../../services/api/extraprotocolares/librosService";
+import { useState } from "react";
+import ExtraFiltersShell, {
+    ExtraFilterField,
+    ExtraFilterSearchButton,
+    ExtraFilterTextField,
+} from "../ExtraFiltersShell";
 
 interface Props {
     cliente: string;
@@ -30,63 +35,42 @@ const LibrosFilters = ({
     setDateTo,
     refetch
 }: Props) => {
+    const [loading, setLoading] = useState(false)
 
-    const handleFilter = () => {
-        // Logic to handle filtering based on the inputs
-        console.log("Filtering with:", {
-            cliente,
-            numDoc,
-            cronologico,
-            dateFrom,
-            dateTo,
-        });
-        refetch();
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+        refetch().finally(() => setLoading(false))
     }
 
   return (
-    <div className="p-4">
-        <div className="p-4 mb-4">
-            <h2 className="text-lg text-center font-semibold my-4">Busqueda por:</h2>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <SimpleInput
-                    label="Empresa / Cliente"
-                    value={cliente}
-                    setValue={setCliente}
-                    horizontal
-                />
-                <SimpleInput
-                    label="DNI / RUC"
-                    value={numDoc}
-                    setValue={setNumDoc}
-                    horizontal
-                />
-            </div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <SimpleInput
-                    label="Cronológico"
-                    value={cronologico}
-                    setValue={setCronologico}
-                    horizontal
-                />
-            </div>
-             <h2 className="text-lg text-center font-semibold my-4">Busqueda por Fecha:</h2>
-            <div className="w-full grid grid-cols-3 gap-4 justify-center items-center text-center my-6">
-                <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-                    <p>Fecha Inicio</p>
-                    <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
-                </div>
-                <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-                    <p>Fecha Fin</p>
-                    <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
-                </div>
-                <div>
-                    <button 
-                        onClick={handleFilter}
-                        className="bg-blue-500 text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer">Buscar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ExtraFiltersShell onSubmit={handleSubmit} columns={2}>
+        <ExtraFilterTextField
+            label="Empresa / Cliente"
+            value={cliente}
+            onChange={setCliente}
+            index={0}
+        />
+        <ExtraFilterTextField
+            label="DNI / RUC"
+            value={numDoc}
+            onChange={setNumDoc}
+            index={1}
+        />
+        <ExtraFilterTextField
+            label="Cronológico"
+            value={cronologico}
+            onChange={setCronologico}
+            index={2}
+        />
+        <ExtraFilterField label="Fecha inicio" index={3}>
+            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterField label="Fecha fin" index={4}>
+            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterSearchButton loading={loading} index={5} colSpan={2} />
+    </ExtraFiltersShell>
   )
 }
 

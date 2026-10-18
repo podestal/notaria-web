@@ -1,9 +1,12 @@
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
-import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
 import { DomiciliarioPage } from "../../../../services/api/extraprotocolares/domiciliarioService";
 import { useState } from "react";
-import { Loader } from "lucide-react";
+import ExtraFiltersShell, {
+    ExtraFilterField,
+    ExtraFilterSearchButton,
+    ExtraFilterTextField,
+} from "../ExtraFiltersShell";
 
 interface Props {
     dateFrom: Date | undefined;
@@ -28,10 +31,10 @@ const DomiciliarioFilters = ({
     setSolicitante,
     refetch,
  }: Props) => {
-
     const [loading, setLoading] = useState(false);
 
-    const handleFilter = () => {
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
         setLoading(true);
         refetch().finally(() => {
             setLoading(false);
@@ -39,46 +42,27 @@ const DomiciliarioFilters = ({
     }
 
   return (
-    <div>
-        <div className="p-4 mb-4">
-            <h2 className="text-lg text-center font-semibold my-4">Busqueda por:</h2>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <SimpleInput
-                    label="Cronológico"
-                    value={crono}
-                    setValue={setCrono}
-                    horizontal
-                />
-                <SimpleInput
-                    label="Solicitante"
-                    value={solicitante}
-                    setValue={setSolicitante}
-                    horizontal
-                />
-
-            </div>
-            <h2 className="text-lg text-center font-semibold my-4">Busqueda por Fecha Cronologico:</h2>
-            <div className="w-full grid grid-cols-3 gap-4 justify-center items-center text-center my-6">
-                <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-                    <p>Fecha Inicio</p>
-                    <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} />
-                </div>
-                <div className="flex flex-col justify-center items-center gap-4 font-semibold text-sm">
-                    <p>Fecha Fin</p>
-                    <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} />
-                </div>
-                <div>
-                    <button 
-                        onClick={handleFilter}
-                        className="bg-blue-500 w-[100px] text-white rounded-lg text-sm py-2 px-4 hover:bg-blue-600 cursor-pointer"
-                        disabled={loading}
-                    >
-                        {loading ? <Loader className="animate-spin text-center mx-auto" /> : 'Buscar'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ExtraFiltersShell onSubmit={handleSubmit} columns={2}>
+        <ExtraFilterTextField
+            label="Cronológico"
+            value={crono}
+            onChange={setCrono}
+            index={0}
+        />
+        <ExtraFilterTextField
+            label="Solicitante"
+            value={solicitante}
+            onChange={setSolicitante}
+            index={1}
+        />
+        <ExtraFilterField label="Fecha inicio" index={2}>
+            <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterField label="Fecha fin" index={3}>
+            <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} fullWidth />
+        </ExtraFilterField>
+        <ExtraFilterSearchButton loading={loading} index={4} colSpan={2} />
+    </ExtraFiltersShell>
   )
 }
 
