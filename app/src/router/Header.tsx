@@ -10,8 +10,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Receipt,
+  Send,
   Settings,
-  Shield,
   Stamp,
   type LucideProps,
 } from 'lucide-react'
@@ -561,7 +561,7 @@ const Header = ({ kardexTypes }: Props) => {
                   aria-current={isHrefActive("/app/sisgen") ? "page" : undefined}
                   onClick={resetNavigationState}
                 >
-                  <Shield className="h-4 w-4 shrink-0" aria-hidden />
+                  <Send className="h-4 w-4 shrink-0" aria-hidden />
                   {!collapsed && <span>Sisgen</span>}
                 </Link>
               </motion.div>
