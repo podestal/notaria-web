@@ -7,6 +7,8 @@ import moment from "moment"
 import PermisosTable from "../../../../extraprotocolares/permisosViaje/PermisosTable"
 import Paginator from "../../../../../ui/Paginator"
 
+import ReportPageShell from "../../../../../ui/ReportPageShell"
+import LoadingState from "../../../../../ui/LoadingState"
 const PermisoViajes = () => {
 
   const [page, setPage] = useState(1)
@@ -21,13 +23,8 @@ const PermisoViajes = () => {
   })
 
   const { data: permisoViajesPage, isLoading, isError, error, isSuccess, refetch } = useGetPermisosViaje({ access, page, dateFrom, dateTo })
-
-  if (isLoading) return <p className="text-center text-xs animate-pulse my-4 py-4">Cargando ...</p>;
-  if (isError) return <p className="text-center text-xs text-red-500 my-4 py-4 ">Error: {error.message}</p>;
-  if (isSuccess) 
-
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black py-6">
+    <ReportPageShell>
         <ReportHeader title="Indice Cronológico de Permisos de Viaje" />
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
@@ -44,7 +41,11 @@ const PermisoViajes = () => {
           }}
           name='reporte_permisos_viaje'
         />
-        <PermisosTable
+      {isLoading && <LoadingState />}
+      {isError && <p className="my-8 text-center text-sm text-red-600">Error: {error.message}</p>}
+      {isSuccess && (
+        <>
+<PermisosTable
           permisosPage={permisoViajesPage}
           readyOnly={true}
           // page={page}
@@ -54,7 +55,9 @@ const PermisoViajes = () => {
           setPage={setPage}
           itemsCount={permisoViajesPage.count}
         />
-    </div>
+        </>
+      )}
+</ReportPageShell>
   )
 }
 

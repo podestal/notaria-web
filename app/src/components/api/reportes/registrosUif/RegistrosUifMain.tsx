@@ -6,6 +6,10 @@ import RegistroUifBody from "./RegistroUifBody"
 import type { UifReportPolicy } from "../../../../services/uif/uifService"
 import type { UifTabId } from "../../../../services/uif/uifTypes"
 
+import ReportPageShell from "../../../ui/ReportPageShell"
+import ReportHeader from "../../../ui/ReportHeader"
+import LoadingState from "../../../ui/LoadingState"
+
 const RegistrosUifMain = () => {
 
   const access = useAuthStore(s => s.access_token) || ''
@@ -43,7 +47,8 @@ const RegistrosUifMain = () => {
   const showLoading = hasGenerated && (isLoading || isFetching)
 
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
+    <ReportPageShell>
+      <ReportHeader title="Registros UIF" subtitle="Generación del registro de operaciones UIF" />
       <RegistroUifFilters
         dateFrom={dateFrom}
         setDateFrom={setDateFrom}
@@ -54,14 +59,12 @@ const RegistrosUifMain = () => {
         onGenerate={handleGenerate}
         isLoading={isLoading || isFetching}
       />
-      {showLoading && (
-        <div className="my-10 text-black text-center">Cargando...</div>
-      )}
+      {showLoading && <LoadingState message="Generando registro…" description="Consultando operaciones UIF" />}
 
       {isError && !showLoading && (
-        <div className="my-10 text-black text-center">
+        <p className="my-10 text-center text-sm text-red-600">
           Error al cargar los datos {error?.message}
-        </div>
+        </p>
       )}
 
       {uifData && !showLoading && (
@@ -77,7 +80,7 @@ const RegistrosUifMain = () => {
           setPage={setPage}
         />
       )}
-    </div>
+    </ReportPageShell>
   )
 }
 

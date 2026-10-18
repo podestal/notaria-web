@@ -7,6 +7,7 @@ import ExtraProtocolaresHeader from "../../ExtraProtocolaresHeader"
 import ReportHeader from "../../../../../ui/ReportHeader"
 import LoadingState from "../../../../../ui/LoadingState"
 
+import ReportPageShell from "../../../../../ui/ReportPageShell"
 const NoContenciosos = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
     const now = new Date()
@@ -19,12 +20,8 @@ const NoContenciosos = () => {
   const [page, setPage] = useState(1)
   const access = useAuthStore(s => s.access_token) || ''
   const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 2, indexReport: 'yes', access, dateFrom, dateTo})
-
-  if (isLoading) return <LoadingState />
-  if (isError) return <p>Error: {error.message}</p>
-  if (isSuccess)
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black py-6">
+    <ReportPageShell>
       <ReportHeader title="Indice Cronológico de Asuntos No Contenciosos" />
       <ExtraProtocolaresHeader 
         dateFrom={dateFrom} 
@@ -41,13 +38,17 @@ const NoContenciosos = () => {
         }}
         name='reporte_no_contenciosos'
       />
+      {isLoading && <LoadingState />}
+      {isError && <p className="my-8 text-center text-sm text-red-600">Error: {error.message}</p>}
+      {isSuccess && (
       <KardexTable 
         kardexPage={escrituras}
         setPage={setPage}
         page={page}
         readyOnly={true}
       />
-  </div>
+      )}
+  </ReportPageShell>
   )
 }
 

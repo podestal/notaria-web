@@ -7,6 +7,9 @@ import Paginator from '../../../../ui/Paginator'
 import ArchivosPdtKardexBody from './ArchivosPdtKardexBody'
 import moment from 'moment'
 
+import ReportHeader from "../../../../ui/ReportHeader"
+import LoadingState from "../../../../ui/LoadingState"
+import ReportPageShell from "../../../../ui/ReportPageShell"
 const ArchivosPdtEscrituras = () => {
 
   const access = useAuthStore(s => s.access_token) || ''
@@ -19,8 +22,8 @@ const ArchivosPdtEscrituras = () => {
   const { data: escriturasPdt, isLoading, isError, error, isSuccess, refetch } = useGetEscriturasPdt({ access, page, dateFrom, dateTo })
 
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black">
-
+    <ReportPageShell>
+      <ReportHeader title="Archivos PDT Escrituras" subtitle="Generación de archivos PDT" />
         <ArchivosPdtHeader 
             dateFrom={dateFrom}
             setDateFrom={setDateFrom}
@@ -31,7 +34,7 @@ const ArchivosPdtEscrituras = () => {
             refetch={refetch}
         />
         {isLoading && (
-            <div className="text-center animate-pulse text-xs ">Cargando...</div>
+            <LoadingState message="Cargando PDT…" description="Consultando operaciones" />
         )}
         {isSuccess && dateFrom && dateTo && (
             <>
@@ -56,9 +59,9 @@ const ArchivosPdtEscrituras = () => {
             </>
         )}
         {isError && (
-            <div className="text-center text-red-500">{error.message}</div>
+            <p className="my-8 text-center text-sm text-red-600">{error.message}</p>
         )}
-    </div>
+    </ReportPageShell>
   )
 }
 

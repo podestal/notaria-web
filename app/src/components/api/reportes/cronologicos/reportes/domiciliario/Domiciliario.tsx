@@ -7,6 +7,8 @@ import useAuthStore from "../../../../../../store/useAuthStore";
 import DomiciliarioTable from "../../../../extraprotocolares/certificadoDomiciliario/DomiciliarioTable";
 import Paginator from "../../../../../ui/Paginator";
 
+import ReportPageShell from "../../../../../ui/ReportPageShell"
+import LoadingState from "../../../../../ui/LoadingState"
 const Domiciliario = () => {
   const access = useAuthStore(state => state.access_token) || '';
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
@@ -20,13 +22,8 @@ const Domiciliario = () => {
   const [page, setPage] = useState(1);
   
   const { data: domiciliariosPage, isLoading, isError, error, isSuccess, refetch } = useGetDomiciliarios({ access, page, dateFrom, dateTo })
-
-  if (isLoading) return <p className="text-center text-xs animate-pulse my-4 py-4">Cargando ...</p>;
-  if (isError) return <p className="text-center text-xs text-red-500 my-4 py-4 ">Error: {error.message}</p>;
-  if (isSuccess) 
-
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black py-6">
+    <ReportPageShell>
       <ReportHeader title="Indice Cronológico de Certificados Domiciliarios" />
       <ExtraProtocolaresHeader 
         dateFrom={dateFrom} 
@@ -43,7 +40,11 @@ const Domiciliario = () => {
         }}
         name='reporte_domiciliario'
       />
-      <DomiciliarioTable 
+      {isLoading && <LoadingState />}
+      {isError && <p className="my-8 text-center text-sm text-red-600">Error: {error.message}</p>}
+      {isSuccess && (
+        <>
+<DomiciliarioTable 
         domiciliarios={domiciliariosPage.results}
         page={page}
         readyOnly={true}
@@ -53,7 +54,9 @@ const Domiciliario = () => {
         setPage={setPage}
         itemsCount={domiciliariosPage.count}
       />
-  </div>
+        </>
+      )}
+</ReportPageShell>
   )
 }
 

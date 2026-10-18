@@ -9,6 +9,8 @@ import moment from "moment"
 
 
 
+import ReportPageShell from "../../../../../ui/ReportPageShell"
+import LoadingState from "../../../../../ui/LoadingState"
 const AperturaLibros = () => {
   const access = useAuthStore(s => s.access_token) || ''
   const [page, setPage] = useState(1)
@@ -23,13 +25,8 @@ const AperturaLibros = () => {
   const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal')
 
   const { data: librosPage, isLoading, isError, error, isSuccess, refetch } = useGetLibros({ access, page:1, dateFrom, dateTo })
-
-  if (isLoading) return <p className="text-center text-xs animate-pulse my-4 py-4">Cargando ...</p>;
-  if (isError) return <p className="text-center text-xs text-red-500 my-4 py-4 ">Error: {error.message}</p>;
-  if (isSuccess) 
-
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black py-6">
+    <ReportPageShell>
         <ReportHeader title="Indice Cronológico de Libros" />
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
@@ -47,7 +44,11 @@ const AperturaLibros = () => {
           name='reporte_libros'
           orientation={'horizontal'}
         />
-        <LibrosTable 
+      {isLoading && <LoadingState />}
+      {isError && <p className="my-8 text-center text-sm text-red-600">Error: {error.message}</p>}
+      {isSuccess && (
+        <>
+<LibrosTable 
           libros={librosPage.results}
           readyOnly={true}
           page={page}
@@ -57,7 +58,9 @@ const AperturaLibros = () => {
           setPage={setPage}
           itemsCount={librosPage.count}
         />
-    </div>
+        </>
+      )}
+</ReportPageShell>
   )
 }
 

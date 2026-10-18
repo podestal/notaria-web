@@ -8,6 +8,8 @@ import PoderesFueraDeRegistroTable from "../../../../extraprotocolares/poderesFu
 import Paginator from "../../../../../ui/Paginator"
 
 
+import ReportPageShell from "../../../../../ui/ReportPageShell"
+import LoadingState from "../../../../../ui/LoadingState"
 const Poderes = () => {
 
 
@@ -23,13 +25,8 @@ const Poderes = () => {
   })
 
   const { data: poderesPage, isLoading, isError, error, isSuccess, refetch } = useGetIngresoPoderes({ access, page, dateFrom, dateTo })
-
-  if (isLoading) return <p className="text-center text-xs animate-pulse my-4 py-4">Cargando ...</p>;
-  if (isError) return <p className="text-center text-xs text-red-500 my-4 py-4 ">Error: {error.message}</p>;
-  if (isSuccess) 
-
   return (
-    <div className="mt-[80px] w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg mb-10 text-black py-6">
+    <ReportPageShell>
         <ReportHeader title="Indice Cronológico de Poderes Fuera de Registro" />
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
@@ -46,7 +43,11 @@ const Poderes = () => {
           }}
           name='reporte_ingreso_poderes'
         />
-        <PoderesFueraDeRegistroTable
+      {isLoading && <LoadingState />}
+      {isError && <p className="my-8 text-center text-sm text-red-600">Error: {error.message}</p>}
+      {isSuccess && (
+        <>
+<PoderesFueraDeRegistroTable
           poderes={poderesPage}
           readyOnly={true}
           page={page}
@@ -67,7 +68,9 @@ const Poderes = () => {
           setPage={setPage}
           itemsCount={permisoViajesPage.count}
         /> */}
-    </div>
+        </>
+      )}
+</ReportPageShell>
   )
 }
 
