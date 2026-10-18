@@ -22,7 +22,7 @@ import useBodyRenderStore from '../hooks/store/bodyRenderStore'
 import useCorrelativeStore from '../hooks/store/useCorrelativeStore'
 import getTitleCase from '../utils/getTitleCase'
 import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
 import { isFacturacionEnabled } from '../utils/isFacturacionEnabled'
 import ComplianceMeReminder from '../components/api/kardex/kardexErrors/ComplianceMeReminder'
@@ -170,6 +170,7 @@ const Header = ({ kardexTypes }: Props) => {
     const currentYear = moment().format('YYYY')
 
     const location = useLocation()
+    const navigate = useNavigate()
     const [openDropdown, setOpenDropdown] = useState<number | null>(0);
     const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
     const collapsed = useSidebarStore((s) => s.collapsed)
@@ -576,6 +577,13 @@ const Header = ({ kardexTypes }: Props) => {
                   type="button"
                   title={item.label}
                   onClick={() => {
+                    if (item.label === "Protocolares") {
+                      resetNavigationState()
+                      navigate("/app/protocolares")
+                      if (collapsed) setCollapsed(false)
+                      setOpenDropdown(index)
+                      return
+                    }
                     if (collapsed) {
                       setCollapsed(false)
                       setOpenDropdown(index)

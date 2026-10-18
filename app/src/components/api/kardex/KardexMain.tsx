@@ -5,6 +5,7 @@ import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import KardexFilters from "./KardexFilters"
 import KardexHeader from "./KardexHeader"
 import KardexTable from "./KardexTable"
+import ProtocolaresHub from "./ProtocolaresHub"
 import useGetKardexList from "../../../hooks/api/kardex/useGetKardexList"
 import useAuthStore from "../../../store/useAuthStore"
 import LoadingState from "../../ui/LoadingState"
@@ -20,6 +21,7 @@ const kardexTypes: Record<number, string> = {
 const KardexMain = () => {
 
     const [searchParams] = useSearchParams()
+    const tipkarParam = searchParams.get('tipkar')
     const setBodyRender = useBodyRenderStore(s => s.setBodyRender)
     const bodyRender = useBodyRenderStore(s => s.bodyRender)
     const [correlative, setCorrelative] = useState(kardexTypes[bodyRender])
@@ -29,9 +31,9 @@ const KardexMain = () => {
     const [page, setPage] = useState(1)
     const idtipkar = useBodyRenderStore(s => s.bodyRender)
     const access = useAuthStore(s => s.access_token) || ''
+    const hasTipkar = Boolean(tipkarParam)
 
     useEffect(() => {
-        const tipkarParam = searchParams.get('tipkar')
         if (tipkarParam) {
             const id = parseInt(tipkarParam, 10)
             if (!Number.isNaN(id) && id !== bodyRender) {
@@ -39,15 +41,16 @@ const KardexMain = () => {
                 return
             }
         }
-    }, [searchParams, bodyRender, setBodyRender])
+    }, [tipkarParam, bodyRender, setBodyRender])
 
     useEffect(() => {
+        if (!hasTipkar) return
         setCorrelative(kardexTypes[bodyRender])
         setPage(1)
         setName('')
         setDocument('')
         setNumescritura('')
-    }, [bodyRender])
+    }, [bodyRender, hasTipkar])
 
     const { data: kardexPage, isLoading, isError, error, isSuccess, refetch } = useGetKardexList({
         page: page.toString(),
@@ -57,7 +60,12 @@ const KardexMain = () => {
         name,
         document,
         numescritura,
+        enabled: hasTipkar,
     })
+
+  if (!hasTipkar) {
+    return <ProtocolaresHub />
+  }
 
   return (
     <motion.div
