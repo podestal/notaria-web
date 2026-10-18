@@ -218,9 +218,6 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Usuarios Taxes", path: "/app/configuracion/usuarios-taxes"},
                 {name: "Tareas", path: "/app/configuracion/tareas"},
             ]},
-        { label: "Sisgen", options:
-            [   {name: "SISGEN", path: "/app/sisgen"}
-            ]},
         { label: "Facturacion", options:
             
             [ 
@@ -241,9 +238,6 @@ const Header = ({ kardexTypes }: Props) => {
     ].filter((item) => {
       if (item.label === "Configuracion") {
         return Number(user?.is_superuser) !== 0 || Number(user?.is_staff) !== 0;
-      }
-      if (item.label === "Sisgen") {
-        return Number(user?.is_superuser) !== 0;
       }
       if (item.label === "Facturacion") {
         return isFacturacionEnabled();
@@ -290,11 +284,20 @@ const Header = ({ kardexTypes }: Props) => {
           <ComplianceMeReminder />
           <Link
             to="/app/panel-general"
-            className="mb-3 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
+            className="mb-2 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
             onClick={resetNavigationState}
           >
             Panel General
           </Link>
+          {Number(user?.is_superuser) !== 0 && (
+            <Link
+              to="/app/sisgen"
+              className="mb-3 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide text-slate-200 transition hover:bg-slate-800 hover:text-white"
+              onClick={resetNavigationState}
+            >
+              Sisgen
+            </Link>
+          )}
           {menuItems.map((item, index) => (
             <div key={item.label} className="mb-2">
               <button
