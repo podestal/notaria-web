@@ -1,7 +1,9 @@
+import { useEffect } from "react";
+import { motion } from "framer-motion";
 import useAuthStore from "../../../../../store/useAuthStore"
 import useGetIngresoPoderesContratantesByPoder from "../../../../../hooks/api/extraprotocolares/ingresoPoderes/contratantes/useGetIngresoPoderesContratantesByPoder";
 import ContratantesCard from "./ContratantesCard";
-import { useEffect } from "react";
+import { emptyMotionProps } from "../../rowMotion";
 
 interface Props {
     idPoder: number;
@@ -41,7 +43,7 @@ const ContratantesTableBody = ({ idPoder, setContratantesDocs }: Props) => {
                     idx={idx}
                 />
             )) :
-            <p className="text-center text-xs my-4">No hay contratantes disponibles</p>
+            <motion.p {...emptyMotionProps} className="text-center text-xs my-4 text-slate-500">No hay contratantes disponibles</motion.p>
         }
     </>
   )

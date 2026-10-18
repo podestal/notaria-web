@@ -1,7 +1,9 @@
 import { useEffect } from "react";
+import { motion } from "framer-motion";
 import useGetContratantesByViaje from "../../../../../hooks/api/extraprotocolares/permisosViaje/contratantes/useGetContratantesByViaje";
 import useAuthStore from "../../../../../store/useAuthStore";
 import ParticipanteCard from "./ParticipanteCard";
+import { emptyMotionProps } from "../../rowMotion";
 
 interface Props {
     viajeId: number;
@@ -38,7 +40,7 @@ const ParticipantesTableBody = ({ viajeId, setParticipantesDocs }: Props) => {
           ))}
         </div>
       ) : (
-        <p className="text-center text-xs my-4">No hay participantes disponibles</p>
+        <motion.p {...emptyMotionProps} className="text-center text-xs my-4 text-slate-500">No hay participantes disponibles</motion.p>
       )}
     </>
   )

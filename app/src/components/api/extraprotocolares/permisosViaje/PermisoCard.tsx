@@ -2,23 +2,27 @@ import { PermisoViaje } from "../../../../services/api/extraprotocolares/permiso
 import { PERMISO_VIAJE_CONDICIONES, PERMISO_VIAJE_ASUNTOS } from "../../../../data/permisoViajeData"
 import TopModal from "../../../ui/TopModal";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import UpdatePermiso from "./UpdatePermiso";
 import getTitleCase from "../../../../utils/getTitleCase";
+import { rowMotionProps } from "../rowMotion";
 
 interface Props {
     permisoViaje: PermisoViaje
     readyOnly?: boolean
+    index?: number
 }
 
-const PermisoCard = ({ permisoViaje, readyOnly }: Props) => {
+const PermisoCard = ({ permisoViaje, readyOnly, index = 0 }: Props) => {
 
     const [open, setOpen] = useState(false);
     
 
   return (
     <>
-    <div
-        className={`grid grid-cols-9 gap-4 p-2 my-4 mx-6 text-xs ${permisoViaje.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}
+    <motion.div
+        {...rowMotionProps(index)}
+        className={`grid grid-cols-9 gap-4 p-2 my-4 mx-6 text-xs transition-colors hover:bg-sky-50/60 ${permisoViaje.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}
       >
         <p 
             onClick={() => {
@@ -41,7 +45,7 @@ const PermisoCard = ({ permisoViaje, readyOnly }: Props) => {
         <p className="text-center">{PERMISO_VIAJE_ASUNTOS.find(asunto => asunto.cod_asunto === permisoViaje.asunto)?.des_asunto}</p>
         <p className="text-center">{permisoViaje.fec_ingreso}</p>
         <p className="col-span-2 text-center">{getTitleCase(permisoViaje.lugar_formu || '')}</p>
-      </div>
+      </motion.div>
       <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}

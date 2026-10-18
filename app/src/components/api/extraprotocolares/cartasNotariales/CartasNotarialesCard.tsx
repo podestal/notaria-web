@@ -1,22 +1,28 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { IngresoCartas } from "../../../../services/api/extraprotocolares/ingresoCartas"
 import TopModal from "../../../ui/TopModal";
 import UpdateCartasNotariales from "./UpdateCartasNotariales";
 import getTitleCase from "../../../../utils/getTitleCase";
+import { rowMotionProps } from "../rowMotion";
 
 interface Props {
     carta: IngresoCartas
     page: number
     readyOnly?: boolean
+    index?: number
 }
 
-const CartasNotarialesCard = ({ carta, readyOnly }: Props) => {
+const CartasNotarialesCard = ({ carta, readyOnly, index = 0 }: Props) => {
 
   const [open, setOpen] = useState(false);
 
   return (
       <>
-      <div className="grid grid-cols-7 gap-4 justify-center items-center text-center text-black text-xs p-2 my-4 mx-6">
+      <motion.div
+        {...rowMotionProps(index)}
+        className="grid grid-cols-7 gap-4 justify-center items-center text-center text-slate-800 text-xs p-2 my-4 mx-6 transition-colors hover:bg-sky-50/60"
+      >
         <p
           onClick={() => {
             if (readyOnly) return;
@@ -28,7 +34,7 @@ const CartasNotarialesCard = ({ carta, readyOnly }: Props) => {
         <p>{carta.fec_entrega}</p>
         <p className="col-span-2">{getTitleCase(carta.nom_remitente || "")}</p>
         <p className="col-span-2">{getTitleCase(carta.nom_destinatario || "")}</p>
-      </div>
+      </motion.div>
       <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}

@@ -1,6 +1,8 @@
+import { motion } from "framer-motion"
 import useGetSellos from "../../../../../hooks/api/extraprotocolares/ingresoCartas/sellosCartas/useGetSellos"
 import useAuthStore from "../../../../../store/useAuthStore"
 import getTitleCase from "../../../../../utils/getTitleCase"
+import { rowMotionProps } from "../../rowMotion"
 
 interface Props {
     description: string
@@ -32,9 +34,10 @@ const SellosTable = ({
         <div>
             {sellos
             .filter(s => s.dessello.toLowerCase().includes(description.toLowerCase()))
-            .map(s => (
-                <div 
+            .map((s, index) => (
+                <motion.div 
                 key={s.idsello}
+                {...rowMotionProps(index)}
                 onClick={() => {
                     setContenido(s.contenido || '')
                     setOpenSellos(false)
@@ -43,7 +46,7 @@ const SellosTable = ({
                 >
                     <p>{s.idsello}</p>
                     <p className="col-span-3">{getTitleCase(s.dessello || '')}</p>
-                </div>
+                </motion.div>
             ))}
         </div>
     </div>

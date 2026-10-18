@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
 import useGetLegalizaciones from "../../../../hooks/api/extraprotocolares/legalizacion/useGetLegalizaciones"
 import useAuthStore from "../../../../store/useAuthStore"
 import Paginator from "../../../ui/Paginator"
 import LegalizacionCard from "./LegalizacionCard"
+import { emptyMotionProps } from "../rowMotion"
 
 interface Props {
     dateFrom: Date | undefined
@@ -28,15 +30,16 @@ const LegalizacionTableBody = ({ dateFrom, dateTo }: Props) => {
     <>
         {legalizaciones.results.length > 0 ? (
             <div className="pb-2">
-                {legalizaciones.results.map((legalizacion) => (
+                {legalizaciones.results.map((legalizacion, index) => (
                     <LegalizacionCard 
                         key={legalizacion.idlegalizacion}
                         legalizacion={legalizacion}
+                        index={index}
                     />
                 ))}
             </div>
         ) : (
-            <p className="text-center text-xs my-4 pb-4">No hay legalizaciones disponibles</p>
+            <motion.p {...emptyMotionProps} className="text-center text-xs my-4 pb-4 text-slate-500">No hay legalizaciones disponibles</motion.p>
         )}
         <Paginator
           page={page}

@@ -1,22 +1,28 @@
 import { useState } from "react"
+import { motion } from "framer-motion"
 import { TIPO_PODERES } from "../../../../data/poderesFueraDeRegistro"
 import { IngresoPoderes } from "../../../../services/api/extraprotocolares/ingresoPoderes"
 import TopModal from "../../../ui/TopModal"
 import UpdatePoderesFueraDeRegistro from "./UpdatePoderesFueraDeRegistro"
+import { rowMotionProps } from "../rowMotion"
 
 interface Props {
     poder: IngresoPoderes
     page: number
     readyOnly?: boolean
+    index?: number
 }
 
-const PoderesFueraDeRegistroCard = ({ poder, page, readyOnly }: Props) => {
+const PoderesFueraDeRegistroCard = ({ poder, page, readyOnly, index = 0 }: Props) => {
 
     const [open, setOpen] = useState(false);
 
   return (
     <>
-        <div className={`grid grid-cols-8 gap-4 justify-center items-center text-center text-black text-xs p-2 my-4 mx-6 ${poder.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}>
+        <motion.div
+            {...rowMotionProps(index)}
+            className={`grid grid-cols-8 gap-4 justify-center items-center text-center text-slate-800 text-xs p-2 my-4 mx-6 transition-colors hover:bg-sky-50/60 ${poder.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}
+        >
             <p
                 onClick={() => {
                     if (readyOnly) return;
@@ -37,7 +43,7 @@ const PoderesFueraDeRegistroCard = ({ poder, page, readyOnly }: Props) => {
                 ))}
             </div>
             <p>{poder.fec_ingreso}</p>
-        </div>
+        </motion.div>
         <TopModal
             isOpen={open}
             onClose={() => setOpen(false)}

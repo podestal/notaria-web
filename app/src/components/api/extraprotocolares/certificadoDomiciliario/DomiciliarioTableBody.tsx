@@ -10,8 +10,8 @@ interface Props {
 const DomiciliarioTableBody = ({ domiciliarios, page, readyOnly }: Props) => {
   return (
     <>
-        {domiciliarios.map((domiciliario) => (
-            <DomiciliarioCard key={domiciliario.id_domiciliario} domiciliario={domiciliario} readyOnly={readyOnly}  />
+        {domiciliarios.map((domiciliario, index) => (
+            <DomiciliarioCard key={domiciliario.id_domiciliario} domiciliario={domiciliario} readyOnly={readyOnly} index={index} />
         ))}
     </>
   )

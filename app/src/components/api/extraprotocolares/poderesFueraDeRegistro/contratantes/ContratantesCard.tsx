@@ -1,7 +1,9 @@
+import { motion } from "framer-motion";
 import { IngresoPoderesContratante } from "../../../../../services/api/extraprotocolares/IngresoPoderesContratanteService"
 import { PODERES_CONDICIONES } from "../../../../../data/poderesFueraDeRegistro";
 import RemoveContratante from "./RemoveContratante";
 import UpdateContratante from "./UpdateContratante";
+import { rowMotionProps } from "../../rowMotion";
 
 interface Props {
     contratante: IngresoPoderesContratante
@@ -10,8 +12,9 @@ interface Props {
 
 const ContratantesCard = ({ contratante, idx }: Props) => {
   return (
-    <div 
-        className="grid grid-cols-8 gap-4 justify-center items-center text-center text-xs p-2 my-4 mx-6 border-b border-gray-200"
+    <motion.div 
+        {...rowMotionProps(idx)}
+        className="grid grid-cols-8 gap-4 justify-center items-center text-center text-xs p-2 my-4 mx-6 border-b border-gray-200 transition-colors hover:bg-sky-50/60"
     >   
         <p>{idx + 1}</p>
         <p>{contratante.c_codcontrat}</p>
@@ -35,7 +38,7 @@ const ContratantesCard = ({ contratante, idx }: Props) => {
                 ingresoPoderesContratanteId={contratante.id_contrata}
             />
         </div>
-    </div>
+    </motion.div>
   )
 }
 
