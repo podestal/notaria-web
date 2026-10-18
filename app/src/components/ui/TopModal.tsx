@@ -1,6 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import useSidebarStore, {
+  SIDEBAR_WIDTH_COLLAPSED,
+  SIDEBAR_WIDTH_EXPANDED,
+} from '../../hooks/store/useSidebarStore';
 
 interface TopModalProps {
   isOpen: boolean;
@@ -27,6 +31,8 @@ const TopModal = ({
   banner,
   tone = "default",
 }: TopModalProps) => {
+  const collapsed = useSidebarStore((s) => s.collapsed)
+  const sidebarLeft = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED
   const overlayZIndex = deepth ?? 40
   const contentZIndex = overlayZIndex + 10
   const dangerFrame =
@@ -63,8 +69,8 @@ const TopModal = ({
           )}
           {/* Overlay */}
           <motion.div
-            className="fixed inset-y-0 right-0 left-56 bg-black/40"
-            style={{ zIndex: overlayZIndex }}
+            className="fixed inset-y-0 right-0 bg-black/40"
+            style={{ zIndex: overlayZIndex, left: sidebarLeft }}
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -75,10 +81,10 @@ const TopModal = ({
           <motion.div
             className={
               wide
-                ? `fixed top-12 right-3 left-56 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-4 text-slate-700 shadow-lg sm:p-6 ${dangerFrame}`
-                : `fixed top-20 right-0 left-56 mx-auto flex w-full max-h-[calc(100vh-5rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-lg max-w-5xl ${dangerFrame}`
+                ? `fixed top-12 right-3 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-4 text-slate-700 shadow-lg sm:p-6 ${dangerFrame}`
+                : `fixed top-20 right-0 mx-auto flex w-full max-h-[calc(100vh-5rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-lg max-w-5xl ${dangerFrame}`
             }
-            style={{ zIndex: contentZIndex }}
+            style={{ zIndex: contentZIndex, left: sidebarLeft }}
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
             exit={{ y: '-100%' }}

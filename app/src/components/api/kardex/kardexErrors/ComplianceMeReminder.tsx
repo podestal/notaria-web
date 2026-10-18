@@ -203,7 +203,7 @@ const ComplianceMeReminder = () => {
                             <button
                                 type="button"
                                 onClick={() => setModalOpen(true)}
-                                className={styles.primaryBtn}
+                                className={`cursor-pointer ${styles.primaryBtn}`}
                             >
                                 {tone === "green" ? "Ver detalle" : "Ver mis kardex"}
                             </button>

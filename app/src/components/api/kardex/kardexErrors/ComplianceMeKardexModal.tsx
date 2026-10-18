@@ -133,7 +133,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
 
     return (
         <>
-            <TopModal isOpen={isOpen} onClose={handleClose} wide>
+            <TopModal isOpen={isOpen} onClose={handleClose} wide portal>
                 <div className="flex min-h-0 flex-1 flex-col gap-4">
                     <header className="border-b border-slate-200 pb-3">
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
