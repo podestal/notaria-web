@@ -11,8 +11,8 @@ const ConfiguracionMain = () => {
   }
 
   return (
-    <div className="w-[85%] mx-auto bg-slate-100 rounded-lg shadow-lg text-black">
-        <Outlet />
+    <div className="mx-auto mb-10 mt-4 w-[92%] max-w-[1400px] text-slate-800">
+      <Outlet />
     </div>
   )
 }

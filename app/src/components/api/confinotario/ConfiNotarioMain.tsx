@@ -1,5 +1,14 @@
 import { useEffect, useMemo, useState } from "react"
-import { Loader2, Save } from "lucide-react"
+import { motion } from "framer-motion"
+import {
+  Building2,
+  Hash,
+  Loader2,
+  Mail,
+  MapPin,
+  Save,
+  UserRound,
+} from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import useGetConfinotario from "../../../hooks/api/confinotario/useGetConfinotario"
@@ -7,6 +16,7 @@ import useUpdateConfinotario from "../../../hooks/api/confinotario/useUpdateConf
 import { UpdateConfinotario } from "../../../services/api/confinotarioService"
 import ConfiNotarioField from "./components/ConfiNotarioField"
 import ConfiNotarioSection from "./components/ConfiNotarioSection"
+import LoadingState from "../../ui/LoadingState"
 
 const emptyForm: UpdateConfinotario = {
   nombre: "",
@@ -80,6 +90,12 @@ const ConfiNotarioMain = () => {
       setShow(true)
       return
     }
+    if (!data?.idnotar) {
+      setMessage("No se encontró el registro del notario")
+      setType("error")
+      setShow(true)
+      return
+    }
     if (isInvalid) {
       setMessage("Complete los campos requeridos: nombre, apellido, telefono, correo y ruc")
       setType("error")
@@ -114,7 +130,7 @@ const ConfiNotarioMain = () => {
       },
       {
         onSuccess: () => {
-          setMessage("Configuracion del notario actualizada correctamente")
+          setMessage("Configuración del notario actualizada correctamente")
           setType("success")
           setShow(true)
         },
@@ -123,7 +139,7 @@ const ConfiNotarioMain = () => {
             (err as any)?.response?.data?.detail ||
             (err as any)?.response?.data?.message ||
             err.message ||
-            "No se pudo actualizar la configuracion del notario"
+            "No se pudo actualizar la configuración del notario"
           setMessage(backendMessage)
           setType("error")
           setShow(true)
@@ -132,97 +148,184 @@ const ConfiNotarioMain = () => {
     )
   }
 
-  if (isLoading) return <p className="my-8 text-center text-sm text-slate-500">Cargando configuracion del notario...</p>
-  if (isError) return <p className="my-8 text-center text-sm text-rose-600">Error: {error.message}</p>
+  if (isLoading) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <LoadingState message="Cargando datos…" description="Configuración del notario" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-rose-200 bg-rose-50/60 p-8 text-center">
+        <p className="text-sm font-medium text-rose-700">Error: {error.message}</p>
+      </div>
+    )
+  }
+
+  const displayName = [form.nombre, form.apellido].filter(Boolean).join(" ").trim()
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      <header className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Datos del Notario</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Administre la informacion institucional y codigos de configuracion.
-          </p>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
+        <div className="keep-dark relative overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-5 text-slate-100">
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sky-500/20 blur-3xl"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.55, 0.85, 0.55] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-24 left-1/4 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl"
+            animate={{ scale: [1.1, 1, 1.1], opacity: [0.45, 0.75, 0.45] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <div className="relative flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <motion.div
+                initial={{ scale: 0.6, rotate: -12, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.08 }}
+                className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2.5"
+              >
+                <Building2 className="text-sky-300" size={22} />
+              </motion.div>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-sky-300/90">Configuración</p>
+                <h1 className="text-lg font-semibold text-white">Datos del Notario</h1>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Información institucional y códigos de configuración
+                </p>
+              </div>
+            </div>
+            {displayName ? (
+              <motion.div
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15, duration: 0.35 }}
+                className="flex items-center gap-2 rounded-xl border border-slate-600/80 bg-slate-800/70 px-3 py-2"
+              >
+                <UserRound size={14} className="text-sky-300" />
+                <p className="text-xs font-medium text-slate-200">{displayName}</p>
+              </motion.div>
+            ) : null}
+          </div>
         </div>
-      </header>
 
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/50 p-4 sm:p-5">
           <ConfiNotarioSection
-            title="Datos Principales"
-            subtitle="Informacion general del notario y datos obligatorios"
+            index={0}
+            icon={UserRound}
+            title="Datos principales"
+            subtitle="Información general del notario y campos obligatorios"
           >
-            <ConfiNotarioField label="Nombre" value={form.nombre} required onChange={(value) => handleChange("nombre", value)} />
-            <ConfiNotarioField label="Apellido" value={form.apellido} required onChange={(value) => handleChange("apellido", value)} />
-            <ConfiNotarioField label="Telefono" value={form.telefono} required onChange={(value) => handleChange("telefono", value)} />
-            <ConfiNotarioField label="Correo" value={form.correo} type="email" required onChange={(value) => handleChange("correo", value)} />
-            <ConfiNotarioField label="RUC" value={form.ruc} required onChange={(value) => handleChange("ruc", value)} />
-            <ConfiNotarioField label="RUC Test" value={form.ructest ?? ""} onChange={(value) => handleChange("ructest", value)} />
-            <ConfiNotarioField label="Abreviatura" value={form.abrev ?? ""} onChange={(value) => handleChange("abrev", value)} />
+            <ConfiNotarioField index={0} label="Nombre" value={form.nombre} required onChange={(value) => handleChange("nombre", value)} />
+            <ConfiNotarioField index={1} label="Apellido" value={form.apellido} required onChange={(value) => handleChange("apellido", value)} />
+            <ConfiNotarioField index={2} label="Teléfono" value={form.telefono} required onChange={(value) => handleChange("telefono", value)} />
+            <ConfiNotarioField index={3} label="Correo" value={form.correo} type="email" required onChange={(value) => handleChange("correo", value)} />
+            <ConfiNotarioField index={4} label="RUC" value={form.ruc} required onChange={(value) => handleChange("ruc", value)} />
+            <ConfiNotarioField index={5} label="RUC Test" value={form.ructest ?? ""} onChange={(value) => handleChange("ructest", value)} />
+            <ConfiNotarioField index={6} label="Abreviatura" value={form.abrev ?? ""} onChange={(value) => handleChange("abrev", value)} />
           </ConfiNotarioSection>
 
           <ConfiNotarioSection
-            title="Ubicacion"
-            subtitle="Direccion y datos geograficos de la notaria"
+            index={1}
+            icon={MapPin}
+            title="Ubicación"
+            subtitle="Dirección y datos geográficos de la notaría"
           >
-            <ConfiNotarioField label="Direccion" value={form.direccion ?? ""} onChange={(value) => handleChange("direccion", value)} />
-            <ConfiNotarioField label="Distrito" value={form.distrito ?? ""} onChange={(value) => handleChange("distrito", value)} />
-            <ConfiNotarioField label="Provincia" value={form.provincia ?? ""} onChange={(value) => handleChange("provincia", value)} />
-            <ConfiNotarioField label="Departamento" value={form.departamento ?? ""} onChange={(value) => handleChange("departamento", value)} />
-            <ConfiNotarioField label="Ubigeo" value={form.ubigeo ?? ""} onChange={(value) => handleChange("ubigeo", value)} />
-            <label className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Es Lima</span>
+            <ConfiNotarioField index={0} label="Dirección" value={form.direccion ?? ""} onChange={(value) => handleChange("direccion", value)} className="md:col-span-2" />
+            <ConfiNotarioField index={1} label="Distrito" value={form.distrito ?? ""} onChange={(value) => handleChange("distrito", value)} />
+            <ConfiNotarioField index={2} label="Provincia" value={form.provincia ?? ""} onChange={(value) => handleChange("provincia", value)} />
+            <ConfiNotarioField index={3} label="Departamento" value={form.departamento ?? ""} onChange={(value) => handleChange("departamento", value)} />
+            <ConfiNotarioField index={4} label="Ubigeo" value={form.ubigeo ?? ""} onChange={(value) => handleChange("ubigeo", value)} />
+            <motion.label
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, delay: 0.15 }}
+              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2 transition-shadow focus-within:border-sky-300 focus-within:shadow-md focus-within:shadow-sky-100"
+            >
+              <span className="min-w-[6.5rem] shrink-0 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Es Lima
+              </span>
               <select
                 value={form.islima === null ? "" : String(form.islima)}
-                onChange={(e) => setForm((prev) => ({ ...prev, islima: e.target.value === "" ? null : Number(e.target.value) }))}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    islima: e.target.value === "" ? null : Number(e.target.value),
+                  }))
+                }
+                className="w-full min-w-0 rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
               >
                 <option value="">No definido</option>
-                <option value="1">Si</option>
+                <option value="1">Sí</option>
                 <option value="0">No</option>
               </select>
-            </label>
+            </motion.label>
           </ConfiNotarioSection>
 
           <ConfiNotarioSection
-            title="Codigos Institucionales"
+            index={2}
+            icon={Hash}
+            title="Códigos institucionales"
             subtitle="Identificadores para integraciones y reportes"
+            columns={3}
           >
-            <ConfiNotarioField label="Cod. Notario" value={form.codnotario ?? ""} onChange={(value) => handleChange("codnotario", value)} />
-            <ConfiNotarioField label="Cod. Oficial" value={form.codoficial ?? ""} onChange={(value) => handleChange("codoficial", value)} />
-            <ConfiNotarioField label="Cod. UIF" value={form.coduif ?? ""} onChange={(value) => handleChange("coduif", value)} />
+            <ConfiNotarioField index={0} label="Cod. Notario" value={form.codnotario ?? ""} onChange={(value) => handleChange("codnotario", value)} />
+            <ConfiNotarioField index={1} label="Cod. Oficial" value={form.codoficial ?? ""} onChange={(value) => handleChange("codoficial", value)} />
+            <ConfiNotarioField index={2} label="Cod. UIF" value={form.coduif ?? ""} onChange={(value) => handleChange("coduif", value)} />
           </ConfiNotarioSection>
 
           <ConfiNotarioSection
-            title="Correo de Caja"
-            subtitle="Credenciales usadas para envios desde caja"
+            index={3}
+            icon={Mail}
+            title="Correo de caja"
+            subtitle="Credenciales usadas para envíos desde caja"
           >
-            <ConfiNotarioField label="Caja Email" value={form.cajaemail ?? ""} onChange={(value) => handleChange("cajaemail", value)} />
-            <ConfiNotarioField label="Password Email" value={form.passwordemail ?? ""} onChange={(value) => handleChange("passwordemail", value)} />
+            <ConfiNotarioField index={0} label="Caja Email" value={form.cajaemail ?? ""} type="email" onChange={(value) => handleChange("cajaemail", value)} />
+            <ConfiNotarioField index={1} label="Password Email" value={form.passwordemail ?? ""} type="password" onChange={(value) => handleChange("passwordemail", value)} />
           </ConfiNotarioSection>
-        </div>
 
-        <div className="mt-5 flex justify-end border-t border-slate-200 pt-4">
-          <button
-            type="submit"
-            disabled={updateConfinotario.isPending || isInvalid}
-            className="inline-flex items-center gap-2 rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-px hover:bg-blue-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35 }}
+            className="sticky bottom-3 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur"
           >
-            {updateConfinotario.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Guardando...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4" />
-                Guardar cambios
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+            <p className="text-[11px] text-slate-400">
+              {isInvalid
+                ? "Complete los campos marcados con * para guardar"
+                : "Los cambios se aplicarán al guardar"}
+            </p>
+            <motion.button
+              type="submit"
+              disabled={updateConfinotario.isPending || isInvalid}
+              whileHover={updateConfinotario.isPending || isInvalid ? undefined : { y: -1 }}
+              whileTap={updateConfinotario.isPending || isInvalid ? undefined : { scale: 0.96 }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {updateConfinotario.isPending ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="h-3.5 w-3.5" />
+                  Guardar cambios
+                </>
+              )}
+            </motion.button>
+          </motion.div>
+        </form>
+    </motion.div>
   )
 }
 
