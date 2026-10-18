@@ -1,8 +1,20 @@
 import moment from 'moment'
 import { daysInSpanish, monthsInSpanish } from '../utils/datesInSpanish'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ComponentType } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import {
+  BarChart3,
+  ChevronDown,
+  FileText,
+  LayoutDashboard,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Receipt,
+  Settings,
+  Shield,
+  Stamp,
+  type LucideProps,
+} from 'lucide-react'
 import Logout from '../components/auth/Logout'
 import ThemeToggle from '../components/ui/ThemeToggle'
 import { Tipokardex } from '../services/api/tipokardexService'
@@ -14,6 +26,20 @@ import { Link, useLocation } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
 import { isFacturacionEnabled } from '../utils/isFacturacionEnabled'
 import ComplianceMeReminder from '../components/api/kardex/kardexErrors/ComplianceMeReminder'
+import useSidebarStore, {
+  SIDEBAR_WIDTH_COLLAPSED,
+  SIDEBAR_WIDTH_EXPANDED,
+} from '../hooks/store/useSidebarStore'
+
+type NavIcon = ComponentType<LucideProps>
+
+const SECTION_ICONS: Record<string, NavIcon> = {
+  Protocolares: FileText,
+  Extraprotocolares: Stamp,
+  Reportes: BarChart3,
+  Configuracion: Settings,
+  Facturacion: Receipt,
+}
 
 const pathMatches = (currentPath: string, targetPath: string) => {
   if (!targetPath) return false
@@ -29,15 +55,19 @@ const SECTION_PREFIX: Record<string, string> = {
   Facturacion: "/app/taxes",
 }
 
-const topLinkClass = (active: boolean) =>
-  `mb-2 flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide transition ${
+const topLinkClass = (active: boolean, collapsed: boolean) =>
+  `mb-2 flex w-full items-center rounded-lg text-left text-xs font-bold tracking-wide transition ${
+    collapsed ? "h-10 justify-center px-0 py-0" : "gap-2.5 px-3 py-2"
+  } ${
     active
       ? "bg-sky-600/25 text-sky-200 ring-1 ring-sky-500/40"
       : "text-slate-200 hover:bg-slate-800 hover:text-white"
   }`
 
-const sectionButtonClass = (active: boolean, open: boolean) =>
-  `flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-bold tracking-wide transition ${
+const sectionButtonClass = (active: boolean, open: boolean, collapsed: boolean) =>
+  `flex w-full items-center rounded-lg text-left text-xs font-bold tracking-wide transition ${
+    collapsed ? "h-10 justify-center px-0 py-0" : "justify-between px-3 py-2"
+  } ${
     active
       ? "bg-sky-600/20 text-sky-200 ring-1 ring-sky-500/35"
       : open
@@ -142,6 +172,9 @@ const Header = ({ kardexTypes }: Props) => {
     const location = useLocation()
     const [openDropdown, setOpenDropdown] = useState<number | null>(0);
     const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
+    const collapsed = useSidebarStore((s) => s.collapsed)
+    const toggleCollapsed = useSidebarStore((s) => s.toggleCollapsed)
+    const setCollapsed = useSidebarStore((s) => s.setCollapsed)
     const user = useUserInfoStore( s => s.user)
     const notariaName = import.meta.env.VITE_NOTARIA_NAME || 'Sin nombre'
     const notariaLogoSlug = notariaName
@@ -386,6 +419,11 @@ const Header = ({ kardexTypes }: Props) => {
     });
 
     useEffect(() => {
+      if (collapsed) {
+        setOpenDropdown(null)
+        setOpenSubDropdown(null)
+        return
+      }
       const activeIndex = menuItems.findIndex((item) => isSectionActive(item))
       if (activeIndex >= 0) {
         setOpenDropdown(activeIndex)
@@ -400,55 +438,98 @@ const Header = ({ kardexTypes }: Props) => {
         }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps -- sync open section to route
-    }, [location.pathname, location.search])
+    }, [location.pathname, location.search, collapsed])
 
   return (
     <motion.aside
       variants={sidebarVariants}
       initial="hidden"
       animate="visible"
-      className="keep-dark fixed left-0 top-0 z-40 h-screen w-56 border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl"
+      className="keep-dark fixed left-0 top-0 z-40 h-screen overflow-hidden border-r border-slate-800 bg-slate-950 text-slate-100 shadow-2xl transition-[width] duration-300 ease-in-out"
+      style={{ width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED }}
     >
       <div className="flex h-full flex-col">
-        <motion.div variants={sidebarSectionVariants} className="border-b border-slate-800 p-4">
+        <motion.div
+          variants={sidebarSectionVariants}
+          className={`border-b border-slate-800 ${collapsed ? "p-2.5" : "p-4"}`}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.12 }}
-            className="flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shadow-lg"
+            className={`flex items-center gap-2 rounded-xl border border-slate-800 bg-gradient-to-r from-slate-900 to-slate-800 shadow-lg ${
+              collapsed ? "justify-center px-2 py-2.5" : "justify-center px-4 py-3"
+            }`}
           >
             <motion.img
               src={notariaLogo}
               alt="Logo Notaria"
-              className="mb-2 h-8 w-8 rounded-md border border-amber-300/50 object-cover shadow-sm"
+              className="h-8 w-8 rounded-md border border-amber-300/50 object-cover shadow-sm"
               loading="lazy"
               initial={{ rotate: -8, opacity: 0 }}
               animate={{ rotate: 0, opacity: 1 }}
               transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.2 }}
             />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-sky-300">Notaría</p>
-              <p className="text-base font-semibold leading-5 text-white">{notariaName}</p>
-            </div>
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  key="notaria-meta"
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -6 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-sky-300">Notaría</p>
+                  <p className="text-base font-semibold leading-5 text-white">{notariaName}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.22, ease: "easeOut" }}
-            className="mt-3 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-3 shadow-lg"
+          <AnimatePresence initial={false}>
+            {!collapsed && (
+              <motion.div
+                key="welcome-card"
+                initial={{ opacity: 0, height: 0, y: -6 }}
+                animate={{ opacity: 1, height: "auto", y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -6 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 rounded-xl border border-slate-800 bg-slate-900/95 px-4 py-3 shadow-lg">
+                  <p className="text-[11px] text-slate-400">
+                    {getTitleCase(currentDate)} {currentDay} de {getTitleCase(currentMonth)} del {currentYear}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-white">Bienvenido, {welcomeName}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            title={collapsed ? "Expandir menú" : "Contraer menú"}
+            aria-label={collapsed ? "Expandir menú" : "Contraer menú"}
+            aria-pressed={collapsed}
+            className={`mt-3 inline-flex items-center justify-center rounded-lg border border-slate-700 bg-slate-900 text-slate-300 transition hover:border-slate-500 hover:bg-slate-800 hover:text-white ${
+              collapsed ? "h-9 w-full" : "h-8 w-full gap-2 px-3 text-[11px] font-semibold tracking-wide"
+            }`}
           >
-            <p className="text-[11px] text-slate-400">
-              {getTitleCase(currentDate)} {currentDay} de {getTitleCase(currentMonth)} del {currentYear}
-            </p>
-            <p className="mt-1 text-sm font-semibold text-white">Bienvenido, {welcomeName}</p>
-          </motion.div>
+            {collapsed ? (
+              <PanelLeftOpen className="h-4 w-4" aria-hidden />
+            ) : (
+              <>
+                <PanelLeftClose className="h-3.5 w-3.5" aria-hidden />
+                <span>Contraer menú</span>
+              </>
+            )}
+          </button>
         </motion.div>
 
         <motion.div
           variants={sidebarSectionVariants}
-          className="flex-1 overflow-y-auto px-3 py-3"
+          className={`flex-1 overflow-y-auto overflow-x-hidden py-3 ${collapsed ? "px-2" : "px-3"}`}
         >
-          <ComplianceMeReminder />
+          {!collapsed && <ComplianceMeReminder />}
           <motion.div
             variants={{
               hidden: {},
@@ -462,53 +543,73 @@ const Header = ({ kardexTypes }: Props) => {
             <motion.div variants={navItemVariants}>
               <Link
                 to="/app/panel-general"
-                className={topLinkClass(isHrefActive("/app/panel-general"))}
+                title="Panel General"
+                className={topLinkClass(isHrefActive("/app/panel-general"), collapsed)}
                 aria-current={isHrefActive("/app/panel-general") ? "page" : undefined}
                 onClick={resetNavigationState}
               >
-                Panel General
+                <LayoutDashboard className="h-4 w-4 shrink-0" aria-hidden />
+                {!collapsed && <span>Panel General</span>}
               </Link>
             </motion.div>
             {Number(user?.is_superuser) !== 0 && (
               <motion.div variants={navItemVariants}>
                 <Link
                   to="/app/sisgen"
-                  className={`${topLinkClass(isHrefActive("/app/sisgen"))} mb-3`}
+                  title="Sisgen"
+                  className={`${topLinkClass(isHrefActive("/app/sisgen"), collapsed)} mb-3`}
                   aria-current={isHrefActive("/app/sisgen") ? "page" : undefined}
                   onClick={resetNavigationState}
                 >
-                  Sisgen
+                  <Shield className="h-4 w-4 shrink-0" aria-hidden />
+                  {!collapsed && <span>Sisgen</span>}
                 </Link>
               </motion.div>
             )}
             {menuItems.map((item, index) => {
               const isOpen = openDropdown === index
               const sectionActive = isSectionActive(item)
+              const SectionIcon = SECTION_ICONS[item.label] ?? FileText
               return (
               <motion.div key={item.label} variants={navItemVariants} className="mb-2">
                 <button
                   type="button"
+                  title={item.label}
                   onClick={() => {
+                    if (collapsed) {
+                      setCollapsed(false)
+                      setOpenDropdown(index)
+                      return
+                    }
                     const next = isOpen ? null : index
                     setOpenDropdown(next)
                     if (next === null) setOpenSubDropdown(null)
                   }}
                   aria-expanded={isOpen}
                   aria-current={sectionActive ? "true" : undefined}
-                  className={sectionButtonClass(sectionActive, isOpen)}
+                  className={sectionButtonClass(sectionActive, isOpen, collapsed)}
                 >
-                  <span>{item.label}</span>
-                  <motion.span
-                    animate={{ rotate: isOpen ? 0 : -90 }}
-                    transition={{ duration: 0.22, ease: "easeOut" }}
-                    className={`inline-flex ${sectionActive ? "text-sky-300" : "text-slate-400"}`}
-                  >
-                    <ChevronDown className="h-3.5 w-3.5" aria-hidden />
-                  </motion.span>
+                  {collapsed ? (
+                    <SectionIcon className="h-4 w-4 shrink-0" aria-hidden />
+                  ) : (
+                    <>
+                      <span className="flex items-center gap-2.5">
+                        <SectionIcon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+                        <span>{item.label}</span>
+                      </span>
+                      <motion.span
+                        animate={{ rotate: isOpen ? 0 : -90 }}
+                        transition={{ duration: 0.22, ease: "easeOut" }}
+                        className={`inline-flex ${sectionActive ? "text-sky-300" : "text-slate-400"}`}
+                      >
+                        <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+                      </motion.span>
+                    </>
+                  )}
                 </button>
 
                 <AnimatePresence initial={false}>
-                  {isOpen && (
+                  {!collapsed && isOpen && (
                     <motion.ul
                       key={`${item.label}-options`}
                       variants={dropdownVariants}
@@ -615,15 +716,19 @@ const Header = ({ kardexTypes }: Props) => {
 
         <motion.div
           variants={sidebarSectionVariants}
-          className="border-t border-slate-800 p-4"
+          className={`border-t border-slate-800 ${collapsed ? "p-2.5" : "p-4"}`}
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.35, ease: "easeOut" }}
-            className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/95 px-3 py-2"
+            className={`flex items-center rounded-xl border border-slate-800 bg-slate-900/95 ${
+              collapsed
+                ? "flex-col justify-center gap-2 px-1.5 py-2"
+                : "justify-between px-3 py-2"
+            }`}
           >
-            <Logout />
+            <Logout iconOnly={collapsed} />
             <ThemeToggle className="border-slate-600 bg-slate-800 text-slate-100 hover:border-slate-400 hover:bg-slate-700" />
           </motion.div>
         </motion.div>

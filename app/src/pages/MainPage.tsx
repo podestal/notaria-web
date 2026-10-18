@@ -7,16 +7,22 @@ import NotificationCard from '../components/ui/NotificationCard'
 import { Outlet } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import LoadingState from "../components/ui/LoadingState"
+import useSidebarStore, {
+  SIDEBAR_WIDTH_COLLAPSED,
+  SIDEBAR_WIDTH_EXPANDED,
+} from '../hooks/store/useSidebarStore'
 
 const MainPage = () => {
 
   const setKardexTypes = useKardexTypesStore(s => s.setKardexTypes)
   const { data: kardexTypes, isLoading, isError, error, isSuccess } = useGetTipoKardexList()
   const { notifications, removeNotification } = useNotificationsStore()
+  const collapsed = useSidebarStore((s) => s.collapsed)
   const isTestApp = import.meta.env.MODE === 'test'
   const visibleKardexTypes = (kardexTypes || []).filter(kardexType => kardexType.idtipkar <= 5)
   const persistentNotification = [...notifications].reverse().find((n) => n.persistent) ?? null
   const toastNotifications = notifications.filter((n) => !n.persistent)
+  const sidebarWidth = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED
 
   useEffect(() => {
     if (isSuccess) {
@@ -33,7 +39,10 @@ const MainPage = () => {
       <Header 
         kardexTypes={visibleKardexTypes}
       />
-      <main className="ml-56 min-h-screen min-w-0 bg-slate-100">
+      <main
+        className="min-h-screen min-w-0 bg-slate-100 transition-[margin] duration-300 ease-in-out"
+        style={{ marginLeft: sidebarWidth }}
+      >
         {isTestApp && (
           <div className="sticky top-0 z-50 border-b border-amber-300 bg-amber-100/95 px-4 py-2 text-center text-xs font-semibold tracking-wide text-amber-900 backdrop-blur">
             ENTORNO DE PRUEBAS: Esta aplicación es de test y no corresponde al sistema real de producción.
