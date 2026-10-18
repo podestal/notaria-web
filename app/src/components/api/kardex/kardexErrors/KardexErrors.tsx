@@ -208,7 +208,7 @@ const KardexErrors = () => {
               {year}
             </span>
             <select
-              className="rounded-md border border-slate-500 bg-slate-100 px-2 py-1 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-300"
+              className="cursor-pointer rounded-md border border-slate-500 bg-slate-100 px-2 py-1 font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-300"
               value={month}
               onChange={(e) => setMonth(Number(e.target.value))}
             >
@@ -357,7 +357,7 @@ const KardexErrors = () => {
                             type="button"
                             {...rowMotion(index)}
                             onClick={() => setSelectedUser(user)}
-                            className="group grid w-full items-center gap-3 px-4 py-3 text-left text-xs text-slate-700 transition-colors hover:bg-sky-50/70"
+                            className="group grid w-full cursor-pointer items-center gap-3 px-4 py-3 text-left text-xs text-slate-700 transition-colors hover:bg-sky-50/70"
                             style={{ gridTemplateColumns: USERS_GRID }}
                           >
                             <div className="min-w-0">

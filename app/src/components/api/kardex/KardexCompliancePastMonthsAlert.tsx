@@ -43,13 +43,13 @@ const KardexCompliancePastMonthsAlert = ({ sticky = false }: Props) => {
                         <button
                             type="button"
                             onClick={() => setModalOpen(true)}
-                            className="rounded-md bg-rose-600 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-rose-700"
+                            className="cursor-pointer rounded-md bg-rose-600 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-rose-700"
                         >
                             Ver mis kardex
                         </button>
                         <Link
                             to="/app/panel-general"
-                            className="rounded-md border border-rose-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-rose-800 transition hover:bg-rose-100"
+                            className="cursor-pointer rounded-md border border-rose-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-rose-800 transition hover:bg-rose-100"
                         >
                             Panel general
                         </Link>

@@ -178,7 +178,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                                 key={key}
                                                 type="button"
                                                 onClick={() => setSelectedMonthKey(key)}
-                                                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                                                className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                                                     isActive
                                                         ? isFocus
                                                             ? "bg-amber-500 text-white"
@@ -289,7 +289,7 @@ const ComplianceMeKardexModal = ({ isOpen, onClose }: Props) => {
                                                     setKardexCode(item.kardex)
                                                     setIsKardexOpen(true)
                                                 }}
-                                                className="text-left font-medium text-sky-700 hover:text-sky-900 hover:underline"
+                                                className="cursor-pointer text-left font-medium text-sky-700 hover:text-sky-900 hover:underline"
                                             >
                                                 {item.kardex}
                                             </button>

@@ -64,7 +64,7 @@ const ComplianceKardexModal = ({ isOpen, onClose, idkardex, kardex }: Props) => 
                             <button
                                 type="button"
                                 onClick={() => refetch()}
-                                className="rounded-lg border border-red-300 bg-white px-2 py-1 text-[10px] font-semibold hover:bg-red-50"
+                                className="cursor-pointer rounded-lg border border-red-300 bg-white px-2 py-1 text-[10px] font-semibold hover:bg-red-50"
                             >
                                 Reintentar
                             </button>

@@ -167,7 +167,7 @@ const ComplianceUserKardexModal = ({ user, year, month, onClose }: Props) => {
                                                                 setKardexCode(item.kardex)
                                                                 setIsKardexOpen(true)
                                                             }}
-                                                            className="truncate text-left font-semibold text-sky-700 hover:text-sky-900 hover:underline"
+                                                            className="cursor-pointer truncate text-left font-semibold text-sky-700 hover:text-sky-900 hover:underline"
                                                         >
                                                             {item.kardex}
                                                         </button>

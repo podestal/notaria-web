@@ -41,9 +41,9 @@ const toneStyles: Record<
         title: "text-amber-100",
         body: "text-amber-200/90",
         primaryBtn:
-            "rounded-md bg-amber-500/25 px-2 py-1 text-[10px] font-semibold text-amber-50 transition hover:bg-amber-500/35",
+            "cursor-pointer rounded-md bg-amber-500/25 px-2 py-1 text-[10px] font-semibold text-amber-50 transition hover:bg-amber-500/35",
         secondaryBtn:
-            "rounded-md border border-amber-500/30 px-2 py-1 text-[10px] font-semibold text-amber-100/90 transition hover:bg-amber-500/15",
+            "cursor-pointer rounded-md border border-amber-500/30 px-2 py-1 text-[10px] font-semibold text-amber-100/90 transition hover:bg-amber-500/15",
     },
     red: {
         card: "compliance-red-glow border-rose-500/55 bg-rose-950/55",
@@ -51,9 +51,9 @@ const toneStyles: Record<
         title: "text-rose-100",
         body: "text-rose-200/90",
         primaryBtn:
-            "rounded-md bg-rose-500/25 px-2 py-1 text-[10px] font-semibold text-rose-50 transition hover:bg-rose-500/35",
+            "cursor-pointer rounded-md bg-rose-500/25 px-2 py-1 text-[10px] font-semibold text-rose-50 transition hover:bg-rose-500/35",
         secondaryBtn:
-            "rounded-md border border-rose-500/30 px-2 py-1 text-[10px] font-semibold text-rose-100/90 transition hover:bg-rose-500/15",
+            "cursor-pointer rounded-md border border-rose-500/30 px-2 py-1 text-[10px] font-semibold text-rose-100/90 transition hover:bg-rose-500/15",
     },
     green: {
         card: "border-emerald-600/35 bg-emerald-950/40",
@@ -61,9 +61,9 @@ const toneStyles: Record<
         title: "text-emerald-100",
         body: "text-emerald-200/80",
         primaryBtn:
-            "rounded-md border border-emerald-500/25 px-2 py-1 text-[10px] font-semibold text-emerald-100/90 transition hover:bg-emerald-500/15",
+            "cursor-pointer rounded-md border border-emerald-500/25 px-2 py-1 text-[10px] font-semibold text-emerald-100/90 transition hover:bg-emerald-500/15",
         secondaryBtn:
-            "rounded-md border border-emerald-500/20 px-2 py-1 text-[10px] font-semibold text-emerald-200/80 transition hover:bg-emerald-500/10",
+            "cursor-pointer rounded-md border border-emerald-500/20 px-2 py-1 text-[10px] font-semibold text-emerald-200/80 transition hover:bg-emerald-500/10",
     },
 }
 
@@ -123,7 +123,7 @@ const ComplianceMeReminder = () => {
                 <button
                     type="button"
                     onClick={() => refetch()}
-                    className="mt-2 text-[10px] font-semibold text-sky-400 hover:text-sky-300"
+                    className="mt-2 cursor-pointer text-[10px] font-semibold text-sky-400 hover:text-sky-300"
                 >
                     Reintentar
                 </button>

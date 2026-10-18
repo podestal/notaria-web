@@ -56,7 +56,7 @@ const SECTION_PREFIX: Record<string, string> = {
 }
 
 const topLinkClass = (active: boolean, collapsed: boolean) =>
-  `mb-2 flex w-full items-center rounded-lg text-left text-xs font-bold tracking-wide transition ${
+  `mb-2 flex w-full cursor-pointer items-center rounded-lg text-left text-xs font-bold tracking-wide transition ${
     collapsed ? "h-10 justify-center px-0 py-0" : "gap-2.5 px-3 py-2"
   } ${
     active
@@ -65,7 +65,7 @@ const topLinkClass = (active: boolean, collapsed: boolean) =>
   }`
 
 const sectionButtonClass = (active: boolean, open: boolean, collapsed: boolean) =>
-  `flex w-full items-center rounded-lg text-left text-xs font-bold tracking-wide transition ${
+  `flex w-full cursor-pointer items-center rounded-lg text-left text-xs font-bold tracking-wide transition ${
     collapsed ? "h-10 justify-center px-0 py-0" : "justify-between px-3 py-2"
   } ${
     active
@@ -76,7 +76,7 @@ const sectionButtonClass = (active: boolean, open: boolean, collapsed: boolean) 
   }`
 
 const childLinkClass = (active: boolean) =>
-  `block w-full rounded-md px-3 py-2 text-left text-xs transition ${
+  `block w-full cursor-pointer rounded-md px-3 py-2 text-left text-xs transition ${
     active
       ? "bg-sky-600 text-white shadow-sm shadow-sky-900/40"
       : "text-slate-300 hover:bg-sky-700 hover:text-white"
@@ -510,7 +510,7 @@ const Header = ({ kardexTypes }: Props) => {
             title={collapsed ? "Expandir menú" : "Contraer menú"}
             aria-label={collapsed ? "Expandir menú" : "Contraer menú"}
             aria-pressed={collapsed}
-            className={`mt-3 inline-flex items-center justify-center rounded-lg border border-slate-700 bg-slate-900 text-slate-300 transition hover:border-slate-500 hover:bg-slate-800 hover:text-white ${
+            className={`mt-3 inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-700 bg-slate-900 text-slate-300 transition hover:border-slate-500 hover:bg-slate-800 hover:text-white ${
               collapsed ? "h-9 w-full" : "h-8 w-full gap-2 px-3 text-[11px] font-semibold tracking-wide"
             }`}
           >

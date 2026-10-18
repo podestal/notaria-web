@@ -11,7 +11,7 @@ const KardexErrorsHeader = () => {
             </div>
             <div className="flex items-center justify-center gap-2">
                 <p>Mostrar:</p>
-                <select className="bg-slate-100 text-slate-700 border border-slate-300 rounded-md p-2">
+                <select className="cursor-pointer bg-slate-100 text-slate-700 border border-slate-300 rounded-md p-2">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>

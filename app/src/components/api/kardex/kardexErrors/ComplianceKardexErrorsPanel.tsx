@@ -130,7 +130,7 @@ const ComplianceKardexErrorsPanel = ({
                         onClick={onRefresh}
                         disabled={isRefreshing}
                         title="Actualizar errores"
-                        className="flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         <RefreshCw
                             className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`}
@@ -150,7 +150,7 @@ const ComplianceKardexErrorsPanel = ({
                         key={tab.id}
                         type="button"
                         onClick={() => setActiveSource(tab.id)}
-                        className={`rounded-lg px-2 py-1.5 text-center text-[10px] font-semibold uppercase transition-colors ${
+                        className={`cursor-pointer rounded-lg px-2 py-1.5 text-center text-[10px] font-semibold uppercase transition-colors ${
                             activeSource === tab.id
                                 ? "bg-blue-600 text-white shadow-sm"
                                 : "bg-white text-slate-700 hover:bg-slate-100"
@@ -179,7 +179,7 @@ const ComplianceKardexErrorsPanel = ({
                                     key={tab.id}
                                     type="button"
                                     onClick={() => setActiveSisgenTab(tab.id)}
-                                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-medium transition-colors ${
+                                    className={`flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-medium transition-colors ${
                                         activeSisgenTab === tab.id
                                             ? "bg-sky-600 text-white"
                                             : "bg-white text-slate-700 hover:bg-slate-100"

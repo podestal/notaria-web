@@ -16,7 +16,7 @@ const ThemeToggle = ({ className = "" }: Props) => {
             onClick={toggleTheme}
             aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
             title={isDark ? "Modo claro" : "Modo oscuro"}
-            className={`inline-flex h-8 w-8 items-center justify-center rounded-md border transition-colors duration-200 ${className}`}
+            className={`inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border transition-colors duration-200 ${className}`}
         >
             {isDark ? <Sun className="h-4 w-4" aria-hidden /> : <Moon className="h-4 w-4" aria-hidden />}
         </button>
