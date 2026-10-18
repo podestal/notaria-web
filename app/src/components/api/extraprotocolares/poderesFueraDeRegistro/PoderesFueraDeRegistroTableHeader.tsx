@@ -1,12 +1,23 @@
+import { EXTRA_HEADER_CLASS } from "../ExtraTableShell"
+
+export const PODERES_GRID_COLUMNS =
+  "minmax(90px,1fr) minmax(90px,0.9fr) minmax(160px,1.8fr) minmax(90px,0.9fr) minmax(180px,2fr) minmax(90px,0.9fr)"
+
+const items = [
+  { label: "Nro Control" },
+  { label: "Cronológico" },
+  { label: "Tipo de Poder" },
+  { label: "Fec. Crono" },
+  { label: "Contratantes" },
+  { label: "Fec. Ingreso" },
+]
+
 const PoderesFueraDeRegistroTableHeader = () => {
   return (
-    <div className="grid grid-cols-8 gap-4 justify-center items-center text-center bg-slate-200 text-black text-xs font-semibold p-2 my-4 mx-6">
-        <div>Nro Control</div>
-        <div>Cronológico</div>
-        <div className="col-span-2">Tipo de Poder</div>
-        <div>Fec. Crono</div>
-        <div className="col-span-2">Contratantes</div>
-        <div>Fec. Ingreso</div>
+    <div className={EXTRA_HEADER_CLASS} style={{ gridTemplateColumns: PODERES_GRID_COLUMNS }}>
+      {items.map((item) => (
+        <p key={item.label} className="text-left">{item.label}</p>
+      ))}
     </div>
   )
 }

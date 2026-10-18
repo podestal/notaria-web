@@ -5,6 +5,8 @@ import TopModal from "../../../ui/TopModal";
 import { NUMERO_LIBROS, TIPOS_FOLIOS } from "../../../../data/librosData";
 import UpdateLibro from "./UpdateLibro";
 import { rowMotionProps } from "../rowMotion";
+import { EXTRA_ID_BADGE_CLASS, EXTRA_ROW_CLASS } from "../ExtraTableShell";
+import { LIBROS_GRID_COLUMNS } from "./LibrosTableHeader";
 
 interface Props {
     libro: Libro
@@ -13,31 +15,45 @@ interface Props {
     index?: number
 }
 
-const LibrosCard = ({ libro, readyOnly, page, index = 0 }: Props) => {
+const Empty = () => <span className="text-slate-300">—</span>
 
+const LibrosCard = ({ libro, readyOnly, page, index = 0 }: Props) => {
     const [open, setOpen] = useState(false);
+    const openRow = () => {
+        if (readyOnly) return
+        setOpen(true)
+    }
 
   return (
     <>
         <motion.div
             {...rowMotionProps(index)}
-            className="grid grid-cols-10 gap-4 justify-center items-center text-center text-slate-800 text-xs p-2 my-4 mx-6 transition-colors hover:bg-sky-50/60"
+            role={readyOnly ? undefined : "button"}
+            tabIndex={readyOnly ? undefined : 0}
+            onClick={openRow}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    openRow()
+                }
+            }}
+            className={`${EXTRA_ROW_CLASS} ${readyOnly ? "" : "cursor-pointer"}`}
+            style={{ gridTemplateColumns: LIBROS_GRID_COLUMNS }}
         >
-            <p
-                onClick={() => {
-                    if (readyOnly) return
-                    setOpen(true)
-                }}
-                className="text-center text-blue-600 cursor-pointer hover:text-blue-500"
-            >{libro.numlibro}-{libro.ano}</p>
-            <p>{libro.fecing}</p>
-            <p className="col-span-2">{libro.empresa}</p>
-            <p>{libro.idtiplib}</p>
-            <p>{NUMERO_LIBROS.find(libro => libro.idnlibro === libro.idnlibro)?.desnlibro}</p>
-            <p>{libro.folio}</p>
-            <p>{TIPOS_FOLIOS.find(folio => folio.idtipfol === libro.idtipfol)?.destipfol}</p>
-            <p>{libro.ruc}</p>
-            <p>l</p>
+            <div>
+                <span className={EXTRA_ID_BADGE_CLASS}>{libro.numlibro}-{libro.ano}</span>
+            </div>
+            <p className="tabular-nums text-slate-600">{libro.fecing || <Empty />}</p>
+            <p className="font-medium leading-snug text-slate-800" title={libro.empresa || undefined}>
+                {libro.empresa || <Empty />}
+            </p>
+            <p className="leading-snug text-slate-700">{libro.idtiplib || <Empty />}</p>
+            <p className="font-mono tabular-nums">
+                {NUMERO_LIBROS.find(n => n.idnlibro === libro.idnlibro)?.desnlibro || <Empty />}
+            </p>
+            <p className="font-mono text-center tabular-nums">{libro.folio || <Empty />}</p>
+            <p>{TIPOS_FOLIOS.find(folio => folio.idtipfol === libro.idtipfol)?.destipfol || <Empty />}</p>
+            <p className="font-mono tabular-nums text-slate-600">{libro.ruc || <Empty />}</p>
         </motion.div>
         <TopModal
             isOpen={open}

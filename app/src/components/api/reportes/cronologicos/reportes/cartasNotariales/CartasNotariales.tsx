@@ -49,6 +49,7 @@ const CartasNotariales = () => {
           ingresoCartas={cartasPage.results}
           readyOnly={true}
           page={page}
+          totalCount={cartasPage.count}
         />
         <Paginator
           page={page}

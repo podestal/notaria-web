@@ -1,16 +1,25 @@
+import { EXTRA_HEADER_CLASS } from "../ExtraTableShell"
+
+export const LIBROS_GRID_COLUMNS =
+  "minmax(110px,1.1fr) minmax(90px,0.9fr) minmax(180px,2fr) minmax(110px,1.1fr) minmax(90px,0.9fr) minmax(80px,0.8fr) minmax(100px,1fr) minmax(110px,1fr)"
+
+const items = [
+  { label: "Nº Cronológico" },
+  { label: "Fecha" },
+  { label: "Empresa / Cliente" },
+  { label: "Tipo Libro" },
+  { label: "N° de Libro" },
+  { label: "N° de Folio" },
+  { label: "Tipo de Folio" },
+  { label: "RUC" },
+]
+
 const LibrosTableHeader = () => {
-    // Nº Cronologico	Fecha	Empresa / Cliente	Tipo Libro	N° de Libro	N° de Folio	Tipo de Folio	RUC	
   return (
-    <div className="grid grid-cols-10 gap-4 justify-center items-center text-center bg-slate-200 text-black text-xs font-semibold p-2 my-4 mx-6">
-        <div>Nº Cronologico</div>
-        <div>Fecha</div>
-        <div className="col-span-2">Empresa / Cliente</div>
-        <div>Tipo Libro</div>
-        <div>N° de Libro</div>
-        <div>N° de Folio</div>
-        <div>Tipo de Folio</div>
-        <div>Ruc</div>
-        <div>l</div>
+    <div className={EXTRA_HEADER_CLASS} style={{ gridTemplateColumns: LIBROS_GRID_COLUMNS }}>
+      {items.map((item) => (
+        <p key={item.label} className="text-left">{item.label}</p>
+      ))}
     </div>
   )
 }

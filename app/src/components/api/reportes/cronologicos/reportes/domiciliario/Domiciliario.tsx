@@ -48,6 +48,7 @@ const Domiciliario = () => {
         domiciliarios={domiciliariosPage.results}
         page={page}
         readyOnly={true}
+        totalCount={domiciliariosPage.count}
       />
       <Paginator
         page={page}

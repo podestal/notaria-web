@@ -60,6 +60,7 @@ const CertDomiciliarioMain = () => {
           <DomiciliarioTable 
               domiciliarios={domiciliarioPage.results}
               page={page}
+              totalCount={domiciliarioPage.count}
           />
 
           <Paginator

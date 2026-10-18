@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
 import ContratantesTableBody from "./ContratantesTableBody"
-import ContratantesTableHeader from "./ContratantesTableHeader"
 
 interface Props {
     idPoder: number;
@@ -9,10 +8,7 @@ interface Props {
 
 const ContratantesTable = ({ idPoder, setContratantesDocs }: Props) => {
   return (
-    <>
-        <ContratantesTableHeader />
-        <ContratantesTableBody idPoder={idPoder} setContratantesDocs={setContratantesDocs} />
-    </>
+    <ContratantesTableBody idPoder={idPoder} setContratantesDocs={setContratantesDocs} />
   )
 }
 

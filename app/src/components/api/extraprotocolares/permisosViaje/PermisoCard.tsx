@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import UpdatePermiso from "./UpdatePermiso";
 import getTitleCase from "../../../../utils/getTitleCase";
 import { rowMotionProps } from "../rowMotion";
+import { EXTRA_ID_BADGE_CLASS, EXTRA_ROW_CLASS } from "../ExtraTableShell";
+import { PERMISOS_GRID_COLUMNS } from "./PermisosTableHeader";
 
 interface Props {
     permisoViaje: PermisoViaje
@@ -13,38 +15,52 @@ interface Props {
     index?: number
 }
 
-const PermisoCard = ({ permisoViaje, readyOnly, index = 0 }: Props) => {
+const Empty = () => <span className="text-slate-300">—</span>
 
+const PermisoCard = ({ permisoViaje, readyOnly, index = 0 }: Props) => {
     const [open, setOpen] = useState(false);
-    
+    const openRow = () => {
+        if (readyOnly) return
+        setOpen(true)
+    }
+    const tipo = PERMISO_VIAJE_ASUNTOS.find(asunto => asunto.cod_asunto === permisoViaje.asunto)?.des_asunto
 
   return (
     <>
     <motion.div
         {...rowMotionProps(index)}
-        className={`grid grid-cols-9 gap-4 p-2 my-4 mx-6 text-xs transition-colors hover:bg-sky-50/60 ${permisoViaje.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}
+        role={readyOnly ? undefined : "button"}
+        tabIndex={readyOnly ? undefined : 0}
+        onClick={openRow}
+        onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                openRow()
+            }
+        }}
+        className={`${EXTRA_ROW_CLASS} ${readyOnly ? "" : "cursor-pointer"} ${
+            permisoViaje.swt_est === "NC" ? "bg-amber-50/80 ring-1 ring-inset ring-amber-200" : ""
+        }`}
+        style={{ gridTemplateColumns: PERMISOS_GRID_COLUMNS }}
       >
-        <p 
-            onClick={() => {
-                if (readyOnly) return;
-                setOpen(true)
-            }}
-            className="text-center text-blue-600 cursor-pointer hover:text-blue-500">{permisoViaje.num_formu}</p>
-        <p className="text-center">{permisoViaje.num_kardex}</p>
-        <div className="col-span-2 text-center">
-            {permisoViaje.contratantes.map((contratante) => (
-                <div 
-                    className="grid grid-cols-6 gap-10 items-start justify-start text-left"
-                    key={contratante.id_contratante}>
-                    <p className="font-semibold col-span-2">{PERMISO_VIAJE_CONDICIONES.find(condicion => condicion.id_condicion === contratante.c_condicontrat)?.des_condicion}:</p>
-                    <p className="col-span-4">{contratante.c_descontrat}</p>
-                </div>
-            ))}
+        <div>
+            <span className={EXTRA_ID_BADGE_CLASS}>{permisoViaje.num_formu || <Empty />}</span>
         </div>
-        <p className="text-center">{permisoViaje.fecha_crono}</p>
-        <p className="text-center">{PERMISO_VIAJE_ASUNTOS.find(asunto => asunto.cod_asunto === permisoViaje.asunto)?.des_asunto}</p>
-        <p className="text-center">{permisoViaje.fec_ingreso}</p>
-        <p className="col-span-2 text-center">{getTitleCase(permisoViaje.lugar_formu || '')}</p>
+        <p className="font-mono tabular-nums text-slate-800">{permisoViaje.num_kardex || <Empty />}</p>
+        <div className="min-w-0 space-y-1">
+            {permisoViaje.contratantes?.length ? permisoViaje.contratantes.map((contratante) => (
+                <div key={contratante.id_contratante} className="leading-snug">
+                    <span className="font-semibold text-slate-500">
+                        {PERMISO_VIAJE_CONDICIONES.find(c => c.id_condicion === contratante.c_condicontrat)?.des_condicion}:
+                    </span>{" "}
+                    <span className="text-slate-800">{contratante.c_descontrat}</span>
+                </div>
+            )) : <Empty />}
+        </div>
+        <p className="tabular-nums text-slate-600">{permisoViaje.fecha_crono || <Empty />}</p>
+        <p className="leading-snug text-slate-700">{tipo || <Empty />}</p>
+        <p className="tabular-nums text-slate-600">{permisoViaje.fec_ingreso || <Empty />}</p>
+        <p className="leading-snug text-slate-700">{getTitleCase(permisoViaje.lugar_formu || "") || <Empty />}</p>
       </motion.div>
       <TopModal
         isOpen={open}

@@ -5,6 +5,8 @@ import TopModal from "../../../ui/TopModal";
 import UpdateCartasNotariales from "./UpdateCartasNotariales";
 import getTitleCase from "../../../../utils/getTitleCase";
 import { rowMotionProps } from "../rowMotion";
+import { EXTRA_ID_BADGE_CLASS, EXTRA_ROW_CLASS } from "../ExtraTableShell";
+import { CARTAS_GRID_COLUMNS } from "./CartasNotarialesTableHeader";
 
 interface Props {
     carta: IngresoCartas
@@ -13,27 +15,42 @@ interface Props {
     index?: number
 }
 
-const CartasNotarialesCard = ({ carta, readyOnly, index = 0 }: Props) => {
+const Empty = () => <span className="text-slate-300">—</span>
 
+const CartasNotarialesCard = ({ carta, readyOnly, index = 0 }: Props) => {
   const [open, setOpen] = useState(false);
+  const openRow = () => {
+    if (readyOnly) return
+    setOpen(true)
+  }
 
   return (
       <>
       <motion.div
         {...rowMotionProps(index)}
-        className="grid grid-cols-7 gap-4 justify-center items-center text-center text-slate-800 text-xs p-2 my-4 mx-6 transition-colors hover:bg-sky-50/60"
+        role={readyOnly ? undefined : "button"}
+        tabIndex={readyOnly ? undefined : 0}
+        onClick={openRow}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            openRow()
+          }
+        }}
+        className={`${EXTRA_ROW_CLASS} ${readyOnly ? "" : "cursor-pointer"}`}
+        style={{ gridTemplateColumns: CARTAS_GRID_COLUMNS }}
       >
-        <p
-          onClick={() => {
-            if (readyOnly) return;
-            setOpen(true)
-          }}
-          className="text-center text-blue-600 cursor-pointer hover:text-blue-500"
-        >{carta.num_carta}</p>
-        <p>{carta.fec_ingreso}</p>
-        <p>{carta.fec_entrega}</p>
-        <p className="col-span-2">{getTitleCase(carta.nom_remitente || "")}</p>
-        <p className="col-span-2">{getTitleCase(carta.nom_destinatario || "")}</p>
+        <div>
+          <span className={EXTRA_ID_BADGE_CLASS}>{carta.num_carta || <Empty />}</span>
+        </div>
+        <p className="tabular-nums text-slate-600">{carta.fec_ingreso || <Empty />}</p>
+        <p className="tabular-nums text-slate-600">{carta.fec_entrega || <Empty />}</p>
+        <p className="font-medium leading-snug text-slate-800">
+          {getTitleCase(carta.nom_remitente || "") || <Empty />}
+        </p>
+        <p className="leading-snug text-slate-700">
+          {getTitleCase(carta.nom_destinatario || "") || <Empty />}
+        </p>
       </motion.div>
       <TopModal
         isOpen={open}

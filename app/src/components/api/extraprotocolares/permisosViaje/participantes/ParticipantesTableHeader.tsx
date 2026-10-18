@@ -1,16 +1,23 @@
+import { EXTRA_HEADER_CLASS } from "../../ExtraTableShell"
 
+export const PARTICIPANTES_GRID_COLUMNS =
+  "48px minmax(100px,1fr) minmax(180px,2fr) 72px minmax(120px,1.2fr) 88px"
+
+const items = [
+  { label: "No" },
+  { label: "Código" },
+  { label: "Nombre" },
+  { label: "Firma" },
+  { label: "Condición" },
+  { label: "" },
+]
 
 const ParticipantesTableHeader = () => {
   return (
-    <div className="grid grid-cols-8 gap-4 justify-center items-center text-center bg-slate-100 text-black text-xs font-semibold p-2 my-4 mx-6">
-        <p>No</p>
-        <p>Codigo</p>
-        <p className="col-span-2">Nombre</p>
-        <p>Firma</p>
-        <p className="col-span-2">Condicion</p>
-        <div className="flex justify-center items-center gap-4 text-xs">
-
-        </div>
+    <div className={EXTRA_HEADER_CLASS} style={{ gridTemplateColumns: PARTICIPANTES_GRID_COLUMNS }}>
+      {items.map((item, i) => (
+        <p key={item.label || `actions-${i}`} className="text-left">{item.label}</p>
+      ))}
     </div>
   )
 }

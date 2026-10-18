@@ -52,6 +52,7 @@ const AperturaLibros = () => {
           libros={librosPage.results}
           readyOnly={true}
           page={page}
+          totalCount={librosPage.count}
         />
         <Paginator
           page={page}

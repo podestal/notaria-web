@@ -68,6 +68,7 @@ const CartasNotarialesMain = () => {
         <CartasNotarialesTable 
           ingresoCartas={ingresoCartas.results}
           page={page}
+          totalCount={ingresoCartas.count}
         />
         <Paginator
           page={page}

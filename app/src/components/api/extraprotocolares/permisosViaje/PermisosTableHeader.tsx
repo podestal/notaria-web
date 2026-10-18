@@ -1,16 +1,29 @@
+import { EXTRA_HEADER_CLASS } from "../ExtraTableShell"
 
+export const PERMISOS_GRID_COLUMNS =
+  "minmax(100px,1fr) minmax(90px,0.9fr) minmax(220px,2.2fr) minmax(90px,0.9fr) minmax(110px,1.1fr) minmax(90px,0.9fr) minmax(160px,1.6fr)"
+
+const items = [
+  { label: "Nro Control", align: "left" },
+  { label: "Cronológico", align: "left" },
+  { label: "Participantes", align: "left" },
+  { label: "Fecha Crono.", align: "left" },
+  { label: "Tip. Permiso", align: "left" },
+  { label: "Fec. Ingreso", align: "left" },
+  { label: "Descripción", align: "left" },
+]
 
 const PermisosTableHeader = () => {
-
   return (
-    <div className="grid grid-cols-9 gap-4 justify-center items-center text-center bg-slate-200 text-black text-xs font-semibold p-2 my-4 mx-6">
-      <div>Nro Control</div>
-      <div>Cronológico</div>
-      <div className="col-span-2">Participantes</div>
-      <div>Fecha Crono.</div>
-      <div>Tip. Permiso</div>
-      <div>Fec. Ingreso</div>
-      <div className="col-span-2">Descripción</div>
+    <div
+      className={EXTRA_HEADER_CLASS}
+      style={{ gridTemplateColumns: PERMISOS_GRID_COLUMNS }}
+    >
+      {items.map((item) => (
+        <p key={item.label} className={item.align === "center" ? "text-center" : "text-left"}>
+          {item.label}
+        </p>
+      ))}
     </div>
   )
 }

@@ -66,6 +66,7 @@ const AperturaDeLibrosMain = () => {
         <LibrosTable 
           libros={librosData.results}
           page={page}
+          totalCount={librosData.count}
         />
         <Paginator
           page={page}

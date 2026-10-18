@@ -1,5 +1,4 @@
 import LegalizacionTableBody from "./LegalizacionTableBody"
-import LegalizacionTableHeader from "./LegalizacionTableHeader"
 
 interface Props {
     dateFrom: Date | undefined
@@ -8,14 +7,10 @@ interface Props {
 
 const LegalizacionTable = ({ dateFrom, dateTo }: Props) => {
   return (
-    <>
-      <LegalizacionTableHeader />
-      <LegalizacionTableBody 
-        dateFrom={dateFrom}
-        dateTo={dateTo}
-      />
-
-    </>
+    <LegalizacionTableBody
+      dateFrom={dateFrom}
+      dateTo={dateTo}
+    />
   )
 }
 

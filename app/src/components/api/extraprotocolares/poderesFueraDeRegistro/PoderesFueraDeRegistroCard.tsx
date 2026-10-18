@@ -5,6 +5,8 @@ import { IngresoPoderes } from "../../../../services/api/extraprotocolares/ingre
 import TopModal from "../../../ui/TopModal"
 import UpdatePoderesFueraDeRegistro from "./UpdatePoderesFueraDeRegistro"
 import { rowMotionProps } from "../rowMotion"
+import { EXTRA_ID_BADGE_CLASS, EXTRA_ROW_CLASS } from "../ExtraTableShell"
+import { PODERES_GRID_COLUMNS } from "./PoderesFueraDeRegistroTableHeader"
 
 interface Props {
     poder: IngresoPoderes
@@ -13,36 +15,48 @@ interface Props {
     index?: number
 }
 
-const PoderesFueraDeRegistroCard = ({ poder, page, readyOnly, index = 0 }: Props) => {
+const Empty = () => <span className="text-slate-300">—</span>
 
+const PoderesFueraDeRegistroCard = ({ poder, page, readyOnly, index = 0 }: Props) => {
     const [open, setOpen] = useState(false);
+    const openRow = () => {
+        if (readyOnly) return
+        setOpen(true)
+    }
+    const tipo = TIPO_PODERES.find(p => p.id_asunto === poder.id_asunto)?.des_asunto
 
   return (
     <>
         <motion.div
             {...rowMotionProps(index)}
-            className={`grid grid-cols-8 gap-4 justify-center items-center text-center text-slate-800 text-xs p-2 my-4 mx-6 transition-colors hover:bg-sky-50/60 ${poder.swt_est === 'NC' ? 'bg-amber-500/10 border-amber-500 border-1 rounded-2xl' : ''}`}
+            role={readyOnly ? undefined : "button"}
+            tabIndex={readyOnly ? undefined : 0}
+            onClick={openRow}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    openRow()
+                }
+            }}
+            className={`${EXTRA_ROW_CLASS} ${readyOnly ? "" : "cursor-pointer"} ${
+                poder.swt_est === "NC" ? "bg-amber-50/80 ring-1 ring-inset ring-amber-200" : ""
+            }`}
+            style={{ gridTemplateColumns: PODERES_GRID_COLUMNS }}
         >
-            <p
-                onClick={() => {
-                    if (readyOnly) return;
-                    setOpen(true)
-                }}
-                className="text-center text-blue-600 cursor-pointer hover:text-blue-500"
-            >{poder.id_poder}</p>
-            <p>{poder.num_kardex}</p>
-            <p className="col-span-2">{TIPO_PODERES.find(p => p.id_asunto === poder.id_asunto)?.des_asunto}</p>
-            <p>{poder.fec_crono}</p>
-            <div className="col-span-2 text-center">
-                {poder.contratantes.map((contratante) => (
-                    <div 
-                        className="w-full gap-10 items-start justify-start text-left"
-                        key={contratante.id_contrata}>
-                        <p>{contratante.c_descontrat}</p>
-                    </div>
-                ))}
+            <div>
+                <span className={EXTRA_ID_BADGE_CLASS}>{poder.id_poder || <Empty />}</span>
             </div>
-            <p>{poder.fec_ingreso}</p>
+            <p className="font-mono tabular-nums text-slate-800">{poder.num_kardex || <Empty />}</p>
+            <p className="leading-snug text-slate-700">{tipo || <Empty />}</p>
+            <p className="tabular-nums text-slate-600">{poder.fec_crono || <Empty />}</p>
+            <div className="min-w-0 space-y-0.5">
+                {poder.contratantes?.length ? poder.contratantes.map((contratante) => (
+                    <p key={contratante.id_contrata} className="leading-snug text-slate-800">
+                        {contratante.c_descontrat}
+                    </p>
+                )) : <Empty />}
+            </div>
+            <p className="tabular-nums text-slate-600">{poder.fec_ingreso || <Empty />}</p>
         </motion.div>
         <TopModal
             isOpen={open}

@@ -4,27 +4,40 @@ import { Legalizacion } from "../../../../services/api/extraprotocolares/legaliz
 import TopModal from "../../../ui/TopModal"
 import UpdateLegalizacion from "./UpdateLegalizacion"
 import { rowMotionProps } from "../rowMotion"
+import { EXTRA_ID_BADGE_CLASS, EXTRA_ROW_CLASS } from "../ExtraTableShell"
+import { LEGALIZACION_GRID_COLUMNS } from "./LegalizacionTableHeader"
 
 interface Props {
     legalizacion: Legalizacion
     index?: number
 }
 
-const LegalizacionCard = ({ legalizacion, index = 0 }: Props) => {
+const Empty = () => <span className="text-slate-300">—</span>
 
+const LegalizacionCard = ({ legalizacion, index = 0 }: Props) => {
     const [open, setOpen] = useState(false)
 
   return (
     <>
         <motion.div
             {...rowMotionProps(index)}
-            className="grid grid-cols-3 gap-4 justify-center items-center text-center text-xs mt-4 px-2 py-2 transition-colors hover:bg-sky-50/60"
+            role="button"
+            tabIndex={0}
+            onClick={() => setOpen(true)}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    setOpen(true)
+                }
+            }}
+            className={`${EXTRA_ROW_CLASS} cursor-pointer`}
+            style={{ gridTemplateColumns: LEGALIZACION_GRID_COLUMNS }}
         >
-            <p 
-                onClick={() => setOpen(true)}
-                className="text-blue-700 cursor-pointer hover:text-blue-500">{legalizacion.idlegalizacion}</p>
-            <p>{legalizacion.fechaingreso}</p>
-            <p>{legalizacion.dni}</p>
+            <div>
+                <span className={EXTRA_ID_BADGE_CLASS}>{legalizacion.idlegalizacion || <Empty />}</span>
+            </div>
+            <p className="tabular-nums text-slate-600">{legalizacion.fechaingreso || <Empty />}</p>
+            <p className="font-mono text-slate-800">{legalizacion.dni || <Empty />}</p>
         </motion.div>
         <TopModal
             isOpen={open}
