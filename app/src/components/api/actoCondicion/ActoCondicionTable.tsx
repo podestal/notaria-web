@@ -1,6 +1,12 @@
+import { motion } from "framer-motion"
 import type { Acto } from "../../../services/api/extraprotocolares/actoService"
 import type { Tipokardex } from "../../../services/api/tipokardexService"
 import { tipokarDescripcion } from "../../../utils/actoTipokarLabel"
+import {
+    EXTRA_HEADER_CLASS,
+    EXTRA_ID_BADGE_CLASS,
+    EXTRA_ROW_CLASS,
+} from "../extraprotocolares/ExtraTableShell"
 
 interface Props {
     actos: Acto[]
@@ -8,29 +14,45 @@ interface Props {
     onSelectActo: (acto: Acto) => void
 }
 
+export const ACTO_GRID_COLUMNS =
+    "minmax(90px,0.8fr) minmax(200px,2.2fr) minmax(140px,1.4fr) 90px 80px 90px 70px 100px"
+
+const Empty = () => <span className="text-slate-300">—</span>
+
+const rowMotion = (index: number) => ({
+    initial: { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+        duration: 0.28,
+        delay: Math.min(index, 16) * 0.03,
+        ease: "easeOut" as const,
+    },
+})
+
 const ActoCondicionTable = ({ actos, tiposKardex, onSelectActo }: Props) => {
     return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-                <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                    <tr>
-                        <th className="px-4 py-3">Tipo acto</th>
-                        <th className="px-4 py-3">Descripción</th>
-                        <th className="px-4 py-3">Tipo kardex</th>
-                        <th className="px-4 py-3">Cód. SUNAT</th>
-                        <th className="px-4 py-3">Impuesto</th>
-                        <th className="px-4 py-3">Cód. UIF</th>
-                        <th className="px-4 py-3">Umbral</th>
-                        <th className="px-4 py-3">Cod. SISGEN</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-800">
+        <div className="overflow-x-auto">
+            <div style={{ minWidth: 960 }}>
+                <div
+                    className={EXTRA_HEADER_CLASS}
+                    style={{ gridTemplateColumns: ACTO_GRID_COLUMNS }}
+                >
+                    <p>Tipo acto</p>
+                    <p>Descripción</p>
+                    <p>Tipo kardex</p>
+                    <p>Cód. SUNAT</p>
+                    <p>Impuesto</p>
+                    <p>Cód. UIF</p>
+                    <p>Umbral</p>
+                    <p>Cod. SISGEN</p>
+                </div>
+                <div className="divide-y divide-slate-100">
                     {actos.map((acto, index) => (
-                        <tr
+                        <motion.div
                             key={`${acto.idtipoacto}-${acto.idtipkar}-${index}`}
+                            {...rowMotion(index)}
                             role="button"
                             tabIndex={0}
-                            className="cursor-pointer hover:bg-blue-50/80 focus:bg-blue-50/80 focus:outline-none"
                             onClick={() => onSelectActo(acto)}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" || e.key === " ") {
@@ -38,23 +60,27 @@ const ActoCondicionTable = ({ actos, tiposKardex, onSelectActo }: Props) => {
                                     onSelectActo(acto)
                                 }
                             }}
+                            className={`${EXTRA_ROW_CLASS} cursor-pointer`}
+                            style={{ gridTemplateColumns: ACTO_GRID_COLUMNS }}
                         >
-                            <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">{acto.idtipoacto}</td>
-                            <td className="max-w-md px-4 py-3 text-sm">{acto.desacto}</td>
-                            <td className="max-w-[12rem] px-4 py-3 text-sm text-slate-700">
-                                {tipokarDescripcion(acto.idtipkar, tiposKardex)}
-                            </td>
-                            <td className="whitespace-nowrap px-4 py-3 text-xs">{acto.actosunat || "—"}</td>
-                            <td className="whitespace-nowrap px-4 py-3">{acto.impuestos}</td>
-                            <td className="whitespace-nowrap px-4 py-3 text-xs">{acto.actouif || "—"}</td>
-                            <td className="whitespace-nowrap px-4 py-3">{acto.umbral}</td>
-                            <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
-                                {(acto.cod_ancert || acto.codigo_ancert || "").trim() || "—"}
-                            </td>
-                        </tr>
+                            <div>
+                                <span className={EXTRA_ID_BADGE_CLASS}>{acto.idtipoacto}</span>
+                            </div>
+                            <p className="leading-snug text-slate-800">{acto.desacto || <Empty />}</p>
+                            <p className="leading-snug text-slate-600">
+                                {tipokarDescripcion(acto.idtipkar, tiposKardex) || <Empty />}
+                            </p>
+                            <p className="font-mono text-[11px] text-slate-600">{acto.actosunat || <Empty />}</p>
+                            <p className="tabular-nums text-slate-700">{acto.impuestos ?? <Empty />}</p>
+                            <p className="font-mono text-[11px] text-slate-600">{acto.actouif || <Empty />}</p>
+                            <p className="tabular-nums text-slate-700">{acto.umbral ?? <Empty />}</p>
+                            <p className="font-mono text-[11px] text-slate-600">
+                                {(acto.cod_ancert || acto.codigo_ancert || "").trim() || <Empty />}
+                            </p>
+                        </motion.div>
                     ))}
-                </tbody>
-            </table>
+                </div>
+            </div>
         </div>
     )
 }

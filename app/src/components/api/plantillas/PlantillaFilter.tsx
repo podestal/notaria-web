@@ -1,4 +1,13 @@
 import { useEffect, useMemo, type SetStateAction } from "react"
+import { motion } from "framer-motion"
+import {
+    BookOpen,
+    Car,
+    FileText,
+    Home,
+    Scale,
+    type LucideIcon,
+} from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetTipoActo from "../../../hooks/api/tipoActo/useGetTipoActo"
 import useGetTipoKardexList from "../../../hooks/api/tipoKardex/useGetTipoKardexList"
@@ -6,8 +15,55 @@ import type { TipoActo } from "../../../services/api/tipoActosService"
 import type { Tipokardex } from "../../../services/api/tipokardexService"
 import getTitleCase from "../../../utils/getTitleCase"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
+import ExtraFiltersShell, {
+    ExtraFilterField,
+    ExtraFilterSearchButton,
+    ExtraFilterTextField,
+} from "../extraprotocolares/ExtraFiltersShell"
 
 const TIPOKAR_IDS = [1, 2, 3, 4, 5] as const
+
+/** Visual meta for protocolares tipos (1–5). Uses remappable slate/tint utilities (no text-white / bg-slate-900). */
+const TIPOKAR_META: Record<
+    number,
+    { icon: LucideIcon; iconTone: string; active: string; dot: string; short: string }
+> = {
+    1: {
+        icon: FileText,
+        iconTone: "bg-sky-50 text-sky-600 ring-sky-100",
+        active: "border-sky-500 ring-sky-500/25",
+        dot: "bg-sky-500",
+        short: "Escrituras",
+    },
+    2: {
+        icon: Scale,
+        iconTone: "bg-violet-50 text-violet-600 ring-violet-100",
+        active: "border-violet-500 ring-violet-500/25",
+        dot: "bg-violet-500",
+        short: "No contenciosos",
+    },
+    3: {
+        icon: Car,
+        iconTone: "bg-amber-50 text-amber-600 ring-amber-100",
+        active: "border-amber-500 ring-amber-500/25",
+        dot: "bg-amber-500",
+        short: "Transferencias",
+    },
+    4: {
+        icon: Home,
+        iconTone: "bg-emerald-50 text-emerald-600 ring-emerald-100",
+        active: "border-emerald-500 ring-emerald-500/25",
+        dot: "bg-emerald-500",
+        short: "Garantías",
+    },
+    5: {
+        icon: BookOpen,
+        iconTone: "bg-indigo-50 text-indigo-600 ring-indigo-100",
+        active: "border-indigo-500 ring-indigo-500/25",
+        dot: "bg-indigo-500",
+        short: "Libros",
+    },
+}
 
 const tiposParaFiltro = (list: Tipokardex[]): Tipokardex[] =>
     TIPOKAR_IDS.map((id) => list.find((t) => t.idtipkar === id) ?? { idtipkar: id, nomtipkar: `Tipo ${id}`, tipkar: "" })
@@ -84,75 +140,111 @@ const PlantillaFilter = ({
     }
 
     return (
-        <section className="mb-8 rounded-xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-6 shadow-sm ring-1 ring-slate-100">
-            <div className="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                    <h2 className="text-sm font-semibold tracking-tight text-slate-800">Filtrar plantillas</h2>
-                    <p className="text-xs text-slate-500">
-                        {isExtraprotocolares ? "Buscar por nombre" : "Nombre, tipo de kardex y acto"}
-                    </p>
-                </div>
-                <button
-                    type="button"
-                    onClick={limpiar}
-                    className="self-start  cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700 sm:self-auto sm:text-sm"
-                >
-                    Limpiar filtros
-                </button>
-            </div>
+        <ExtraFiltersShell
+            title={isExtraprotocolares ? "Filtrar plantillas:" : "Búsqueda por:"}
+            columns={isExtraprotocolares ? 2 : 2}
+        >
+            <ExtraFilterTextField
+                label="Nombre"
+                value={nameTemplate}
+                onChange={setNameTemplate}
+                placeholder="Buscar por nombre…"
+                index={0}
+                colSpan={isExtraprotocolares ? 1 : 2}
+            />
 
-            <div className={`grid gap-6 ${isExtraprotocolares ? "" : "lg:grid-cols-2 lg:gap-8"}`}>
-                <div className="flex flex-col gap-2">
-                    <label htmlFor="plantilla-filter-name" className="text-xs font-semibold text-slate-700">
-                        Nombre de plantilla
-                    </label>
-                    <input
-                        id="plantilla-filter-name"
-                        type="text"
-                        value={nameTemplate}
-                        onChange={(e) => setNameTemplate(e.target.value)}
-                        placeholder="Buscar por nombre…"
-                        className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-3 pr-3 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                    />
-                </div>
-
-                {!isExtraprotocolares && (
-                    <div className="flex flex-col gap-2">
-                        <span className="text-xs font-semibold text-slate-700">Tipo kardex</span>
-                        <div className="flex flex-wrap gap-2" role="group" aria-label="Tipo kardex">
-                            {tiposKardex.map((t) => {
-                                const active = fkType === String(t.idtipkar)
-                                return (
-                                    <button
-                                        key={t.idtipkar}
-                                        type="button"
-                                        onClick={() => handleTipokarClick(t.idtipkar)}
-                                        aria-pressed={active}
-                                        title={`Tipo kardex ${t.idtipkar}`}
-                                        className={`max-w-[11rem] cursor-pointer rounded-lg border px-2.5 py-2 text-center text-xs leading-snug transition-colors sm:text-sm ${
-                                            active
-                                                ? "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-600/25 ring-2 ring-blue-600 ring-offset-2 hover:bg-blue-700"
-                                                : "bg-white hover:border-blue-700 hover:bg-blue-700 hover:text-white"
-                                        }`}
-                                    >
-                                        {getTitleCase(t.nomtipkar)}
-                                    </button>
-                                )
-                            })}
-                        </div>
-                        <p className="text-[11px] text-slate-500">
-                            Un solo tipo a la vez. Vuelve a pulsar el mismo para quitar.
-                        </p>
-                    </div>
-                )}
-            </div>
             {!isExtraprotocolares && (
-                <div className="mt-6 flex min-w-0 flex-col gap-2">
-                    <span className="text-xs font-semibold text-slate-700">Acto</span>
-                    {isLoading && <p className="text-xs text-slate-500">Cargando actos…</p>}
-                    {isError && <p className="text-xs text-red-600">No se pudieron cargar los actos.</p>}
+                <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.08 }}
+                    className="md:col-span-2 space-y-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+                >
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-0.5">
+                        <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                                Tipo de kardex
+                            </p>
+                            <p className="text-[11px] text-slate-400">
+                                Elija un tipo para filtrar actos y plantillas
+                            </p>
+                        </div>
+                        {fkType ? (
+                            <button
+                                type="button"
+                                onClick={() => setFkType("")}
+                                className="text-[11px] font-semibold text-sky-600 hover:text-sky-800 hover:underline"
+                            >
+                                Quitar selección
+                            </button>
+                        ) : null}
+                    </div>
+                    <div
+                        className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5"
+                        role="group"
+                        aria-label="Tipo kardex"
+                    >
+                        {tiposKardex.map((t, i) => {
+                            const active = fkType === String(t.idtipkar)
+                            const meta = TIPOKAR_META[t.idtipkar]
+                            const Icon = meta?.icon ?? FileText
+                            const label = meta?.short || getTitleCase(t.nomtipkar)
+                            const fullName = getTitleCase(t.nomtipkar)
+
+                            return (
+                                <motion.button
+                                    key={t.idtipkar}
+                                    type="button"
+                                    onClick={() => handleTipokarClick(t.idtipkar)}
+                                    aria-pressed={active}
+                                    title={fullName}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 + i * 0.04, duration: 0.25 }}
+                                    whileHover={{ y: -2 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    className={`relative flex flex-col items-start gap-2 rounded-xl border bg-white px-3 py-3 text-left shadow-sm transition ${
+                                        active
+                                            ? `${meta?.active ?? "border-sky-500 ring-sky-500/25"} shadow-md ring-4`
+                                            : "border-slate-200 hover:border-sky-300 hover:shadow-md"
+                                    }`}
+                                >
+                                    <div className="flex w-full items-center justify-between gap-2">
+                                        <span
+                                            className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ring-1 ${
+                                                meta?.iconTone ?? "bg-sky-50 text-sky-600 ring-sky-100"
+                                            }`}
+                                        >
+                                            <Icon size={18} aria-hidden />
+                                        </span>
+                                        {active && (
+                                            <motion.span
+                                                layoutId="plantilla-tipokar-dot"
+                                                className={`h-2 w-2 shrink-0 rounded-full ${meta?.dot ?? "bg-sky-500"}`}
+                                            />
+                                        )}
+                                    </div>
+                                    <span className="min-w-0">
+                                        <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                            Tipo {t.idtipkar}
+                                        </span>
+                                        <span className="mt-0.5 block text-xs font-semibold leading-snug text-slate-800">
+                                            {label}
+                                        </span>
+                                    </span>
+                                </motion.button>
+                            )
+                        })}
+                    </div>
+                </motion.div>
+            )}
+
+            {!isExtraprotocolares && (
+                <ExtraFilterField label="Acto" index={2} colSpan={2}>
+                    {isLoading && <p className="text-[11px] text-slate-400">Cargando actos…</p>}
+                    {isError && <p className="text-[11px] text-rose-600">No se pudieron cargar los actos.</p>}
                     {!isLoading && !isError && (
-                        <div className="-my-2">
+                        <div className="-my-1 min-w-0">
                             <SearchableDropdownInput
                                 options={dropdownOptions}
                                 selected={selectedActo}
@@ -163,9 +255,18 @@ const PlantillaFilter = ({
                             />
                         </div>
                     )}
-                </div>
+                </ExtraFilterField>
             )}
-        </section>
+
+            <ExtraFilterSearchButton
+                type="button"
+                variant="clear"
+                label="Limpiar"
+                onClick={limpiar}
+                index={3}
+                colSpan={isExtraprotocolares ? 1 : 2}
+            />
+        </ExtraFiltersShell>
     )
 }
 

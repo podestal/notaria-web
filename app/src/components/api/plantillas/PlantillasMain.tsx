@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import { Plus } from "lucide-react"
+import { motion } from "framer-motion"
+import { FileStack, Plus } from "lucide-react"
 import TopModal from "../../ui/TopModal"
 import PlantillaFilter, { type PlantillasTabVariant } from "./PlantillaFilter"
 import PantillaList from "./PantillaList"
@@ -28,51 +29,94 @@ const PlantillasMain = () => {
 
   return (
     <>
-      <div className="mx-auto max-w-6xl px-4 py-6">
-        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Control de plantillas</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Busque, filtre y descargue plantillas; cree nuevas cuando las necesite.
-            </p>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      >
+        <div className="keep-dark relative overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-5 text-slate-100">
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sky-500/20 blur-3xl"
+            animate={{ scale: [1, 1.15, 1], opacity: [0.55, 0.85, 0.55] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-24 left-1/4 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl"
+            animate={{ scale: [1.1, 1, 1.1], opacity: [0.45, 0.75, 0.45] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <div className="relative flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <motion.div
+                initial={{ scale: 0.6, rotate: -12, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.08 }}
+                className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2.5"
+              >
+                <FileStack className="text-sky-300" size={22} />
+              </motion.div>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-sky-300/90">Configuración</p>
+                <h1 className="text-lg font-semibold text-white">Control de plantillas</h1>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  Busque, filtre y descargue plantillas; cree nuevas cuando las necesite
+                </p>
+              </div>
+            </div>
+            <motion.button
+              type="button"
+              onClick={() => setCreateOpen(true)}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15, duration: 0.35 }}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.96 }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-sky-400/40 bg-sky-500/20 px-3 py-2 text-xs font-semibold text-sky-100 transition hover:bg-sky-500/30"
+            >
+              <Plus className="h-3.5 w-3.5" aria-hidden />
+              Nueva plantilla
+            </motion.button>
           </div>
-          <button
-            type="button"
-            onClick={() => setCreateOpen(true)}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4" aria-hidden />
-            Nueva plantilla
-          </button>
-        </header>
+        </div>
 
-        <div className="mb-6 flex gap-1 border-b border-slate-200" role="tablist" aria-label="Ámbito de plantillas">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === "protocolares"}
-            onClick={() => switchTab("protocolares")}
-            className={`relative -mb-px border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
-              tab === "protocolares"
-                ? "border-blue-600 text-blue-700"
-                : "border-transparent text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            Protocolares
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === "extraprotocolares"}
-            onClick={() => switchTab("extraprotocolares")}
-            className={`relative -mb-px border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
-              tab === "extraprotocolares"
-                ? "border-indigo-600 text-indigo-800"
-                : "border-transparent text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            Extraprotocolares
-          </button>
+        <div
+          className="flex gap-1 border-b border-slate-200 bg-slate-50/70 px-4 pt-3"
+          role="tablist"
+          aria-label="Ámbito de plantillas"
+        >
+          {(
+            [
+              { id: "protocolares" as const, label: "Protocolares" },
+              { id: "extraprotocolares" as const, label: "Extraprotocolares" },
+            ] as const
+          ).map((t) => {
+            const active = tab === t.id
+            return (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => switchTab(t.id)}
+                className={`relative -mb-px rounded-t-lg border border-b-0 px-4 py-2.5 text-xs font-semibold transition-colors ${
+                  active
+                    ? "border-slate-200 bg-white text-sky-700"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                {t.label}
+                {active && (
+                  <motion.span
+                    layoutId="plantillas-tab-underline"
+                    className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-sky-500"
+                  />
+                )}
+              </button>
+            )
+          })}
         </div>
 
         <PlantillaFilter
@@ -92,7 +136,7 @@ const PlantillasMain = () => {
           setPage={setPage}
           hideDelete={tab === "extraprotocolares"}
         />
-      </div>
+      </motion.div>
 
       <TopModal isOpen={createOpen} onClose={() => setCreateOpen(false)}>
         <CreatePlantilla

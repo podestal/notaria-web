@@ -154,24 +154,22 @@ const PlantillaForm = ({ onCreated, lockedFktypekardex }: PlantillaFormProps) =>
   const isLoading = createTemplate.isPending
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-6">
-
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="bg-blue-100 rounded-xl p-2.5">
-          <FileText className="w-5 h-5 text-blue-600" />
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-3">
+        <div className="rounded-lg bg-sky-50 p-2 ring-1 ring-sky-100">
+          <FileText className="h-4 w-4 text-sky-600" />
         </div>
         <div>
-          <h2 className="text-sm font-semibold text-slate-800">Nueva Plantilla</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h2 className="text-sm font-semibold text-slate-800">Nueva plantilla</h2>
+          <p className="mt-0.5 text-xs text-slate-500">
             {isKardexLocked
               ? 'Indique el nombre y adjunte el documento Word'
-              : 'Completa los campos y adjunta el documento Word'}
+              : 'Complete los campos y adjunte el documento Word'}
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-4 sm:p-5">
 
         {/* Row 1: Name (+ Tipo Kardex solo protocolares) */}
         <div className={`grid gap-6 ${isKardexLocked ? 'grid-cols-1' : 'grid-cols-2'}`}>
@@ -376,26 +374,22 @@ const PlantillaForm = ({ onCreated, lockedFktypekardex }: PlantillaFormProps) =>
           )}
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-slate-100" />
-
-        {/* Submit */}
-        <div className="flex justify-end">
+        <div className="flex justify-end border-t border-slate-200 pt-4">
           <button
             type="submit"
             disabled={isLoading}
-            className={`flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors
-              ${isLoading ? 'opacity-60 cursor-not-allowed' : 'hover:bg-blue-700 active:bg-blue-800'}`}
+            className={`inline-flex items-center gap-1.5 rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors
+              ${isLoading ? 'cursor-not-allowed opacity-60' : 'hover:bg-blue-700'}`}
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 Guardando...
               </>
             ) : (
               <>
-                <Upload className="w-4 h-4" />
-                Crear Plantilla
+                <Upload className="h-3.5 w-3.5" />
+                Crear plantilla
               </>
             )}
           </button>

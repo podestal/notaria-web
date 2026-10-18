@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
-import { Loader2, RefreshCw, RotateCcw, Unlock } from "lucide-react"
+import { motion } from "framer-motion"
+import { FileSearch, Loader2, RefreshCw, RotateCcw, Unlock } from "lucide-react"
 import useAuthStore from "../../../../store/useAuthStore"
 import useKardexTypesStore from "../../../../hooks/store/useKardexTypesStore"
 import useGetAdminReservations from "../../../../hooks/signatum/useGetAdminReservations"
@@ -9,6 +10,18 @@ import type {
 } from "../../../../services/signatum/adminReservationsService"
 import getTitleCase from "../../../../utils/getTitleCase"
 import Paginator from "../../../ui/Paginator"
+import LoadingState from "../../../ui/LoadingState"
+import ExtraFiltersShell, {
+  ExtraFilterSearchButton,
+  ExtraFilterSelectField,
+  ExtraFilterTextField,
+} from "../../extraprotocolares/ExtraFiltersShell"
+import ExtraTableShell, {
+  EXTRA_HEADER_CLASS,
+  EXTRA_ID_BADGE_CLASS,
+  EXTRA_ROW_CLASS,
+} from "../../extraprotocolares/ExtraTableShell"
+import { emptyMotionProps } from "../../extraprotocolares/rowMotion"
 import ReleaseReservationModal from "./ReleaseReservationModal"
 import ReverseReservationModal from "./ReverseReservationModal"
 
@@ -22,18 +35,21 @@ const STATUS_OPTIONS = [
 
 const PAGE_SIZE = 10
 
+const GRID =
+  "70px minmax(100px,1fr) minmax(110px,1.1fr) 72px 80px 70px 100px 100px minmax(110px,1.1fr) 110px 100px"
+
 const statusBadgeClass = (status: string) => {
   switch (status) {
     case "PE":
-      return "bg-amber-100 text-amber-800 ring-amber-200"
+      return "bg-amber-50 text-amber-700 ring-amber-100"
     case "CO":
-      return "bg-emerald-100 text-emerald-800 ring-emerald-200"
+      return "bg-emerald-50 text-emerald-700 ring-emerald-100"
     case "CA":
-      return "bg-rose-100 text-rose-800 ring-rose-200"
+      return "bg-rose-50 text-rose-700 ring-rose-100"
     case "EX":
-      return "bg-slate-200 text-slate-700 ring-slate-300"
+      return "bg-slate-100 text-slate-600 ring-slate-200"
     default:
-      return "bg-slate-100 text-slate-700 ring-slate-200"
+      return "bg-slate-100 text-slate-600 ring-slate-200"
   }
 }
 
@@ -46,6 +62,18 @@ const formatDateTime = (value: string) => {
     timeStyle: "short",
   })
 }
+
+const Empty = () => <span className="text-slate-300">—</span>
+
+const rowMotion = (index: number) => ({
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  transition: {
+    duration: 0.28,
+    delay: Math.min(index, 12) * 0.03,
+    ease: "easeOut" as const,
+  },
+})
 
 const ReservacionesList = () => {
   const access = useAuthStore((s) => s.access_token) || ""
@@ -83,14 +111,22 @@ const ReservacionesList = () => {
 
   const reservations = data?.results ?? []
   const totalCount = data?.count ?? 0
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
 
   const tipkarLabel = (id: number) => {
     const found = kardexTypes.find((t) => t.idtipkar === id)
     return found ? getTitleCase(found.nomtipkar) : String(id)
   }
 
-  const handleApplyFilters = () => {
+  const tipkarOptions = [
+    { value: "", label: "Todos" },
+    ...kardexTypes.map((type) => ({
+      value: String(type.idtipkar),
+      label: getTitleCase(type.nomtipkar),
+    })),
+  ]
+
+  const handleApplyFilters = (e?: React.FormEvent) => {
+    e?.preventDefault()
     setPage(1)
     setAppliedFilters({
       status: status.trim() || undefined,
@@ -110,229 +146,198 @@ const ReservacionesList = () => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">Reservaciones</h2>
-          <p className="mt-0.5 text-sm text-slate-500">
-            Listado de reservaciones notariales, liberación y reversión.
-          </p>
-        </div>
-        <button
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50/40 px-4 py-2.5 sm:px-6">
+        <p className="text-xs text-slate-500">
+          Listado de reservaciones notariales, liberación y reversión
+        </p>
+        <motion.button
           type="button"
           onClick={() => refetch()}
           disabled={isFetching}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+          whileHover={isFetching ? undefined : { y: -1 }}
+          whileTap={isFetching ? undefined : { scale: 0.96 }}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
         >
           <RefreshCw
             className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`}
             aria-hidden
           />
           Actualizar
-        </button>
+        </motion.button>
       </div>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-          Filtros
+      <ExtraFiltersShell title="Búsqueda por:" onSubmit={handleApplyFilters} columns={2}>
+        <ExtraFilterSelectField
+          label="Estado"
+          value={status}
+          onChange={setStatus}
+          options={STATUS_OPTIONS}
+          index={0}
+        />
+        <ExtraFilterSelectField
+          label="Tipo kardex"
+          value={idtipkar}
+          onChange={setIdtipkar}
+          options={tipkarOptions}
+          index={1}
+        />
+        <ExtraFilterTextField
+          label="Kardex"
+          value={kardex}
+          onChange={setKardex}
+          placeholder="Ej. A143-2026"
+          index={2}
+        />
+        <ExtraFilterTextField
+          label="Held by"
+          value={heldBy}
+          onChange={setHeldBy}
+          placeholder="Id usuario"
+          index={3}
+        />
+        <ExtraFilterSearchButton loading={false} label="Aplicar" index={4} colSpan={1} />
+        <ExtraFilterSearchButton
+          type="button"
+          variant="clear"
+          label="Limpiar"
+          onClick={handleClearFilters}
+          index={5}
+          colSpan={1}
+        />
+      </ExtraFiltersShell>
+
+      {isLoading && (
+        <LoadingState message="Cargando reservaciones…" description="Signatum" />
+      )}
+
+      {isError && (
+        <p className="my-8 text-center text-sm text-rose-600">
+          Error al cargar reservaciones: {error.message}
         </p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="block text-xs font-semibold text-slate-600">
-            Estado
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-            >
-              {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value || "all"} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-xs font-semibold text-slate-600">
-            Tipo de kardex
-            <select
-              value={idtipkar}
-              onChange={(e) => setIdtipkar(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-            >
-              <option value="">Todos</option>
-              {kardexTypes.map((type) => (
-                <option key={type.idtipkar} value={String(type.idtipkar)}>
-                  {getTitleCase(type.nomtipkar)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-xs font-semibold text-slate-600">
-            Kardex
-            <input
-              value={kardex}
-              onChange={(e) => setKardex(e.target.value)}
-              placeholder="Ej. A143-2026"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-            />
-          </label>
-          <label className="block text-xs font-semibold text-slate-600">
-            Held by (id usuario)
-            <input
-              value={heldBy}
-              onChange={(e) => setHeldBy(e.target.value)}
-              placeholder="Ej. 28"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-            />
-          </label>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={handleApplyFilters}
-            className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
-          >
-            Aplicar filtros
-          </button>
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-          >
-            Limpiar
-          </button>
-        </div>
-      </section>
+      )}
 
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <p className="text-sm font-semibold text-slate-800">
-            {totalCount} reservación{totalCount === 1 ? "" : "es"}
-            {totalCount > 0 && (
-              <span className="ml-2 font-normal text-slate-500">
-                · página {page} de {totalPages}
-              </span>
-            )}
-          </p>
-          {isFetching && !isLoading && (
-            <span className="inline-flex items-center gap-1 text-[11px] text-slate-500">
-              <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-              Actualizando…
-            </span>
-          )}
-        </div>
-
-        {isLoading && (
-          <p className="p-8 text-center text-sm text-slate-500 animate-pulse">
-            Cargando reservaciones...
-          </p>
-        )}
-
-        {isError && (
-          <p className="p-8 text-center text-sm text-rose-600">
-            Error al cargar reservaciones: {error.message}
-          </p>
-        )}
-
-        {!isLoading && !isError && reservations.length === 0 && (
-          <p className="p-8 text-center text-sm text-slate-500">
-            No hay reservaciones para los filtros seleccionados.
-          </p>
-        )}
-
-        {!isLoading && !isError && reservations.length > 0 && (
-          <>
-            <div className="overflow-x-auto">
-              <table className="min-w-[1100px] w-full text-left text-sm text-slate-700">
-                <thead className="bg-slate-100 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
-                  <tr>
-                    <th className="px-3 py-2">ID</th>
-                    <th className="px-3 py-2">Kardex</th>
-                    <th className="px-3 py-2">Tipo</th>
-                    <th className="px-3 py-2">Estado</th>
-                    <th className="px-3 py-2">Escritura</th>
-                    <th className="px-3 py-2">Minuta</th>
-                    <th className="px-3 py-2">Folios</th>
-                    <th className="px-3 py-2">Fecha escritura</th>
-                    <th className="px-3 py-2">Held by</th>
-                    <th className="px-3 py-2">Creado</th>
-                    <th className="px-3 py-2 text-right">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reservations.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className={index % 2 === 0 ? "bg-white" : "bg-slate-50"}
-                    >
-                      <td className="px-3 py-2 font-mono text-xs">{item.id}</td>
-                      <td className="px-3 py-2 font-semibold text-sky-700">
-                        {item.kardex || "—"}
-                      </td>
-                      <td className="px-3 py-2">{tipkarLabel(item.idtipkar)}</td>
-                      <td className="px-3 py-2">
-                        <span
-                          className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${statusBadgeClass(item.status)}`}
-                        >
-                          {item.status || "—"}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2">{item.num_escritura || "—"}</td>
-                      <td className="px-3 py-2">{item.num_minuta || "—"}</td>
-                      <td className="px-3 py-2">
-                        {item.folio_ini || item.folio_fin
-                          ? `${item.folio_ini || "—"} – ${item.folio_fin || "—"}`
-                          : "—"}
-                      </td>
-                      <td className="px-3 py-2">{item.fecha_escritura || "—"}</td>
-                      <td className="px-3 py-2">
-                        <p className="font-medium">
-                          {item.held_by_username || "—"}
-                        </p>
-                        <p className="text-[11px] text-slate-500">
-                          id {item.held_by}
-                        </p>
-                      </td>
-                      <td className="px-3 py-2 text-xs text-slate-600">
-                        {formatDateTime(item.created_at)}
-                      </td>
-                      <td className="px-3 py-2 text-right">
-                        {item.status === "PE" ? (
-                          <button
-                            type="button"
-                            onClick={() => setReleasing(item)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-rose-300 bg-rose-50 px-2.5 py-1.5 text-[11px] font-semibold text-rose-700 transition hover:bg-rose-100"
-                          >
-                            <Unlock className="h-3.5 w-3.5" aria-hidden />
-                            Liberar
-                          </button>
-                        ) : item.status === "CO" ? (
-                          <button
-                            type="button"
-                            onClick={() => setReversing(item)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-semibold text-amber-800 transition hover:bg-amber-100"
-                          >
-                            <RotateCcw className="h-3.5 w-3.5" aria-hidden />
-                            Revertir
-                          </button>
-                        ) : (
-                          <span className="text-[11px] text-slate-400">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
+      {!isLoading && !isError && (
+        <ExtraTableShell
+          count={totalCount}
+          label="reservaciones"
+          hint={
+            isFetching
+              ? "Actualizando…"
+              : "Liberar (PE) o revertir (CO) desde cada fila"
+          }
+          minWidth="1100px"
+          footer={
             <Paginator
               page={page}
               setPage={setPage}
               itemsCount={totalCount}
               itemsPerPage={PAGE_SIZE}
             />
-          </>
-        )}
-      </section>
+          }
+        >
+          <div className={EXTRA_HEADER_CLASS} style={{ gridTemplateColumns: GRID }}>
+            <p>ID</p>
+            <p>Kardex</p>
+            <p>Tipo</p>
+            <p>Estado</p>
+            <p>Escritura</p>
+            <p>Minuta</p>
+            <p>Folios</p>
+            <p>Fec. esc.</p>
+            <p>Held by</p>
+            <p>Creado</p>
+            <p className="text-right">Acciones</p>
+          </div>
+
+          {reservations.length === 0 ? (
+            <motion.div
+              {...emptyMotionProps}
+              className="flex flex-col items-center justify-center gap-2 px-4 py-14 text-center"
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                <FileSearch className="h-5 w-5" aria-hidden />
+              </span>
+              <p className="text-sm font-medium text-slate-600">
+                No hay reservaciones para estos filtros
+              </p>
+            </motion.div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {reservations.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  {...rowMotion(index)}
+                  className={EXTRA_ROW_CLASS}
+                  style={{ gridTemplateColumns: GRID }}
+                >
+                  <div>
+                    <span className={EXTRA_ID_BADGE_CLASS}>{item.id}</span>
+                  </div>
+                  <p className="truncate font-semibold text-sky-700">
+                    {item.kardex || <Empty />}
+                  </p>
+                  <p className="leading-snug text-slate-600">{tipkarLabel(item.idtipkar)}</p>
+                  <div>
+                    <span
+                      className={`inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-semibold ring-1 ${statusBadgeClass(item.status)}`}
+                    >
+                      {item.status || "—"}
+                    </span>
+                  </div>
+                  <p className="tabular-nums text-slate-700">{item.num_escritura || <Empty />}</p>
+                  <p className="tabular-nums text-slate-700">{item.num_minuta || <Empty />}</p>
+                  <p className="tabular-nums text-[11px] text-slate-600">
+                    {item.folio_ini || item.folio_fin
+                      ? `${item.folio_ini || "—"}–${item.folio_fin || "—"}`
+                      : <Empty />}
+                  </p>
+                  <p className="tabular-nums text-[11px] text-slate-600">
+                    {item.fecha_escritura || <Empty />}
+                  </p>
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-slate-800">
+                      {item.held_by_username || <Empty />}
+                    </p>
+                    <p className="text-[10px] text-slate-400">id {item.held_by}</p>
+                  </div>
+                  <p className="text-[11px] text-slate-500">{formatDateTime(item.created_at)}</p>
+                  <div className="flex justify-end">
+                    {item.status === "PE" ? (
+                      <button
+                        type="button"
+                        onClick={() => setReleasing(item)}
+                        className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-[11px] font-semibold text-rose-700 transition hover:bg-rose-100"
+                      >
+                        <Unlock className="h-3 w-3" aria-hidden />
+                        Liberar
+                      </button>
+                    ) : item.status === "CO" ? (
+                      <button
+                        type="button"
+                        onClick={() => setReversing(item)}
+                        className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-700 transition hover:bg-amber-100"
+                      >
+                        <RotateCcw className="h-3 w-3" aria-hidden />
+                        Revertir
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-slate-300">—</span>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {isFetching && !isLoading && (
+            <p className="flex items-center justify-center gap-1.5 border-t border-slate-100 px-4 py-2 text-[11px] text-slate-400">
+              <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+              Actualizando…
+            </p>
+          )}
+        </ExtraTableShell>
+      )}
 
       <ReleaseReservationModal
         reservation={releasing}

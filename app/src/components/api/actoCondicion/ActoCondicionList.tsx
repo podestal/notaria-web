@@ -1,9 +1,14 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react"
+import { motion } from "framer-motion"
+import { FileSearch } from "lucide-react"
 import type { Acto } from "../../../services/api/extraprotocolares/actoService"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetTipoKardexList from "../../../hooks/api/tipoKardex/useGetTipoKardexList"
 import useGetActosPage from "../../../hooks/api/acto/useGetActosPage"
 import Paginator from "../../ui/Paginator"
+import LoadingState from "../../ui/LoadingState"
+import ExtraTableShell from "../extraprotocolares/ExtraTableShell"
+import { emptyMotionProps } from "../extraprotocolares/rowMotion"
 import ActoCondicionTable from "./ActoCondicionTable"
 import ActoCondicionCard from "./ActoCondicionCard"
 import ActoDetalleModal from "./ActoDetalleModal"
@@ -33,35 +38,63 @@ const ActoCondicionList = ({ desacto, idtipoacto, idtipkar, page, setPage }: Pro
     const results = data?.results ?? []
     const itemsCount = data?.count ?? 0
 
-    return (
-        <div className="mt-6 space-y-4">
-            {isLoading && <p className="text-center text-sm text-slate-500">Cargando tipos de acto…</p>}
-            {isError && (
-                <p className="text-center text-sm text-red-600">
-                    {error instanceof Error ? error.message : "No se pudieron cargar los actos."}
-                </p>
-            )}
-            {!isLoading && !isError && results.length === 0 && (
-                <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50/80 py-10 text-center text-sm text-slate-500">
-                    No hay actos con estos filtros.
-                </p>
-            )}
-            {!isLoading && results.length > 0 && (
-                <>
-                    <div className="hidden md:block">
-                        <ActoCondicionTable actos={results} tiposKardex={tiposKardex} onSelectActo={setSelectedActo} />
-                    </div>
-                    <ul className="space-y-3 md:hidden">
-                        {results.map((acto, index) => (
-                            <li key={`${acto.idtipoacto}-${acto.idtipkar}-${index}`}>
-                                <ActoCondicionCard acto={acto} tiposKardex={tiposKardex} onSelectActo={setSelectedActo} />
-                            </li>
-                        ))}
-                    </ul>
-                </>
-            )}
+    if (isLoading) {
+        return <LoadingState message="Cargando actos…" description="Tipos de acto y condición" />
+    }
 
-            {!isLoading && !isError && <Paginator page={page} setPage={setPage} itemsCount={itemsCount} itemsPerPage={10} />}
+    if (isError) {
+        return (
+            <p className="my-8 text-center text-sm text-rose-600">
+                {error instanceof Error ? error.message : "No se pudieron cargar los actos."}
+            </p>
+        )
+    }
+
+    return (
+        <>
+            <ExtraTableShell
+                count={itemsCount}
+                label="actos encontrados"
+                hint="Haga clic en una fila para ver el detalle"
+                minWidth="960px"
+                footer={
+                    <Paginator page={page} setPage={setPage} itemsCount={itemsCount} itemsPerPage={10} />
+                }
+            >
+                {results.length === 0 ? (
+                    <motion.div
+                        {...emptyMotionProps}
+                        className="flex flex-col items-center justify-center gap-2 px-4 py-14 text-center"
+                    >
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                            <FileSearch className="h-5 w-5" aria-hidden />
+                        </span>
+                        <p className="text-sm font-medium text-slate-600">No hay actos con estos filtros</p>
+                    </motion.div>
+                ) : (
+                    <>
+                        <div className="hidden md:block">
+                            <ActoCondicionTable
+                                actos={results}
+                                tiposKardex={tiposKardex}
+                                onSelectActo={setSelectedActo}
+                            />
+                        </div>
+                        <ul className="space-y-3 p-3 md:hidden">
+                            {results.map((acto, index) => (
+                                <li key={`${acto.idtipoacto}-${acto.idtipkar}-${index}`}>
+                                    <ActoCondicionCard
+                                        acto={acto}
+                                        tiposKardex={tiposKardex}
+                                        onSelectActo={setSelectedActo}
+                                        index={index}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                )}
+            </ExtraTableShell>
 
             <ActoDetalleModal
                 acto={selectedActo}
@@ -69,7 +102,7 @@ const ActoCondicionList = ({ desacto, idtipoacto, idtipkar, page, setPage }: Pro
                 onClose={() => setSelectedActo(null)}
                 onActoUpdated={(a) => setSelectedActo(a)}
             />
-        </div>
+        </>
     )
 }
 

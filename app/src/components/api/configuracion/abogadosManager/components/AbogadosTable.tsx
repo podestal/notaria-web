@@ -1,75 +1,114 @@
-import { Pencil, Trash2 } from "lucide-react";
-import { Abogado } from "../../../../../services/api/abogadosService";
+import { motion } from "framer-motion"
+import { FileSearch, Pencil, Trash2 } from "lucide-react"
+import { Abogado } from "../../../../../services/api/abogadosService"
+import ExtraTableShell, {
+    EXTRA_HEADER_CLASS,
+    EXTRA_ID_BADGE_CLASS,
+    EXTRA_ROW_CLASS,
+} from "../../../extraprotocolares/ExtraTableShell"
+import { emptyMotionProps } from "../../../extraprotocolares/rowMotion"
 
 interface Props {
-    abogados: Abogado[];
-    onEdit: (abogado: Abogado) => void;
-    onDelete: (abogado: Abogado) => void;
+    abogados: Abogado[]
+    onEdit: (abogado: Abogado) => void
+    onDelete: (abogado: Abogado) => void
 }
 
+const GRID =
+    "70px minmax(180px,2fr) minmax(110px,1fr) minmax(100px,0.9fr) minmax(100px,0.9fr) minmax(110px,1fr) 160px"
+
 const valueOrDash = (value: string | null | undefined) => {
-    const trimmed = (value ?? "").trim();
-    return trimmed || "-";
-};
+    const trimmed = (value ?? "").trim()
+    return trimmed || null
+}
+
+const Empty = () => <span className="text-slate-300">—</span>
+
+const rowMotion = (index: number) => ({
+    initial: { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+        duration: 0.28,
+        delay: Math.min(index, 16) * 0.03,
+        ease: "easeOut" as const,
+    },
+})
 
 const AbogadosTable = ({ abogados, onEdit, onDelete }: Props) => {
-    if (!abogados.length) {
-        return (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
-                No hay abogados registrados.
-            </div>
-        );
-    }
-
     return (
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200 bg-white text-sm">
-                <thead className="bg-slate-50">
-                    <tr>
-                        <th className="px-3 py-2 text-left font-semibold text-slate-600">ID</th>
-                        <th className="px-3 py-2 text-left font-semibold text-slate-600">Razon Social</th>
-                        <th className="px-3 py-2 text-left font-semibold text-slate-600">Documento</th>
-                        <th className="px-3 py-2 text-left font-semibold text-slate-600">Telefono</th>
-                        <th className="px-3 py-2 text-left font-semibold text-slate-600">Matricula</th>
-                        <th className="px-3 py-2 text-left font-semibold text-slate-600">Distrito</th>
-                        <th className="px-3 py-2 text-right font-semibold text-slate-600">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                    {abogados.map((abogado) => (
-                        <tr key={abogado.idabogado} className="hover:bg-slate-50">
-                            <td className="px-3 py-2 font-medium text-slate-700">{abogado.idabogado}</td>
-                            <td className="px-3 py-2 text-slate-700">{valueOrDash(abogado.razonsocial)}</td>
-                            <td className="px-3 py-2 text-slate-700">{valueOrDash(abogado.documento)}</td>
-                            <td className="px-3 py-2 text-slate-700">{valueOrDash(abogado.telefono)}</td>
-                            <td className="px-3 py-2 text-slate-700">{valueOrDash(abogado.matricula)}</td>
-                            <td className="px-3 py-2 text-slate-700">{valueOrDash(abogado.distrito)}</td>
-                            <td className="px-3 py-2">
-                                <div className="flex justify-end gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => onEdit(abogado)}
-                                        className="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100"
-                                    >
-                                        <Pencil className="h-3.5 w-3.5" />
-                                        Editar
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => onDelete(abogado)}
-                                        className="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100"
-                                    >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                        Eliminar
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-};
+        <ExtraTableShell
+            count={abogados.length}
+            label="abogados encontrados"
+            hint="Use Editar o Eliminar en cada fila"
+            minWidth="900px"
+        >
+            <div className={EXTRA_HEADER_CLASS} style={{ gridTemplateColumns: GRID }}>
+                <p>ID</p>
+                <p>Razón social</p>
+                <p>Documento</p>
+                <p>Teléfono</p>
+                <p>Matrícula</p>
+                <p>Distrito</p>
+                <p className="text-right">Acciones</p>
+            </div>
 
-export default AbogadosTable;
+            {abogados.length === 0 ? (
+                <motion.div
+                    {...emptyMotionProps}
+                    className="flex flex-col items-center justify-center gap-2 px-4 py-14 text-center"
+                >
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                        <FileSearch className="h-5 w-5" aria-hidden />
+                    </span>
+                    <p className="text-sm font-medium text-slate-600">No hay abogados registrados</p>
+                </motion.div>
+            ) : (
+                <div className="divide-y divide-slate-100">
+                    {abogados.map((abogado, index) => (
+                        <motion.div
+                            key={abogado.idabogado}
+                            {...rowMotion(index)}
+                            className={EXTRA_ROW_CLASS}
+                            style={{ gridTemplateColumns: GRID }}
+                        >
+                            <div>
+                                <span className={EXTRA_ID_BADGE_CLASS}>{abogado.idabogado}</span>
+                            </div>
+                            <p className="leading-snug font-medium text-slate-800">
+                                {valueOrDash(abogado.razonsocial) || <Empty />}
+                            </p>
+                            <p className="font-mono text-[11px] text-slate-700">
+                                {valueOrDash(abogado.documento) || <Empty />}
+                            </p>
+                            <p className="tabular-nums text-slate-600">
+                                {valueOrDash(abogado.telefono) || <Empty />}
+                            </p>
+                            <p className="text-slate-600">{valueOrDash(abogado.matricula) || <Empty />}</p>
+                            <p className="text-slate-600">{valueOrDash(abogado.distrito) || <Empty />}</p>
+                            <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                    type="button"
+                                    onClick={() => onEdit(abogado)}
+                                    className="inline-flex items-center gap-1 rounded-md border border-sky-200 bg-sky-50 px-2 py-1 text-[11px] font-semibold text-sky-700 transition hover:bg-sky-100"
+                                >
+                                    <Pencil className="h-3 w-3" />
+                                    Editar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => onDelete(abogado)}
+                                    className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-[11px] font-semibold text-rose-700 transition hover:bg-rose-100"
+                                >
+                                    <Trash2 className="h-3 w-3" />
+                                    Eliminar
+                                </button>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
+        </ExtraTableShell>
+    )
+}
+
+export default AbogadosTable
