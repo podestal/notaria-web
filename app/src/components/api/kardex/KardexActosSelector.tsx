@@ -64,7 +64,7 @@ const KardexActosSelector = ({
                                     prev.filter((id) => id !== acto.idtipoacto),
                                 )
                             }
-                            className="inline-flex shrink-0 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-2.5 text-red-600 transition hover:bg-red-100"
+                            className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-lg border border-red-200 bg-red-50 px-2.5 text-red-600 transition hover:bg-red-100"
                             title="Quitar acto"
                         >
                             <X className="h-4 w-4" aria-hidden />

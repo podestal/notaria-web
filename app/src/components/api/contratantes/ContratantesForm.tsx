@@ -629,7 +629,7 @@ const ContratantesForm = ({
                     <button
                         type="button"
                         disabled={isLoading}
-                        className="rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-xs transition duration-300 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="cursor-pointer rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-xs transition duration-300 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
                         onClick={() =>
                             requestDiscard(() => {
                                 setShowContratanteForm(false)
@@ -642,7 +642,7 @@ const ContratantesForm = ({
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="inline-flex min-w-[11.5rem] items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs text-white transition duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex min-w-[11.5rem] cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs text-white transition duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {isLoading && <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" aria-hidden />}
                         {isLoading
@@ -676,7 +676,7 @@ const ContratantesForm = ({
                             <div className="mt-6 flex justify-end gap-3">
                                 <button
                                     type="button"
-                                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                                    className="cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                                     onClick={() => {
                                         setShowDiscardConfirm(false)
                                         pendingDiscardActionRef.current = null
@@ -686,7 +686,7 @@ const ContratantesForm = ({
                                 </button>
                                 <button
                                     type="button"
-                                    className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+                                    className="cursor-pointer rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
                                     onClick={() => {
                                         const action = pendingDiscardActionRef.current
                                         setShowDiscardConfirm(false)

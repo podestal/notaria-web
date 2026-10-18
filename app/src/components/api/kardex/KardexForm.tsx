@@ -74,7 +74,7 @@ const fieldInputClass =
     "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
 
 const fieldSelectClass =
-    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+    "w-full cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
 
 interface FieldLabelProps {
     htmlFor?: string
@@ -448,7 +448,7 @@ const KardexForm = ({
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="inline-flex min-w-[10.5rem] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
+                                className="inline-flex min-w-[10.5rem] cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
                             >
                                 {loading ? (
                                     <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
@@ -637,7 +637,7 @@ const KardexForm = ({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="inline-flex min-w-[11.5rem] items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                        className="inline-flex min-w-[11.5rem] cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                         {loading ? (
                             <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />

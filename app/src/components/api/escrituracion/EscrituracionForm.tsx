@@ -145,7 +145,7 @@ const FolioSerieIncDec = ({ onInc, onDec }: { onInc: () => void; onDec: () => vo
             type="button"
             aria-label="Incrementar"
             onClick={onInc}
-            className="rounded-sm px-0.5 py-0 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
+            className="cursor-pointer rounded-sm px-0.5 py-0 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
         >
             <ChevronUp className="h-3 w-3" strokeWidth={2.25} />
         </button>
@@ -153,7 +153,7 @@ const FolioSerieIncDec = ({ onInc, onDec }: { onInc: () => void; onDec: () => vo
             type="button"
             aria-label="Decrementar"
             onClick={onDec}
-            className="rounded-sm px-0.5 py-0 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
+            className="cursor-pointer rounded-sm px-0.5 py-0 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
         >
             <ChevronDown className="h-3 w-3" strokeWidth={2.25} />
         </button>
@@ -608,7 +608,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             <div className="flex flex-wrap items-center gap-2">
             {reservationExpiresAt !== null && <ReservationCountdown expiresAt={reservationExpiresAt} />}
             <button
-                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70"
                 type="button"
                 onClick={handleFetchNotarizationReservation}
                 disabled={createNotarizationReservation.isPending}
@@ -689,7 +689,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                     <button
                         type="button"
                         onClick={() => setOpenSerieNotarial(true)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100"
+                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-100"
                     >
                         <Layers className="h-3.5 w-3.5" aria-hidden />
                         Gestionar serie notarial
@@ -745,7 +745,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 onClick={() => {
                     if (!loading) setOpenClearConfirm(true)
                 }}
-                className="inline-flex items-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={loading}
             >
                 <Trash2 className="h-4 w-4" aria-hidden />
@@ -753,7 +753,7 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             </button>
             <button
                 type="submit"
-                className="inline-flex min-w-[110px] items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex min-w-[110px] cursor-pointer items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={loading || reservationExpired}
                 title={reservationExpired ? 'La reserva expiró. Vuelva a obtener datos.' : undefined}
             >

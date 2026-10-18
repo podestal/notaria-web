@@ -83,7 +83,7 @@ const UpdateDocumento = ({ kardex }: Props) => {
 
   return (
     <button 
-        className="mt-8 inline-flex min-w-[10.5rem] items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs text-white transition-colors duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-8 inline-flex min-w-[10.5rem] cursor-pointer items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-xs text-white transition-colors duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         disabled={isLoading}
         onClick={handleUpdate}
     >

@@ -76,7 +76,7 @@ const KardexFilters = ({
                 transition={{ delay: 0.25 }}
                 whileHover={loading ? undefined : { y: -1 }}
                 whileTap={loading ? undefined : { scale: 0.96 }}
-                className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-blue-700 bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2">
+                className="ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-blue-700 bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors duration-300 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2">
                 {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Search className="h-3.5 w-3.5" />}
                 {loading ? 'Buscando...' : 'Buscar'}
             </motion.button>

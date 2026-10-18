@@ -259,7 +259,7 @@ const SerieNotarialMain = () => {
               type="button"
               onClick={handleCreateSerie}
               disabled={!canSubmit || createSerieNotarial.isPending || loadingSeries}
-              className="inline-flex min-w-[140px] items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-w-[140px] cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {createSerieNotarial.isPending ? (
                 <>
@@ -307,7 +307,7 @@ const SerieNotarialMain = () => {
                         <button
                           type="button"
                           onClick={() => setSerieConfirmDeactivate(serie)}
-                          className="shrink-0 rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-[10px] font-semibold text-rose-700 transition hover:bg-rose-100"
+                          className="shrink-0 cursor-pointer rounded-md border border-rose-200 bg-rose-50 px-2 py-1 text-[10px] font-semibold text-rose-700 transition hover:bg-rose-100"
                         >
                           Desactivar
                         </button>
@@ -350,7 +350,7 @@ const SerieNotarialMain = () => {
                 type="button"
                 disabled={deactivateSerieNotarial.isPending}
                 onClick={() => setSerieConfirmDeactivate(null)}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+                className="cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
               >
                 Cancelar
               </button>
@@ -358,7 +358,7 @@ const SerieNotarialMain = () => {
                 type="button"
                 disabled={deactivateSerieNotarial.isPending}
                 onClick={handleConfirmDeactivate}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-rose-600 bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-rose-600 bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-60"
               >
                 {deactivateSerieNotarial.isPending ? (
                   <>
