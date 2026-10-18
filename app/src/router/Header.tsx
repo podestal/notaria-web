@@ -577,9 +577,13 @@ const Header = ({ kardexTypes }: Props) => {
                   type="button"
                   title={item.label}
                   onClick={() => {
-                    if (item.label === "Protocolares") {
+                    if (item.label === "Protocolares" || item.label === "Extraprotocolares") {
                       resetNavigationState()
-                      navigate("/app/protocolares")
+                      navigate(
+                        item.label === "Protocolares"
+                          ? "/app/protocolares"
+                          : "/app/extraprotocolares",
+                      )
                       if (collapsed) setCollapsed(false)
                       setOpenDropdown(index)
                       return

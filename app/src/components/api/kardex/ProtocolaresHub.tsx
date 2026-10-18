@@ -82,9 +82,9 @@ const ProtocolaresHub = () => {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="mx-auto mb-10 mt-4 w-[92%] max-w-[1400px] overflow-hidden rounded-2xl bg-slate-100/80 text-slate-800 shadow-sm"
+      className="mx-auto mb-10 mt-4 w-[92%] max-w-[1400px] text-slate-800"
     >
-      <div className="keep-dark relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-6 py-8 text-slate-100 sm:px-8">
+      <div className="keep-dark relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-6 py-8 text-slate-100 sm:px-8">
         <motion.div
           aria-hidden
           className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-sky-500/25 blur-3xl"
@@ -126,7 +126,7 @@ const ProtocolaresHub = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-7 lg:grid-cols-3">
+      <div className="mt-5 grid gap-4 sm:mt-6 sm:grid-cols-2 lg:grid-cols-3">
         {types.map((tipo, index) => {
           const meta = TIPOKAR_META[tipo.idtipkar]
           const Icon = meta?.icon ?? FileText

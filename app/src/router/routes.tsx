@@ -5,6 +5,7 @@ import PrivateRoutes from "../components/auth/PrivateRoutes";
 import KardexMain from "../components/api/kardex/KardexMain";
 import PanelGeneralMain from "../components/api/panelGeneral/PanelGeneralMain";
 import ExtraprotocolaresMain from "../components/api/extraprotocolares/ExtraprotocolaresMain";
+import ExtraprotocolaresHub from "../components/api/extraprotocolares/ExtraprotocolaresHub";
 import ReportesMain from "../components/api/reportes/ReportesMain";
 import CajaMain from "../components/api/caja/CajaMain";
 import UsuariosMain from "../components/api/usuarios/UsuariosMain";
@@ -192,6 +193,10 @@ const routes = createBrowserRouter([
                     <ExtraprotocolaresMain />
                 </PrivateRoutes>,
                 children: [
+                    {
+                        index: true,
+                        element: <ExtraprotocolaresHub />,
+                    },
                     {
                         path:"certificacionFirmas",
                         element: <PrivateRoutes><LegalizacionMain /></PrivateRoutes>
