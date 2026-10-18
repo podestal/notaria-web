@@ -226,9 +226,6 @@ const ExtraprotocolaresHub = () => {
               <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 Elija el tipo de trámite
               </h1>
-              <p className="mt-1.5 max-w-lg text-sm text-slate-400">
-                Abra un módulo desde aquí, o use el menú lateral cuando ya sepa a dónde ir.
-              </p>
             </div>
           </div>
           <p className="text-xs tabular-nums text-slate-500">

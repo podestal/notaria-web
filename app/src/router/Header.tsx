@@ -171,7 +171,7 @@ const Header = ({ kardexTypes }: Props) => {
 
     const location = useLocation()
     const navigate = useNavigate()
-    const [openDropdown, setOpenDropdown] = useState<number | null>(0);
+    const [openDropdown, setOpenDropdown] = useState<number | null>(null);
     const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
     const collapsed = useSidebarStore((s) => s.collapsed)
     const toggleCollapsed = useSidebarStore((s) => s.toggleCollapsed)
