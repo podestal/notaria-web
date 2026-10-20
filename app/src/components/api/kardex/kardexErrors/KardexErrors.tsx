@@ -146,11 +146,20 @@ const KardexErrors = () => {
     {
       title: "Errores UIF",
       value: String(counts.uif),
-      trend: `${counts.pdt} PDT`,
+      trend: "reporte UIF",
       icon: Users,
       accent: "bg-indigo-50 text-indigo-600 ring-indigo-100",
       valueTone: "text-indigo-700",
       trendTone: "text-indigo-600",
+    },
+    {
+      title: "Errores PDT",
+      value: String(counts.pdt),
+      trend: "renta · bienes · fondos · conclusión",
+      icon: FileWarning,
+      accent: "bg-amber-50 text-amber-600 ring-amber-100",
+      valueTone: "text-amber-700",
+      trendTone: "text-amber-600",
     },
     {
       title: "Total errores",
@@ -230,7 +239,7 @@ const KardexErrors = () => {
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <div className="grid grid-cols-1 gap-3 border-b border-slate-200 bg-slate-50/70 p-4 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-3 border-b border-slate-200 bg-slate-50/70 p-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
             {summaryCards.map((card, i) => {
               const Icon = card.icon
               return (
@@ -390,9 +399,9 @@ const KardexErrors = () => {
                 </div>
               </div>
             </div>
-            {summary.pdt_note && (
+            {summary.pdt_note ? (
               <p className="mt-3 text-xs text-slate-500">{summary.pdt_note}</p>
-            )}
+            ) : null}
           </div>
         </motion.div>
       </AnimatePresence>

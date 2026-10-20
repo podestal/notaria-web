@@ -301,7 +301,8 @@ const Header = ({ kardexTypes }: Props) => {
                     {name: "Archivos PDT Escrituras", path: "/app/reportes/archivos-pdt/escrituras"}, 
                     {name: "Archivos PDT Garantías", path: "/app/reportes/archivos-pdt/garantias"}, 
                     {name: "Archivos PDT Vehiculares", path: "/app/reportes/archivos-pdt/vehiculares"}, 
-                    {name: "Archivos PDT Libros", path: "/app/reportes/archivos-pdt/libros"}
+                    {name: "Archivos PDT Libros", path: "/app/reportes/archivos-pdt/libros"},
+                    {name: "Mis errores PDT", path: "/app/reportes/archivos-pdt/mis-errores"}
                   ]},
                 {name: "Registro de Operaciones UIF",
                   path: "/app/reportes/registros-uif",

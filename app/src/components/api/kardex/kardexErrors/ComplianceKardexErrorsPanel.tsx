@@ -49,8 +49,7 @@ const ComplianceKardexErrorsPanel = ({
     )
 
     const firstSource =
-        sourceTabs.find((tab) => tab.count > 0)?.id ??
-        (data.errors.pdt.note || data.errors.pdt.status !== "ok" ? "pdt" : "sisgen")
+        sourceTabs.find((tab) => tab.count > 0)?.id ?? "sisgen"
 
     const [activeSource, setActiveSource] = useState<SourceTabId>(firstSource)
 
@@ -267,32 +266,31 @@ const ComplianceKardexErrorsPanel = ({
 
                 {activeSource === "pdt" && (
                     <div className="space-y-3">
-                        <div className="rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-700">
-                            <p className="font-semibold uppercase text-[10px] text-slate-500">
-                                Estado
-                            </p>
-                            <p className="mt-1 capitalize">{data.errors.pdt.status || "—"}</p>
-                        </div>
-                        {data.errors.pdt.note && (
-                            <p className="rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs text-amber-900">
-                                {data.errors.pdt.note}
-                            </p>
-                        )}
                         {pdtErrors.length > 0 ? (
                             <ul className="space-y-2">
-                                {pdtErrors.map((item, idx) => (
-                                    <li
-                                        key={`pdt-${idx}`}
-                                        className="rounded-md border border-orange-200 bg-orange-50 px-2.5 py-2 text-xs leading-snug text-orange-900"
-                                    >
-                                        {item}
-                                    </li>
-                                ))}
+                                {pdtErrors.map((item, idx) => {
+                                    const isObject = typeof item === "object" && item != null
+                                    const title = isObject
+                                        ? item.error_type || item.kind || "PDT"
+                                        : ""
+                                    const body = isObject
+                                        ? item.error_description || item.error || ""
+                                        : String(item)
+                                    return (
+                                        <li
+                                            key={`pdt-${idx}`}
+                                            className="rounded-md border border-orange-200 bg-orange-50 px-2.5 py-2 text-xs leading-snug text-orange-900"
+                                        >
+                                            {title ? (
+                                                <p className="font-semibold">{title}</p>
+                                            ) : null}
+                                            <p className={title ? "mt-1" : ""}>{body}</p>
+                                        </li>
+                                    )
+                                })}
                             </ul>
                         ) : (
-                            !data.errors.pdt.note && (
-                                <p className="text-xs text-slate-500">Sin errores PDT.</p>
-                            )
+                            <p className="text-xs text-slate-500">Sin errores PDT.</p>
                         )}
                     </div>
                 )}

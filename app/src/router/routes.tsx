@@ -50,6 +50,7 @@ import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/pdtKar
 import ArchivosPdtTransferencias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtTransferencias";
 import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtGarantias";
 import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/PDTLibros/ArchivosPdtLibros";
+import MisErroresPdt from "../components/api/reportes/archivosPdt/misErrores/MisErroresPdt";
 import AlfabeticosEscrituras from "../components/api/reportes/alfabeticos/AlfabeticosEscrituras";
 import AlfabeticosGarantias from "../components/api/reportes/alfabeticos/AlfabeticosGarantias";
 import AlfabeticosNoCont from "../components/api/reportes/alfabeticos/AlfebeticosNoCont";
@@ -360,6 +361,10 @@ const routes = createBrowserRouter([
                             {
                                 path: "libros",
                                 element: <PrivateRoutes><ArchivosPdtLibros /></PrivateRoutes>
+                            },
+                            {
+                                path: "mis-errores",
+                                element: <PrivateRoutes><MisErroresPdt /></PrivateRoutes>
                             }
                         ]
                     },

@@ -142,9 +142,22 @@ export interface ComplianceUifErrors {
     observations: ComplianceUifErrorItem[]
 }
 
+export interface CompliancePdtErrorItem {
+    kind?: string
+    error_type?: string
+    error_description?: string
+    error?: string
+}
+
 export interface CompliancePdtErrors {
     status: string
-    errors: string[]
+    errors: Array<string | CompliancePdtErrorItem>
+    counts?: {
+        renta: number
+        bien: number
+        ofondo: number
+        conclusion: number
+    }
     note?: string
 }
 
