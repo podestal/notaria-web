@@ -32,9 +32,12 @@ const RegistroUifBody = ({
     page,
     setPage,
 }: Props) => {
+  const errorsCount = kardexRO.lista_errores?.length ?? 0
+  const roCount = kardexRO.lista_kardex_ro?.length ?? 0
+  const noRoCount = kardexRO.lista_kardex_no_envian?.length ?? 0
 
   return (
-    <div className="w-[85%] mx-auto mb-10 text-black">
+    <div className="mb-2 text-slate-800">
        <RegistroUifSummary
             count={kardexRO.summary?.total_kardex ?? 0}
             totalErrors={kardexRO.summary?.total_errors ?? 0}
@@ -42,16 +45,18 @@ const RegistroUifBody = ({
             dateTo={dateTo}
             reportPolicy={reportPolicy}
         />
+       <div className="px-4 sm:px-6">
        <KardexFormTabs
             key={activeTab}
             initialActiveTab={activeTab}
             setFilter={(tabId) => onTabChange(tabId as UifTabId)}
             tabs={[
-                { id: 'errors', label: 'Lista de Errores', content: <ListaDeErrores kardexErrors={kardexRO.lista_errores} /> },
-                { id: 'ro', label: 'Lista de Kardex (RO)', content: <ListaDeKardex kardexErrors={kardexRO.lista_kardex_ro} /> },
-                { id: 'not_ro', label: 'Lista de Kardex que no envían', content: <ListaKardexNoEnvian kardexNoEnvian={kardexRO.lista_kardex_no_envian} /> },
+                { id: 'errors', label: `Lista de errores (${errorsCount})`, content: <ListaDeErrores kardexErrors={kardexRO.lista_errores} /> },
+                { id: 'ro', label: `Lista de kardex RO (${roCount})`, content: <ListaDeKardex kardexErrors={kardexRO.lista_kardex_ro} /> },
+                { id: 'not_ro', label: `Kardex que no envían (${noRoCount})`, content: <ListaKardexNoEnvian kardexNoEnvian={kardexRO.lista_kardex_no_envian} /> },
             ]}
         />
+       </div>
         <Paginator
             page={page}
             setPage={setPage}

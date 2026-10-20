@@ -1,4 +1,6 @@
 import { useCallback, useState } from "react"
+import { motion } from "framer-motion"
+import { Shield } from "lucide-react"
 import RegistroUifFilters from "./RegistroUifFilters"
 import useAuthStore from "../../../../store/useAuthStore"
 import useGetUifRegistro from "../../../../hooks/api/uif/useGetUifRegistro"
@@ -60,6 +62,22 @@ const RegistrosUifMain = () => {
         isLoading={isLoading || isFetching}
       />
       {showLoading && <LoadingState message="Generando registro…" description="Consultando operaciones UIF" />}
+
+      {!hasGenerated && !showLoading && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center gap-3 px-4 py-16 text-center"
+        >
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-500">
+            <Shield className="h-5 w-5" aria-hidden />
+          </span>
+          <p className="text-sm font-medium text-slate-700">Genere el registro de operaciones</p>
+          <p className="max-w-sm text-xs text-slate-400">
+            Seleccione el rango de fechas y el tipo de registro, luego pulse Generar RO.
+          </p>
+        </motion.div>
+      )}
 
       {isError && !showLoading && (
         <p className="my-10 text-center text-sm text-red-600">

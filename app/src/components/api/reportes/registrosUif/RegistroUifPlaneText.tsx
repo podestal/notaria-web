@@ -1,6 +1,7 @@
-import { FileText, Loader2 } from 'lucide-react'
+import { FileDown, Loader2 } from 'lucide-react'
 import useAuthStore from '../../../../store/useAuthStore'
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { downloadUifPlaneReport, type UifReportPolicy } from '../../../../services/uif/uifService'
 import useNotificationsStore from '../../../../hooks/store/useNotificationsStore'
 
@@ -40,8 +41,7 @@ const RegistroUifPlaneText = ({ dateFrom, dateTo, reportPolicy }: Props) => {
             link.click()
             document.body.removeChild(link)
             window.URL.revokeObjectURL(url)
-        } catch (error) {
-            console.error('Error downloading file:', error)
+        } catch {
             setMessage('No se pudo descargar el archivo plano')
             setShow(true)
             setType('error')
@@ -51,16 +51,17 @@ const RegistroUifPlaneText = ({ dateFrom, dateTo, reportPolicy }: Props) => {
     }
 
     return (
-        <div className="flex items-center gap-2">
-            {loading ? (
-                <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
-            ) : (
-                <FileText
-                    onClick={handleDownload}
-                    className="w-4 h-4 text-blue-600 cursor-pointer hover:text-blue-700 transition-all duration-300"
-                />
-            )}
-        </div>
+        <motion.button
+            type="button"
+            onClick={handleDownload}
+            disabled={loading}
+            whileHover={loading ? undefined : { y: -1 }}
+            whileTap={loading ? undefined : { scale: 0.97 }}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-70"
+        >
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileDown className="h-3.5 w-3.5" />}
+            {loading ? "Descargando…" : "Descargar plano"}
+        </motion.button>
     )
 }
 

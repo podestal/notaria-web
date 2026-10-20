@@ -1,39 +1,75 @@
+import { motion } from "framer-motion"
+import { FileSearch } from "lucide-react"
 import { KardexNoEnvian } from "../../../../../services/api/kardexService"
 import { formatUifPatrimonial } from "../../../../../utils/uifCurrencyFormat"
+import getTitleCase from "../../../../../utils/getTitleCase"
+import { EXTRA_HEADER_CLASS, EXTRA_ID_BADGE_CLASS, EXTRA_ROW_CLASS } from "../../../extraprotocolares/ExtraTableShell"
+import { emptyMotionProps, rowMotionProps } from "../../../extraprotocolares/rowMotion"
 
 interface Props {
     kardexNoEnvian: KardexNoEnvian[]
 }
 
-// KARDEX	ACTO	TIPO DE MONEDA	PATRIMONIAL
+const NO_RO_GRID = "minmax(110px,1fr) minmax(160px,1.6fr) minmax(100px,0.9fr) minmax(120px,1fr) minmax(180px,1.8fr)"
 
 const ListaKardexNoEnvian = ({
     kardexNoEnvian
 }: Props) => {
+  const rows = kardexNoEnvian ?? []
+
   return (
     <div>
-        <div className="grid grid-cols-5 text-left gap-4 justify-center items-center text-xs font-semibold p-2 my-4 mx-6">
-            <p>Kardex</p>
-            <p className="col-span-2">Acto</p>
-            <p>Tipo de Moneda</p>
-            <p>Patrimonial</p>
-        </div>
-        {kardexNoEnvian?.map((kardex) => (
-            <div key={kardex.idkardex}>
-                <div className="grid grid-cols-5 text-left gap-4 justify-center items-center text-xs p-2 my-4 mx-6">
-                    <p>{kardex.kardex}</p>
-                    <p className="col-span-2">{kardex.act}</p>
-                    <p>{kardex.tipo_moneda}</p>
-                    <p>
-                        {formatUifPatrimonial({
-                            patrimonial: kardex.patrimonial,
-                            tipo_moneda: kardex.tipo_moneda,
-                            currency_symbol: kardex.currency_symbol,
-                        })}
-                    </p>
+        <p className="mb-3 text-xs text-slate-500">
+            <span className="font-semibold text-slate-800">{rows.length}</span>{" "}
+            kardex que no envían
+        </p>
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <div style={{ minWidth: 860 }}>
+                <div className={EXTRA_HEADER_CLASS} style={{ gridTemplateColumns: NO_RO_GRID }}>
+                    <p>Kardex</p>
+                    <p>Acto</p>
+                    <p>Tipo de moneda</p>
+                    <p>Patrimonial</p>
+                    <p>Motivo</p>
                 </div>
+                {rows.length === 0 ? (
+                    <motion.div
+                        {...emptyMotionProps}
+                        className="flex flex-col items-center justify-center gap-2 px-4 py-12 text-center"
+                    >
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-50 text-indigo-500">
+                            <FileSearch className="h-5 w-5" aria-hidden />
+                        </span>
+                        <p className="text-sm font-medium text-slate-600">No hay kardex excluidos del RO</p>
+                    </motion.div>
+                ) : (
+                    <div className="divide-y divide-slate-100">
+                        {rows.map((kardex, idx) => (
+                            <motion.div
+                                key={kardex.idkardex}
+                                {...rowMotionProps(idx)}
+                                className={EXTRA_ROW_CLASS}
+                                style={{ gridTemplateColumns: NO_RO_GRID }}
+                            >
+                                <div>
+                                    <span className={EXTRA_ID_BADGE_CLASS}>{kardex.kardex}</span>
+                                </div>
+                                <p className="leading-snug text-slate-800">{getTitleCase(kardex.act || "") || "—"}</p>
+                                <p className="text-slate-600">{kardex.tipo_moneda || "—"}</p>
+                                <p className="tabular-nums font-medium text-slate-800">
+                                    {formatUifPatrimonial({
+                                        patrimonial: kardex.patrimonial,
+                                        tipo_moneda: kardex.tipo_moneda,
+                                        currency_symbol: kardex.currency_symbol,
+                                    })}
+                                </p>
+                                <p className="leading-snug text-slate-600">{kardex.reason || "—"}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
-        ))}
+        </div>
     </div>
   )
 }
