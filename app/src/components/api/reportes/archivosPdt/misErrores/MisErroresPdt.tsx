@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
+import { motion } from "framer-motion"
 import { AlertTriangle } from "lucide-react"
 import useAuthStore from "../../../../../store/useAuthStore"
 import useUserInfoStore from "../../../../../hooks/store/useGetUserInfo"
@@ -48,7 +49,7 @@ const MisErroresPdt = () => {
         <label className="flex items-center gap-2 text-xs text-slate-200">
             <span>Año</span>
             <select
-                className="rounded-md border border-slate-500 bg-slate-800 px-2 py-1 text-xs text-white"
+                className="cursor-pointer rounded-md border border-slate-500 bg-slate-800 px-2 py-1 text-xs text-white"
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value))}
             >
@@ -75,7 +76,12 @@ const MisErroresPdt = () => {
             />
 
             <div className="grid gap-6 p-6 lg:grid-cols-[minmax(240px,320px)_1fr]">
-                <section className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <motion.section
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                >
                     <h3 className="mb-3 text-sm font-semibold text-slate-800">
                         Ranking de trabajadores
                     </h3>
@@ -126,15 +132,19 @@ const MisErroresPdt = () => {
                     {viewingOther && (
                         <button
                             type="button"
-                            className="mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                            className="mt-3 cursor-pointer text-xs font-semibold text-indigo-600 hover:text-indigo-800"
                             onClick={() => setSearchParams({})}
                         >
                             Ver mis errores
                         </button>
                     )}
-                </section>
+                </motion.section>
 
-                <section>
+                <motion.section
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.32, delay: 0.06 }}
+                >
                     {isLoading && (
                         <LoadingState
                             message="Cargando errores PDT…"
@@ -170,12 +180,12 @@ const MisErroresPdt = () => {
                                     </thead>
                                     <tbody>
                                         {rows.map((row: PdtMisError, idx) => (
-                                            <tr key={`${row.kind}-${row.idkardex}-${idx}`} className="border-t border-slate-100">
+                                            <tr key={`${row.kind}-${row.idkardex}-${idx}`} className="border-t border-slate-100 transition-colors hover:bg-sky-50/70">
                                                 <td className="px-3 py-2 tabular-nums text-slate-400">{row.idkardex}</td>
                                                 <td className="px-3 py-2">
                                                     <button
                                                         type="button"
-                                                        className="font-mono font-semibold text-sky-700 hover:text-sky-900"
+                                                        className="cursor-pointer font-mono font-semibold text-sky-700 hover:text-sky-900"
                                                         onClick={() => setOpenKardexId(row.idkardex)}
                                                     >
                                                         {row.kardex}
@@ -217,7 +227,7 @@ const MisErroresPdt = () => {
                             </div>
                         </>
                     )}
-                </section>
+                </motion.section>
             </div>
 
             <TopModal isOpen={openKardexId != null} onClose={() => setOpenKardexId(null)} portal>

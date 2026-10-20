@@ -1,9 +1,10 @@
-import { File, Loader } from 'lucide-react'
+import { FileDown, Loader2 } from 'lucide-react'
 import useAuthStore from '../../../../../store/useAuthStore'
 import useNotificationsStore from '../../../../../hooks/store/useNotificationsStore'
 import axios from 'axios'
 import moment from 'moment'
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 
 interface Props {
     initialDate: Date | undefined
@@ -11,7 +12,6 @@ interface Props {
 }
 
 const ArchivoPdtLibroDownload = ({ initialDate, finalDate }: Props) => {
-
     const access = useAuthStore( s => s.access_token) || ''
     const { setMessage, setShow, setType } = useNotificationsStore()
     const [isLoading, setIsLoading] = useState(false)
@@ -63,13 +63,11 @@ const ArchivoPdtLibroDownload = ({ initialDate, finalDate }: Props) => {
                 }
             })
 
-            // Create blob link to download
             const blob = new Blob([response.data], { type: 'application/octet-stream' })
             const url = window.URL.createObjectURL(blob)
             const link = document.createElement('a')
             link.href = url
 
-            // Get filename from response headers or create a default one
             const contentDisposition = response.headers['content-disposition']
             const filename = contentDisposition
                 ? contentDisposition.split('filename=')[1].replace(/"/g, '')
@@ -79,7 +77,6 @@ const ArchivoPdtLibroDownload = ({ initialDate, finalDate }: Props) => {
             document.body.appendChild(link)
             link.click()
 
-            // Cleanup
             window.URL.revokeObjectURL(url)
             document.body.removeChild(link)
 
@@ -87,7 +84,6 @@ const ArchivoPdtLibroDownload = ({ initialDate, finalDate }: Props) => {
             setMessage('Archivo descargado exitosamente')
             setShow(true)
         } catch (error: any) {
-            console.error('Error downloading file:', error.response || error)
             setType('error')
             setMessage(error.response?.data?.error || 'Error al descargar el archivo')
             setShow(true)
@@ -97,18 +93,19 @@ const ArchivoPdtLibroDownload = ({ initialDate, finalDate }: Props) => {
     }
 
     return (
-        <div>
-        
-        {isLoading ? <Loader className="w-4 h-4 animate-spin text-blue-600" /> : <File 
-            onClick={() => {
-                if (isLoading) return
-                handleDownload()
-            }}
-            className={`w-4 h-4 font-semibold text-blue-600 cursor-pointer hover:text-blue-700 transition-all duration-300 ${isLoading ? 'animate-pulse' : ''}`}
-            
-        />}
-
-        </div>
+        <motion.button
+            type="button"
+            onClick={handleDownload}
+            disabled={isLoading}
+            whileHover={isLoading ? undefined : { y: -1 }}
+            whileTap={isLoading ? undefined : { scale: 0.97 }}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70"
+        >
+            {isLoading
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <FileDown className="h-3.5 w-3.5" />}
+            {isLoading ? "Descargando…" : "Descargar LIB"}
+        </motion.button>
     )
 }
 

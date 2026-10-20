@@ -39,6 +39,7 @@ import SupervivenciaIncapaz from "../components/api/reportes/cronologicos/report
 import Domiciliario from "../components/api/reportes/cronologicos/reportes/domiciliario/Domiciliario";
 import AlfabeticosMain from "../components/api/reportes/alfabeticos/AlfabeticosMain";
 import ArchivosPdtMain from "../components/api/reportes/archivosPdt/ArchivosPdtMain";
+import ArchivosPdtHub from "../components/api/reportes/archivosPdt/ArchivosPdtHub";
 import RegistrosUifMain from "../components/api/reportes/registrosUif/RegistrosUifMain";
 import ReoporteUifMian from "../components/api/reportes/reporteUif/ReoporteUifMian";
 import BusquedaMain from "../components/api/reportes/busqueda/BusquedaMain";
@@ -346,6 +347,10 @@ const routes = createBrowserRouter([
                         path: "archivos-pdt",
                         element: <PrivateRoutes><ArchivosPdtMain /></PrivateRoutes>,
                         children: [
+                            {
+                                index: true,
+                                element: <ArchivosPdtHub />,
+                            },
                             {
                                 path: "escrituras",
                                 element: <PrivateRoutes><ArchivosPdtEscrituras /></PrivateRoutes>

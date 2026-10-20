@@ -5,8 +5,6 @@ import useGetGarantiasPdt from '../../../../../hooks/api/kardex/pdt/useGetGarant
 import ArchivosPdtKardexHeader from './ArchivosPdtKardexHeader'
 import ArchivosPdtKardexBody from './ArchivosPdtKardexBody'
 import Paginator from '../../../../ui/Paginator'
-import moment from 'moment'
-
 import ReportHeader from "../../../../ui/ReportHeader"
 import LoadingState from "../../../../ui/LoadingState"
 import ReportPageShell from "../../../../ui/ReportPageShell"
@@ -38,8 +36,6 @@ const ArchivosPdtGarantias = () => {
         {isSuccess && (
             <>
                 <ArchivosPdtKardexHeader 
-                    // dateFrom={new Date(moment(dateFrom).format('YYYY-MM-DD') + 'T00:00:00.000Z')}
-                    // dateTo={new Date(moment(dateTo).format('YYYY-MM-DD') + 'T23:59:59.999Z')}
                     dateFrom={dateFrom}
                     dateTo={dateTo}
                     count={garantiasPdt.results.totalRecords} 

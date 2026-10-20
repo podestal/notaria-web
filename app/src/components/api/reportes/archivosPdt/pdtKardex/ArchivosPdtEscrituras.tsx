@@ -5,8 +5,6 @@ import useGetEscriturasPdt from '../../../../../hooks/api/kardex/pdt/useGetEscri
 import ArchivosPdtKardexHeader from './ArchivosPdtKardexHeader'
 import Paginator from '../../../../ui/Paginator'
 import ArchivosPdtKardexBody from './ArchivosPdtKardexBody'
-import moment from 'moment'
-
 import ReportHeader from "../../../../ui/ReportHeader"
 import LoadingState from "../../../../ui/LoadingState"
 import ReportPageShell from "../../../../ui/ReportPageShell"
@@ -39,8 +37,6 @@ const ArchivosPdtEscrituras = () => {
         {isSuccess && dateFrom && dateTo && (
             <>
                 <ArchivosPdtKardexHeader 
-                    // dateFrom={new Date(moment(dateFrom).format('YYYY-MM-DD'))}
-                    // dateTo={new Date(moment(dateTo).format('YYYY-MM-DD'))}
                     dateFrom={dateFrom}
                     dateTo={dateTo}
                     count={escriturasPdt.results.totalRecords} 

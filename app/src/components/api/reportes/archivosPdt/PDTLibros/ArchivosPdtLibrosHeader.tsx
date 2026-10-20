@@ -1,4 +1,6 @@
+import { BookOpen, CalendarDays } from 'lucide-react'
 import moment from 'moment'
+import { motion } from 'framer-motion'
 import ArchivoPdtLibroDownload from './ArchivoPdtLibroDownload'
 
 interface Props {
@@ -8,24 +10,67 @@ interface Props {
 }
 
 const ArchivosPdtLibrosHeader = ({ dateFrom, dateTo, count }: Props) => {
-//   const monthName = dateFrom ? spanishMonths[dateFrom.getMonth() as keyof typeof spanishMonths] : ''
-
   return (
-    <div className="w-[85%] mx-auto">
-    <h2 className="text-lg text-center font-semibold my-4 mx-6">Resumen de Operaciones PDT Libros</h2>
-    <div className="w-full text-sm grid grid-cols-5 gap-4 justify-center items-center text-center my-6 px-8 py-4 mx-6">
-        <div className="flex flex-col justify-center items-start font-semibold gap-2">
-            <h2>Mes</h2>
-            <h2>Cantidad de Kardex</h2>
-            <h2>Archivo Plano</h2>
+    <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.32, delay: 0.08 }}
+        className="border-b border-slate-200 px-4 py-5 sm:px-6"
+    >
+        <div className="mb-4">
+            <h2 className="text-sm font-semibold text-slate-800">Resumen PDT Libros</h2>
+            <p className="text-xs text-slate-500">
+                {dateFrom && dateTo
+                    ? `${moment(dateFrom).format('DD/MM/YYYY')} – ${moment(dateTo).format('DD/MM/YYYY')}`
+                    : "Seleccione un rango de fechas"}
+            </p>
         </div>
-        <div className="col-span-4 flex flex-col justify-center items-start gap-2">
-            <h2>{moment(dateFrom).format('DD/MM/YYYY')} - {moment(dateTo).format('DD/MM/YYYY')}</h2>
-            <h2>{count}</h2>
-            <ArchivoPdtLibroDownload initialDate={dateFrom} finalDate={dateTo} />
+        <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3"
+            >
+                <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Periodo</p>
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+                        <CalendarDays className="h-3.5 w-3.5" aria-hidden />
+                    </span>
+                </div>
+                <p className="mt-1 text-sm font-semibold text-slate-800">
+                    {dateFrom && dateTo
+                        ? `${moment(dateFrom).format('DD/MM/YYYY')} – ${moment(dateTo).format('DD/MM/YYYY')}`
+                        : "—"}
+                </p>
+            </motion.div>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3"
+            >
+                <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Libros</p>
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-violet-50 text-violet-600 ring-1 ring-violet-100">
+                        <BookOpen className="h-3.5 w-3.5" aria-hidden />
+                    </span>
+                </div>
+                <p className="mt-1 text-2xl font-semibold tabular-nums text-slate-800">{count}</p>
+            </motion.div>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-3"
+            >
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                    Archivo plano
+                </p>
+                <ArchivoPdtLibroDownload initialDate={dateFrom} finalDate={dateTo} />
+            </motion.div>
         </div>
-    </div>
-    </div>
+    </motion.div>
   )
 }
 
