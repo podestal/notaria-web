@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import KardexForm from "./KardexForm"
+import KardexLogsPanel from "./KardexLogsPanel"
 import useCreateKardex from "../../../hooks/api/kardex/useCreateKardex"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
+import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 import TopModal from "../../ui/TopModal"
 import { Kardex } from "../../../services/api/kardexService"
 import KardexCompliancePastMonthsAlert from "./KardexCompliancePastMonthsAlert"
@@ -15,6 +17,9 @@ const CreateKardex = () => {
     const createKardex = useCreateKardex({ idtipkar: bodyRender }) 
     const [kardex, setKardex] = useState<Kardex | null>(null)
     const { show: pastUrgent } = useCompliancePastMonthsUrgent()
+    const user = useUserInfoStore(s => s.user)
+    const isSuperuser = Number(user?.is_superuser) !== 0
+    const showLogs = isSuperuser && open && Boolean(kardex?.idkardex)
 
   return (
     <>
@@ -34,16 +39,36 @@ const CreateKardex = () => {
             setOpen(false)
             setKardex(null)
         }}
+        wide={showLogs}
         tone={pastUrgent ? "danger" : "default"}
         banner={
             pastUrgent ? <KardexCompliancePastMonthsAlert sticky /> : null
         }
     >
-        <KardexForm 
-            createKardex={createKardex} 
-            setKardex={setKardex}
-            kardex={kardex}
-        />
+        {showLogs && kardex ? (
+            <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-0">
+                <div className="flex max-h-[32vh] shrink-0 flex-col lg:max-h-none lg:w-[22rem] xl:w-96">
+                    <KardexLogsPanel
+                        idkardex={kardex.idkardex}
+                        enabled={open}
+                        className="h-full lg:max-h-none"
+                    />
+                </div>
+                <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-auto lg:pl-4">
+                    <KardexForm
+                        createKardex={createKardex}
+                        setKardex={setKardex}
+                        kardex={kardex}
+                    />
+                </main>
+            </div>
+        ) : (
+            <KardexForm
+                createKardex={createKardex}
+                setKardex={setKardex}
+                kardex={kardex}
+            />
+        )}
     </TopModal>
     </>
   )

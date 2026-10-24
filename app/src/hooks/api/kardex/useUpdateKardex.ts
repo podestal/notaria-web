@@ -1,5 +1,6 @@
 import { UseMutationResult, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateUpdateKardex, Kardex, getSingleKardexService } from "../../../services/api/kardexService";
+import { KARDEX_LOGS_QUERY_KEY } from "../../../services/api/kardexLogsService";
 
 export interface UpdateKardexData {
     kardex: CreateUpdateKardex;
@@ -34,6 +35,7 @@ const useUpdateKardex = ({ kardexId, signatumReservationId }: Props): UseMutatio
             // Refresh dependent data keyed by kardex code.
             queryClient.invalidateQueries({ queryKey: ["contratantes by kardex", updatedKardex.kardex] });
             queryClient.invalidateQueries({ queryKey: ["documents by kardex", `${updatedKardex.kardex}`] });
+            queryClient.invalidateQueries({ queryKey: [KARDEX_LOGS_QUERY_KEY, kardexId] });
         },
         onError: (error) => {
             console.error("Error updating Kardex:", error);

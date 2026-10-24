@@ -3,10 +3,12 @@ import { motion } from "framer-motion"
 import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
 import KardexForm from "./KardexForm"
+import KardexLogsPanel from "./KardexLogsPanel"
 import TopModal from "../../ui/TopModal"
 import useUpdateKardex from "../../../hooks/api/kardex/useUpdateKardex"
 import useRetrieveKardex from "../../../hooks/api/kardex/useRetrieveKardex"
 import useAuthStore from "../../../store/useAuthStore"
+import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 import KardexCompliancePastMonthsAlert from "./KardexCompliancePastMonthsAlert"
 import { useCompliancePastMonthsUrgent } from "./useCompliancePastMonthsUrgent"
 import { KARDEX_GRID_COLUMNS } from "./KardexTableHeader"
@@ -34,10 +36,18 @@ const getInitials = (name: string) =>
 
 const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
+    const user = useUserInfoStore(s => s.user)
+    const isSuperuser = Number(user?.is_superuser) !== 0
     const [open, setOpen] = useState(false)
     const [getKardex, setGetKardex] = useState(false)
     const updateKardex = useUpdateKardex({ kardexId: kardex.idkardex })
     const { show: pastUrgent } = useCompliancePastMonthsUrgent()
+    const { data: singleKardex, isLoading, isError, error, isSuccess } = useRetrieveKardex({
+        id: kardex.idkardex,
+        enabled: getKardex,
+        access,
+    })
+    const showLogs = isSuperuser && open
 
     const openKardex = () => {
         if (readyOnly) return
@@ -104,27 +114,42 @@ const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
     <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}
+        wide={showLogs}
         tone={pastUrgent ? "danger" : "default"}
         banner={
             pastUrgent ? <KardexCompliancePastMonthsAlert sticky /> : null
         }
     >
-        <>
-        {(() => {
-            const {data: singleKardex, isLoading, isError, error, isSuccess} = useRetrieveKardex({ id: kardex.idkardex , enabled: getKardex, access })
-            if (isLoading) return <p className="text-md animate-pulse text-center my-2">Cargando ...</p>
-            if (isError) return <p className="text-md text-red-500 text-center">Error: {error.message}</p>
-            if (isSuccess)
-            return (
-                <KardexForm 
+        {isLoading && (
+            <p className="text-md my-2 animate-pulse text-center">Cargando ...</p>
+        )}
+        {isError && (
+            <p className="text-md text-center text-red-500">Error: {error.message}</p>
+        )}
+        {isSuccess && singleKardex && (
+            showLogs ? (
+                <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-0">
+                    <div className="flex max-h-[32vh] shrink-0 flex-col lg:max-h-none lg:w-[22rem] xl:w-96">
+                        <KardexLogsPanel
+                            idkardex={singleKardex.idkardex}
+                            enabled={open}
+                            className="h-full lg:max-h-none"
+                        />
+                    </div>
+                    <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-auto lg:pl-4">
+                        <KardexForm
+                            kardex={singleKardex}
+                            updateKardex={updateKardex}
+                        />
+                    </main>
+                </div>
+            ) : (
+                <KardexForm
                     kardex={singleKardex}
-                    // onClose={() => setOpen(false)}
                     updateKardex={updateKardex}
                 />
             )
-        })()}
-        </>
-            
+        )}
     </TopModal>
     </>
   )
