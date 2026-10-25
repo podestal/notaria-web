@@ -168,6 +168,7 @@ const KardexForm = ({
     const [recepcion, setRecepcion] = useState<string>(kardex?.recepcion || user?.idusuario.toString() || '0')
 
     const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
+    const [selectedAbogado, setSelectedAbogado] = useState(kardex?.idabogado ?? "")
     const kardexWithSelectedTemplate = kardex ? { ...kardex, fktemplate: selectedTemplate } : null
 
     useEffect(() => {
@@ -179,6 +180,10 @@ const KardexForm = ({
     useEffect(() => {
         setSelectedTemplate(kardex?.fktemplate || 0)
     }, [kardex?.fktemplate])
+
+    useEffect(() => {
+        setSelectedAbogado(kardex?.idabogado ?? "")
+    }, [kardex?.idabogado])
 
     const [kardexId, setKardexId] = useState(kardex?.idkardex || 0)
     const [doneCreate, setDoneCreate] = useState(false);
@@ -234,6 +239,7 @@ const KardexForm = ({
                     estado_sisgen: 0,
                     numminuta: '',
                     nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
+                    idabogado: selectedAbogado || "",
                     
                 }
             }, {
@@ -277,6 +283,7 @@ const KardexForm = ({
                     recepcion: recepcion,
                     estado_sisgen: kardex?.estado_sisgen ?? 0,
                     nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
+                    idabogado: selectedAbogado || "",
                     ...preservedKardexFields(kardex),
                 },
                 access
@@ -574,15 +581,15 @@ const KardexForm = ({
                     </FormField>
                     <FormField label="Abogado">
                         <select
-                            defaultValue={0}
-                            onChange={() => {}}
+                            value={selectedAbogado}
+                            onChange={(e) => setSelectedAbogado(e.target.value)}
                             className={fieldSelectClass}
                         >
-                            <option value={0}>Seleccionar abogado</option>
+                            <option value="">Seleccionar abogado</option>
                             {abogados.map((abogado) => (
                                 <option
                                     key={abogado.idabogado}
-                                    value={Number(abogado.idabogado)}
+                                    value={abogado.idabogado}
                                 >
                                     {getTitleCase(abogado.razonsocial)}
                                 </option>

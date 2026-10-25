@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ChevronDown, History, Loader2, RefreshCw } from "lucide-react"
+import { ChevronDown, History, Loader2, RefreshCw, User } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetKardexLogs from "../../../hooks/api/kardex/useGetKardexLogs"
+import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
+import { getUsuarioDisplayName } from "../../../services/api/usuariosService"
+import getTitleCase from "../../../utils/getTitleCase"
 import {
     KARDEX_LOGS_QUERY_KEY,
     type KardexLogAction,
@@ -14,6 +17,18 @@ interface Props {
     idkardex: number
     enabled: boolean
     className?: string
+}
+
+const FIELD_LABELS: Record<string, string> = {
+    idabogado: "Abogado",
+    idusuario: "Usuario",
+    responsable: "Responsable",
+    recepcion: "Recepción",
+    fktemplate: "Plantilla",
+    referencia: "Referencia",
+    contrato: "Contrato",
+    codactos: "Actos",
+    fechaingreso: "Fecha de ingreso",
 }
 
 const TABLE_LABELS: Record<string, string> = {
@@ -54,6 +69,8 @@ const tableLabel = (tableName: string) =>
     TABLE_LABELS[tableName] ??
     tableName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
 
+const fieldLabel = (field: string) => FIELD_LABELS[field] ?? field
+
 const actionMeta = (action: KardexLogAction) =>
     ACTION_META[action] ?? {
         label: action,
@@ -87,6 +104,7 @@ const formatLogValue = (value: KardexLogChangeValue): string => {
 const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const queryClient = useQueryClient()
+    const { data: usuarios } = useGetUsuarios({ access })
     const [page, setPage] = useState(1)
     const [openId, setOpenId] = useState<number | null>(null)
 
@@ -198,6 +216,11 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
                             const meta = actionMeta(log.action)
                             const isOpen = openId === log.id
                             const fields = Object.entries(log.changes ?? {})
+                            const actor = usuarios?.find((u) => u.idusuario === log.user_id)
+                            const username = log.username || actor?.username || ""
+                            const displayName = actor
+                                ? getTitleCase(getUsuarioDisplayName(actor))
+                                : ""
 
                             return (
                                 <li key={log.id}>
@@ -215,8 +238,19 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
                                             <span className="block truncate text-xs font-semibold text-slate-800">
                                                 {tableLabel(log.table_name)}
                                             </span>
-                                            <span className="mt-0.5 block truncate text-[11px] text-slate-500">
-                                                {log.username || "—"} · {formatLogTime(log.created_at)}
+                                            <span className="mt-1 flex min-w-0 items-center gap-1 text-[11px] text-slate-700">
+                                                <User className="h-3 w-3 shrink-0 text-indigo-500" aria-hidden />
+                                                <span className="truncate font-semibold">
+                                                    {username || "Usuario desconocido"}
+                                                </span>
+                                            </span>
+                                            {displayName && displayName.toLowerCase() !== username.toLowerCase() && (
+                                                <span className="mt-0.5 block truncate pl-4 text-[11px] text-slate-500">
+                                                    {displayName}
+                                                </span>
+                                            )}
+                                            <span className="mt-0.5 block truncate text-[11px] text-slate-400">
+                                                {formatLogTime(log.created_at)}
                                             </span>
                                             {log.record_pk && log.record_pk !== "*" && (
                                                 <span className="mt-0.5 block font-mono text-[10px] text-slate-400">
@@ -244,7 +278,7 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
                                                         fields.map(([field, change]) => (
                                                             <div key={field} className="text-[11px] leading-snug">
                                                                 <p className="font-mono text-[10px] font-semibold text-slate-500">
-                                                                    {field}
+                                                                    {fieldLabel(field)}
                                                                 </p>
                                                                 <p className="mt-0.5 text-slate-700">
                                                                     <span className="text-slate-400">
