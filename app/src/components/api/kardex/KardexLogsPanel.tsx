@@ -237,9 +237,11 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
                                             <span className="mt-0.5 block truncate text-[11px] text-slate-400">
                                                 {formatLogTime(log.created_at)}
                                             </span>
-                                            {log.record_pk && log.record_pk !== "*" && (
-                                                <span className="mt-0.5 block font-mono text-[10px] text-slate-400">
-                                                    #{log.record_pk}
+                                            {(log.record_label || (log.record_pk && log.record_pk !== "*")) && (
+                                                <span className="mt-0.5 block truncate text-[10px] text-slate-400">
+                                                    {log.record_label && log.record_label !== log.record_pk
+                                                        ? log.record_label
+                                                        : `#${log.record_pk}`}
                                                 </span>
                                             )}
                                         </span>

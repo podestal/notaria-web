@@ -21,6 +21,7 @@ export interface KardexLog {
     idkardex: number
     table_name: string
     record_pk: string
+    record_label?: string
     action: KardexLogAction
     changes: Record<string, KardexLogChange>
     user_id: number
