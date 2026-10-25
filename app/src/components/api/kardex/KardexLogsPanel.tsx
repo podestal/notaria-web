@@ -4,9 +4,6 @@ import { ChevronDown, History, Loader2, RefreshCw, User } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetKardexLogs from "../../../hooks/api/kardex/useGetKardexLogs"
-import useGetUsuarios from "../../../hooks/api/usuarios/useGetUsuarios"
-import { getUsuarioDisplayName } from "../../../services/api/usuariosService"
-import getTitleCase from "../../../utils/getTitleCase"
 import {
     KARDEX_LOGS_QUERY_KEY,
     type KardexLogAction,
@@ -104,7 +101,6 @@ const formatLogValue = (value: KardexLogChangeValue): string => {
 const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
     const queryClient = useQueryClient()
-    const { data: usuarios } = useGetUsuarios({ access })
     const [page, setPage] = useState(1)
     const [openId, setOpenId] = useState<number | null>(null)
 
@@ -216,12 +212,6 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
                             const meta = actionMeta(log.action)
                             const isOpen = openId === log.id
                             const fields = Object.entries(log.changes ?? {})
-                            const actor = usuarios?.find((u) => u.idusuario === log.user_id)
-                            const username = log.username || actor?.username || ""
-                            const displayName = actor
-                                ? getTitleCase(getUsuarioDisplayName(actor))
-                                : ""
-
                             return (
                                 <li key={log.id}>
                                     <button
@@ -241,14 +231,9 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
                                             <span className="mt-1 flex min-w-0 items-center gap-1 text-[11px] text-slate-700">
                                                 <User className="h-3 w-3 shrink-0 text-indigo-500" aria-hidden />
                                                 <span className="truncate font-semibold">
-                                                    {username || "Usuario desconocido"}
+                                                    {log.username || "—"}
                                                 </span>
                                             </span>
-                                            {displayName && displayName.toLowerCase() !== username.toLowerCase() && (
-                                                <span className="mt-0.5 block truncate pl-4 text-[11px] text-slate-500">
-                                                    {displayName}
-                                                </span>
-                                            )}
                                             <span className="mt-0.5 block truncate text-[11px] text-slate-400">
                                                 {formatLogTime(log.created_at)}
                                             </span>
