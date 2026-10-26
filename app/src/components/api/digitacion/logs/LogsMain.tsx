@@ -39,8 +39,8 @@ const LogsMain = ({ kardex }: Props) => {
       </div>
       {logs.map(log => (
         <div key={log.id} className="grid grid-cols-3 gap-2 border-b border-gray-100 py-2 text-xs">
-          <p>{log.user}</p>
-          <p>{log.action}</p>
+          <p>{log.user_name || log.username || log.user}</p>
+          <p>{log.action_label || log.action}</p>
           <p>{new Date(log.created_at).toLocaleString()}</p>
         </div>
       ))}

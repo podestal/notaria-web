@@ -43,6 +43,8 @@ const TABLE_LABELS: Record<string, string> = {
     contratantesxacto: "Participa",
     detallebienes: "Detalle de bienes",
     detalle_bienes: "Detalle de bienes",
+    documento: "Documento",
+    documentos: "Documento",
     detallemediopago: "Medio de pago",
     detallemediodepago: "Medio de pago",
     detalleactoskardex: "Actos del kardex",

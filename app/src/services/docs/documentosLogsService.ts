@@ -9,7 +9,12 @@ export interface DocumentoLog {
     id: number
     kardex: string
     user: number
+    username?: string
+    user_name?: string
+    first_name?: string
+    last_name?: string
     action: string
+    action_label?: string
     created_at: string
 }
 
