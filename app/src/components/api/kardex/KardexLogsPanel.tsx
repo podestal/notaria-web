@@ -26,15 +26,24 @@ const FIELD_LABELS: Record<string, string> = {
     contrato: "Contrato",
     codactos: "Actos",
     fechaingreso: "Fecha de ingreso",
+    monto: "Monto",
+    porcentaje: "Porcentaje",
+    ofondo: "Origen de fondos",
+    idmon: "Moneda",
+    fpago: "Forma de pago",
+    idoppago: "Oportunidad de pago",
+    codmepag: "Medio de pago",
+    idbancos: "Banco",
 }
 
 const TABLE_LABELS: Record<string, string> = {
     cliente: "Cliente",
     cliente1: "Cliente",
     cliente2: "Cliente",
-    contratantesxacto: "Contratantes por acto",
+    contratantesxacto: "Participa",
     detallebienes: "Detalle de bienes",
     detalle_bienes: "Detalle de bienes",
+    detallemediopago: "Medio de pago",
     detallemediodepago: "Medio de pago",
     detalleactoskardex: "Actos del kardex",
     kardex: "Kardex",
@@ -231,7 +240,7 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
                                             <span className="mt-1 flex min-w-0 items-center gap-1 text-[11px] text-slate-700">
                                                 <User className="h-3 w-3 shrink-0 text-indigo-500" aria-hidden />
                                                 <span className="truncate font-semibold">
-                                                    {log.username || "—"}
+                                                    {log.user_name || log.username || "—"}
                                                 </span>
                                             </span>
                                             <span className="mt-0.5 block truncate text-[11px] text-slate-400">

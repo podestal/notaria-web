@@ -39,6 +39,7 @@ const CreateKardex = () => {
             setOpen(false)
             setKardex(null)
         }}
+        portal
         wide={showLogs}
         tone={pastUrgent ? "danger" : "default"}
         banner={

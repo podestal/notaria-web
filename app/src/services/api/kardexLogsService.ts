@@ -26,6 +26,9 @@ export interface KardexLog {
     changes: Record<string, KardexLogChange>
     user_id: number
     username: string
+    user_name?: string
+    first_name?: string
+    last_name?: string
     source: string
     created_at: string
 }
