@@ -8,6 +8,7 @@ import useNotificationsStore from "../../../../hooks/store/useNotificationsStore
 import useUpdateMapUser from "../../../../hooks/api/users/useUpdateMapUser"
 import LinkTaxesUsuarioSelector from "./LinkTaxesUsuarioSelector"
 import ProtocolarPermissionsToggles from "./ProtocolarPermissionsToggles"
+import ExtraProtocolarPermissionsToggles from "./ExtraProtocolarPermissionsToggles"
 
 interface Props {
     user: User
@@ -239,6 +240,7 @@ const UserMappingCard = ({
                 )}
 
             {showProtocolar && <ProtocolarPermissionsToggles user={user} />}
+            {showProtocolar && <ExtraProtocolarPermissionsToggles user={user} />}
         </article>
     )
 }

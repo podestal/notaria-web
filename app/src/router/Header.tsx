@@ -24,6 +24,7 @@ import getTitleCase from '../utils/getTitleCase'
 import useKardexFiltersStore from '../hooks/store/useKardexFiltersStore'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
+import { userCanExtraprotocolar } from '../services/auth/userService'
 import { isFacturacionEnabled } from '../utils/isFacturacionEnabled'
 import ComplianceMeReminder from '../components/api/kardex/kardexErrors/ComplianceMeReminder'
 import useSidebarStore, {
@@ -151,6 +152,7 @@ interface MenuOptions {
     path?: string
     subOptions?: SubOption[]
     docType?: number
+    extraType?: string
 }
 
 interface MenuItem {
@@ -256,15 +258,15 @@ const Header = ({ kardexTypes }: Props) => {
         { label: "Extraprotocolares", options: 
             [   
               // {name: "Certificación de Firmas", path: "/app/extraprotocolares/certificacionFirmas"},
-                {name: "Cert. Autorización de viaje", path: "/app/extraprotocolares/permisosViaje"},
-                {name: "Poderes Fuera de Registro", path: "/app/extraprotocolares/poderesFueraDeRegistro"},
-                {name: "Cartas Notariales", path: "/app/extraprotocolares/cartaNotarial"},
-                {name: "Cert. Apertura de Libros", path: "/app/extraprotocolares/aperturaLibros"},
-                {name: "Cert. Supervivencia Persona Capaz", path: "/app/extraprotocolares/supervivenciaCapaz"},
-                {name: "Cert. Supervivencia Persona Incapaz", path: "/app/extraprotocolares/supervivenciaIncapaz"},
-                {name: "Certificado Domiciliario", path: "/app/extraprotocolares/certificadoDomiciliario"},
-                {name: "Cambio de Características", path: "/app/extraprotocolares/cambioCaracteristicas"},
-                {name: "Busqueda Avanzada", path: "/app/extraprotocolares/busquedaAvanzada"}
+                {name: "Cert. Autorización de viaje", path: "/app/extraprotocolares/permisosViaje", extraType: "permisos_viaje"},
+                {name: "Poderes Fuera de Registro", path: "/app/extraprotocolares/poderesFueraDeRegistro", extraType: "poderes"},
+                {name: "Cartas Notariales", path: "/app/extraprotocolares/cartaNotarial", extraType: "cartas"},
+                {name: "Cert. Apertura de Libros", path: "/app/extraprotocolares/aperturaLibros", extraType: "libros"},
+                {name: "Cert. Supervivencia Persona Capaz", path: "/app/extraprotocolares/supervivenciaCapaz", extraType: "supervivencia_capaz"},
+                {name: "Cert. Supervivencia Persona Incapaz", path: "/app/extraprotocolares/supervivenciaIncapaz", extraType: "supervivencia_incapaz"},
+                {name: "Certificado Domiciliario", path: "/app/extraprotocolares/certificadoDomiciliario", extraType: "domiciliario"},
+                {name: "Cambio de Características", path: "/app/extraprotocolares/cambioCaracteristicas", extraType: "cambio_caracteristicas"},
+                {name: "Busqueda Avanzada", path: "/app/extraprotocolares/busquedaAvanzada", extraType: "busqueda_avanzada"}
             ]},
         { label: "Reportes", options: 
             [   {name: "Indices Cronologicos", 
@@ -407,6 +409,15 @@ const Header = ({ kardexTypes }: Props) => {
         return isFacturacionEnabled();
       }
       return true;
+    }).map((item) => {
+      if (item.label !== "Extraprotocolares") return item
+      return {
+        ...item,
+        options: item.options.filter(
+          (opt) =>
+            !opt.extraType || userCanExtraprotocolar(user, opt.extraType),
+        ),
+      }
     });
 
     useEffect(() => {

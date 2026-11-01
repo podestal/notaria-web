@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom"
+import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
+import { userCanExtraprotocolar } from "../../../services/auth/userService"
 import { motion } from "framer-motion"
 import {
   ArrowRight,
@@ -18,6 +20,7 @@ import {
 type ExtraOption = {
   name: string
   path: string
+  extraType: string
   icon: LucideIcon
   available: boolean
   surface: string
@@ -30,6 +33,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Cert. Autorización de viaje",
     path: "/app/extraprotocolares/permisosViaje",
+    extraType: "permisos_viaje",
     icon: Plane,
     available: true,
     surface: "bg-gradient-to-br from-sky-500/25 via-sky-500/10 to-transparent",
@@ -40,6 +44,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Poderes Fuera de Registro",
     path: "/app/extraprotocolares/poderesFueraDeRegistro",
+    extraType: "poderes",
     icon: ScrollText,
     available: true,
     surface: "bg-gradient-to-br from-violet-500/25 via-violet-500/10 to-transparent",
@@ -50,6 +55,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Cartas Notariales",
     path: "/app/extraprotocolares/cartaNotarial",
+    extraType: "cartas",
     icon: Mail,
     available: true,
     surface: "bg-gradient-to-br from-amber-500/25 via-amber-500/10 to-transparent",
@@ -60,6 +66,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Cert. Apertura de Libros",
     path: "/app/extraprotocolares/aperturaLibros",
+    extraType: "libros",
     icon: BookOpen,
     available: true,
     surface: "bg-gradient-to-br from-emerald-500/25 via-emerald-500/10 to-transparent",
@@ -70,6 +77,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Cert. Supervivencia Persona Capaz",
     path: "/app/extraprotocolares/supervivenciaCapaz",
+    extraType: "supervivencia_capaz",
     icon: HeartPulse,
     available: false,
     surface: "bg-gradient-to-br from-slate-400/20 via-slate-400/10 to-transparent",
@@ -80,6 +88,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Cert. Supervivencia Persona Incapaz",
     path: "/app/extraprotocolares/supervivenciaIncapaz",
+    extraType: "supervivencia_incapaz",
     icon: UserRoundX,
     available: false,
     surface: "bg-gradient-to-br from-slate-400/20 via-slate-400/10 to-transparent",
@@ -90,6 +99,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Certificado Domiciliario",
     path: "/app/extraprotocolares/certificadoDomiciliario",
+    extraType: "domiciliario",
     icon: MapPin,
     available: true,
     surface: "bg-gradient-to-br from-teal-500/25 via-teal-500/10 to-transparent",
@@ -100,6 +110,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Cambio de Características",
     path: "/app/extraprotocolares/cambioCaracteristicas",
+    extraType: "cambio_caracteristicas",
     icon: RefreshCw,
     available: false,
     surface: "bg-gradient-to-br from-slate-400/20 via-slate-400/10 to-transparent",
@@ -110,6 +121,7 @@ const EXTRA_OPTIONS: ExtraOption[] = [
   {
     name: "Busqueda Avanzada",
     path: "/app/extraprotocolares/busquedaAvanzada",
+    extraType: "busqueda_avanzada",
     icon: Search,
     available: false,
     surface: "bg-gradient-to-br from-slate-400/20 via-slate-400/10 to-transparent",
@@ -187,7 +199,11 @@ const CardShell = ({ option, index }: { option: ExtraOption; index: number }) =>
 }
 
 const ExtraprotocolaresHub = () => {
-  const availableCount = EXTRA_OPTIONS.filter((o) => o.available).length
+  const user = useUserInfoStore((s) => s.user)
+  const visibleOptions = EXTRA_OPTIONS.filter((option) =>
+    userCanExtraprotocolar(user, option.extraType),
+  )
+  const availableCount = visibleOptions.filter((o) => o.available).length
 
   return (
     <motion.div
@@ -230,16 +246,22 @@ const ExtraprotocolaresHub = () => {
           </div>
           <p className="text-xs tabular-nums text-slate-500">
             {availableCount} disponible{availableCount === 1 ? "" : "s"} ·{" "}
-            {EXTRA_OPTIONS.length - availableCount} próximamente
+            {visibleOptions.length - availableCount} próximamente
           </p>
         </div>
       </div>
 
       <div className="mt-5 grid gap-4 sm:mt-6 sm:grid-cols-2 lg:grid-cols-3">
-        {EXTRA_OPTIONS.map((option, index) => (
+        {visibleOptions.map((option, index) => (
           <CardShell key={option.path} option={option} index={index} />
         ))}
       </div>
+
+      {visibleOptions.length === 0 && (
+        <p className="px-6 pb-10 text-center text-sm text-slate-500">
+          No tiene permiso para ningún extraprotocolar.
+        </p>
+      )}
     </motion.div>
   )
 }

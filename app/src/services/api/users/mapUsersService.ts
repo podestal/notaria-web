@@ -1,5 +1,9 @@
 import APIClient from "../apiClient"
-import type { ProtocolarPermission, User } from "../../auth/userService"
+import type {
+    ExtraProtocolarPermission,
+    ProtocolarPermission,
+    User,
+} from "../../auth/userService"
 
 export interface UpdateMapUser {
     username?: string
@@ -13,6 +17,7 @@ export interface UpdateMapUser {
     is_staff?: boolean
     is_superuser?: boolean
     protocolar_permissions?: ProtocolarPermission[]
+    extraprotocolar_permissions?: ExtraProtocolarPermission[]
 }
 
 interface Props {
