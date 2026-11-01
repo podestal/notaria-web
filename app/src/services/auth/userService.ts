@@ -1,5 +1,11 @@
 import AuthClient from "./authClient";
 
+export interface ProtocolarPermission {
+    idtipkar: number
+    name: string
+    allowed: boolean
+}
+
 export interface User {
     idusuario: number
     username: string
@@ -14,6 +20,19 @@ export interface User {
     is_superuser: boolean
     date_joined: string
     last_login: string | null
+    protocolar_permissions?: ProtocolarPermission[]
+}
+
+export const userCanProtocolar = (
+    user: User | null | undefined,
+    idtipkar: number,
+): boolean => {
+    if (!user) return true
+    if (Number(user.is_superuser) !== 0) return true
+    const perms = user.protocolar_permissions
+    if (!perms || perms.length === 0) return true
+    const found = perms.find((item) => item.idtipkar === idtipkar)
+    return found ? found.allowed : true
 }
 
 export default new AuthClient<User>('/users/me/');

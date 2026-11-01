@@ -2,10 +2,18 @@ import { AlertTriangle, UserRound } from "lucide-react"
 import type { User } from "../../../../services/auth/userService"
 import { getUsuarioDisplayName } from "../../../../services/api/usuariosService"
 import getTitleCase from "../../../../utils/getTitleCase"
+import useAuthStore from "../../../../store/useAuthStore"
+import useUserInfoStore from "../../../../hooks/store/useGetUserInfo"
+import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
+import useUpdateMapUser from "../../../../hooks/api/users/useUpdateMapUser"
 import LinkTaxesUsuarioSelector from "./LinkTaxesUsuarioSelector"
+import ProtocolarPermissionsToggles from "./ProtocolarPermissionsToggles"
 
 interface Props {
     user: User
+    showLinking?: boolean
+    showProtocolar?: boolean
+    showStatusToggle?: boolean
 }
 
 const formatDate = (iso: string | null) => {
@@ -30,10 +38,58 @@ const getMappingAlerts = (user: User): string[] => {
     return alerts
 }
 
-const UserMappingCard = ({ user }: Props) => {
+const UserMappingCard = ({
+    user,
+    showLinking = true,
+    showProtocolar = true,
+    showStatusToggle = false,
+}: Props) => {
+    const access = useAuthStore((s) => s.access_token) || ""
+    const currentUser = useUserInfoStore((s) => s.user)
+    const { setMessage, setShow, setType } = useNotificationsStore()
+    const updateMapUser = useUpdateMapUser({ idusuario: user.idusuario })
     const alerts = getMappingAlerts(user)
-    const needsMapping = alerts.length > 0
+    const needsMapping = showLinking && alerts.length > 0
     const displayName = getTitleCase(getUsuarioDisplayName(user))
+    const isSelf = currentUser?.idusuario === user.idusuario
+
+    const handleToggleActive = () => {
+        const nextActive = !user.is_active
+        updateMapUser.mutate(
+            { access, user: { is_active: nextActive } },
+            {
+                onSuccess: () => {
+                    setMessage(
+                        nextActive
+                            ? "Usuario activado"
+                            : "Usuario desactivado",
+                    )
+                    setType("success")
+                    setShow(true)
+                },
+                onError: (error) => {
+                    const data = (
+                        error as {
+                            response?: {
+                                data?: { detail?: string; is_active?: string[] }
+                            }
+                        }
+                    )?.response?.data
+                    const fieldError = Array.isArray(data?.is_active)
+                        ? data.is_active[0]
+                        : undefined
+                    setMessage(
+                        fieldError ||
+                            (typeof data?.detail === "string"
+                                ? data.detail
+                                : "No se pudo cambiar el estado del usuario."),
+                    )
+                    setType("error")
+                    setShow(true)
+                },
+            },
+        )
+    }
 
     return (
         <article
@@ -82,15 +138,57 @@ const UserMappingCard = ({ user }: Props) => {
                             <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
                                 {user.username}
                             </span>
-                            <span
-                                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                                    user.is_active
-                                        ? "bg-emerald-100 text-emerald-800"
-                                        : "bg-slate-200 text-slate-600"
-                                }`}
-                            >
-                                {user.is_active ? "Activo" : "Inactivo"}
-                            </span>
+                            {showStatusToggle ? (
+                                <button
+                                    type="button"
+                                    onClick={handleToggleActive}
+                                    disabled={updateMapUser.isPending || isSelf}
+                                    title={
+                                        isSelf
+                                            ? "No puede desactivar su propio usuario"
+                                            : user.is_active
+                                              ? "Desactivar usuario"
+                                              : "Activar usuario"
+                                    }
+                                    className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                                        user.is_active
+                                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                                            : "bg-slate-200 text-slate-600 hover:bg-slate-300"
+                                    }`}
+                                >
+                                    <span
+                                        className={`h-1.5 w-1.5 rounded-full ${
+                                            user.is_active
+                                                ? "bg-emerald-600"
+                                                : "bg-slate-500"
+                                        }`}
+                                    />
+                                    {updateMapUser.isPending
+                                        ? "Guardando…"
+                                        : user.is_active
+                                          ? "Activo"
+                                          : "Inactivo"}
+                                </button>
+                            ) : (
+                                <span
+                                    className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                        user.is_active
+                                            ? "bg-emerald-100 text-emerald-800"
+                                            : "bg-slate-200 text-slate-600"
+                                    }`}
+                                >
+                                    {user.is_active ? "Activo" : "Inactivo"}
+                                </span>
+                            )}
+                            {user.is_superuser ? (
+                                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-800">
+                                    Superusuario
+                                </span>
+                            ) : user.is_staff ? (
+                                <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-800">
+                                    Staff
+                                </span>
+                            ) : null}
                         </div>
                         <h3 className="mt-1 text-sm font-medium leading-snug text-slate-900">
                             {displayName}
@@ -135,9 +233,12 @@ const UserMappingCard = ({ user }: Props) => {
                 </div>
             </dl>
 
-            {(user.taxes_usuario_id == null || user.negocio_id == null) && (
-                <LinkTaxesUsuarioSelector idusuario={user.idusuario} />
-            )}
+            {showLinking &&
+                (user.taxes_usuario_id == null || user.negocio_id == null) && (
+                    <LinkTaxesUsuarioSelector idusuario={user.idusuario} />
+                )}
+
+            {showProtocolar && <ProtocolarPermissionsToggles user={user} />}
         </article>
     )
 }

@@ -59,7 +59,7 @@ import AlfabeticosTransferencias from "../components/api/reportes/alfabeticos/Al
 import AlfabeticosTestamento from "../components/api/reportes/alfabeticos/AlfabeticosTestamento";
 import PlantillasMain from "../components/api/plantillas/PlantillasMain";
 import ConfiNotarioMain from "../components/api/confinotario/ConfiNotarioMain";
-import CreateUser from "../components/auth/CreateUser";
+import UsuariosConfigMain from "../components/api/configuracion/usuarios/UsuariosConfigMain";
 import AbogadosMain from "../components/api/configuracion/abogadosManager/AbogadosMain";
 import ActoCondicionMain from "../components/api/actoCondicion/ActoCondicionMain";
 import TaxesMain from "../components/taxes/TaxesMain";
@@ -68,7 +68,6 @@ import BoletasMain from "../components/taxes/boletas/BoletasMain";
 import FacturasMain from "../components/taxes/facturas/FacturasMain";
 import NotasMain from "../components/taxes/notas/NotasMain";
 import ResumenesMain from "../components/taxes/resumenes/ResumenesMain";
-import UserMappingMain from "../components/api/configuracion/userMapping/UserMappingMain";
 import ReservacionesMain from "../components/api/configuracion/reservaciones/ReservacionesMain";
 import TaxesUsuariosMain from "../components/api/configuracion/taxesUsuarios/TaxesUsuariosMain";
 import TareasMain from "../components/api/configuracion/tareas/TareasMain";
@@ -436,8 +435,12 @@ const routes = createBrowserRouter([
                         element: <PrivateRoutes><ActoCondicionMain /></PrivateRoutes>
                     },
                     {
+                        path: "usuarios",
+                        element: <PrivateRoutes><UsuariosConfigMain /></PrivateRoutes>
+                    },
+                    {
                         path: "create-user",
-                        element: <PrivateRoutes><CreateUser /></PrivateRoutes>
+                        element: <Navigate to="/app/configuracion/usuarios" replace />
                     },
                     {
                         path: "abogados-manager",
@@ -449,7 +452,7 @@ const routes = createBrowserRouter([
                     },
                     {
                         path: "user-mapping",
-                        element: <PrivateRoutes><UserMappingMain /></PrivateRoutes>
+                        element: <Navigate to="/app/configuracion/usuarios?tab=enlazar" replace />
                     },
                     {
                         path: "usuarios-taxes",

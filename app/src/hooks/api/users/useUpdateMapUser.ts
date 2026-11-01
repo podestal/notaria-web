@@ -32,6 +32,7 @@ const useUpdateMapUser = ({
             queryClient.invalidateQueries({
                 queryKey: ["admin-users", idusuario],
             })
+            queryClient.invalidateQueries({ queryKey: ["user"] })
         },
     })
 }

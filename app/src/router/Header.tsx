@@ -375,11 +375,10 @@ const Header = ({ kardexTypes }: Props) => {
                 // {name: "Configurar SISNOT"},
                 // {name: "Activar Errores Usuarios"},
                 {name: "Acto Condicion", path: "/app/configuracion/acto-condicion"},
-                {name: "Crear Usuario", path: "/app/configuracion/create-user"},
+                {name: "Usuarios", path: "/app/configuracion/usuarios"},
                 {name: "Abogados Manager", path: "/app/configuracion/abogados-manager"},
                 {name: "Plantillas", path: "/app/configuracion/plantillas"},
                 {name: "Reservaciones", path: "/app/configuracion/reservaciones"},
-                {name: "Enlazar Usuarios", path: "/app/configuracion/user-mapping"},
                 {name: "Usuarios Taxes", path: "/app/configuracion/usuarios-taxes"},
                 {name: "Tareas", path: "/app/configuracion/tareas"},
             ]},
@@ -408,16 +407,6 @@ const Header = ({ kardexTypes }: Props) => {
         return isFacturacionEnabled();
       }
       return true;
-    }).map((item) => {
-      if (item.label !== "Configuracion") return item;
-      const isSuperuser = Number(user?.is_superuser) !== 0;
-      return {
-        ...item,
-        options: item.options.filter(
-          (opt) =>
-            opt.path !== "/app/configuracion/user-mapping" || isSuperuser,
-        ),
-      };
     });
 
     useEffect(() => {

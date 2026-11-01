@@ -2,6 +2,8 @@ import Header from '../router/Header'
 import useGetTipoKardexList from '../hooks/api/tipoKardex/useGetTipoKardexList'
 import { useEffect } from 'react'
 import useKardexTypesStore from '../hooks/store/useKardexTypesStore'
+import useUserInfoStore from '../hooks/store/useGetUserInfo'
+import { userCanProtocolar } from '../services/auth/userService'
 import useNotificationsStore from '../hooks/store/useNotificationsStore'
 import NotificationCard from '../components/ui/NotificationCard'
 import { Outlet } from 'react-router-dom'
@@ -15,20 +17,24 @@ import useSidebarStore, {
 const MainPage = () => {
 
   const setKardexTypes = useKardexTypesStore(s => s.setKardexTypes)
+  const user = useUserInfoStore(s => s.user)
   const { data: kardexTypes, isLoading, isError, error, isSuccess } = useGetTipoKardexList()
   const { notifications, removeNotification } = useNotificationsStore()
   const collapsed = useSidebarStore((s) => s.collapsed)
   const isTestApp = import.meta.env.MODE === 'test'
-  const visibleKardexTypes = (kardexTypes || []).filter(kardexType => kardexType.idtipkar <= 5)
+  const protocolarKardexTypes = (kardexTypes || []).filter(kardexType => kardexType.idtipkar <= 5)
+  const visibleKardexTypes = protocolarKardexTypes.filter((kardexType) =>
+    userCanProtocolar(user, kardexType.idtipkar),
+  )
   const persistentNotification = [...notifications].reverse().find((n) => n.persistent) ?? null
   const toastNotifications = notifications.filter((n) => !n.persistent)
   const sidebarWidth = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED
 
   useEffect(() => {
     if (isSuccess) {
-      setKardexTypes(visibleKardexTypes)
+      setKardexTypes(protocolarKardexTypes)
     }
-  }, [visibleKardexTypes, isSuccess, setKardexTypes])
+  }, [protocolarKardexTypes, isSuccess, setKardexTypes])
 
   if (isLoading) return <LoadingState fullScreen />
   if (isError) return <p>Error: {error.message}</p>

@@ -8,6 +8,8 @@ import KardexTable from "./KardexTable"
 import ProtocolaresHub from "./ProtocolaresHub"
 import useGetKardexList from "../../../hooks/api/kardex/useGetKardexList"
 import useAuthStore from "../../../store/useAuthStore"
+import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
+import { userCanProtocolar } from "../../../services/auth/userService"
 import LoadingState from "../../ui/LoadingState"
 
 const kardexTypes: Record<number, string> = {
@@ -31,7 +33,9 @@ const KardexMain = () => {
     const [page, setPage] = useState(1)
     const idtipkar = useBodyRenderStore(s => s.bodyRender)
     const access = useAuthStore(s => s.access_token) || ''
-    const hasTipkar = Boolean(tipkarParam)
+    const user = useUserInfoStore(s => s.user)
+    const tipkarId = tipkarParam ? parseInt(tipkarParam, 10) : NaN
+    const hasTipkar = Boolean(tipkarParam) && userCanProtocolar(user, tipkarId)
 
     useEffect(() => {
         if (tipkarParam) {

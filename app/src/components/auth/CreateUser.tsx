@@ -16,7 +16,12 @@ const inputClass =
 const inputErrorClass =
     "w-full min-w-0 rounded-md border border-rose-400 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
 
-const CreateUser = () => {
+interface Props {
+    embedded?: boolean
+    onCreated?: () => void
+}
+
+const CreateUser = ({ embedded = false, onCreated }: Props) => {
     const [form, setForm] = useState<CreateUserPayload>({
         username: "",
         email: "",
@@ -124,6 +129,7 @@ const CreateUser = () => {
             setMessage("Usuario creado exitosamente")
             setShow(true)
             resetForm()
+            onCreated?.()
         } catch (error: any) {
             const backendMessage =
                 error?.response?.data?.detail ||
@@ -167,45 +173,7 @@ const CreateUser = () => {
         </motion.div>
     )
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-        >
-            <div className="keep-dark relative overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-5 text-slate-100">
-                <motion.div
-                    aria-hidden
-                    className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sky-500/20 blur-3xl"
-                    animate={{ scale: [1, 1.15, 1], opacity: [0.55, 0.85, 0.55] }}
-                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                    aria-hidden
-                    className="pointer-events-none absolute -bottom-24 left-1/4 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl"
-                    animate={{ scale: [1.1, 1, 1.1], opacity: [0.45, 0.75, 0.45] }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <div className="relative flex items-center gap-3">
-                    <motion.div
-                        initial={{ scale: 0.6, rotate: -12, opacity: 0 }}
-                        animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.08 }}
-                        className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2.5"
-                    >
-                        <UserPlus className="text-sky-300" size={22} />
-                    </motion.div>
-                    <div>
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-sky-300/90">Configuración</p>
-                        <h1 className="text-lg font-semibold text-white">Crear usuario</h1>
-                        <p className="mt-0.5 text-xs text-slate-400">
-                            Complete los datos obligatorios para registrar un nuevo usuario
-                        </p>
-                    </div>
-                </div>
-            </div>
-
+    const formBody = (
             <form onSubmit={handleSubmit} className="space-y-4 bg-slate-50/50 p-4 sm:p-5">
                 <motion.section
                     initial={{ opacity: 0, y: 12 }}
@@ -327,6 +295,49 @@ const CreateUser = () => {
                     </motion.button>
                 </motion.div>
             </form>
+    )
+
+    if (embedded) return formBody
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        >
+            <div className="keep-dark relative overflow-hidden border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-5 text-slate-100">
+                <motion.div
+                    aria-hidden
+                    className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sky-500/20 blur-3xl"
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.55, 0.85, 0.55] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                    aria-hidden
+                    className="pointer-events-none absolute -bottom-24 left-1/4 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl"
+                    animate={{ scale: [1.1, 1, 1.1], opacity: [0.45, 0.75, 0.45] }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <div className="relative flex items-center gap-3">
+                    <motion.div
+                        initial={{ scale: 0.6, rotate: -12, opacity: 0 }}
+                        animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.08 }}
+                        className="rounded-xl border border-sky-400/30 bg-sky-500/15 p-2.5"
+                    >
+                        <UserPlus className="text-sky-300" size={22} />
+                    </motion.div>
+                    <div>
+                        <p className="text-[10px] uppercase tracking-[0.16em] text-sky-300/90">Configuración</p>
+                        <h1 className="text-lg font-semibold text-white">Crear usuario</h1>
+                        <p className="mt-0.5 text-xs text-slate-400">
+                            Complete los datos obligatorios para registrar un nuevo usuario
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {formBody}
         </motion.div>
     )
 }

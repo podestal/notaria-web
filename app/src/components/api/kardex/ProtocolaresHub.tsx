@@ -14,6 +14,8 @@ import useKardexTypesStore from "../../../hooks/store/useKardexTypesStore"
 import useBodyRenderStore from "../../../hooks/store/bodyRenderStore"
 import useKardexFiltersStore from "../../../hooks/store/useKardexFiltersStore"
 import useCorrelativeStore from "../../../hooks/store/useCorrelativeStore"
+import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
+import { userCanProtocolar } from "../../../services/auth/userService"
 import getTitleCase from "../../../utils/getTitleCase"
 
 const TIPOKAR_META: Record<
@@ -65,11 +67,14 @@ const TIPOKAR_META: Record<
 
 const ProtocolaresHub = () => {
   const kardexTypes = useKardexTypesStore((s) => s.kardexTypes)
+  const user = useUserInfoStore((s) => s.user)
   const setBodyRender = useBodyRenderStore((s) => s.setBodyRender)
   const setKardexFilter = useKardexFiltersStore((s) => s.setKardexFilter)
   const setCorrelative = useCorrelativeStore((s) => s.setCorrelative)
 
-  const types = kardexTypes.filter((t) => t.idtipkar <= 5)
+  const types = kardexTypes.filter(
+    (t) => t.idtipkar <= 5 && userCanProtocolar(user, t.idtipkar),
+  )
 
   const handleSelect = (idtipkar: number) => {
     setCorrelative("")

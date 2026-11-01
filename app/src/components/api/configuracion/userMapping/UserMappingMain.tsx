@@ -11,7 +11,11 @@ const userNeedsMapping = (user: {
     negocio_id: number | null
 }) => user.taxes_usuario_id == null || user.negocio_id == null
 
-const UserMappingMain = () => {
+interface Props {
+    embedded?: boolean
+}
+
+const UserMappingMain = ({ embedded = false }: Props) => {
     const user = useUserInfoStore((s) => s.user)
     const isSuperuser = Number(user?.is_superuser) !== 0
     const access = useAuthStore((s) => s.access_token) || ""
@@ -48,21 +52,28 @@ const UserMappingMain = () => {
     )
 
     if (!isSuperuser) {
-        return <Navigate to="/app/protocolares" replace />
+        return embedded ? null : <Navigate to="/app/protocolares" replace />
     }
 
     return (
-        <section className="space-y-4 px-4 py-6">
-            <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Enlazar usuarios</h1>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Revise qué usuarios del core aún no tienen enlace con taxes o negocio.
-                    </p>
-                </div>
-            </header>
+        <section className={embedded ? "space-y-4 bg-slate-50/50 p-4 sm:p-5" : "space-y-4 px-4 py-6"}>
+            {!embedded && (
+                <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900">Enlazar usuarios</h1>
+                        <p className="mt-1 text-sm text-slate-500">
+                            Enlace usuarios con taxes y marque qué protocolares puede hacer cada uno.
+                        </p>
+                    </div>
+                </header>
+            )}
 
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className={embedded ? "space-y-4" : "rounded-xl border border-slate-200 bg-white p-4 shadow-sm"}>
+                {embedded && (
+                    <p className="text-xs text-slate-500">
+                        Enlace usuarios con taxes y marque qué protocolares puede hacer cada uno.
+                    </p>
+                )}
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <input
                         value={search}
@@ -123,7 +134,10 @@ const UserMappingMain = () => {
                             })
                             .map((user) => (
                                 <li key={user.idusuario}>
-                                    <UserMappingCard user={user} />
+                                    <UserMappingCard
+                                        user={user}
+                                        showProtocolar={false}
+                                    />
                                 </li>
                             ))}
                     </ul>
