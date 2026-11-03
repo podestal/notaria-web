@@ -70,6 +70,13 @@ const DetalleBienForm = ({
     const [otherSpecific, setOtherSpecific] = useState(detalleBien ? detalleBien.oespecific : '')
 
     const [loading, setLoading] = useState(false)
+    const [tipoBienError, setTipoBienError] = useState('')
+    const [tipoBienJuridicoError, setTipoBienJuridicoError] = useState('')
+    const [ubigeoError, setUbigeoError] = useState('')
+    const [serieMaqEqError, setSerieMaqEqError] = useState('')
+    const [tpsmError, setTpsmError] = useState('')
+    const [npsmError, setNpsmError] = useState('')
+    const [otherSpecificError, setOtherSpecificError] = useState('')
     const [fechaError, setFechaError] = useState('')
 
     useEffect(() => {
@@ -80,37 +87,123 @@ const DetalleBienForm = ({
         }
     }, [tipoBienJuridico])
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const validateForm = () => {
+        let hasError = false
+        let firstMessage = ''
+
+        const setFirst = (msg: string) => {
+            if (!firstMessage) firstMessage = msg
+        }
+
+        if (!tipoBien || (tipoBien !== 1 && tipoBien !== 2)) {
+            setTipoBienError('Debe seleccionar un tipo de bien')
+            setFirst('Debe seleccionar un tipo de bien')
+            hasError = true
+        } else {
+            setTipoBienError('')
+        }
+
+        if (!tipoBienJuridico) {
+            setTipoBienJuridicoError('Debe seleccionar un bien acto jurídico')
+            setFirst('Debe seleccionar un bien acto jurídico')
+            hasError = true
+        } else {
+            setTipoBienJuridicoError('')
+        }
+
+        if (!ubigeo?.id) {
+            setUbigeoError('Debe seleccionar un ubigeo')
+            setFirst('Debe seleccionar un ubigeo')
+            hasError = true
+        } else {
+            setUbigeoError('')
+        }
+
+        if (tipoBienJuridico === 5 && !serieMaqEq.trim()) {
+            setSerieMaqEqError('Debe ingresar el N° de serie para maquinaria y equipos')
+            setFirst('Debe ingresar el N° de serie para maquinaria y equipos')
+            hasError = true
+        } else {
+            setSerieMaqEqError('')
+        }
+
+        if (tipoBienJuridico === 8) {
+            if (!tpsm || !['P', 'S', 'M'].includes(tpsm)) {
+                setTpsmError('Debe seleccionar placa, serie o motor')
+                setFirst('Debe seleccionar placa, serie o motor')
+                hasError = true
+            } else {
+                setTpsmError('')
+            }
+            if (!npsm.trim()) {
+                setNpsmError(
+                    tpsm === 'P'
+                        ? 'Debe ingresar el N° de placa'
+                        : tpsm === 'S'
+                          ? 'Debe ingresar el N° de serie'
+                          : 'Debe ingresar el N° de motor',
+                )
+                setFirst('Debe completar el identificador del vehículo')
+                hasError = true
+            } else {
+                setNpsmError('')
+            }
+        } else {
+            setTpsmError('')
+            setNpsmError('')
+        }
+
+        if (tipoBienJuridico === 10 && !otherSpecific.trim()) {
+            setOtherSpecificError('Debe detallar el bien materia del acto jurídico')
+            setFirst('Debe detallar el bien materia del acto jurídico')
+            hasError = true
+        } else {
+            setOtherSpecificError('')
+        }
 
         if (!isValidFourDigitYearOrEmpty(fecha)) {
             setFechaError(FOUR_DIGIT_YEAR_ERROR)
-            setMessage(FOUR_DIGIT_YEAR_ERROR)
-            setShow(true)
-            setType('error')
-            return
+            setFirst(FOUR_DIGIT_YEAR_ERROR)
+            hasError = true
+        } else {
+            setFechaError('')
         }
 
-        setFechaError('')
+        if (hasError) {
+            setMessage(firstMessage)
+            setShow(true)
+            setType('error')
+        }
+
+        return !hasError
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateForm()) return
+
         setLoading(true)
+
+        const payload = {
+            kardex,
+            idtipacto: idtipoacto,
+            tipob: tipoBien === 1 ? 'BIENES' : 'SERVICIOS',
+            pregistral: partida,
+            idtipbien: tipoBienJuridico,
+            idsedereg: sedeRegistral,
+            coddis: ubigeo ? ubigeo.id : '',
+            fechaconst: fecha,
+            itemmp,
+            oespecific: tipoBienJuridico === 10 ? otherSpecific : '',
+            smaquiequipo: tipoBienJuridico === 5 ? serieMaqEq : '',
+            tpsm: tipoBienJuridico === 8 ? tpsm : '',
+            npsm: tipoBienJuridico === 8 ? npsm : '',
+        }
 
         createDetalleBien && createDetalleBien.mutate({
             access,
-            detalleBien: {
-                kardex,
-                idtipacto: idtipoacto,
-                tipob: tipoBien === 1 ? 'BIENES' : 'SERVICIOS',
-                pregistral: partida,
-                idtipbien: tipoBienJuridico,
-                idsedereg: sedeRegistral,
-                coddis: ubigeo ? ubigeo.id : '',
-                fechaconst: fecha,
-                itemmp,
-                oespecific: otherSpecific,
-                smaquiequipo: serieMaqEq,
-                tpsm: tpsm,
-                npsm: npsm
-            }
+            detalleBien: payload,
         }, {
             onSuccess: () => {
                 setMessage('Detalle de Bien creado correctamente')
@@ -130,21 +223,7 @@ const DetalleBienForm = ({
 
         updateDetalleBien && updateDetalleBien.mutate({
             access,
-            detalleBien: {
-                kardex,
-                idtipacto: idtipoacto,
-                tipob: tipoBien === 1 ? 'BIENES' : 'SERVICIOS',
-                pregistral: partida,
-                idtipbien: tipoBienJuridico,
-                idsedereg: sedeRegistral,
-                coddis: ubigeo ? ubigeo.id : '',
-                fechaconst: fecha,
-                itemmp,
-                oespecific: otherSpecific,
-                smaquiequipo: serieMaqEq,
-                tpsm: tpsm,
-                npsm: npsm
-            }
+            detalleBien: payload,
         }, {
             onSuccess: () => {
                 setMessage('Detalle de Bien actualizado correctamente')
@@ -178,6 +257,9 @@ const DetalleBienForm = ({
                 }))]}
                 defaultValue={tipoBien}
                 setter={setTipoBien}
+                required
+                error={tipoBienError}
+                setError={setTipoBienError}
             />
             <SimpleInput 
                 label="Partida Registral"
@@ -194,7 +276,16 @@ const DetalleBienForm = ({
                     label: item.desestcivil
                 }))]}
                 defaultValue={tipoBienJuridico}
-                setter={setTipoBienJuridico}
+                setter={(value) => {
+                    setTipoBienJuridico(value)
+                    setSerieMaqEqError('')
+                    setTpsmError('')
+                    setNpsmError('')
+                    setOtherSpecificError('')
+                }}
+                required
+                error={tipoBienJuridicoError}
+                setError={setTipoBienJuridicoError}
             />
             <SimpleSelectorStr
                 label="Sede Registral"
@@ -223,26 +314,46 @@ const DetalleBienForm = ({
             <SimpleInput
                 label="N° de Serie para Maquinaria y Equipos"
                 value={serieMaqEq}
-                setValue={setSerieMaqEq}
+                setValue={(value) => {
+                    setSerieMaqEqError('')
+                    setSerieMaqEq(value)
+                }}
                 horizontal
+                required
+                error={serieMaqEqError}
+                setError={setSerieMaqEqError}
             />
         </div>}
         {tipoBienJuridico === 8 && 
         <div className="grid grid-cols-2 gap-4">
-            <SingleSelect 
-                options={[
-                    { value: 'P', label: 'N° de Placa' },
-                    { value: 'S', label: 'N° de Serie' },
-                    { value: 'M', label: 'N° de Motor' }
-                ]}
-                selected={tpsm}
-                onChange={setTpsm}
-            />
+            <div className="flex flex-col gap-1">
+                <SingleSelect 
+                    options={[
+                        { value: 'P', label: 'N° de Placa' },
+                        { value: 'S', label: 'N° de Serie' },
+                        { value: 'M', label: 'N° de Motor' }
+                    ]}
+                    selected={tpsm}
+                    onChange={(value) => {
+                        setTpsmError('')
+                        setTpsm(value)
+                    }}
+                />
+                {tpsmError && (
+                    <p className="text-xs text-red-500 px-2">{tpsmError}</p>
+                )}
+            </div>
             <SimpleInput
                 label={tpsm === 'P' ? 'N° de Placa' : tpsm === 'S' ? 'N° de Serie' : 'N° de Motor'}
                 value={npsm}
-                setValue={setNpsm}
+                setValue={(value) => {
+                    setNpsmError('')
+                    setNpsm(value)
+                }}
                 horizontal
+                required
+                error={npsmError}
+                setError={setNpsmError}
             />
         </div>}
         {tipoBienJuridico === 10 && 
@@ -250,8 +361,14 @@ const DetalleBienForm = ({
             <SimpleInput
                 label="Detalle del bien materia del acto juridico"
                 value={otherSpecific}
-                setValue={setOtherSpecific}
+                setValue={(value) => {
+                    setOtherSpecificError('')
+                    setOtherSpecific(value)
+                }}
                 horizontal
+                required
+                error={otherSpecificError}
+                setError={setOtherSpecificError}
             />
         </div>}
         <div className="flex items-center justify-start gap-4 px-2">
@@ -262,7 +379,8 @@ const DetalleBienForm = ({
             setSelected={setUbigeo}
             placeholder="Buscar Ubigeo"
             required
-            
+            error={ubigeoError}
+            setError={setUbigeoError}
         />
         </div>
         <div className="grid grid-cols-2 gap-4">
