@@ -53,6 +53,17 @@ const FilteredActoCondiciones = ({
         [options]
     )
 
+    const optionIds = useMemo(() => options.map((option) => option.id), [options])
+
+    // Drop stale selections from a previous acto/item (e.g. 043.6027 after acto → 028).
+    useEffect(() => {
+        if (optionIds.length === 0) return
+        setSelectedActos((prev) => {
+            const next = prev.filter((id) => optionIds.includes(id))
+            return next.length === prev.length ? prev : next
+        })
+    }, [optionIds, setSelectedActos])
+
     useEffect(() => {
         if (representanteOptionIds.length === 0) return
 

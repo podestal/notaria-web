@@ -26,10 +26,20 @@ const ParticipaMain = ({ kardex }: Props) => {
   if (isErrorDetalleActos || isErrorContratantes || isErrorPatrimonial) return <p className="text-center text-red-500 text-xs">Error al cargar los actos: ${errorDetalleActos?.message}</p>
 
   if (isSuccessDetalleActos && isSuccessContratantes && isSuccessPatrimonial) {
-  // Only parte 1 (vendedor/otorgante) and 2 (comprador/beneficiario) take part in the distribution.
+  // Only parte 1/2 on actos still present for this kardex (ignore leftover rows from removed actos).
+  const activeActos = new Set(
+    (Array.isArray(patrimonial) ? patrimonial : [])
+      .map((p) => (p.idtipoacto || '').trim())
+      .filter(Boolean)
+  )
+  if (tipoacto) activeActos.add(tipoacto)
+
   const participantes = (Array.isArray(contratantes) ? contratantes : []).filter((c) => {
     const parte = (c.parte || '').trim()
-    return parte === '1' || parte === '2'
+    if (parte !== '1' && parte !== '2') return false
+    const acto = (c.idtipoacto || '').trim()
+    if (activeActos.size > 0 && acto && !activeActos.has(acto)) return false
+    return true
   })
 
   return (
