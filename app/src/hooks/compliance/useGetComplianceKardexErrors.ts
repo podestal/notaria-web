@@ -19,6 +19,7 @@ const useGetComplianceKardexErrors = ({
         queryKey: ["compliance", "kardex", kardex, "errors"],
         queryFn: () => getComplianceKardexErrors(access, kardex!),
         enabled: Boolean(access) && Boolean(kardex) && enabled,
+        staleTime: 0,
         refetchOnWindowFocus: false,
     })
 }
