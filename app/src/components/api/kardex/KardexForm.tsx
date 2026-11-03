@@ -70,6 +70,11 @@ const preservedKardexFields = (existing?: Kardex | null): Pick<
     numminuta: existing?.numminuta ?? "",
 })
 
+const normalizeTemplateId = (value: unknown): number => {
+    const n = Number(value)
+    return Number.isFinite(n) && n > 0 ? n : 0
+}
+
 const fieldInputClass =
     "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
 
@@ -167,9 +172,13 @@ const KardexForm = ({
     const [responsible, setResponsible] = useState<{ id: string; label: string } | null>(null)
     const [recepcion, setRecepcion] = useState<string>(kardex?.recepcion || user?.idusuario.toString() || '0')
 
-    const [selectedTemplate, setSelectedTemplate] = useState(kardex ? kardex.fktemplate : 0)
+    const [selectedTemplate, setSelectedTemplate] = useState(
+        () => normalizeTemplateId(kardex?.fktemplate),
+    )
     const [selectedAbogado, setSelectedAbogado] = useState(kardex?.idabogado ?? "")
-    const kardexWithSelectedTemplate = kardex ? { ...kardex, fktemplate: selectedTemplate } : null
+    const kardexWithSelectedTemplate = kardex
+        ? { ...kardex, fktemplate: selectedTemplate || normalizeTemplateId(kardex.fktemplate) }
+        : null
 
     useEffect(() => {
         if (!kardex?.fechaingreso) return
@@ -178,7 +187,10 @@ const KardexForm = ({
     }, [kardex?.fechaingreso])
 
     useEffect(() => {
-        setSelectedTemplate(kardex?.fktemplate || 0)
+        const next = normalizeTemplateId(kardex?.fktemplate)
+        // Only sync when the server has a real plantilla — avoid wiping local
+        // selection while templates refetch after an actos change.
+        if (next > 0) setSelectedTemplate(next)
     }, [kardex?.fktemplate])
 
     useEffect(() => {
@@ -279,7 +291,12 @@ const KardexForm = ({
                     visita: 0,
                     idnotario: 1,
                     contrato: `${formattedContratoDes} / `, 
-                    fktemplate: selectedTemplate,
+                    // Keep existing plantilla if the select snapped to 0 while
+                    // templates were reloading for the current actos.
+                    fktemplate:
+                        selectedTemplate ||
+                        normalizeTemplateId(kardex?.fktemplate) ||
+                        0,
                     recepcion: recepcion,
                     estado_sisgen: kardex?.estado_sisgen ?? 0,
                     nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
@@ -313,6 +330,28 @@ const KardexForm = ({
     const { data: usuarios, isLoading: isLoadingUsuarios, isError: isErrorUsuarios, error: errorUsuarios, isSuccess: isSuccessUsuarios } = useGetUsuarios({ access })
     const { data: abogados, isLoading: isLoadingAbogados, isError: isErrorAbogados, error: errorAbogados, isSuccess: isSuccessAbogados } = useGetAbogados({ access })
     const { data: templates, isSuccess: isSuccessTemplates } = useGetTemplatesByActos({ access, codactos: contratos.join('') })
+
+    const templateOptions = useMemo(() => {
+        const list = Array.isArray(templates) ? [...templates] : []
+        const selectedId = normalizeTemplateId(selectedTemplate)
+        if (
+            selectedId > 0 &&
+            !list.some((template) => normalizeTemplateId(template.pktemplate) === selectedId)
+        ) {
+            list.unshift({
+                pktemplate: selectedId,
+                nametemplate: `Plantilla actual (#${selectedId})`,
+                fktypekardex: selectedKardexType,
+                codeacts: contratos.join(""),
+                contract: "",
+                urltemplate: "",
+                filename: "",
+                registrationdate: "",
+                statusregister: 1,
+            })
+        }
+        return list
+    }, [templates, selectedTemplate, selectedKardexType, contratos])
 
     const filteredTipoActos = useMemo(
         () => (tipoActos ?? []).filter((acto) => acto.idtipkar === selectedKardexType),
@@ -613,16 +652,18 @@ const KardexForm = ({
                     </FormField>
                     <FormField label="Plantilla">
                         <select
-                            value={selectedTemplate}
+                            value={selectedTemplate || 0}
                             onChange={(e) =>
-                                setSelectedTemplate(parseInt(e.target.value, 10) || 0)
+                                setSelectedTemplate(
+                                    normalizeTemplateId(e.target.value),
+                                )
                             }
                             className={fieldSelectClass}
                         >
-                            {isSuccessTemplates && templates.length > 0 ? (
+                            {templateOptions.length > 0 ? (
                                 <>
                                     <option value={0}>Seleccione plantilla</option>
-                                    {templates.map((template) => (
+                                    {templateOptions.map((template) => (
                                         <option
                                             key={template.pktemplate}
                                             value={template.pktemplate}
@@ -632,7 +673,18 @@ const KardexForm = ({
                                     ))}
                                 </>
                             ) : (
-                                <option value={0}>No hay plantillas disponibles</option>
+                                <>
+                                    {selectedTemplate > 0 ? (
+                                        <option value={selectedTemplate}>
+                                            Plantilla actual (#{selectedTemplate})
+                                        </option>
+                                    ) : null}
+                                    <option value={0}>
+                                        {isSuccessTemplates
+                                            ? "No hay plantillas disponibles"
+                                            : "Cargando plantillas…"}
+                                    </option>
+                                </>
                             )}
                         </select>
                     </FormField>
