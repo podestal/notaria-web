@@ -46,7 +46,10 @@ const ArchivosPdtTransferencias = () => {
                     typeKardex={3}
                     typeKardexName="Transferencias"
                 />
-                <ArchivosPdtKardexBody errors={vehicularesPdt.results.list} />
+                <ArchivosPdtKardexBody
+                    errors={vehicularesPdt.results.list}
+                    onCorrected={() => { void refetch() }}
+                />
                 <Paginator page={page} setPage={setPage} itemsCount={vehicularesPdt.count}/>
             </>
         )}

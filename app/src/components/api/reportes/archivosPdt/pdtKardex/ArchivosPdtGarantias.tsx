@@ -44,7 +44,10 @@ const ArchivosPdtGarantias = () => {
                     typeKardex={4}
                     typeKardexName="Garantias"
                 />
-                <ArchivosPdtKardexBody errors={garantiasPdt.results.list} />
+                <ArchivosPdtKardexBody
+                    errors={garantiasPdt.results.list}
+                    onCorrected={() => { void refetch() }}
+                />
                 <Paginator page={page} setPage={setPage} itemsCount={garantiasPdt.count}/>
             </>
         )}

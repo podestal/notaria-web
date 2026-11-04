@@ -7,11 +7,11 @@ export interface PdtError {
     act: string;
     fileType: string;
     isCorrectable: number;
-    typeOfCorrection: string;
-    categoryCorrect: string;
+    typeOfCorrection: number | string;
+    categoryCorrect: number | string;
     writingDate: string | null;
-    idContractor: number | null;
-    itemMp: number | null;
+    idContractor: number | string | null;
+    itemMp: number | string | null;
     typeAct: string;
 }
 

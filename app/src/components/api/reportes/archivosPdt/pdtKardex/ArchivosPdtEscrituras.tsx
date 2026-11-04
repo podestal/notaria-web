@@ -46,7 +46,8 @@ const ArchivosPdtEscrituras = () => {
                     typeKardexName="Escrituras"
                 />
                 <ArchivosPdtKardexBody 
-                    errors={escriturasPdt.results.list} 
+                    errors={escriturasPdt.results.list}
+                    onCorrected={() => { void refetch() }}
                 />
                 <Paginator 
                     page={page} 

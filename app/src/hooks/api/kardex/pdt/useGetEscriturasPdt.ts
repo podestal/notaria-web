@@ -17,7 +17,7 @@ const useGetEscriturasPdt = ({ access, page, dateFrom, dateTo }: Props): UseQuer
         finalDate: dateTo ? moment(dateTo).format('DD/MM/YYYY') : '',
     }
     return useQuery({
-        queryKey: ['pdt-escrituras', page],
+        queryKey: ['pdt-escrituras', page, params.initialDate, params.finalDate],
         queryFn: () => pdtKardexErrorsService.get(access, params),
         enabled: !!dateFrom && !!dateTo
     })
