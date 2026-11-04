@@ -34,7 +34,7 @@ const ParticipaFormularioTable = ({ idrenta }: Props) => {
                 <FileX2 className="h-8 w-8 text-slate-300" aria-hidden />
                 <p className="text-sm font-medium text-slate-600">Sin formularios</p>
                 <p className="text-xs text-slate-400">
-                    Agregue el primer formulario usando el panel izquierdo.
+                    Agregue el primer formulario con el formulario de arriba.
                 </p>
             </div>
         )

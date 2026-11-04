@@ -479,6 +479,9 @@ const ParticipaGenerateCard = ({ contratante, detalleActo, monto, kardex }: Prop
                                             onChange={(value) => {
                                                 state.set(value)
                                                 state.setError(false)
+                                                if (question.id === 'pregu3' && value === '0') {
+                                                    setShowFormulario(true)
+                                                }
                                             }}
                                             disabled={isSaving}
                                         />

@@ -14,6 +14,7 @@ const useGetFormularioByRenta = ({ access, idrenta }: Props): UseQueryResult<For
     return useQuery({
         queryKey: ['formulario', idrenta],
         queryFn: () => formularioService.get(access, params),
+        enabled: Boolean(access && idrenta),
     })
 }
 
