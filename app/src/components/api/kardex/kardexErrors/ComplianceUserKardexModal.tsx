@@ -84,7 +84,7 @@ const ComplianceUserKardexModal = ({ user, year, month, onClose }: Props) => {
         <>
             <TopModal isOpen={isOpen} onClose={handleClose} wide>
                 <div className="flex min-h-0 flex-1 flex-col gap-4">
-                    <header className="border-b border-slate-200 pb-3">
+                    <header className="shrink-0 border-b border-slate-200 pb-3">
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                             Kardex con errores
                         </p>
@@ -108,7 +108,7 @@ const ComplianceUserKardexModal = ({ user, year, month, onClose }: Props) => {
 
                     {data && (
                         <>
-                            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                            <div className="grid shrink-0 grid-cols-2 gap-2 sm:grid-cols-5">
                                 {summaryTiles.map((tile, i) => (
                                     <motion.div
                                         key={tile.label}
@@ -127,73 +127,71 @@ const ComplianceUserKardexModal = ({ user, year, month, onClose }: Props) => {
                                 ))}
                             </div>
 
-                            <div className="overflow-hidden rounded-xl border border-slate-200">
-                                <div className="overflow-x-auto">
-                                    <div style={{ minWidth: 720 }}>
-                                        <div
-                                            className="sticky top-0 z-10 grid items-center gap-2 border-b border-slate-200 bg-slate-50/95 px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 backdrop-blur"
-                                            style={{ gridTemplateColumns: MODAL_GRID }}
-                                        >
-                                            <p>Kardex</p>
-                                            <p>Contrato</p>
-                                            <p>Fecha ingreso</p>
-                                            <p className="text-center">SISGEN</p>
-                                            <p className="text-center">UIF</p>
-                                            <p className="text-center">PDT</p>
-                                            <p className="text-center">Total</p>
-                                        </div>
-                                        {data.kardex.length === 0 ? (
-                                            <p className="px-3 py-8 text-center text-sm text-slate-500">
-                                                No hay kardex con errores para este usuario en el periodo.
-                                            </p>
-                                        ) : (
-                                            <div className="divide-y divide-slate-100">
-                                                {data.kardex.map((item, index) => (
-                                                    <motion.div
-                                                        key={item.idkardex}
-                                                        initial={{ opacity: 0, y: 6 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{
-                                                            duration: 0.25,
-                                                            delay: Math.min(index, 12) * 0.03,
-                                                        }}
-                                                        className="grid items-center gap-2 px-3 py-2.5 text-xs text-slate-700 transition-colors hover:bg-sky-50/70"
-                                                        style={{ gridTemplateColumns: MODAL_GRID }}
-                                                    >
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setKardexId(item.idkardex)
-                                                                setKardexCode(item.kardex)
-                                                                setIsKardexOpen(true)
-                                                            }}
-                                                            className="cursor-pointer truncate text-left font-semibold text-sky-700 hover:text-sky-900 hover:underline"
-                                                        >
-                                                            {item.kardex}
-                                                        </button>
-                                                        <p className="truncate" title={item.contrato}>
-                                                            {item.contrato || "—"}
-                                                        </p>
-                                                        <p className="tabular-nums text-slate-600">
-                                                            {item.fechaingreso || "—"}
-                                                        </p>
-                                                        <div className="flex justify-center">
-                                                            <ErrorBadge value={item.counts.sisgen} tone="sky" />
-                                                        </div>
-                                                        <div className="flex justify-center">
-                                                            <ErrorBadge value={item.counts.uif} tone="indigo" />
-                                                        </div>
-                                                        <div className="flex justify-center">
-                                                            <ErrorBadge value={item.counts.pdt} tone="amber" />
-                                                        </div>
-                                                        <div className="flex justify-center">
-                                                            <ErrorBadge value={item.counts.total} tone="rose" />
-                                                        </div>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        )}
+                            <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-slate-200">
+                                <div style={{ minWidth: 720 }}>
+                                    <div
+                                        className="sticky top-0 z-10 grid items-center gap-2 border-b border-slate-200 bg-slate-50/95 px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 backdrop-blur"
+                                        style={{ gridTemplateColumns: MODAL_GRID }}
+                                    >
+                                        <p>Kardex</p>
+                                        <p>Contrato</p>
+                                        <p>Fecha ingreso</p>
+                                        <p className="text-center">SISGEN</p>
+                                        <p className="text-center">UIF</p>
+                                        <p className="text-center">PDT</p>
+                                        <p className="text-center">Total</p>
                                     </div>
+                                    {data.kardex.length === 0 ? (
+                                        <p className="px-3 py-8 text-center text-sm text-slate-500">
+                                            No hay kardex con errores para este usuario en el periodo.
+                                        </p>
+                                    ) : (
+                                        <div className="divide-y divide-slate-100">
+                                            {data.kardex.map((item, index) => (
+                                                <motion.div
+                                                    key={item.idkardex}
+                                                    initial={{ opacity: 0, y: 6 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{
+                                                        duration: 0.25,
+                                                        delay: Math.min(index, 12) * 0.03,
+                                                    }}
+                                                    className="grid items-center gap-2 px-3 py-2.5 text-xs text-slate-700 transition-colors hover:bg-sky-50/70"
+                                                    style={{ gridTemplateColumns: MODAL_GRID }}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setKardexId(item.idkardex)
+                                                            setKardexCode(item.kardex)
+                                                            setIsKardexOpen(true)
+                                                        }}
+                                                        className="cursor-pointer truncate text-left font-semibold text-sky-700 hover:text-sky-900 hover:underline"
+                                                    >
+                                                        {item.kardex}
+                                                    </button>
+                                                    <p className="truncate" title={item.contrato}>
+                                                        {item.contrato || "—"}
+                                                    </p>
+                                                    <p className="tabular-nums text-slate-600">
+                                                        {item.fechaingreso || "—"}
+                                                    </p>
+                                                    <div className="flex justify-center">
+                                                        <ErrorBadge value={item.counts.sisgen} tone="sky" />
+                                                    </div>
+                                                    <div className="flex justify-center">
+                                                        <ErrorBadge value={item.counts.uif} tone="indigo" />
+                                                    </div>
+                                                    <div className="flex justify-center">
+                                                        <ErrorBadge value={item.counts.pdt} tone="amber" />
+                                                    </div>
+                                                    <div className="flex justify-center">
+                                                        <ErrorBadge value={item.counts.total} tone="rose" />
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </>
