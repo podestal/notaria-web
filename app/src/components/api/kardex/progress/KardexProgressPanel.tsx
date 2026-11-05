@@ -4,6 +4,7 @@ import type { ComplianceKardexErrorsResponse } from "../../../../services/compli
 import {
     buildKardexProgress,
     type ContratantesStage,
+    type PatrimonialStageStep,
     type ProgressStatus,
     type ProgressStep,
 } from "./kardexProgressModel"
@@ -13,6 +14,7 @@ interface Props {
     idtipkar?: number | null
     data?: ComplianceKardexErrorsResponse
     contratantes?: ContratantesStage | null
+    patrimonial?: PatrimonialStageStep[] | null
     isLoading?: boolean
     isError?: boolean
     isRefreshing?: boolean
@@ -189,12 +191,13 @@ const KardexProgressPanel = ({
     idtipkar,
     data,
     contratantes = null,
+    patrimonial = null,
     isLoading = false,
     isError = false,
     isRefreshing = false,
     onRefresh,
 }: Props) => {
-    const { steps, unmatched } = buildKardexProgress(idtipkar, data, contratantes)
+    const { steps, unmatched } = buildKardexProgress(idtipkar, data, contratantes, patrimonial)
     const errors = countIssues(steps, "error") + unmatched.filter((item) => item.level === "error").length
     const warnings = countIssues(steps, "warning") + unmatched.filter((item) => item.level === "warning").length
     const score = leafScore(steps)

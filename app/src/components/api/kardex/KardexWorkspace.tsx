@@ -3,6 +3,7 @@ import { Kardex } from "../../../services/api/kardexService"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetComplianceKardexErrors from "../../../hooks/compliance/useGetComplianceKardexErrors"
 import useGetContratantesProgress from "../../../hooks/compliance/useGetContratantesProgress"
+import useGetPatrimonialProgress from "../../../hooks/compliance/useGetPatrimonialProgress"
 import KardexLogsPanel from "./KardexLogsPanel"
 import ComplianceKardexErrorsPanel from "./kardexErrors/ComplianceKardexErrorsPanel"
 import KardexProgressPanel from "./progress/KardexProgressPanel"
@@ -37,7 +38,13 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
         kardex: kardex.kardex,
         enabled: enabled && Boolean(kardex.kardex),
     })
-    const isRefreshing = (isFetching && !isLoading) || contratantesQuery.isFetching
+    const patrimonialQuery = useGetPatrimonialProgress({
+        access,
+        kardex: kardex.kardex,
+        enabled: enabled && Boolean(kardex.kardex),
+    })
+    const isRefreshing =
+        (isFetching && !isLoading) || contratantesQuery.isFetching || patrimonialQuery.isFetching
     const contratantesStage = contratantesQuery.data
         ? {
             status: contratantesQuery.data.status,
@@ -48,9 +55,21 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
             })),
         }
         : null
+    const patrimonialStage = patrimonialQuery.data
+        ? patrimonialQuery.data.steps.map((step) => ({
+            id: step.id,
+            status: step.status,
+            issues: step.issues.map((issue) => ({
+                level: issue.level === "warning" ? "warning" as const : "error" as const,
+                text: issue.text,
+                source: issue.source,
+            })),
+        }))
+        : null
     const refreshAll = () => {
         void refetch()
         void contratantesQuery.refetch()
+        void patrimonialQuery.refetch()
     }
 
     return (
@@ -81,7 +100,8 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
                             idtipkar={kardex.idtipkar}
                             data={data}
                             contratantes={contratantesStage}
-                            isLoading={isLoading || contratantesQuery.isLoading}
+                            patrimonial={patrimonialStage}
+                            isLoading={isLoading || contratantesQuery.isLoading || patrimonialQuery.isLoading}
                             isError={isError}
                             isRefreshing={isRefreshing}
                             onRefresh={refreshAll}

@@ -14,6 +14,12 @@ export interface ContratantesStage {
     issues: ProgressIssue[]
 }
 
+export interface PatrimonialStageStep {
+    id: string
+    status: ProgressStatus
+    issues: ProgressIssue[]
+}
+
 export interface ProgressStep {
     id: string
     label: string
@@ -78,6 +84,17 @@ const STEP_RULES: { id: string; test: RegExp }[] = [
     { id: "digitacion", test: /digitaci|plantilla/i },
     { id: "facturacion", test: /facturaci|comprobante|boleta/i },
 ]
+
+const OWNED_BY_API = new Set(["contratantes", "patrimonial", "medio-pago", "detalle-bien"])
+
+function findStep(steps: ProgressStep[], id: string): ProgressStep | undefined {
+    for (const step of steps) {
+        if (step.id === id) return step
+        const child = step.children ? findStep(step.children, id) : undefined
+        if (child) return child
+    }
+    return undefined
+}
 
 function assignStep(text: string, allowed: Set<string>): string | null {
     for (const rule of STEP_RULES) {
@@ -163,6 +180,7 @@ export function buildKardexProgress(
     idtipkar: number | null | undefined,
     data: ComplianceKardexErrorsResponse | undefined,
     contratantes?: ContratantesStage | null,
+    patrimonial?: PatrimonialStageStep[] | null,
 ): { steps: ProgressStep[]; unmatched: ProgressIssue[] } {
     const defs = kardexProgressSteps(idtipkar)
     const allowed = flattenIds(defs)
@@ -172,8 +190,7 @@ export function buildKardexProgress(
     if (data) {
         for (const issue of collectIssues(data)) {
             const stepId = assignStep(issue.text, allowed)
-            // Contratantes comes only from its own API. Do not guess it from other errors.
-            if (!stepId || stepId === "contratantes") {
+            if (!stepId || OWNED_BY_API.has(stepId)) {
                 if (!stepId) unmatched.push(issue)
                 continue
             }
@@ -192,6 +209,20 @@ export function buildKardexProgress(
         } else {
             contratantesStage.status = contratantes.status
             contratantesStage.issues = contratantes.issues
+        }
+    }
+
+    const patrimonialIds = ["patrimonial", "medio-pago", "detalle-bien"]
+    for (const id of patrimonialIds) {
+        const node = findStep(steps, id)
+        if (!node) continue
+        const fromApi = patrimonial?.find((step) => step.id === id)
+        if (!fromApi || fromApi.status === "idle") {
+            node.status = "idle"
+            node.issues = []
+        } else {
+            node.status = fromApi.status
+            node.issues = fromApi.issues
         }
     }
 

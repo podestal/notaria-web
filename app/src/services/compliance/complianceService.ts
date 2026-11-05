@@ -265,6 +265,30 @@ export interface ContratantesProgressResponse {
     issues: ContratantesProgressIssue[]
 }
 
+export interface PatrimonialProgressStep {
+    id: string
+    status: "done" | "warning" | "error" | "idle"
+    issues: ContratantesProgressIssue[]
+}
+
+export interface PatrimonialProgressResponse {
+    kardex: string
+    applicable: boolean
+    status: "done" | "warning" | "error" | "idle"
+    steps: PatrimonialProgressStep[]
+}
+
+export const getPatrimonialProgress = (
+    access: string,
+    kardex: string,
+): Promise<PatrimonialProgressResponse> =>
+    complianceAxios
+        .get<PatrimonialProgressResponse>(
+            `kardex/${encodeURIComponent(kardex)}/patrimonial/`,
+            { headers: authHeaders(access) },
+        )
+        .then((res) => res.data)
+
 export const getContratantesProgress = (
     access: string,
     kardex: string,
