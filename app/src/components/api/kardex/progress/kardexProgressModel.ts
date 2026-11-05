@@ -1,5 +1,4 @@
 import type { ComplianceKardexErrorsResponse } from "../../../../services/compliance/complianceService"
-import { isFacturacionEnabled } from "../../../../utils/isFacturacionEnabled"
 
 export type ProgressStatus = "done" | "warning" | "error" | "idle"
 
@@ -65,10 +64,6 @@ export function kardexProgressSteps(idtipkar?: number | null): StepDef[] {
         { id: "escrituracion", label: "Escrituración" },
     )
 
-    if (isFacturacionEnabled()) {
-        steps.push({ id: "facturacion", label: "Facturación" })
-    }
-
     return steps
 }
 
@@ -77,15 +72,23 @@ const STEP_RULES: { id: string; test: RegExp }[] = [
     { id: "medio-pago", test: /medio de pago|forma de pago|oportunidad de pago|entidad financiera|\bbanco\b/i },
     { id: "detalle-bien", test: /detalle del bien|\bbien\b|predio|veh[ií]culo|placa/i },
     { id: "preguntas-uif", test: /renta|formulario|pregunta|impuesto/i },
-    { id: "participa", test: /participa|origen de fondo/i },
+    { id: "participa", test: /participa|origen de fondo|monto inv[aá]lido/i },
     { id: "patrimonial", test: /patrimonial|cuant[ií]a|moneda/i },
     { id: "contratantes", test: /contratante|documento|dni|ruc|profesi|direcci|ubigeo|apellido|nacionalidad/i },
-    { id: "escrituracion", test: /escritur|folio|instrumento|minuta/i },
+    { id: "escrituracion", test: /escritur|folio|instrumento|minuta|n[uú]mero de escritura/i },
     { id: "digitacion", test: /digitaci|plantilla/i },
-    { id: "facturacion", test: /facturaci|comprobante|boleta/i },
 ]
 
-const OWNED_BY_API = new Set(["contratantes", "patrimonial", "medio-pago", "detalle-bien"])
+const OWNED_BY_API = new Set([
+    "contratantes",
+    "patrimonial",
+    "medio-pago",
+    "detalle-bien",
+    "participa",
+    "preguntas-uif",
+    "digitacion",
+    "escrituracion",
+])
 
 function findStep(steps: ProgressStep[], id: string): ProgressStep | undefined {
     for (const step of steps) {
@@ -94,6 +97,25 @@ function findStep(steps: ProgressStep[], id: string): ProgressStep | undefined {
         if (child) return child
     }
     return undefined
+}
+
+function applyOwnedSteps(
+    steps: ProgressStep[],
+    ids: string[],
+    fromApi: PatrimonialStageStep[] | null | undefined,
+) {
+    for (const id of ids) {
+        const node = findStep(steps, id)
+        if (!node) continue
+        const match = fromApi?.find((step) => step.id === id)
+        if (!match || match.status === "idle") {
+            node.status = "idle"
+            node.issues = []
+        } else {
+            node.status = match.status
+            node.issues = match.issues
+        }
+    }
 }
 
 function assignStep(text: string, allowed: Set<string>): string | null {
@@ -181,6 +203,8 @@ export function buildKardexProgress(
     data: ComplianceKardexErrorsResponse | undefined,
     contratantes?: ContratantesStage | null,
     patrimonial?: PatrimonialStageStep[] | null,
+    participa?: PatrimonialStageStep[] | null,
+    instrumento?: PatrimonialStageStep[] | null,
 ): { steps: ProgressStep[]; unmatched: ProgressIssue[] } {
     const defs = kardexProgressSteps(idtipkar)
     const allowed = flattenIds(defs)
@@ -189,6 +213,7 @@ export function buildKardexProgress(
 
     if (data) {
         for (const issue of collectIssues(data)) {
+            if (/facturaci|comprobante|boleta/i.test(issue.text)) continue
             const stepId = assignStep(issue.text, allowed)
             if (!stepId || OWNED_BY_API.has(stepId)) {
                 if (!stepId) unmatched.push(issue)
@@ -212,19 +237,9 @@ export function buildKardexProgress(
         }
     }
 
-    const patrimonialIds = ["patrimonial", "medio-pago", "detalle-bien"]
-    for (const id of patrimonialIds) {
-        const node = findStep(steps, id)
-        if (!node) continue
-        const fromApi = patrimonial?.find((step) => step.id === id)
-        if (!fromApi || fromApi.status === "idle") {
-            node.status = "idle"
-            node.issues = []
-        } else {
-            node.status = fromApi.status
-            node.issues = fromApi.issues
-        }
-    }
+    applyOwnedSteps(steps, ["patrimonial", "medio-pago", "detalle-bien"], patrimonial)
+    applyOwnedSteps(steps, ["participa", "preguntas-uif"], participa)
+    applyOwnedSteps(steps, ["digitacion", "escrituracion"], instrumento)
 
     return { steps, unmatched }
 }

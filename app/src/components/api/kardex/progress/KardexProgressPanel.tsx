@@ -15,6 +15,8 @@ interface Props {
     data?: ComplianceKardexErrorsResponse
     contratantes?: ContratantesStage | null
     patrimonial?: PatrimonialStageStep[] | null
+    participa?: PatrimonialStageStep[] | null
+    instrumento?: PatrimonialStageStep[] | null
     isLoading?: boolean
     isError?: boolean
     isRefreshing?: boolean
@@ -192,12 +194,21 @@ const KardexProgressPanel = ({
     data,
     contratantes = null,
     patrimonial = null,
+    participa = null,
+    instrumento = null,
     isLoading = false,
     isError = false,
     isRefreshing = false,
     onRefresh,
 }: Props) => {
-    const { steps, unmatched } = buildKardexProgress(idtipkar, data, contratantes, patrimonial)
+    const { steps, unmatched } = buildKardexProgress(
+        idtipkar,
+        data,
+        contratantes,
+        patrimonial,
+        participa,
+        instrumento,
+    )
     const errors = countIssues(steps, "error") + unmatched.filter((item) => item.level === "error").length
     const warnings = countIssues(steps, "warning") + unmatched.filter((item) => item.level === "warning").length
     const score = leafScore(steps)

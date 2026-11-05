@@ -278,6 +278,47 @@ export interface PatrimonialProgressResponse {
     steps: PatrimonialProgressStep[]
 }
 
+export interface ParticipaProgressStep {
+    id: string
+    status: "done" | "warning" | "error" | "idle"
+    issues: ContratantesProgressIssue[]
+}
+
+export interface ParticipaProgressResponse {
+    kardex: string
+    applicable: boolean
+    status: "done" | "warning" | "error" | "idle"
+    steps: ParticipaProgressStep[]
+}
+
+export interface InstrumentoProgressResponse {
+    kardex: string
+    status: "done" | "warning" | "error" | "idle"
+    steps: ParticipaProgressStep[]
+}
+
+export const getInstrumentoProgress = (
+    access: string,
+    kardex: string,
+): Promise<InstrumentoProgressResponse> =>
+    complianceAxios
+        .get<InstrumentoProgressResponse>(
+            `kardex/${encodeURIComponent(kardex)}/instrumento/`,
+            { headers: authHeaders(access) },
+        )
+        .then((res) => res.data)
+
+export const getParticipaProgress = (
+    access: string,
+    kardex: string,
+): Promise<ParticipaProgressResponse> =>
+    complianceAxios
+        .get<ParticipaProgressResponse>(
+            `kardex/${encodeURIComponent(kardex)}/participa/`,
+            { headers: authHeaders(access) },
+        )
+        .then((res) => res.data)
+
 export const getPatrimonialProgress = (
     access: string,
     kardex: string,

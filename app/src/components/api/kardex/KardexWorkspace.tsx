@@ -4,6 +4,8 @@ import useAuthStore from "../../../store/useAuthStore"
 import useGetComplianceKardexErrors from "../../../hooks/compliance/useGetComplianceKardexErrors"
 import useGetContratantesProgress from "../../../hooks/compliance/useGetContratantesProgress"
 import useGetPatrimonialProgress from "../../../hooks/compliance/useGetPatrimonialProgress"
+import useGetParticipaProgress from "../../../hooks/compliance/useGetParticipaProgress"
+import useGetInstrumentoProgress from "../../../hooks/compliance/useGetInstrumentoProgress"
 import KardexLogsPanel from "./KardexLogsPanel"
 import ComplianceKardexErrorsPanel from "./kardexErrors/ComplianceKardexErrorsPanel"
 import KardexProgressPanel from "./progress/KardexProgressPanel"
@@ -43,8 +45,22 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
         kardex: kardex.kardex,
         enabled: enabled && Boolean(kardex.kardex),
     })
+    const participaQuery = useGetParticipaProgress({
+        access,
+        kardex: kardex.kardex,
+        enabled: enabled && Boolean(kardex.kardex),
+    })
+    const instrumentoQuery = useGetInstrumentoProgress({
+        access,
+        kardex: kardex.kardex,
+        enabled: enabled && Boolean(kardex.kardex),
+    })
     const isRefreshing =
-        (isFetching && !isLoading) || contratantesQuery.isFetching || patrimonialQuery.isFetching
+        (isFetching && !isLoading) ||
+        contratantesQuery.isFetching ||
+        patrimonialQuery.isFetching ||
+        participaQuery.isFetching ||
+        instrumentoQuery.isFetching
     const contratantesStage = contratantesQuery.data
         ? {
             status: contratantesQuery.data.status,
@@ -66,10 +82,34 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
             })),
         }))
         : null
+    const participaStage = participaQuery.data
+        ? participaQuery.data.steps.map((step) => ({
+            id: step.id,
+            status: step.status,
+            issues: step.issues.map((issue) => ({
+                level: issue.level === "warning" ? "warning" as const : "error" as const,
+                text: issue.text,
+                source: issue.source,
+            })),
+        }))
+        : null
+    const instrumentoStage = instrumentoQuery.data
+        ? instrumentoQuery.data.steps.map((step) => ({
+            id: step.id,
+            status: step.status,
+            issues: step.issues.map((issue) => ({
+                level: issue.level === "warning" ? "warning" as const : "error" as const,
+                text: issue.text,
+                source: issue.source,
+            })),
+        }))
+        : null
     const refreshAll = () => {
         void refetch()
         void contratantesQuery.refetch()
         void patrimonialQuery.refetch()
+        void participaQuery.refetch()
+        void instrumentoQuery.refetch()
     }
 
     return (
@@ -101,7 +141,15 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
                             data={data}
                             contratantes={contratantesStage}
                             patrimonial={patrimonialStage}
-                            isLoading={isLoading || contratantesQuery.isLoading || patrimonialQuery.isLoading}
+                            participa={participaStage}
+                            instrumento={instrumentoStage}
+                            isLoading={
+                                isLoading ||
+                                contratantesQuery.isLoading ||
+                                patrimonialQuery.isLoading ||
+                                participaQuery.isLoading ||
+                                instrumentoQuery.isLoading
+                            }
                             isError={isError}
                             isRefreshing={isRefreshing}
                             onRefresh={refreshAll}
