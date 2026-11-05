@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
 import KardexForm from "./KardexForm"
-import KardexLogsPanel from "./KardexLogsPanel"
+import KardexWorkspace from "./KardexWorkspace"
 import TopModal from "../../ui/TopModal"
 import useUpdateKardex from "../../../hooks/api/kardex/useUpdateKardex"
 import useRetrieveKardex from "../../../hooks/api/kardex/useRetrieveKardex"
@@ -47,8 +47,6 @@ const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
         enabled: getKardex,
         access,
     })
-    const showLogs = isSuperuser && open
-
     const openKardex = () => {
         if (readyOnly) return
         setGetKardex(true)
@@ -114,7 +112,7 @@ const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
     <TopModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        wide={showLogs}
+        wide={open}
         tone={pastUrgent ? "danger" : "default"}
         banner={
             pastUrgent ? <KardexCompliancePastMonthsAlert sticky /> : null
@@ -127,28 +125,12 @@ const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
             <p className="text-md text-center text-red-500">Error: {error.message}</p>
         )}
         {isSuccess && singleKardex && (
-            showLogs ? (
-                <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-0">
-                    <div className="flex max-h-[32vh] shrink-0 flex-col lg:max-h-none lg:w-[22rem] xl:w-96">
-                        <KardexLogsPanel
-                            idkardex={singleKardex.idkardex}
-                            enabled={open}
-                            className="h-full lg:max-h-none"
-                        />
-                    </div>
-                    <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-auto lg:pl-4">
-                        <KardexForm
-                            kardex={singleKardex}
-                            updateKardex={updateKardex}
-                        />
-                    </main>
-                </div>
-            ) : (
+            <KardexWorkspace kardex={singleKardex} isSuperuser={isSuperuser} enabled={open}>
                 <KardexForm
                     kardex={singleKardex}
                     updateKardex={updateKardex}
                 />
-            )
+            </KardexWorkspace>
         )}
     </TopModal>
     </>

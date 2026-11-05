@@ -250,6 +250,32 @@ export const getComplianceMeKardexMonth = (
         })
         .then((res) => res.data)
 
+export interface ContratantesProgressIssue {
+    source: "sisgen" | "uif" | "pdt" | string
+    level: "error" | "warning"
+    field: string
+    idcontratante: string
+    text: string
+}
+
+export interface ContratantesProgressResponse {
+    kardex: string
+    status: "done" | "warning" | "error" | "idle"
+    count: number
+    issues: ContratantesProgressIssue[]
+}
+
+export const getContratantesProgress = (
+    access: string,
+    kardex: string,
+): Promise<ContratantesProgressResponse> =>
+    complianceAxios
+        .get<ContratantesProgressResponse>(
+            `kardex/${encodeURIComponent(kardex)}/contratantes/`,
+            { headers: authHeaders(access) },
+        )
+        .then((res) => res.data)
+
 export const getComplianceKardexErrors = (
     access: string,
     kardex: string,
