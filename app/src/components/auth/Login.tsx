@@ -1,10 +1,11 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import useAuthStore from '../../store/useAuthStore';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useAnimationControls, type Variants } from 'framer-motion';
 import { AlertCircle, ArrowRight, Eye, EyeOff, FileSignature, Loader2, Lock, ShieldCheck, User, Users } from 'lucide-react';
 import useLogin from '../../hooks/auth/useLogin';
+import { consumeSessionNotice } from '../../services/http/tokenRefresh';
 import useUserInfoStore from '../../hooks/store/useGetUserInfo';
 import { queryClient } from '../../queryClient';
 import ThemeToggle from '../ui/ThemeToggle';
@@ -102,6 +103,11 @@ const Login = () => {
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [messageError, setMessageError] = useState('');
+
+    useEffect(() => {
+        const notice = consumeSessionNotice()
+        if (notice) setMessageError(notice)
+    }, [])
     const shake = useAnimationControls();
 
     const shakeForm = () => {

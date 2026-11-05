@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios, { AxiosError } from "axios";
 import useAuthStore from "../../store/useAuthStore";
 import useGetUser from "../../hooks/auth/useGetUser";
 import useUserInfoStore from "../../hooks/store/useGetUserInfo";
+import { isSessionOver, redirectToLoginAfterAuthFailure } from "../../services/http/tokenRefresh";
 
 interface Props {
     children: React.ReactElement;
@@ -16,26 +18,24 @@ const PrivateRoutes = ({ children }: Props) => {
     
 
     useEffect(() => {
-        console.log("Access Token:", access);
         if (!access) {
-            navigate("/", { replace: true }); // Use replace to prevent back navigation
+            navigate("/", { replace: true });
         }
-    }, [access]);
-    
-      useEffect(() => {
-
-        user && setUser(user)
-
-    }, [ user])
-
+    }, [access, navigate]);
 
     useEffect(() => {
-        console.log('private routes');
-        
-    }, [])
+        if (user) setUser(user)
+    }, [user, setUser])
 
     if (isLoading) return <p className="text-center text-xs animate-pulse my-4">Cargando usuario...</p>;
-    if (isError) return <p className="text-center text-xs text-red-500 my-4">Error al cargar usuario: {error.message}</p>;
+    if (isError) {
+        const status = (error as AxiosError)?.response?.status
+        if (status === 401 || status === 403 || axios.isCancel(error) || isSessionOver()) {
+            redirectToLoginAfterAuthFailure()
+            return null
+        }
+        return <p className="text-center text-xs text-red-500 my-4">Error al cargar usuario: {error.message}</p>
+    }
 
     if (isSuccess)
 

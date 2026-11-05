@@ -1,9 +1,12 @@
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios"
+import { authHeaderValue, setAuthorizationHeader } from "./attachAxiosAuthRequestInterceptor"
 import {
     getRefreshedAccessToken,
     isAuthLoginOrRefreshUrl,
+    isJwtExpired,
     redirectToLoginAfterAuthFailure,
 } from "./tokenRefresh"
+import useAuthStore from "../../store/useAuthStore"
 
 type RequestConfig = InternalAxiosRequestConfig & { _authRetry?: boolean }
 
@@ -30,6 +33,9 @@ export function attachAxiosAuthRefreshInterceptor(
             const original = error.config as RequestConfig | undefined
 
             if (status !== 401 || !original || !shouldAttemptRefresh(original)) {
+                if (status === 401 && original?._authRetry) {
+                    redirectToLoginAfterAuthFailure()
+                }
                 return Promise.reject(error)
             }
 
@@ -37,11 +43,20 @@ export function attachAxiosAuthRefreshInterceptor(
                 return Promise.reject(error)
             }
 
+            const currentAccess =
+                useAuthStore.getState().access_token?.trim() ||
+                localStorage.getItem("access_token")?.trim() ||
+                ""
+            // Access already dead (12h): don't mint another one. Send them to login.
+            if (!currentAccess || isJwtExpired(currentAccess, 0)) {
+                redirectToLoginAfterAuthFailure()
+                return Promise.reject(error)
+            }
+
             try {
                 const access = await getRefreshedAccessToken()
                 original._authRetry = true
-                original.headers = original.headers ?? {}
-                original.headers.Authorization = `JWT ${access}`
+                setAuthorizationHeader(original, authHeaderValue(access))
                 return instance.request(original)
             } catch {
                 redirectToLoginAfterAuthFailure()
