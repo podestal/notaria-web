@@ -8,6 +8,7 @@ import useGetParticipaProgress from "../../../../hooks/compliance/useGetParticip
 import useGetInstrumentoProgress from "../../../../hooks/compliance/useGetInstrumentoProgress"
 import {
     buildKardexProgress,
+    kardexCompletion,
     type PatrimonialStageStep,
     type ProgressIssue,
     type ProgressStatus,
@@ -60,27 +61,24 @@ const FLOW: Record<ProgressStatus, string> = {
     idle: "bg-slate-300",
 }
 
-const countIssues = (steps: ProgressStep[], level: "error" | "warning"): number =>
-    steps.reduce((total, step) => {
-        const here = step.issues.filter((issue) => issue.level === level).length
-        return total + here + countIssues(step.children ?? [], level)
-    }, 0)
+type FlowMode = "flow" | "stuck" | "still"
 
-const leafScore = (steps: ProgressStep[]): { done: number; total: number } => {
-    let done = 0
-    let total = 0
-    const walk = (list: ProgressStep[]) => {
-        for (const step of list) {
-            if (step.children?.length) {
-                walk(step.children)
-                continue
-            }
-            total += 1
-            if (step.status === "done") done += 1
-        }
-    }
-    walk(steps)
-    return { done, total }
+const isBlocked = (status: ProgressStatus) => status === "error" || status === "idle"
+
+const connectorMode = (steps: ProgressStep[], index: number, complete: boolean): FlowMode => {
+    if (index >= steps.length - 1) return "still"
+    if (complete) return "flow"
+    const blockAt = steps.findIndex((step) => isBlocked(step.status))
+    if (blockAt === -1) return index === steps.length - 2 ? "stuck" : "flow"
+    if (index < blockAt - 1) return "flow"
+    if (index === blockAt - 1) return "stuck"
+    return "still"
+}
+
+const stuckDot = (steps: ProgressStep[], index: number): string => {
+    const next = steps[index + 1]
+    if (next?.status === "idle") return "bg-slate-300"
+    return "bg-rose-200"
 }
 
 const NodeIcon = ({ status }: { status: ProgressStatus }) => {
@@ -90,7 +88,19 @@ const NodeIcon = ({ status }: { status: ProgressStatus }) => {
     return <CircleDashed className="h-3 w-3" aria-hidden />
 }
 
-const Connector = ({ status, active }: { status: ProgressStatus; active: boolean }) => (
+const Connector = ({
+    status,
+    mode,
+    delay,
+    stuckClass,
+    complete,
+}: {
+    status: ProgressStatus
+    mode: FlowMode
+    delay: number
+    stuckClass: string
+    complete: boolean
+}) => (
     <div className="relative mt-1 w-0.5 flex-1 overflow-hidden rounded-full bg-slate-200">
         <motion.div
             className={`absolute inset-x-0 top-0 origin-top ${LINE[status]}`}
@@ -98,9 +108,25 @@ const Connector = ({ status, active }: { status: ProgressStatus; active: boolean
             animate={{ height: "100%" }}
             transition={{ duration: 0.45, ease: "easeOut" }}
         />
-        {active && status !== "idle" && (
+        {mode === "flow" && (
+            <>
+                <span
+                    className={`${complete ? "pipeline-flow" : "pipeline-flow-slow"} absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full ${FLOW[status]}`}
+                    style={{ animationDelay: `${delay}s` }}
+                    aria-hidden
+                />
+                {complete && (
+                    <span
+                        className={`pipeline-flow-late absolute left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full ${FLOW[status]}`}
+                        style={{ animationDelay: `${delay + 0.55}s` }}
+                        aria-hidden
+                    />
+                )}
+            </>
+        )}
+        {mode === "stuck" && (
             <span
-                className={`pipeline-flow absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full ${FLOW[status]}`}
+                className={`pipeline-stuck absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full ${stuckClass}`}
                 aria-hidden
             />
         )}
@@ -112,13 +138,20 @@ const StepRow = ({
     index,
     nested = false,
     isLast = false,
+    mode,
+    complete,
+    stuckClass,
 }: {
     step: ProgressStep
     index: number
     nested?: boolean
     isLast?: boolean
+    mode: FlowMode
+    complete: boolean
+    stuckClass: string
 }) => {
-    const flowing = step.status === "done" || step.status === "warning"
+    const hold = !complete && isBlocked(step.status)
+    const holdClass = hold ? (step.status === "error" ? "node-hold-error" : "node-hold-idle") : ""
 
     return (
         <motion.li
@@ -130,7 +163,7 @@ const StepRow = ({
             <div className="flex gap-3">
                 <div className="flex w-6 shrink-0 flex-col items-center">
                     <motion.span
-                        className={`z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 shadow-sm ${NODE[step.status]} ${
+                        className={`z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 shadow-sm ${NODE[step.status]} ${holdClass} ${
                             nested ? "h-5 w-5" : ""
                         }`}
                         initial={{ scale: 0.6 }}
@@ -139,7 +172,15 @@ const StepRow = ({
                     >
                         <NodeIcon status={step.status} />
                     </motion.span>
-                    {!isLast && <Connector status={step.status} active={flowing} />}
+                    {!isLast && (
+                        <Connector
+                            status={step.status}
+                            mode={mode}
+                            delay={index * 0.16}
+                            stuckClass={stuckClass}
+                            complete={complete}
+                        />
+                    )}
                 </div>
 
                 <div className={`min-w-0 flex-1 ${isLast ? "pb-1" : "pb-4"}`}>
@@ -170,15 +211,7 @@ const StepRow = ({
 
                     {step.children && step.children.length > 0 && (
                         <ol className="relative mt-3 ml-1 border-l border-dashed border-slate-200 pl-3">
-                            {step.children.map((child, childIndex) => (
-                                <StepRow
-                                    key={child.id}
-                                    step={child}
-                                    index={index + childIndex + 1}
-                                    nested
-                                    isLast={childIndex === step.children!.length - 1}
-                                />
-                            ))}
+                            <PipelineList steps={step.children} complete={complete} nested startIndex={index + 1} />
                         </ol>
                     )}
                 </div>
@@ -186,6 +219,33 @@ const StepRow = ({
         </motion.li>
     )
 }
+
+const PipelineList = ({
+    steps,
+    complete,
+    nested = false,
+    startIndex = 0,
+}: {
+    steps: ProgressStep[]
+    complete: boolean
+    nested?: boolean
+    startIndex?: number
+}) => (
+    <>
+        {steps.map((step, index) => (
+            <StepRow
+                key={step.id}
+                step={step}
+                index={startIndex + index}
+                nested={nested}
+                isLast={index === steps.length - 1}
+                mode={connectorMode(steps, index, complete)}
+                complete={complete}
+                stuckClass={stuckDot(steps, index)}
+            />
+        ))}
+    </>
+)
 
 const toIssues = (
     issues: { level: string; text: string; source?: string }[],
@@ -260,10 +320,8 @@ const KardexProgressPanel = ({
         participa,
         instrumento,
     )
-    const errors = countIssues(steps, "error") + unmatched.filter((item) => item.level === "error").length
-    const warnings = countIssues(steps, "warning") + unmatched.filter((item) => item.level === "warning").length
-    const score = leafScore(steps)
-    const percent = score.total === 0 ? 0 : Math.round((score.done / score.total) * 100)
+    const score = kardexCompletion(steps, unmatched)
+    const { percent, stagesDone, stageTotal, errorCount, warningCount, complete } = score
 
     let summary = "Sin iniciar"
     let summaryClass = "text-slate-500"
@@ -275,20 +333,18 @@ const KardexProgressPanel = ({
         summary = "No se pudo revisar"
         summaryClass = "text-rose-600"
         barClass = "bg-rose-400"
-    } else if (data) {
-        if (errors > 0) {
-            summary = `${errors} error${errors === 1 ? "" : "es"}`
-            summaryClass = "text-rose-600"
-            barClass = "bg-rose-500"
-        } else if (warnings > 0) {
-            summary = `${warnings} aviso${warnings === 1 ? "" : "s"}`
-            summaryClass = "text-amber-700"
-            barClass = "bg-amber-400"
-        } else {
-            summary = "Sin incidencias"
-            summaryClass = "text-emerald-700"
-            barClass = "bg-emerald-500"
-        }
+    } else if (complete) {
+        summary = warningCount > 0 ? `Completo · ${warningCount} aviso${warningCount === 1 ? "" : "s"}` : "Completo"
+        summaryClass = "text-emerald-700"
+        barClass = "bg-emerald-500"
+    } else if (errorCount > 0) {
+        summary = `${errorCount} error${errorCount === 1 ? "" : "es"} por cerrar`
+        summaryClass = "text-rose-600"
+        barClass = "bg-rose-500"
+    } else if (percent > 0) {
+        summary = "En progreso"
+        summaryClass = "text-emerald-700"
+        barClass = "bg-emerald-500"
     }
 
     return (
@@ -300,9 +356,33 @@ const KardexProgressPanel = ({
                     88% { opacity: 1; }
                     100% { top: calc(100% - 2px); opacity: 0; }
                 }
-                .pipeline-flow {
-                    animation: pipeline-flow 1.6s ease-in-out infinite;
+                .pipeline-flow, .pipeline-flow-late {
+                    animation: pipeline-flow 1.15s linear infinite;
+                    animation-fill-mode: backwards;
                 }
+                .pipeline-flow-slow {
+                    animation: pipeline-flow 2.6s ease-in-out infinite;
+                    animation-fill-mode: backwards;
+                }
+                @keyframes pipeline-stuck {
+                    0% { top: -8px; opacity: 0; }
+                    14% { opacity: 1; }
+                    58% { top: calc(100% - 8px); opacity: 1; }
+                    100% { top: calc(100% - 8px); opacity: 0.9; }
+                }
+                .pipeline-stuck {
+                    animation: pipeline-stuck 2.4s ease-in-out infinite;
+                }
+                @keyframes node-hold-error {
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.55); }
+                    50% { box-shadow: 0 0 0 5px rgba(244, 63, 94, 0); }
+                }
+                .node-hold-error { animation: node-hold-error 1.8s ease-in-out infinite; }
+                @keyframes node-hold-idle {
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(148, 163, 184, 0.75); }
+                    50% { box-shadow: 0 0 0 5px rgba(148, 163, 184, 0); }
+                }
+                .node-hold-idle { animation: node-hold-idle 2.2s ease-in-out infinite; }
                 @keyframes pipeline-bar {
                     0% { transform: translateX(-60%); }
                     100% { transform: translateX(220%); }
@@ -312,7 +392,8 @@ const KardexProgressPanel = ({
                     animation: pipeline-bar 1.2s ease-in-out infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
-                    .pipeline-flow { animation: none; opacity: 0; }
+                    .pipeline-flow, .pipeline-flow-late, .pipeline-flow-slow, .pipeline-stuck,
+                    .node-hold-error, .node-hold-idle { animation: none; opacity: 0; }
                     .pipeline-bar-loading { animation: none; }
                 }
             `}</style>
@@ -342,7 +423,11 @@ const KardexProgressPanel = ({
 
                 <div className="mt-3">
                     <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-slate-500">
-                        <span>{loading ? "Comprobando" : `${score.done} de ${score.total} etapas`}</span>
+                        <span>
+                            {loading
+                                ? "Comprobando"
+                                : `${stagesDone} de ${stageTotal} etapas${errorCount > 0 ? ` · ${errorCount} error${errorCount === 1 ? "" : "es"}` : ""}`}
+                        </span>
                         <span className="tabular-nums">{loading ? "" : `${percent}%`}</span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
@@ -368,14 +453,7 @@ const KardexProgressPanel = ({
                 )}
                 {!isError && (
                     <ol>
-                        {steps.map((step, index) => (
-                            <StepRow
-                                key={step.id}
-                                step={step}
-                                index={index}
-                                isLast={index === steps.length - 1}
-                            />
-                        ))}
+                        <PipelineList steps={steps} complete={!loading && complete} />
                     </ol>
                 )}
                 {!loading && unmatched.length > 0 && (

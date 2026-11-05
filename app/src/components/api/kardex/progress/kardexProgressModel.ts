@@ -243,3 +243,49 @@ export function buildKardexProgress(
 
     return { steps, unmatched }
 }
+
+/** A finished stage is worth more than one error. Warnings do not reduce the score. */
+const STAGE_POINTS = 4
+const ERROR_POINTS = 1
+
+function leaves(steps: ProgressStep[]): ProgressStep[] {
+    const found: ProgressStep[] = []
+    const walk = (list: ProgressStep[]) => {
+        for (const step of list) {
+            if (step.children?.length) walk(step.children)
+            else found.push(step)
+        }
+    }
+    walk(steps)
+    return found
+}
+
+function countLevel(steps: ProgressStep[], level: "error" | "warning"): number {
+    return steps.reduce((total, step) => {
+        const here = step.issues.filter((issue) => issue.level === level).length
+        return total + here + countLevel(step.children ?? [], level)
+    }, 0)
+}
+
+export function kardexCompletion(steps: ProgressStep[], unmatched: ProgressIssue[] = []) {
+    const stageList = leaves(steps)
+    const stagesDone = stageList.filter(
+        (step) => step.status === "done" || step.status === "warning",
+    ).length
+    const errorCount =
+        countLevel(steps, "error") + unmatched.filter((issue) => issue.level === "error").length
+    const warningCount =
+        countLevel(steps, "warning") + unmatched.filter((issue) => issue.level === "warning").length
+    const max = stageList.length * STAGE_POINTS + errorCount * ERROR_POINTS
+    const earned = stagesDone * STAGE_POINTS
+    const raw = max === 0 ? 0 : Math.round((earned / max) * 100)
+    const percent = errorCount > 0 ? Math.min(raw, 99) : raw
+    return {
+        percent,
+        stagesDone,
+        stageTotal: stageList.length,
+        errorCount,
+        warningCount,
+        complete: percent === 100 && errorCount === 0,
+    }
+}
