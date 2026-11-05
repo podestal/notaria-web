@@ -82,7 +82,7 @@ const TopModal = ({
             className={
               wide
                 ? `fixed top-12 right-3 flex h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-4 text-slate-700 shadow-lg sm:p-6 ${dangerFrame}`
-                : `fixed top-20 right-0 mx-auto flex w-full max-h-[calc(100vh-5rem)] flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-lg max-w-5xl ${dangerFrame}`
+                : `fixed top-20 right-0 mx-auto flex w-full max-h-[calc(100vh-5rem)] max-w-5xl flex-col overflow-hidden rounded-b-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-lg ${dangerFrame}`
             }
             style={{ zIndex: contentZIndex, left: sidebarLeft }}
             initial={{ y: '-100%' }}

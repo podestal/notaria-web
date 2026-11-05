@@ -244,6 +244,7 @@ const ClientesForm = ({
     const [domFiscalError, setDomFiscalError] = useState('')
     const [ciiuError, setCiiuError] = useState('')
     const [contacEmpresaError, setContacEmpresaError] = useState('')
+    const [phoneError, setPhoneError] = useState('')
 
     const clearFieldErrors = () => {
         setApepatError('')
@@ -261,6 +262,7 @@ const ClientesForm = ({
         setDomFiscalError('')
         setCiiuError('')
         setContacEmpresaError('')
+        setPhoneError('')
     }
     
     const handleSubmit = () => {
@@ -460,6 +462,15 @@ const ClientesForm = ({
                 setCargoError(CARGO_SELECT_MESSAGE)
                 setType('error')
                 setMessage(CARGO_SELECT_MESSAGE)
+                setShow(true)
+                return
+            }
+
+            if (!fixedPhone.trim() && !celphone.trim()) {
+                const phoneMessage = 'Ingrese teléfono fijo o teléfono celular. Debe registrar al menos uno.'
+                setPhoneError(phoneMessage)
+                setType('error')
+                setMessage(phoneMessage)
                 setShow(true)
                 return
             }
@@ -1006,6 +1017,8 @@ const ClientesForm = ({
                 value={celphone}
                 setValue={setCellphone}
                 horizontal={true}
+                error={phoneError}
+                setError={setPhoneError}
             />
             <SimpleInput 
                 label="Teléfono Oficina"
@@ -1020,6 +1033,8 @@ const ClientesForm = ({
                 value={fixedPhone}
                 setValue={setFixedPhone}
                 horizontal={true}
+                error={phoneError}
+                setError={setPhoneError}
             />
             <SimpleInput 
                 label="Email"

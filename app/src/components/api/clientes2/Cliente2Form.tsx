@@ -231,6 +231,7 @@ const Cliente2Form = ({
         const [domFiscalError, setDomFiscalError] = useState('')
         const [ciiuError, setCiiuError] = useState('')
         const [contacEmpresaError, setContacEmpresaError] = useState('')
+        const [phoneError, setPhoneError] = useState('')
 
         const clearFieldErrors = () => {
             setApepatError('')
@@ -248,6 +249,7 @@ const Cliente2Form = ({
             setDomFiscalError('')
             setCiiuError('')
             setContacEmpresaError('')
+            setPhoneError('')
         }
         
         const handleSubmit = (e: React.FormEvent) => {
@@ -410,6 +412,16 @@ const Cliente2Form = ({
                     setShow(true)
                     return
                 }
+
+                if (!fixedPhone.trim() && !celphone.trim()) {
+                    const phoneMessage = 'Ingrese teléfono fijo o teléfono celular. Debe registrar al menos uno.'
+                    setPhoneError(phoneMessage)
+                    setType('error')
+                    setMessage(phoneMessage)
+                    setShow(true)
+                    return
+                }
+
                 const cargoId = matchedCargo
                     ? matchedCargo.idcargoprofe
                     : !Number.isNaN(cargoIdFromSelected)
@@ -817,9 +829,23 @@ const Cliente2Form = ({
 
         <ClienteFormSection title="Contacto">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <SimpleInput label="Teléfono Celular" value={celphone} setValue={setCellphone} fullWidth />
+                <SimpleInput
+                    label="Teléfono Celular"
+                    value={celphone}
+                    setValue={setCellphone}
+                    fullWidth
+                    error={phoneError}
+                    setError={setPhoneError}
+                />
                 <SimpleInput label="Teléfono Oficina" value={officePhone} setValue={setOfficePhone} fullWidth />
-                <SimpleInput label="Teléfono Fijo" value={fixedPhone} setValue={setFixedPhone} fullWidth />
+                <SimpleInput
+                    label="Teléfono Fijo"
+                    value={fixedPhone}
+                    setValue={setFixedPhone}
+                    fullWidth
+                    error={phoneError}
+                    setError={setPhoneError}
+                />
                 <SimpleInput label="Email" value={email} setValue={setEmail} fullWidth />
             </div>
         </ClienteFormSection>

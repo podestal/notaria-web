@@ -23,7 +23,7 @@ const TopModalWithTabs = ({ isOpen, onClose, tabs }: TopModalWithTabsProps) => {
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-y-0 right-0 left-56 bg-black/40 z-40"
+            className="fixed inset-y-0 right-0 left-56 z-40 bg-black/40"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
