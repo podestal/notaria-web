@@ -2,10 +2,6 @@ import { ReactNode, useState } from "react"
 import { Kardex } from "../../../services/api/kardexService"
 import useAuthStore from "../../../store/useAuthStore"
 import useGetComplianceKardexErrors from "../../../hooks/compliance/useGetComplianceKardexErrors"
-import useGetContratantesProgress from "../../../hooks/compliance/useGetContratantesProgress"
-import useGetPatrimonialProgress from "../../../hooks/compliance/useGetPatrimonialProgress"
-import useGetParticipaProgress from "../../../hooks/compliance/useGetParticipaProgress"
-import useGetInstrumentoProgress from "../../../hooks/compliance/useGetInstrumentoProgress"
 import KardexLogsPanel from "./KardexLogsPanel"
 import ComplianceKardexErrorsPanel from "./kardexErrors/ComplianceKardexErrorsPanel"
 import KardexProgressPanel from "./progress/KardexProgressPanel"
@@ -35,81 +31,8 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
         kardex: kardex.kardex,
         enabled: enabled && Boolean(kardex.kardex),
     })
-    const contratantesQuery = useGetContratantesProgress({
-        access,
-        kardex: kardex.kardex,
-        enabled: enabled && Boolean(kardex.kardex),
-    })
-    const patrimonialQuery = useGetPatrimonialProgress({
-        access,
-        kardex: kardex.kardex,
-        enabled: enabled && Boolean(kardex.kardex),
-    })
-    const participaQuery = useGetParticipaProgress({
-        access,
-        kardex: kardex.kardex,
-        enabled: enabled && Boolean(kardex.kardex),
-    })
-    const instrumentoQuery = useGetInstrumentoProgress({
-        access,
-        kardex: kardex.kardex,
-        enabled: enabled && Boolean(kardex.kardex),
-    })
-    const isRefreshing =
-        (isFetching && !isLoading) ||
-        contratantesQuery.isFetching ||
-        patrimonialQuery.isFetching ||
-        participaQuery.isFetching ||
-        instrumentoQuery.isFetching
-    const contratantesStage = contratantesQuery.data
-        ? {
-            status: contratantesQuery.data.status,
-            issues: contratantesQuery.data.issues.map((issue) => ({
-                level: issue.level,
-                text: issue.text,
-                source: issue.source,
-            })),
-        }
-        : null
-    const patrimonialStage = patrimonialQuery.data
-        ? patrimonialQuery.data.steps.map((step) => ({
-            id: step.id,
-            status: step.status,
-            issues: step.issues.map((issue) => ({
-                level: issue.level === "warning" ? "warning" as const : "error" as const,
-                text: issue.text,
-                source: issue.source,
-            })),
-        }))
-        : null
-    const participaStage = participaQuery.data
-        ? participaQuery.data.steps.map((step) => ({
-            id: step.id,
-            status: step.status,
-            issues: step.issues.map((issue) => ({
-                level: issue.level === "warning" ? "warning" as const : "error" as const,
-                text: issue.text,
-                source: issue.source,
-            })),
-        }))
-        : null
-    const instrumentoStage = instrumentoQuery.data
-        ? instrumentoQuery.data.steps.map((step) => ({
-            id: step.id,
-            status: step.status,
-            issues: step.issues.map((issue) => ({
-                level: issue.level === "warning" ? "warning" as const : "error" as const,
-                text: issue.text,
-                source: issue.source,
-            })),
-        }))
-        : null
-    const refreshAll = () => {
+    const refreshErrors = () => {
         void refetch()
-        void contratantesQuery.refetch()
-        void patrimonialQuery.refetch()
-        void participaQuery.refetch()
-        void instrumentoQuery.refetch()
     }
 
     return (
@@ -139,20 +62,11 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
                             kardex={kardex.kardex}
                             idtipkar={kardex.idtipkar}
                             data={data}
-                            contratantes={contratantesStage}
-                            patrimonial={patrimonialStage}
-                            participa={participaStage}
-                            instrumento={instrumentoStage}
-                            isLoading={
-                                isLoading ||
-                                contratantesQuery.isLoading ||
-                                patrimonialQuery.isLoading ||
-                                participaQuery.isLoading ||
-                                instrumentoQuery.isLoading
-                            }
+                            enabled={enabled}
+                            isLoading={isLoading}
                             isError={isError}
-                            isRefreshing={isRefreshing}
-                            onRefresh={refreshAll}
+                            isRefreshing={isFetching && !isLoading}
+                            onRefresh={refreshErrors}
                         />
                     )}
                     {sideView === "errors" && (
@@ -160,8 +74,8 @@ const KardexWorkspace = ({ kardex, isSuperuser, enabled = true, children }: Prop
                             <ComplianceKardexErrorsPanel
                                 data={data}
                                 className="h-full lg:max-h-none"
-                                onRefresh={refreshAll}
-                                isRefreshing={isRefreshing}
+                                onRefresh={refreshErrors}
+                                isRefreshing={isFetching && !isLoading}
                             />
                         ) : (
                             <aside className="flex h-full min-h-[8rem] items-center justify-center bg-slate-50 p-4 text-xs text-slate-500">

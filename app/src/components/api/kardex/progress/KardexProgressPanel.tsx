@@ -1,10 +1,15 @@
 import { AlertTriangle, Check, CircleDashed, RefreshCw, X } from "lucide-react"
 import { motion } from "framer-motion"
 import type { ComplianceKardexErrorsResponse } from "../../../../services/compliance/complianceService"
+import useAuthStore from "../../../../store/useAuthStore"
+import useGetContratantesProgress from "../../../../hooks/compliance/useGetContratantesProgress"
+import useGetPatrimonialProgress from "../../../../hooks/compliance/useGetPatrimonialProgress"
+import useGetParticipaProgress from "../../../../hooks/compliance/useGetParticipaProgress"
+import useGetInstrumentoProgress from "../../../../hooks/compliance/useGetInstrumentoProgress"
 import {
     buildKardexProgress,
-    type ContratantesStage,
     type PatrimonialStageStep,
+    type ProgressIssue,
     type ProgressStatus,
     type ProgressStep,
 } from "./kardexProgressModel"
@@ -13,10 +18,7 @@ interface Props {
     kardex: string
     idtipkar?: number | null
     data?: ComplianceKardexErrorsResponse
-    contratantes?: ContratantesStage | null
-    patrimonial?: PatrimonialStageStep[] | null
-    participa?: PatrimonialStageStep[] | null
-    instrumento?: PatrimonialStageStep[] | null
+    enabled?: boolean
     isLoading?: boolean
     isError?: boolean
     isRefreshing?: boolean
@@ -150,24 +152,21 @@ const StepRow = ({
                         </span>
                     </div>
 
-                    {step.issues.slice(0, 3).map((issue) => (
+                    {step.issues.map((issue) => (
                         <p
                             key={`${issue.source ?? ""}-${issue.text}`}
-                            className={`mt-1 line-clamp-2 text-[11px] leading-snug ${
+                            className={`mt-1 whitespace-normal break-words text-[11px] leading-snug ${
                                 issue.level === "error" ? "text-rose-700" : "text-amber-800"
                             }`}
                         >
                             {issue.source ? (
-                                <span className="mr-1 font-semibold uppercase tracking-wide">
+                                <span className="mr-1.5 font-semibold uppercase tracking-wide">
                                     {issue.source}
                                 </span>
                             ) : null}
                             {issue.text}
                         </p>
                     ))}
-                    {step.issues.length > 3 && (
-                        <p className="mt-0.5 text-[10px] text-slate-400">+{step.issues.length - 3} más</p>
-                    )}
 
                     {step.children && step.children.length > 0 && (
                         <ol className="relative mt-3 ml-1 border-l border-dashed border-slate-200 pl-3">
@@ -188,19 +187,71 @@ const StepRow = ({
     )
 }
 
+const toIssues = (
+    issues: { level: string; text: string; source?: string }[],
+): ProgressIssue[] =>
+    issues.map((issue) => ({
+        level: issue.level === "warning" ? "warning" : "error",
+        text: issue.text,
+        source: issue.source,
+    }))
+
+const toSteps = (
+    steps: { id: string; status: PatrimonialStageStep["status"]; issues: { level: string; text: string; source?: string }[] }[] | undefined,
+): PatrimonialStageStep[] | null =>
+    steps
+        ? steps.map((step) => ({
+            id: step.id,
+            status: step.status,
+            issues: toIssues(step.issues),
+        }))
+        : null
+
 const KardexProgressPanel = ({
     kardex,
     idtipkar,
     data,
-    contratantes = null,
-    patrimonial = null,
-    participa = null,
-    instrumento = null,
+    enabled = true,
     isLoading = false,
     isError = false,
     isRefreshing = false,
     onRefresh,
 }: Props) => {
+    const access = useAuthStore((state) => state.access_token) || ""
+    const canQuery = enabled && Boolean(access) && Boolean(kardex)
+    const contratantesQuery = useGetContratantesProgress({ access, kardex, enabled: canQuery })
+    const patrimonialQuery = useGetPatrimonialProgress({ access, kardex, enabled: canQuery })
+    const participaQuery = useGetParticipaProgress({ access, kardex, enabled: canQuery })
+    const instrumentoQuery = useGetInstrumentoProgress({ access, kardex, enabled: canQuery })
+    const stageLoading =
+        contratantesQuery.isLoading ||
+        patrimonialQuery.isLoading ||
+        participaQuery.isLoading ||
+        instrumentoQuery.isLoading
+    const stageRefreshing =
+        contratantesQuery.isFetching ||
+        patrimonialQuery.isFetching ||
+        participaQuery.isFetching ||
+        instrumentoQuery.isFetching
+    const contratantes = contratantesQuery.data
+        ? {
+            status: contratantesQuery.data.status,
+            issues: toIssues(contratantesQuery.data.issues),
+        }
+        : null
+    const patrimonial = toSteps(patrimonialQuery.data?.steps)
+    const participa = toSteps(participaQuery.data?.steps)
+    const instrumento = toSteps(instrumentoQuery.data?.steps)
+    const refresh = () => {
+        onRefresh?.()
+        void contratantesQuery.refetch()
+        void patrimonialQuery.refetch()
+        void participaQuery.refetch()
+        void instrumentoQuery.refetch()
+    }
+    const loading = isLoading || stageLoading
+    const refreshing = isRefreshing || stageRefreshing
+
     const { steps, unmatched } = buildKardexProgress(
         idtipkar,
         data,
@@ -217,7 +268,7 @@ const KardexProgressPanel = ({
     let summary = "Sin iniciar"
     let summaryClass = "text-slate-500"
     let barClass = "bg-slate-300"
-    if (isLoading) {
+    if (loading) {
         summary = "Revisando etapas…"
         barClass = "bg-sky-400"
     } else if (isError) {
@@ -278,12 +329,12 @@ const KardexProgressPanel = ({
                     {onRefresh && (
                         <button
                             type="button"
-                            onClick={onRefresh}
-                            disabled={isRefreshing || isLoading}
+                            onClick={refresh}
+                            disabled={refreshing || loading}
                             title="Actualizar avance"
                             className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} aria-hidden />
+                            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} aria-hidden />
                             Actualizar
                         </button>
                     )}
@@ -291,11 +342,11 @@ const KardexProgressPanel = ({
 
                 <div className="mt-3">
                     <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-slate-500">
-                        <span>{isLoading ? "Comprobando" : `${score.done} de ${score.total} etapas`}</span>
-                        <span className="tabular-nums">{isLoading ? "" : `${percent}%`}</span>
+                        <span>{loading ? "Comprobando" : `${score.done} de ${score.total} etapas`}</span>
+                        <span className="tabular-nums">{loading ? "" : `${percent}%`}</span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
-                        {isLoading ? (
+                        {loading ? (
                             <div className={`pipeline-bar-loading h-full rounded-full ${barClass}`} />
                         ) : (
                             <motion.div
@@ -327,16 +378,16 @@ const KardexProgressPanel = ({
                         ))}
                     </ol>
                 )}
-                {!isLoading && unmatched.length > 0 && (
+                {!loading && unmatched.length > 0 && (
                     <div className="mt-2 border-t border-slate-200 pt-3">
                         <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                             Otras incidencias
                         </p>
                         <ul className="mt-2 space-y-1">
-                            {unmatched.slice(0, 4).map((issue) => (
+                            {unmatched.map((issue) => (
                                 <li
                                     key={issue.text}
-                                    className={`line-clamp-2 text-[11px] leading-snug ${
+                                    className={`whitespace-normal break-words text-[11px] leading-snug ${
                                         issue.level === "error" ? "text-rose-700" : "text-amber-800"
                                     }`}
                                 >
