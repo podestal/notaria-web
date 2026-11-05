@@ -125,6 +125,7 @@ const Calendar: React.FC<Props> = ({ selectedDate, setSelectedDate, fullWidth = 
                 >
                     <DayPicker
                         mode="single"
+                        showOutsideDays
                         selected={selectedDate}
                         onSelect={(date) => {
                             setSelectedDate(date)
