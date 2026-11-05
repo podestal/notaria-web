@@ -341,6 +341,23 @@ export const getContratantesProgress = (
         )
         .then((res) => res.data)
 
+export type KardexListTone = "incomplete" | "warning" | "complete"
+
+export interface KardexListProgressResponse {
+    results: Record<string, KardexListTone>
+}
+
+export const getKardexListProgress = (
+    access: string,
+    kardex: string[],
+): Promise<KardexListProgressResponse> =>
+    complianceAxios
+        .get<KardexListProgressResponse>("kardex/progress/", {
+            headers: authHeaders(access),
+            params: { kardex: kardex.join(",") },
+        })
+        .then((res) => res.data)
+
 export const getComplianceKardexErrors = (
     access: string,
     kardex: string,

@@ -12,11 +12,13 @@ import useUserInfoStore from "../../../hooks/store/useGetUserInfo"
 import KardexCompliancePastMonthsAlert from "./KardexCompliancePastMonthsAlert"
 import { useCompliancePastMonthsUrgent } from "./useCompliancePastMonthsUrgent"
 import { KARDEX_GRID_COLUMNS } from "./KardexTableHeader"
+import KardexListProgress, { KardexListProgressTone } from "./KardexListProgress"
 
 interface Props {
     kardex: Kardex
     readyOnly?: boolean
     index?: number
+    progress?: KardexListProgressTone
 }
 
 const Empty = () => <span className="text-slate-300">—</span>
@@ -34,7 +36,7 @@ const getInitials = (name: string) =>
         .map(part => part[0]?.toUpperCase() ?? '')
         .join('')
 
-const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
+const KardexCard = ({ kardex, readyOnly, index = 0, progress = "pending" }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
     const user = useUserInfoStore(s => s.user)
     const isSuperuser = Number(user?.is_superuser) !== 0
@@ -72,7 +74,7 @@ const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
                 openKardex()
             }
         }}
-        className={`group grid items-center gap-3 px-4 py-3 text-xs text-slate-700 transition-colors ${
+        className={`group relative grid items-center gap-3 px-4 py-3 text-xs text-slate-700 transition-colors ${
             readyOnly ? '' : 'cursor-pointer hover:bg-sky-50/70 focus:bg-sky-50/70 focus:outline-none'
         }`}
         style={{ gridTemplateColumns: KARDEX_GRID_COLUMNS }}
@@ -108,6 +110,7 @@ const KardexCard = ({ kardex, readyOnly, index = 0 }: Props) => {
                 </>
             ) : <Empty />}
         </div>
+        <KardexListProgress tone={progress} />
     </motion.div>
     <TopModal
         isOpen={open}

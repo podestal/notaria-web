@@ -1,7 +1,11 @@
+import { useMemo } from "react"
 import { motion } from "framer-motion"
 import { FileSearch } from "lucide-react"
 import { Kardex, KardexPage } from "../../../services/api/kardexService"
+import useAuthStore from "../../../store/useAuthStore"
+import useGetKardexListProgress from "../../../hooks/compliance/useGetKardexListProgress"
 import KardexCard from "./KardexCard"
+import { KardexListProgressStyles } from "./KardexListProgress"
 
 interface Props {
     kardexList: KardexPage | Kardex[]
@@ -9,7 +13,10 @@ interface Props {
 }
 
 const KardexTableBody = ({ kardexList, readyOnly }: Props) => {
+    const access = useAuthStore(s => s.access_token) || ''
     const rows = Array.isArray(kardexList) ? kardexList : []
+    const keys = useMemo(() => rows.map((row) => row.kardex).filter(Boolean), [rows])
+    const { data, isSuccess } = useGetKardexListProgress({ access, kardex: keys })
 
     if (rows.length === 0) {
         return (
@@ -32,6 +39,8 @@ const KardexTableBody = ({ kardexList, readyOnly }: Props) => {
     }
 
   return (
+    <>
+    <KardexListProgressStyles />
     <div className="divide-y divide-slate-100">
         {rows.map((singleKardex, index) => (
             <KardexCard 
@@ -39,9 +48,11 @@ const KardexTableBody = ({ kardexList, readyOnly }: Props) => {
                 kardex={singleKardex}
                 readyOnly={readyOnly}
                 index={index}
+                progress={isSuccess ? (data.results[singleKardex.kardex] ?? "incomplete") : "pending"}
             />
         ))}
     </div>
+    </>
   )
 }
 
