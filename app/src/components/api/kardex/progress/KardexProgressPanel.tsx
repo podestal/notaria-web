@@ -105,7 +105,6 @@ const StepRow = ({
     nested = false,
     isLast = false,
     stopId,
-    stopRef,
     waiting = false,
 }: {
     step: ProgressStep
@@ -113,7 +112,6 @@ const StepRow = ({
     nested?: boolean
     isLast?: boolean
     stopId: string | null
-    stopRef: React.RefObject<HTMLSpanElement | null>
     waiting?: boolean
 }) => {
     const hold = step.id === stopId
@@ -129,7 +127,7 @@ const StepRow = ({
             <div className="flex gap-3">
                 <div className="flex w-6 shrink-0 flex-col items-center">
                     <motion.span
-                        ref={hold ? stopRef : undefined}
+                        data-pipeline-stop={hold ? "true" : undefined}
                         className={`z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${NODE[statusKey]} ${hold ? "node-hold-error" : ""} ${
                             nested ? "h-5 w-5" : ""
                         }`}
@@ -178,7 +176,6 @@ const StepRow = ({
                                 nested
                                 startIndex={index + 1}
                                 stopId={waiting ? null : stopId}
-                                stopRef={stopRef}
                             />
                         </ol>
                     )}
@@ -193,13 +190,11 @@ const PipelineList = ({
     nested = false,
     startIndex = 0,
     stopId,
-    stopRef,
 }: {
     steps: ProgressStep[]
     nested?: boolean
     startIndex?: number
     stopId: string | null
-    stopRef: React.RefObject<HTMLSpanElement | null>
 }) => {
     const blockAt = stopId ? steps.findIndex((step) => containsStop(step, stopId)) : -1
     return (
@@ -212,7 +207,6 @@ const PipelineList = ({
                     nested={nested}
                     isLast={index === steps.length - 1}
                     stopId={stopId}
-                    stopRef={stopRef}
                     waiting={blockAt !== -1 && index > blockAt}
                 />
             ))}
@@ -230,7 +224,6 @@ const PipelineTrack = ({
     stopId: string | null
 }) => {
     const rootRef = useRef<HTMLOListElement>(null)
-    const stopRef = useRef<HTMLSpanElement>(null)
     const [end, setEnd] = useState<number | null>(null)
 
     useLayoutEffect(() => {
@@ -240,18 +233,26 @@ const PipelineTrack = ({
             return
         }
         const measure = () => {
-            if (stopId && stopRef.current) {
-                const rootTop = root.getBoundingClientRect().top
-                const stop = stopRef.current.getBoundingClientRect()
-                setEnd(Math.max(stop.top - rootTop + stop.height / 2, 0))
+            const node = stopId
+                ? root.querySelector<HTMLElement>("[data-pipeline-stop='true']")
+                : null
+            if (stopId) {
+                if (!node) return
+                const rootBox = root.getBoundingClientRect()
+                const nodeBox = node.getBoundingClientRect()
+                setEnd(Math.max(nodeBox.top - rootBox.top + nodeBox.height / 2, 0))
                 return
             }
-            setEnd(Math.max(root.scrollHeight - 10, 0))
+            setEnd(Math.max(root.scrollHeight - 12, 0))
         }
         measure()
+        const frame = requestAnimationFrame(measure)
         const observer = new ResizeObserver(measure)
         observer.observe(root)
-        return () => observer.disconnect()
+        return () => {
+            cancelAnimationFrame(frame)
+            observer.disconnect()
+        }
     }, [running, stopId, steps])
 
     return (
@@ -284,7 +285,7 @@ const PipelineTrack = ({
                     />
                 </>
             )}
-            <PipelineList steps={steps} stopId={stopId} stopRef={stopRef} />
+            <PipelineList steps={steps} stopId={stopId} />
         </ol>
     )
 }
@@ -386,7 +387,7 @@ const KardexProgressPanel = ({
         barClass = "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
         runClass = "border-emerald-400/40 bg-emerald-400/15 text-emerald-200"
     } else if (errorCount > 0 || stopped) {
-        summary = "Detenido"
+        summary = "Incompleto"
         summaryClass = errorCount > 0 ? "text-rose-300" : "text-slate-300"
         barClass = errorCount > 0
             ? "bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.75)]"

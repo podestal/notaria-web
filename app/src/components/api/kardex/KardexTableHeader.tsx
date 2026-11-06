@@ -1,5 +1,5 @@
 export const KARDEX_GRID_COLUMNS =
-    "minmax(104px,1.1fr) minmax(86px,0.85fr) minmax(150px,1.7fr) minmax(170px,2fr) minmax(86px,0.85fr) minmax(64px,0.7fr) minmax(60px,0.65fr) minmax(64px,0.65fr) minmax(64px,0.65fr) minmax(64px,0.7fr) minmax(56px,0.6fr) minmax(120px,1.1fr)"
+    "minmax(118px,1.2fr) minmax(86px,0.85fr) minmax(150px,1.7fr) minmax(170px,2fr) minmax(86px,0.85fr) minmax(64px,0.7fr) minmax(60px,0.65fr) minmax(64px,0.65fr) minmax(64px,0.65fr) minmax(64px,0.7fr) minmax(56px,0.6fr) minmax(120px,1.1fr)"
 
 const headerItems = [
     { label: "N° Kardex", align: "left" },

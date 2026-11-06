@@ -79,12 +79,13 @@ const KardexCard = ({ kardex, readyOnly, index = 0, progress = "pending" }: Prop
         }`}
         style={{ gridTemplateColumns: KARDEX_GRID_COLUMNS }}
     >
-        <div>
+        <div className="min-w-0">
             <span className={`inline-flex rounded-md bg-sky-50 px-2 py-1 font-mono text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100 transition duration-200 ${
                 readyOnly ? '' : 'group-hover:scale-105 group-hover:bg-sky-100 group-hover:ring-sky-200 group-hover:shadow-sm'
             }`}>
                 {kardex.kardex}
             </span>
+            <KardexListProgress tone={progress} />
         </div>
         <CellValue value={kardex.fechaingreso} className="tabular-nums text-slate-600" />
         <p className="line-clamp-2 leading-snug text-slate-700" title={kardex.contrato || undefined}>
@@ -110,7 +111,6 @@ const KardexCard = ({ kardex, readyOnly, index = 0, progress = "pending" }: Prop
                 </>
             ) : <Empty />}
         </div>
-        <KardexListProgress tone={progress} />
     </motion.div>
     <TopModal
         isOpen={open}
