@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from "react"
 import { AlertTriangle, Check, CircleDashed, RefreshCw, X } from "lucide-react"
 import { motion } from "framer-motion"
 import type { ComplianceKardexErrorsResponse } from "../../../../services/compliance/complianceService"
@@ -27,58 +28,57 @@ interface Props {
 }
 
 const LINE: Record<ProgressStatus, string> = {
-    done: "bg-emerald-400",
-    warning: "bg-amber-400",
-    error: "bg-rose-400",
-    idle: "bg-slate-200",
+    done: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
+    warning: "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]",
+    error: "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]",
+    idle: "bg-slate-600",
 }
 
 const NODE: Record<ProgressStatus, string> = {
-    done: "border-emerald-500 bg-emerald-500 text-white shadow-emerald-200",
-    warning: "border-amber-500 bg-amber-500 text-white shadow-amber-200",
-    error: "border-rose-500 bg-rose-500 text-white shadow-rose-200",
-    idle: "border-slate-300 bg-white text-slate-400 shadow-slate-100",
+    done: "border-emerald-400 bg-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.55)]",
+    warning: "border-amber-300 bg-amber-500 text-white shadow-[0_0_12px_rgba(245,158,11,0.5)]",
+    error: "border-rose-300 bg-rose-500 text-white shadow-[0_0_14px_rgba(244,63,94,0.7)]",
+    idle: "border-slate-500 bg-slate-900 text-slate-400",
 }
 
 const LABEL: Record<ProgressStatus, string> = {
-    done: "text-emerald-700",
-    warning: "text-amber-700",
-    error: "text-rose-700",
+    done: "text-emerald-300",
+    warning: "text-amber-300",
+    error: "text-rose-300",
     idle: "text-slate-400",
 }
 
 const STATUS_LABEL: Record<ProgressStatus, string> = {
     done: "Listo",
     warning: "Aviso",
-    error: "Error",
+    error: "Falló",
     idle: "Sin iniciar",
 }
 
-const FLOW: Record<ProgressStatus, string> = {
-    done: "bg-white",
-    warning: "bg-amber-100",
-    error: "bg-rose-100",
-    idle: "bg-slate-300",
+const CARD: Record<ProgressStatus, string> = {
+    done: "border-emerald-400/30 bg-emerald-400/10",
+    warning: "border-amber-400/30 bg-amber-400/10",
+    error: "border-rose-400/40 bg-rose-500/15",
+    idle: "border-slate-600/80 bg-slate-800/40",
 }
-
-type FlowMode = "flow" | "stuck" | "still"
 
 const isBlocked = (status: ProgressStatus) => status === "error" || status === "idle"
 
-const connectorMode = (steps: ProgressStep[], index: number, complete: boolean): FlowMode => {
-    if (index >= steps.length - 1) return "still"
-    if (complete) return "flow"
-    const blockAt = steps.findIndex((step) => isBlocked(step.status))
-    if (blockAt === -1) return index === steps.length - 2 ? "stuck" : "flow"
-    if (index < blockAt - 1) return "flow"
-    if (index === blockAt - 1) return "stuck"
-    return "still"
+const findFirstErrorId = (steps: ProgressStep[]): string | null => {
+    for (const step of steps) {
+        if (step.children?.length) {
+            const nested = findFirstErrorId(step.children)
+            if (nested) return nested
+        }
+        if (step.status === "error") return step.id
+    }
+    return null
 }
 
-const stuckDot = (steps: ProgressStep[], index: number): string => {
-    const next = steps[index + 1]
-    if (next?.status === "idle") return "bg-slate-300"
-    return "bg-rose-200"
+const containsStop = (step: ProgressStep, stopId: string | null): boolean => {
+    if (!stopId) return false
+    if (step.id === stopId) return true
+    return step.children?.some((child) => containsStop(child, stopId)) ?? false
 }
 
 const NodeIcon = ({ status }: { status: ProgressStatus }) => {
@@ -88,48 +88,14 @@ const NodeIcon = ({ status }: { status: ProgressStatus }) => {
     return <CircleDashed className="h-3 w-3" aria-hidden />
 }
 
-const Connector = ({
-    status,
-    mode,
-    delay,
-    stuckClass,
-    complete,
-}: {
-    status: ProgressStatus
-    mode: FlowMode
-    delay: number
-    stuckClass: string
-    complete: boolean
-}) => (
-    <div className="relative mt-1 w-0.5 flex-1 overflow-hidden rounded-full bg-slate-200">
+const Connector = ({ status }: { status: ProgressStatus }) => (
+    <div className="relative mt-1 w-0.5 flex-1 overflow-hidden rounded-full bg-slate-800">
         <motion.div
             className={`absolute inset-x-0 top-0 origin-top ${LINE[status]}`}
             initial={{ height: 0 }}
             animate={{ height: "100%" }}
             transition={{ duration: 0.45, ease: "easeOut" }}
         />
-        {mode === "flow" && (
-            <>
-                <span
-                    className={`${complete ? "pipeline-flow" : "pipeline-flow-slow"} absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full ${FLOW[status]}`}
-                    style={{ animationDelay: `${delay}s` }}
-                    aria-hidden
-                />
-                {complete && (
-                    <span
-                        className={`pipeline-flow-late absolute left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full ${FLOW[status]}`}
-                        style={{ animationDelay: `${delay + 0.55}s` }}
-                        aria-hidden
-                    />
-                )}
-            </>
-        )}
-        {mode === "stuck" && (
-            <span
-                className={`pipeline-stuck absolute left-1/2 h-2 w-2 -translate-x-1/2 rounded-full ${stuckClass}`}
-                aria-hidden
-            />
-        )}
     </div>
 )
 
@@ -138,80 +104,82 @@ const StepRow = ({
     index,
     nested = false,
     isLast = false,
-    mode,
-    complete,
-    stuckClass,
+    stopId,
+    stopRef,
+    waiting = false,
 }: {
     step: ProgressStep
     index: number
     nested?: boolean
     isLast?: boolean
-    mode: FlowMode
-    complete: boolean
-    stuckClass: string
+    stopId: string | null
+    stopRef: React.RefObject<HTMLSpanElement | null>
+    waiting?: boolean
 }) => {
-    const hold = !complete && isBlocked(step.status)
-    const holdClass = hold ? (step.status === "error" ? "node-hold-error" : "node-hold-idle") : ""
+    const hold = step.id === stopId
+    const statusKey: ProgressStatus = waiting ? "idle" : step.status
 
     return (
         <motion.li
-            className="relative"
+            className={`relative ${waiting ? "opacity-45" : ""}`}
             initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={{ opacity: waiting ? 0.45 : 1, x: 0 }}
             transition={{ duration: 0.28, delay: index * 0.06, ease: "easeOut" }}
         >
             <div className="flex gap-3">
                 <div className="flex w-6 shrink-0 flex-col items-center">
                     <motion.span
-                        className={`z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 shadow-sm ${NODE[step.status]} ${holdClass} ${
+                        ref={hold ? stopRef : undefined}
+                        className={`z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${NODE[statusKey]} ${hold ? "node-hold-error" : ""} ${
                             nested ? "h-5 w-5" : ""
                         }`}
                         initial={{ scale: 0.6 }}
                         animate={{ scale: 1 }}
                         transition={{ type: "spring", stiffness: 420, damping: 22, delay: index * 0.06 }}
                     >
-                        <NodeIcon status={step.status} />
+                        <NodeIcon status={waiting ? "idle" : step.status} />
                     </motion.span>
                     {!isLast && (
-                        <Connector
-                            status={step.status}
-                            mode={mode}
-                            delay={index * 0.16}
-                            stuckClass={stuckClass}
-                            complete={complete}
-                        />
+                        <Connector status={waiting ? "idle" : step.status} />
                     )}
                 </div>
 
-                <div className={`min-w-0 flex-1 ${isLast ? "pb-1" : "pb-4"}`}>
-                    <div className="flex items-center justify-between gap-2">
-                        <p className={`truncate font-semibold text-slate-800 ${nested ? "text-[13px]" : "text-sm"}`}>
-                            {step.label}
-                        </p>
-                        <span className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide ${LABEL[step.status]}`}>
-                            {STATUS_LABEL[step.status]}
-                        </span>
+                <div className={`min-w-0 flex-1 ${isLast ? "pb-1" : "pb-3"}`}>
+                    <div className={`rounded-lg border px-2.5 py-2 ${waiting ? CARD.idle : CARD[step.status]}`}>
+                        <div className="flex items-center justify-between gap-2">
+                            <p className={`truncate font-semibold text-slate-100 ${nested ? "text-[13px]" : "text-sm"}`}>
+                                {step.label}
+                            </p>
+                            <span className={`shrink-0 font-mono text-[10px] font-semibold uppercase tracking-wider ${waiting ? "text-slate-500" : LABEL[step.status]}`}>
+                                {waiting ? "En cola" : STATUS_LABEL[step.status]}
+                            </span>
+                        </div>
+                        {!waiting && step.issues.map((issue) => (
+                            <p
+                                key={`${issue.source ?? ""}-${issue.text}`}
+                                className={`mt-1 whitespace-normal break-words text-[11px] leading-snug ${
+                                    issue.level === "error" ? "text-rose-200" : "text-amber-200"
+                                }`}
+                            >
+                                {issue.source ? (
+                                    <span className="mr-1.5 font-semibold uppercase tracking-wide">
+                                        {issue.source}
+                                    </span>
+                                ) : null}
+                                {issue.text}
+                            </p>
+                        ))}
                     </div>
 
-                    {step.issues.map((issue) => (
-                        <p
-                            key={`${issue.source ?? ""}-${issue.text}`}
-                            className={`mt-1 whitespace-normal break-words text-[11px] leading-snug ${
-                                issue.level === "error" ? "text-rose-700" : "text-amber-800"
-                            }`}
-                        >
-                            {issue.source ? (
-                                <span className="mr-1.5 font-semibold uppercase tracking-wide">
-                                    {issue.source}
-                                </span>
-                            ) : null}
-                            {issue.text}
-                        </p>
-                    ))}
-
                     {step.children && step.children.length > 0 && (
-                        <ol className="relative mt-3 ml-1 border-l border-dashed border-slate-200 pl-3">
-                            <PipelineList steps={step.children} complete={complete} nested startIndex={index + 1} />
+                        <ol className="relative mt-2 ml-1">
+                            <PipelineList
+                                steps={step.children}
+                                nested
+                                startIndex={index + 1}
+                                stopId={waiting ? null : stopId}
+                                stopRef={stopRef}
+                            />
                         </ol>
                     )}
                 </div>
@@ -222,30 +190,104 @@ const StepRow = ({
 
 const PipelineList = ({
     steps,
-    complete,
     nested = false,
     startIndex = 0,
+    stopId,
+    stopRef,
 }: {
     steps: ProgressStep[]
-    complete: boolean
     nested?: boolean
     startIndex?: number
-}) => (
-    <>
-        {steps.map((step, index) => (
-            <StepRow
-                key={step.id}
-                step={step}
-                index={startIndex + index}
-                nested={nested}
-                isLast={index === steps.length - 1}
-                mode={connectorMode(steps, index, complete)}
-                complete={complete}
-                stuckClass={stuckDot(steps, index)}
-            />
-        ))}
-    </>
-)
+    stopId: string | null
+    stopRef: React.RefObject<HTMLSpanElement | null>
+}) => {
+    const blockAt = stopId ? steps.findIndex((step) => containsStop(step, stopId)) : -1
+    return (
+        <>
+            {steps.map((step, index) => (
+                <StepRow
+                    key={step.id}
+                    step={step}
+                    index={startIndex + index}
+                    nested={nested}
+                    isLast={index === steps.length - 1}
+                    stopId={stopId}
+                    stopRef={stopRef}
+                    waiting={blockAt !== -1 && index > blockAt}
+                />
+            ))}
+        </>
+    )
+}
+
+const PipelineTrack = ({
+    steps,
+    running,
+    stopId,
+}: {
+    steps: ProgressStep[]
+    running: boolean
+    stopId: string | null
+}) => {
+    const rootRef = useRef<HTMLOListElement>(null)
+    const stopRef = useRef<HTMLSpanElement>(null)
+    const [end, setEnd] = useState<number | null>(null)
+
+    useLayoutEffect(() => {
+        const root = rootRef.current
+        if (!root || !running) {
+            setEnd(null)
+            return
+        }
+        const measure = () => {
+            if (stopId && stopRef.current) {
+                const rootTop = root.getBoundingClientRect().top
+                const stop = stopRef.current.getBoundingClientRect()
+                setEnd(Math.max(stop.top - rootTop + stop.height / 2, 0))
+                return
+            }
+            setEnd(Math.max(root.scrollHeight - 10, 0))
+        }
+        measure()
+        const observer = new ResizeObserver(measure)
+        observer.observe(root)
+        return () => observer.disconnect()
+    }, [running, stopId, steps])
+
+    return (
+        <ol ref={rootRef} className="relative">
+            {running && end != null && end > 0 && !stopId &&
+                [0, 1, 2].map((bead) => (
+                    <span
+                        key={`run-${bead}-${Math.round(end)}`}
+                        className={`pipeline-run pipeline-bead pipeline-bead-${bead} absolute left-3 z-20 rounded-full`}
+                        style={{
+                            ["--pipeline-end" as string]: `${end}px`,
+                            animationDelay: `${bead * 0.28}s`,
+                        }}
+                        aria-hidden
+                    />
+                ))}
+            {running && end != null && end > 0 && stopId && (
+                <>
+                    <span
+                        key={`halt-ring-${Math.round(end)}`}
+                        className="pipeline-halt-ring absolute left-3 z-10 h-7 w-7 rounded-full border border-rose-300/80"
+                        style={{ top: end }}
+                        aria-hidden
+                    />
+                    <span
+                        key={`halt-${Math.round(end)}`}
+                        className="pipeline-halt absolute left-3 z-20 rounded-full"
+                        style={{ ["--pipeline-end" as string]: `${end}px` }}
+                        aria-hidden
+                    />
+                </>
+            )}
+            <PipelineList steps={steps} stopId={stopId} stopRef={stopRef} />
+        </ol>
+    )
+}
 
 const toIssues = (
     issues: { level: string; text: string; source?: string }[],
@@ -322,67 +364,111 @@ const KardexProgressPanel = ({
     )
     const score = kardexCompletion(steps, unmatched)
     const { percent, stagesDone, stageTotal, errorCount, warningCount, complete } = score
+    const stopped = !complete && steps.some((step) => isBlocked(step.status))
 
-    let summary = "Sin iniciar"
-    let summaryClass = "text-slate-500"
-    let barClass = "bg-slate-300"
+    let summary = "En cola"
+    let summaryClass = "text-slate-400"
+    let barClass = "bg-slate-500"
+    let runClass = "border-slate-600 bg-slate-800 text-slate-300"
     if (loading) {
-        summary = "Revisando etapas…"
+        summary = "En curso"
+        summaryClass = "text-sky-300"
         barClass = "bg-sky-400"
+        runClass = "border-sky-400/40 bg-sky-400/15 text-sky-200"
     } else if (isError) {
-        summary = "No se pudo revisar"
-        summaryClass = "text-rose-600"
+        summary = "Falló"
+        summaryClass = "text-rose-300"
         barClass = "bg-rose-400"
+        runClass = "border-rose-400/40 bg-rose-500/15 text-rose-200"
     } else if (complete) {
-        summary = warningCount > 0 ? `Completo · ${warningCount} aviso${warningCount === 1 ? "" : "s"}` : "Completo"
-        summaryClass = "text-emerald-700"
-        barClass = "bg-emerald-500"
-    } else if (errorCount > 0) {
-        summary = `${errorCount} error${errorCount === 1 ? "" : "es"} por cerrar`
-        summaryClass = "text-rose-600"
-        barClass = "bg-rose-500"
+        summary = warningCount > 0 ? "Listo con avisos" : "Listo"
+        summaryClass = "text-emerald-300"
+        barClass = "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
+        runClass = "border-emerald-400/40 bg-emerald-400/15 text-emerald-200"
+    } else if (errorCount > 0 || stopped) {
+        summary = "Detenido"
+        summaryClass = errorCount > 0 ? "text-rose-300" : "text-slate-300"
+        barClass = errorCount > 0
+            ? "bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.75)]"
+            : "bg-slate-400"
+        runClass = errorCount > 0
+            ? "border-rose-400/40 bg-rose-500/15 text-rose-200"
+            : "border-slate-500 bg-slate-800 text-slate-300"
     } else if (percent > 0) {
-        summary = "En progreso"
-        summaryClass = "text-emerald-700"
-        barClass = "bg-emerald-500"
+        summary = "En curso"
+        summaryClass = "text-emerald-300"
+        barClass = "bg-emerald-400"
+        runClass = "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
     }
 
     return (
-        <aside className="flex h-full min-h-0 w-full flex-col overflow-hidden border-slate-200 bg-slate-50 lg:border-r">
+        <aside className="keep-dark flex h-full min-h-0 w-full flex-col overflow-hidden border-slate-800 bg-slate-950 text-slate-200 lg:border-r">
             <style>{`
-                @keyframes pipeline-flow {
-                    0% { top: -8px; opacity: 0; }
-                    12% { opacity: 1; }
-                    88% { opacity: 1; }
-                    100% { top: calc(100% - 2px); opacity: 0; }
+                @keyframes pipeline-run {
+                    0% { top: -8px; opacity: 0; transform: translateX(-50%) scale(0.55); }
+                    10% { opacity: 1; transform: translateX(-50%) scale(1); }
+                    86% { opacity: 0.95; transform: translateX(-50%) scale(1); }
+                    100% { top: var(--pipeline-end); opacity: 0; transform: translateX(-50%) scale(0.45); }
                 }
-                .pipeline-flow, .pipeline-flow-late {
-                    animation: pipeline-flow 1.15s linear infinite;
+                .pipeline-run {
+                    animation: pipeline-run 3.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
                     animation-fill-mode: backwards;
                 }
-                .pipeline-flow-slow {
-                    animation: pipeline-flow 2.6s ease-in-out infinite;
-                    animation-fill-mode: backwards;
+                .pipeline-bead {
+                    width: 8px;
+                    height: 8px;
+                    background: #fff;
+                    box-shadow: 0 0 10px rgba(167, 243, 208, 0.95), 0 0 2px #fff;
                 }
-                @keyframes pipeline-stuck {
-                    0% { top: -8px; opacity: 0; }
-                    14% { opacity: 1; }
-                    58% { top: calc(100% - 8px); opacity: 1; }
-                    100% { top: calc(100% - 8px); opacity: 0.9; }
+                .pipeline-bead-1 {
+                    width: 6px;
+                    height: 6px;
+                    background: #a7f3d0;
+                    box-shadow: 0 0 8px rgba(52, 211, 153, 0.75);
                 }
-                .pipeline-stuck {
-                    animation: pipeline-stuck 2.4s ease-in-out infinite;
+                .pipeline-bead-2 {
+                    width: 4px;
+                    height: 4px;
+                    background: #34d399;
+                    box-shadow: 0 0 6px rgba(16, 185, 129, 0.55);
+                }
+                @keyframes pipeline-halt {
+                    0% { top: -8px; opacity: 0; transform: translateX(-50%) scale(0.6); }
+                    16% { opacity: 1; transform: translateX(-50%) scale(1); }
+                    72% { top: var(--pipeline-end); opacity: 1; transform: translateX(-50%) scale(1); }
+                    100% { top: var(--pipeline-end); opacity: 1; transform: translateX(-50%) scale(1.2); }
+                }
+                @keyframes pipeline-halt-glow {
+                    0%, 100% { box-shadow: 0 0 10px rgba(251, 113, 133, 0.85), 0 0 0 0 rgba(251, 113, 133, 0.45); }
+                    50% { box-shadow: 0 0 16px rgba(251, 113, 133, 0.45), 0 0 0 7px rgba(251, 113, 133, 0); }
+                }
+                .pipeline-halt {
+                    width: 8px;
+                    height: 8px;
+                    background: #ffe4e6;
+                    animation:
+                        pipeline-halt 1.7s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+                        pipeline-halt-glow 1.8s ease-in-out 1.7s infinite;
+                }
+                @keyframes pipeline-halt-ring {
+                    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.35); }
+                    55% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                    100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+                }
+                @keyframes pipeline-halt-breathe {
+                    0%, 100% { opacity: 0.55; box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.4); }
+                    50% { opacity: 1; box-shadow: 0 0 12px rgba(251, 113, 133, 0.35), 0 0 0 6px rgba(251, 113, 133, 0); }
+                }
+                .pipeline-halt-ring {
+                    animation:
+                        pipeline-halt-ring 1.7s ease-out forwards,
+                        pipeline-halt-breathe 2s ease-in-out 1.7s infinite;
                 }
                 @keyframes node-hold-error {
-                    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.55); }
-                    50% { box-shadow: 0 0 0 5px rgba(244, 63, 94, 0); }
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.45), 0 0 12px rgba(244, 63, 94, 0.35); }
+                    50% { box-shadow: 0 0 0 6px rgba(244, 63, 94, 0), 0 0 18px rgba(244, 63, 94, 0.15); }
                 }
-                .node-hold-error { animation: node-hold-error 1.8s ease-in-out infinite; }
-                @keyframes node-hold-idle {
-                    0%, 100% { box-shadow: 0 0 0 0 rgba(148, 163, 184, 0.75); }
-                    50% { box-shadow: 0 0 0 5px rgba(148, 163, 184, 0); }
-                }
-                .node-hold-idle { animation: node-hold-idle 2.2s ease-in-out infinite; }
+                .node-hold-error { animation: node-hold-error 2s ease-in-out infinite; }
                 @keyframes pipeline-bar {
                     0% { transform: translateX(-60%); }
                     100% { transform: translateX(220%); }
@@ -392,20 +478,30 @@ const KardexProgressPanel = ({
                     animation: pipeline-bar 1.2s ease-in-out infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
-                    .pipeline-flow, .pipeline-flow-late, .pipeline-flow-slow, .pipeline-stuck,
-                    .node-hold-error, .node-hold-idle { animation: none; opacity: 0; }
+                    .pipeline-run, .pipeline-halt, .pipeline-halt-ring, .node-hold-error { animation: none; opacity: 0; }
                     .pipeline-bar-loading { animation: none; }
                 }
             `}</style>
 
-            <div className="border-b border-slate-200 px-4 py-3">
+            <div className="border-b border-slate-800 bg-slate-900/80 px-4 py-3">
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                            Avance del kardex
+                        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-300/80">
+                            Pipeline
                         </p>
-                        <p className="mt-1 truncate text-sm font-semibold text-slate-900">{kardex}</p>
-                        <p className={`mt-1 text-xs font-semibold ${summaryClass}`}>{summary}</p>
+                        <p className="mt-1 truncate font-mono text-sm font-semibold text-white">{kardex}</p>
+                        <span className={`mt-2 inline-flex rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${runClass}`}>
+                            {summary}
+                        </span>
+                        <p className={`mt-1 text-[11px] ${summaryClass}`}>
+                            {loading
+                                ? "Revisando etapas"
+                                : errorCount > 0
+                                  ? `${errorCount} error${errorCount === 1 ? "" : "es"}`
+                                  : warningCount > 0
+                                    ? `${warningCount} aviso${warningCount === 1 ? "" : "s"}`
+                                    : `${stagesDone} de ${stageTotal} etapas`}
+                        </p>
                     </div>
                     {onRefresh && (
                         <button
@@ -413,7 +509,7 @@ const KardexProgressPanel = ({
                             onClick={refresh}
                             disabled={refreshing || loading}
                             title="Actualizar avance"
-                            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1.5 font-mono text-[10px] font-semibold text-slate-200 transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} aria-hidden />
                             Actualizar
@@ -422,15 +518,15 @@ const KardexProgressPanel = ({
                 </div>
 
                 <div className="mt-3">
-                    <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-slate-500">
+                    <div className="mb-1 flex items-center justify-between font-mono text-[10px] font-medium text-slate-400">
                         <span>
                             {loading
-                                ? "Comprobando"
-                                : `${stagesDone} de ${stageTotal} etapas${errorCount > 0 ? ` · ${errorCount} error${errorCount === 1 ? "" : "es"}` : ""}`}
+                                ? "Revisando"
+                                : `${stagesDone}/${stageTotal} etapas`}
                         </span>
-                        <span className="tabular-nums">{loading ? "" : `${percent}%`}</span>
+                        <span className="tabular-nums text-slate-200">{loading ? "" : `${percent}%`}</span>
                     </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
                         {loading ? (
                             <div className={`pipeline-bar-loading h-full rounded-full ${barClass}`} />
                         ) : (
@@ -447,18 +543,20 @@ const KardexProgressPanel = ({
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
                 {isError && !data && (
-                    <p className="py-6 text-center text-xs text-rose-600">
+                    <p className="py-6 text-center text-xs text-rose-300">
                         No se pudieron cargar las incidencias.
                     </p>
                 )}
                 {!isError && (
-                    <ol>
-                        <PipelineList steps={steps} complete={!loading && complete} />
-                    </ol>
+                    <PipelineTrack
+                        steps={steps}
+                        running={!loading && (complete || findFirstErrorId(steps) != null)}
+                        stopId={loading || complete ? null : findFirstErrorId(steps)}
+                    />
                 )}
                 {!loading && unmatched.length > 0 && (
-                    <div className="mt-2 border-t border-slate-200 pt-3">
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                    <div className="mt-2 border-t border-slate-800 pt-3">
+                        <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                             Otras incidencias
                         </p>
                         <ul className="mt-2 space-y-1">
@@ -466,7 +564,7 @@ const KardexProgressPanel = ({
                                 <li
                                     key={issue.text}
                                     className={`whitespace-normal break-words text-[11px] leading-snug ${
-                                        issue.level === "error" ? "text-rose-700" : "text-amber-800"
+                                        issue.level === "error" ? "text-rose-200" : "text-amber-200"
                                     }`}
                                 >
                                     {issue.text}
@@ -477,18 +575,18 @@ const KardexProgressPanel = ({
                 )}
             </div>
 
-            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-slate-200 px-4 py-2 text-[10px] text-slate-500">
+            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-slate-800 bg-slate-900/70 px-4 py-2 font-mono text-[10px] text-slate-400">
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" /> Listo
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" /> Listo
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-amber-500" /> Aviso
+                    <span className="h-2 w-2 rounded-full bg-amber-400" /> Aviso
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-rose-500" /> Error
+                    <span className="h-2 w-2 rounded-full bg-rose-400" /> Falló
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full border border-slate-300 bg-white" /> Sin iniciar
+                    <span className="h-2 w-2 rounded-full border border-slate-500 bg-slate-900" /> En cola
                 </span>
             </div>
         </aside>
