@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore";
 import useAuthStore from "../../../store/useAuthStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { invalidateComplianceQueries } from "../../../hooks/compliance/invalidateComplianceQueries";
 
 interface Props {
     kardex: Kardex
@@ -16,6 +18,7 @@ const UpdateDocumento = ({ kardex }: Props) => {
     const [isLoading, setIsLoading] = useState(false);
     const { setMessage, setShow, setType } = useNotificationsStore();
     const access = useAuthStore((s) => s.access_token) || ''
+    const queryClient = useQueryClient()
 
     const handleDownloadUpdatedDocument = async () => {
         const mode = 'download';
@@ -60,6 +63,7 @@ const UpdateDocumento = ({ kardex }: Props) => {
                 setType('success');
                 setMessage('Documento actualizado correctamente');
                 setShow(true);
+                void invalidateComplianceQueries(queryClient);
                 try {
                     await handleDownloadUpdatedDocument();
                 } catch (downloadError) {

@@ -3,6 +3,7 @@ import useAuthStore from "../../../store/useAuthStore"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
+import { invalidateComplianceQueries } from "../../../hooks/compliance/invalidateComplianceQueries"
 
 interface Props {
   kardex: string
@@ -27,6 +28,7 @@ const ParticipaGenerate = ({ kardex, item }: Props) => {
     })
     .then(() => {
       queryClient.invalidateQueries({ queryKey: ['contratantesPorActoByKardex', kardex] })
+      void invalidateComplianceQueries(queryClient)
     })
     .catch(err => {
       console.log(err)

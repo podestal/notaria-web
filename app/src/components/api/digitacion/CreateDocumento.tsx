@@ -2,6 +2,7 @@ import axios from "axios";
 import { Kardex } from "../../../services/api/kardexService";
 import useAuthStore from "../../../store/useAuthStore";
 import { useQueryClient } from "@tanstack/react-query";
+import { invalidateComplianceQueries } from "../../../hooks/compliance/invalidateComplianceQueries";
 import ExplanationMessage from "../../ui/ExplanationMessage";
 import { useState } from "react";
 import TopModal from "../../ui/TopModal";
@@ -53,6 +54,7 @@ const CreateDocumento = ({ kardex, hasExistingDocument = false }: Props) => {
         link.click();
         document.body.removeChild(link);
         setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+        void invalidateComplianceQueries(queryClient);
 
       } catch (error) {
         console.error('Error opening Word document:', error);

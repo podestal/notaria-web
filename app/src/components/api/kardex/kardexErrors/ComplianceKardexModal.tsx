@@ -3,10 +3,6 @@ import PreKardexForm from "../../reportes/registrosUif/PreKardexForm"
 import useGetComplianceKardexErrors from "../../../../hooks/compliance/useGetComplianceKardexErrors"
 import useAuthStore from "../../../../store/useAuthStore"
 import ComplianceKardexErrorsPanel from "./ComplianceKardexErrorsPanel"
-import { useEffect } from "react"
-import { useQueryClient } from "@tanstack/react-query"
-import { invalidateComplianceQueries } from "../../../../hooks/compliance/invalidateComplianceQueries"
-
 interface Props {
     isOpen: boolean
     onClose: () => void
@@ -16,21 +12,6 @@ interface Props {
 
 const ComplianceKardexModal = ({ isOpen, onClose, idkardex, kardex }: Props) => {
     const access = useAuthStore((s) => s.access_token) || ""
-    const queryClient = useQueryClient()
-
-    useEffect(() => {
-        if (!isOpen) return
-
-        return queryClient.getMutationCache().subscribe((event) => {
-            if (
-                event.type === "updated" &&
-                event.action.type === "success" &&
-                event.mutation.state.status === "success"
-            ) {
-                void invalidateComplianceQueries(queryClient)
-            }
-        })
-    }, [isOpen, queryClient])
 
     const {
         data,

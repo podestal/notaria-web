@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import axios from "axios"
 import { AnimatePresence, motion } from "framer-motion"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import useAuthStore from "../../../store/useAuthStore"
@@ -18,6 +19,7 @@ import CreateRepresentante from "../representantes/CreateRepresentante"
 import { UpdateContratanteData } from "../../../hooks/api/contratantes/useUpdateContratante"
 import { Cliente2 } from "../../../services/api/clienteService"
 import useGetCliente2ByContratante from "../../../hooks/api/cliente2/useGetCliente2ByContratante"
+import { SESSION_EXPIRED_MESSAGE } from "../../../services/http/tokenRefresh"
 
 interface Props {
     cliente1: Cliente | null
@@ -34,6 +36,40 @@ interface Props {
     contratante?: Contratante
     selectedTipoPersona: number
     onRegisterCloseGuard?: (guard: () => boolean) => void
+}
+
+const PHONE_SAVE_MESSAGE =
+    "No se pudo crear el contratante porque el cliente no tiene teléfono fijo ni celular. Registre al menos uno en la ficha del cliente."
+
+const isSessionFailure = (error: unknown) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) return true
+    if (axios.isCancel(error)) return /sesi[oó]n/i.test(error.message || "")
+    return error instanceof Error && /sesi[oó]n expir/i.test(error.message)
+}
+
+const apiErrorText = (error: unknown): string => {
+    if (!axios.isAxiosError(error)) return ""
+    const data = error.response?.data
+    if (typeof data === "string") return data
+    if (!data || typeof data !== "object") return ""
+    const record = data as Record<string, unknown>
+    const pieces: string[] = []
+    const push = (value: unknown) => {
+        if (typeof value === "string" && value.trim()) pieces.push(value.trim())
+        else if (Array.isArray(value)) value.forEach(push)
+        else if (value && typeof value === "object") Object.values(value as Record<string, unknown>).forEach(push)
+    }
+    if ("error" in record) push(record.error)
+    else Object.values(record).forEach(push)
+    return [...new Set(pieces)].join(" ")
+}
+
+const contratanteSaveError = (error: unknown, fallback: string) => {
+    if (isSessionFailure(error)) return SESSION_EXPIRED_MESSAGE
+    const text = apiErrorText(error)
+    if (/tel[eé]fono fijo|telcel|informaci[oó]n de contacto/i.test(text)) return PHONE_SAVE_MESSAGE
+    if (text && !text.trim().startsWith("<") && text.length < 400) return text
+    return fallback
 }
 
 const representationOptions = [
@@ -393,8 +429,8 @@ const ContratantesForm = ({
                         setClientesCheck(false)
                         setCloseUpdateContratante?.(false)
                     },
-                    onError: () => {
-                        notify("error", "Error al actualizar el contratante. Por favor, inténtelo de nuevo.")
+                    onError: (error) => {
+                        notify("error", contratanteSaveError(error, "Error al actualizar el contratante. Por favor, inténtelo de nuevo."))
                     },
                 }
             )
@@ -413,8 +449,8 @@ const ContratantesForm = ({
                         setShowClienteForm(false)
                         setClientesCheck(false)
                     },
-                    onError: () => {
-                        notify("error", "Error al crear el contratante. Por favor, inténtelo de nuevo.")
+                    onError: (error) => {
+                        notify("error", contratanteSaveError(error, "Error al crear el contratante. Por favor, inténtelo de nuevo."))
                     },
                 }
             )
