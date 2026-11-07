@@ -20,7 +20,7 @@ const useGetKardexListProgress = ({
         queryKey: ["compliance", "kardex", "progress", keys.join(",")],
         queryFn: () => getKardexListProgress(access, keys),
         enabled: enabled && keys.length > 0,
-        staleTime: 60_000,
+        staleTime: 120_000,
         refetchOnWindowFocus: false,
     })
 }
