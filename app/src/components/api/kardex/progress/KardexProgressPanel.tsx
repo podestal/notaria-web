@@ -28,23 +28,23 @@ interface Props {
 }
 
 const LINE: Record<ProgressStatus, string> = {
-    done: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
-    warning: "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]",
-    error: "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]",
-    idle: "bg-slate-600",
+    done: "bg-emerald-400",
+    warning: "bg-amber-400",
+    error: "bg-rose-400",
+    idle: "bg-slate-200",
 }
 
 const NODE: Record<ProgressStatus, string> = {
-    done: "border-emerald-400 bg-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.55)]",
-    warning: "border-amber-300 bg-amber-500 text-white shadow-[0_0_12px_rgba(245,158,11,0.5)]",
-    error: "border-rose-300 bg-rose-500 text-white shadow-[0_0_14px_rgba(244,63,94,0.7)]",
-    idle: "border-slate-500 bg-slate-900 text-slate-400",
+    done: "border-emerald-500 bg-emerald-500 text-white shadow-sm shadow-emerald-200",
+    warning: "border-amber-500 bg-amber-500 text-white shadow-sm shadow-amber-200",
+    error: "border-rose-500 bg-rose-500 text-white shadow-sm shadow-rose-200",
+    idle: "border-slate-300 bg-white text-slate-400 shadow-sm",
 }
 
 const LABEL: Record<ProgressStatus, string> = {
-    done: "text-emerald-300",
-    warning: "text-amber-300",
-    error: "text-rose-300",
+    done: "text-emerald-700",
+    warning: "text-amber-700",
+    error: "text-rose-700",
     idle: "text-slate-400",
 }
 
@@ -56,10 +56,10 @@ const STATUS_LABEL: Record<ProgressStatus, string> = {
 }
 
 const CARD: Record<ProgressStatus, string> = {
-    done: "border-emerald-400/30 bg-emerald-400/10",
-    warning: "border-amber-400/30 bg-amber-400/10",
-    error: "border-rose-400/40 bg-rose-500/15",
-    idle: "border-slate-600/80 bg-slate-800/40",
+    done: "border-emerald-200 bg-emerald-50",
+    warning: "border-amber-200 bg-amber-50",
+    error: "border-rose-200 bg-rose-50",
+    idle: "border-slate-200 bg-white",
 }
 
 const isBlocked = (status: ProgressStatus) => status === "error" || status === "idle"
@@ -89,7 +89,7 @@ const NodeIcon = ({ status }: { status: ProgressStatus }) => {
 }
 
 const Connector = ({ status }: { status: ProgressStatus }) => (
-    <div className="relative mt-1 w-0.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+    <div className="relative mt-1 w-0.5 flex-1 overflow-hidden rounded-full bg-slate-200">
         <motion.div
             className={`absolute inset-x-0 top-0 origin-top ${LINE[status]}`}
             initial={{ height: 0 }}
@@ -145,10 +145,10 @@ const StepRow = ({
                 <div className={`min-w-0 flex-1 ${isLast ? "pb-1" : "pb-3"}`}>
                     <div className={`rounded-lg border px-2.5 py-2 ${waiting ? CARD.idle : CARD[step.status]}`}>
                         <div className="flex items-center justify-between gap-2">
-                            <p className={`truncate font-semibold text-slate-100 ${nested ? "text-[13px]" : "text-sm"}`}>
+                            <p className={`truncate font-semibold text-slate-800 ${nested ? "text-[13px]" : "text-sm"}`}>
                                 {step.label}
                             </p>
-                            <span className={`shrink-0 font-mono text-[10px] font-semibold uppercase tracking-wider ${waiting ? "text-slate-500" : LABEL[step.status]}`}>
+                            <span className={`shrink-0 font-mono text-[10px] font-semibold uppercase tracking-wider ${waiting ? "text-slate-400" : LABEL[step.status]}`}>
                                 {waiting ? "En cola" : STATUS_LABEL[step.status]}
                             </span>
                         </div>
@@ -156,7 +156,7 @@ const StepRow = ({
                             <p
                                 key={`${issue.source ?? ""}-${issue.text}`}
                                 className={`mt-1 whitespace-normal break-words text-[11px] leading-snug ${
-                                    issue.level === "error" ? "text-rose-200" : "text-amber-200"
+                                    issue.level === "error" ? "text-rose-700" : "text-amber-800"
                                 }`}
                             >
                                 {issue.source ? (
@@ -368,42 +368,40 @@ const KardexProgressPanel = ({
     const stopped = !complete && steps.some((step) => isBlocked(step.status))
 
     let summary = "En cola"
-    let summaryClass = "text-slate-400"
-    let barClass = "bg-slate-500"
-    let runClass = "border-slate-600 bg-slate-800 text-slate-300"
+    let summaryClass = "text-slate-500"
+    let barClass = "bg-slate-300"
+    let runClass = "border-slate-200 bg-slate-100 text-slate-600"
     if (loading) {
         summary = "En curso"
-        summaryClass = "text-sky-300"
+        summaryClass = "text-sky-700"
         barClass = "bg-sky-400"
-        runClass = "border-sky-400/40 bg-sky-400/15 text-sky-200"
+        runClass = "border-sky-200 bg-sky-50 text-sky-700"
     } else if (isError) {
         summary = "Falló"
-        summaryClass = "text-rose-300"
+        summaryClass = "text-rose-600"
         barClass = "bg-rose-400"
-        runClass = "border-rose-400/40 bg-rose-500/15 text-rose-200"
+        runClass = "border-rose-200 bg-rose-50 text-rose-700"
     } else if (complete) {
         summary = warningCount > 0 ? "Listo con avisos" : "Listo"
-        summaryClass = "text-emerald-300"
-        barClass = "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
-        runClass = "border-emerald-400/40 bg-emerald-400/15 text-emerald-200"
+        summaryClass = "text-emerald-700"
+        barClass = "bg-emerald-500"
+        runClass = "border-emerald-200 bg-emerald-50 text-emerald-700"
     } else if (errorCount > 0 || stopped) {
         summary = "Incompleto"
-        summaryClass = errorCount > 0 ? "text-rose-300" : "text-slate-300"
-        barClass = errorCount > 0
-            ? "bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.75)]"
-            : "bg-slate-400"
+        summaryClass = errorCount > 0 ? "text-rose-600" : "text-slate-600"
+        barClass = errorCount > 0 ? "bg-rose-500" : "bg-slate-400"
         runClass = errorCount > 0
-            ? "border-rose-400/40 bg-rose-500/15 text-rose-200"
-            : "border-slate-500 bg-slate-800 text-slate-300"
+            ? "border-rose-200 bg-rose-50 text-rose-700"
+            : "border-slate-200 bg-slate-100 text-slate-600"
     } else if (percent > 0) {
         summary = "En curso"
-        summaryClass = "text-emerald-300"
-        barClass = "bg-emerald-400"
-        runClass = "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+        summaryClass = "text-emerald-700"
+        barClass = "bg-emerald-500"
+        runClass = "border-emerald-200 bg-emerald-50 text-emerald-700"
     }
 
     return (
-        <aside className="keep-dark flex h-full min-h-0 w-full flex-col overflow-hidden border-slate-800 bg-slate-950 text-slate-200 lg:border-r">
+        <aside className="flex h-full min-h-0 w-full flex-col overflow-hidden border-slate-200 bg-slate-50 text-slate-700 lg:border-r">
             <style>{`
                 @keyframes pipeline-run {
                     0% { top: -8px; opacity: 0; transform: translateX(-50%) scale(0.55); }
@@ -418,20 +416,20 @@ const KardexProgressPanel = ({
                 .pipeline-bead {
                     width: 8px;
                     height: 8px;
-                    background: #fff;
-                    box-shadow: 0 0 10px rgba(167, 243, 208, 0.95), 0 0 2px #fff;
+                    background: #10b981;
+                    box-shadow: 0 0 8px rgba(16, 185, 129, 0.55);
                 }
                 .pipeline-bead-1 {
                     width: 6px;
                     height: 6px;
-                    background: #a7f3d0;
-                    box-shadow: 0 0 8px rgba(52, 211, 153, 0.75);
+                    background: #34d399;
+                    box-shadow: 0 0 6px rgba(52, 211, 153, 0.45);
                 }
                 .pipeline-bead-2 {
                     width: 4px;
                     height: 4px;
-                    background: #34d399;
-                    box-shadow: 0 0 6px rgba(16, 185, 129, 0.55);
+                    background: #6ee7b7;
+                    box-shadow: 0 0 4px rgba(110, 231, 183, 0.4);
                 }
                 @keyframes pipeline-halt {
                     0% { top: -8px; opacity: 0; transform: translateX(-50%) scale(0.6); }
@@ -440,13 +438,13 @@ const KardexProgressPanel = ({
                     100% { top: var(--pipeline-end); opacity: 1; transform: translateX(-50%) scale(1.2); }
                 }
                 @keyframes pipeline-halt-glow {
-                    0%, 100% { box-shadow: 0 0 10px rgba(251, 113, 133, 0.85), 0 0 0 0 rgba(251, 113, 133, 0.45); }
-                    50% { box-shadow: 0 0 16px rgba(251, 113, 133, 0.45), 0 0 0 7px rgba(251, 113, 133, 0); }
+                    0%, 100% { box-shadow: 0 0 8px rgba(244, 63, 94, 0.55), 0 0 0 0 rgba(244, 63, 94, 0.35); }
+                    50% { box-shadow: 0 0 12px rgba(244, 63, 94, 0.35), 0 0 0 6px rgba(244, 63, 94, 0); }
                 }
                 .pipeline-halt {
                     width: 8px;
                     height: 8px;
-                    background: #ffe4e6;
+                    background: #fb7185;
                     animation:
                         pipeline-halt 1.7s cubic-bezier(0.16, 1, 0.3, 1) forwards,
                         pipeline-halt-glow 1.8s ease-in-out 1.7s infinite;
@@ -457,8 +455,8 @@ const KardexProgressPanel = ({
                     100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
                 }
                 @keyframes pipeline-halt-breathe {
-                    0%, 100% { opacity: 0.55; box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.4); }
-                    50% { opacity: 1; box-shadow: 0 0 12px rgba(251, 113, 133, 0.35), 0 0 0 6px rgba(251, 113, 133, 0); }
+                    0%, 100% { opacity: 0.45; box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.3); }
+                    50% { opacity: 1; box-shadow: 0 0 10px rgba(244, 63, 94, 0.25), 0 0 0 5px rgba(244, 63, 94, 0); }
                 }
                 .pipeline-halt-ring {
                     animation:
@@ -466,8 +464,8 @@ const KardexProgressPanel = ({
                         pipeline-halt-breathe 2s ease-in-out 1.7s infinite;
                 }
                 @keyframes node-hold-error {
-                    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.45), 0 0 12px rgba(244, 63, 94, 0.35); }
-                    50% { box-shadow: 0 0 0 6px rgba(244, 63, 94, 0), 0 0 18px rgba(244, 63, 94, 0.15); }
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+                    50% { box-shadow: 0 0 0 5px rgba(244, 63, 94, 0); }
                 }
                 .node-hold-error { animation: node-hold-error 2s ease-in-out infinite; }
                 @keyframes pipeline-bar {
@@ -484,13 +482,13 @@ const KardexProgressPanel = ({
                 }
             `}</style>
 
-            <div className="border-b border-slate-800 bg-slate-900/80 px-4 py-3">
+            <div className="border-b border-slate-200 bg-white px-4 py-3">
                 <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-300/80">
+                        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-600">
                             Pipeline
                         </p>
-                        <p className="mt-1 truncate font-mono text-sm font-semibold text-white">{kardex}</p>
+                        <p className="mt-1 truncate font-mono text-sm font-semibold text-slate-900">{kardex}</p>
                         <span className={`mt-2 inline-flex rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${runClass}`}>
                             {summary}
                         </span>
@@ -510,7 +508,7 @@ const KardexProgressPanel = ({
                             onClick={refresh}
                             disabled={refreshing || loading}
                             title="Actualizar avance"
-                            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1.5 font-mono text-[10px] font-semibold text-slate-200 transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 font-mono text-[10px] font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} aria-hidden />
                             Actualizar
@@ -519,15 +517,15 @@ const KardexProgressPanel = ({
                 </div>
 
                 <div className="mt-3">
-                    <div className="mb-1 flex items-center justify-between font-mono text-[10px] font-medium text-slate-400">
+                    <div className="mb-1 flex items-center justify-between font-mono text-[10px] font-medium text-slate-500">
                         <span>
                             {loading
                                 ? "Revisando"
                                 : `${stagesDone}/${stageTotal} etapas`}
                         </span>
-                        <span className="tabular-nums text-slate-200">{loading ? "" : `${percent}%`}</span>
+                        <span className="tabular-nums text-slate-700">{loading ? "" : `${percent}%`}</span>
                     </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
                         {loading ? (
                             <div className={`pipeline-bar-loading h-full rounded-full ${barClass}`} />
                         ) : (
@@ -544,7 +542,7 @@ const KardexProgressPanel = ({
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
                 {isError && !data && (
-                    <p className="py-6 text-center text-xs text-rose-300">
+                    <p className="py-6 text-center text-xs text-rose-600">
                         No se pudieron cargar las incidencias.
                     </p>
                 )}
@@ -556,8 +554,8 @@ const KardexProgressPanel = ({
                     />
                 )}
                 {!loading && unmatched.length > 0 && (
-                    <div className="mt-2 border-t border-slate-800 pt-3">
-                        <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                    <div className="mt-2 border-t border-slate-200 pt-3">
+                        <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                             Otras incidencias
                         </p>
                         <ul className="mt-2 space-y-1">
@@ -565,7 +563,7 @@ const KardexProgressPanel = ({
                                 <li
                                     key={issue.text}
                                     className={`whitespace-normal break-words text-[11px] leading-snug ${
-                                        issue.level === "error" ? "text-rose-200" : "text-amber-200"
+                                        issue.level === "error" ? "text-rose-700" : "text-amber-800"
                                     }`}
                                 >
                                     {issue.text}
@@ -576,18 +574,18 @@ const KardexProgressPanel = ({
                 )}
             </div>
 
-            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-slate-800 bg-slate-900/70 px-4 py-2 font-mono text-[10px] text-slate-400">
+            <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-slate-200 bg-white px-4 py-2 font-mono text-[10px] text-slate-500">
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" /> Listo
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" /> Listo
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-amber-400" /> Aviso
+                    <span className="h-2 w-2 rounded-full bg-amber-500" /> Aviso
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-rose-400" /> Falló
+                    <span className="h-2 w-2 rounded-full bg-rose-500" /> Falló
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full border border-slate-500 bg-slate-900" /> En cola
+                    <span className="h-2 w-2 rounded-full border border-slate-300 bg-white" /> En cola
                 </span>
             </div>
         </aside>
