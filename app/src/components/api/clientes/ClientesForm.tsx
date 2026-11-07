@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { UserRoundSearch } from "lucide-react"
 import SimpleInput from "../../ui/SimpleInput"
 import SimpleSelector from "../../ui/SimpleSelector"
 import SearchableDropdownInput from "../../ui/SearchableDropdownInput"
@@ -19,7 +20,13 @@ import useAuthStore from "../../../store/useAuthStore"
 import ClienteMarriedMain from "./married/ClienteMarriedMain"
 import TopModal from "../../ui/TopModal"
 import ExplanationMessage from "../../ui/ExplanationMessage"
-import ClienteContratanteFormLayout, { clienteFormBackButtonClass } from "./shared/ClienteContratanteFormLayout"
+import ClienteContratanteFormLayout, {
+    ClienteDropdownField,
+    ClienteFormSection,
+    clienteFormActionButtonClass,
+    clienteFormBackButtonClass,
+    clienteFormPrimaryButtonClass,
+} from "./shared/ClienteContratanteFormLayout"
 import {
     hasNoLetters,
     isRequiredTextMissing,
@@ -820,7 +827,7 @@ const ClientesForm = ({
             <button type="button" onClick={handleBackToContratante} className={clienteFormBackButtonClass}>
                 Volver al contratante
             </button>
-            <button type="button" onClick={handleSubmit} className={clienteFormBackButtonClass}>
+            <button type="button" onClick={handleSubmit} className={clienteFormPrimaryButtonClass}>
                 {cliente1 ? "Actualizar cliente" : "Crear cliente"}
             </button>
         </>
@@ -833,221 +840,236 @@ const ClientesForm = ({
         onBack={handleBackToContratante}
         footer={clienteFormFooter}
     >
-    <div className="space-y-4">
-        {selectedTipoPersona === 1 && 
+        {selectedTipoPersona === 1 && (
         <>
-        <div className="flex justify-end">
-            <button
-                type="button"
-                onClick={handleReniec}
-                className={clienteFormBackButtonClass}
-            >
-                Consulta Reniec
-            </button>
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <SimpleInput 
-                label="Apellido Paterno"
-                value={apepat}
-                setValue={setApepat}
-                horizontal={true}
-                required={true}
-                error={apepatError}
-                setError={setApepatError}
-            />
-            <SimpleInput 
-                label="Apellido Materno"
-                value={apemat}
-                setValue={(val) => setApemat(sanitizeNameInput(val))}
-                horizontal={true}
-                error={apematError}
-                setError={setApematError}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleInput 
-                label="Primer Nombre"
-                value={prinom}
-                setValue={setPrinom}
-                horizontal={true}
-                required
-                error={prinomError}
-                setError={setPrinomError}
-            />
-            <SimpleInput 
-                label="Segundo Nombre"
-                value={segnom}
-                setValue={setSegnom}
-                horizontal={true}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <SimpleInput 
-                label="Dirección"
-                value={direccion}
-                setValue={setDireccion}
-                horizontal={true}
-                required
-                error={direccionError}
-                setError={setDireccionError}
-            />
-            <div className="w-full flex justify-center items-center gap-4 col-span-2">
-                <p className="pl-2 block text-xs font-semibold text-slate-700">Ubigeo</p>
-                <SearchableDropdownInput
-                    options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
-                    selected={ubigeo}
-                    setSelected={setUbigeo}
-                    placeholder="Buscar Ubigeo"
+        <ClienteFormSection
+            title="Datos personales"
+            action={
+                <button
+                    type="button"
+                    onClick={handleReniec}
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500"
+                >
+                    <UserRoundSearch className="h-4 w-4" aria-hidden />
+                    Consulta RENIEC
+                </button>
+            }
+        >
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                <SimpleInput
+                    label="Apellido Paterno"
+                    value={apepat}
+                    setValue={setApepat}
                     required
-                    error={ubigeoError}
-                    setError={setUbigeoError}
+                    error={apepatError}
+                    setError={setApepatError}
+                    fullWidth
+                />
+                <SimpleInput
+                    label="Apellido Materno"
+                    value={apemat}
+                    setValue={(val) => setApemat(sanitizeNameInput(val))}
+                    error={apematError}
+                    setError={setApematError}
+                    fullWidth
+                />
+                <SimpleInput
+                    label="Primer Nombre"
+                    value={prinom}
+                    setValue={setPrinom}
+                    required
+                    error={prinomError}
+                    setError={setPrinomError}
+                    fullWidth
+                />
+                <SimpleInput
+                    label="Segundo Nombre"
+                    value={segnom}
+                    setValue={setSegnom}
+                    fullWidth
                 />
             </div>
+        </ClienteFormSection>
 
-        </div>
-        <div className="w-full grid grid-cols-2 gap-6 mb-6">
-            {!noCivilStatus && <SimpleSelector 
-                label="Estado Civil"
-                setter={setCivilStatus}
-                options={civilStatusOptions}
-                horizontal={true}
-                required
-                error={civilStatusError}
-                setError={setCivilStatusError}
-                defaultValue={civilStatus}
-            />}
-            <SimpleSelector 
-                label="Sexo"
-                setter={setGender}
-                defaultValue={gender}
-                options={sexOptions}
-                horizontal={true}
-                required
-                error={genderError}
-                setError={setGenderError}
-            />
-        </div>
-        {(civilStatus === 2 || civilStatus === 5) && cliente1 &&
-        <ClienteMarriedMain 
-            cliente1={cliente1}
-            setConyuge={setConyuge}
-            setConyugeMarried={setConyugeMarried}
-        />}
-        <div className="grid grid-cols-3 items-center gap-6 mb-6">
-            <div className="w-full flex justify-center items-center gap-4 col-span-2">
-                <p className="pl-2 block text-xs font-semibold text-slate-700">Nacionalidad</p>
-                <SearchableDropdownInput
-                    options={[...nacionalidades.map(nat => ({ id: (nat.idnacionalidad).toString(), label: nat.descripcion }))]}
-                    selected={nationality}
-                    setSelected={setNationality}
-                    placeholder="Buscar nacionalidad"
+        <ClienteFormSection title="Ubicación">
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                <SimpleInput
+                    label="Dirección"
+                    value={direccion}
+                    setValue={setDireccion}
                     required
-                    error={nationalityError}
-                    setError={setNationalityError}
+                    error={direccionError}
+                    setError={setDireccionError}
+                    fullWidth
+                />
+                <ClienteDropdownField label="Ubigeo" required error={ubigeoError}>
+                    <SearchableDropdownInput
+                        options={ubigeos.map((ubi) => ({
+                            id: ubi.coddis,
+                            label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}`,
+                        }))}
+                        selected={ubigeo}
+                        setSelected={setUbigeo}
+                        placeholder="Buscar ubigeo"
+                        required
+                        error={ubigeoError}
+                        setError={setUbigeoError}
+                    />
+                </ClienteDropdownField>
+            </div>
+        </ClienteFormSection>
+
+        <ClienteFormSection title="Identidad">
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                {!noCivilStatus && (
+                    <SimpleSelector
+                        label="Estado Civil"
+                        setter={setCivilStatus}
+                        options={civilStatusOptions}
+                        required
+                        error={civilStatusError}
+                        setError={setCivilStatusError}
+                        defaultValue={civilStatus}
+                    />
+                )}
+                <SimpleSelector
+                    label="Sexo"
+                    setter={setGender}
+                    defaultValue={gender}
+                    options={sexOptions}
+                    required
+                    error={genderError}
+                    setError={setGenderError}
+                />
+                <ClienteDropdownField label="Nacionalidad" required error={nationalityError}>
+                    <SearchableDropdownInput
+                        options={nacionalidades.map((nat) => ({
+                            id: nat.idnacionalidad.toString(),
+                            label: nat.descripcion,
+                        }))}
+                        selected={nationality}
+                        setSelected={setNationality}
+                        placeholder="Buscar nacionalidad"
+                        required
+                        error={nationalityError}
+                        setError={setNationalityError}
+                    />
+                </ClienteDropdownField>
+                <SimpleSelector
+                    label="Residente"
+                    setter={setResident}
+                    defaultValue={resident}
+                    options={[
+                        { value: 1, label: "Sí" },
+                        { value: 0, label: "No" },
+                    ]}
+                    required
+                />
+                <SimpleInput
+                    label="Natural de"
+                    value={naturalFrom}
+                    setValue={setNaturalFrom}
+                    fullWidth
+                />
+                <DateInput
+                    label="Fecha de Nacimiento"
+                    value={birthdate}
+                    setValue={setBirthdate}
+                    required
+                    error={birthdateError}
+                    setError={setBirthdateError}
                 />
             </div>
-            <SimpleSelector 
-                label="Residente"
-                setter={setResident}
-                defaultValue={resident}
-                options={[
-                    { value: 1, label: 'Sí' },
-                    { value: 0, label: 'No' }
-                ]}
-                horizontal={true}
-                required
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleInput 
-                label="Natural de"
-                value={naturalFrom}
-                setValue={setNaturalFrom}
-                horizontal={true}
-            />
-            <DateInput 
-                label="Fecha de Nacimiento"
-                value={birthdate}
-                setValue={setBirthdate}
-                required
-                error={birthdateError}
-                setError={setBirthdateError}
-                horizontal
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <div className="w-full flex justify-center items-center gap-4 col-span-2">
-                <p className="pl-2 block text-xs font-semibold text-slate-700">Profesión</p>
-                <SearchableDropdownInput
-                    options={[...profesiones.map(prof => ({ id: (prof.idprofesion).toString(), label: prof.desprofesion }))]}
-                    selected={profesion}
-                    setSelected={setProfesion}
-                    onInputChange={setProfesionInput}
-                    placeholder="Buscar Profesión"
-                    required
-                    defaultValue={profesionInput}
-                    error={profesionError}
-                    setError={setProfesionError}
-                    requireSelectionFirst
-                    requireSelectionMessage={PROFESION_SELECT_MESSAGE}
+            {(civilStatus === 2 || civilStatus === 5) && cliente1 && (
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                    <ClienteMarriedMain
+                        cliente1={cliente1}
+                        setConyuge={setConyuge}
+                        setConyugeMarried={setConyugeMarried}
+                    />
+                </div>
+            )}
+        </ClienteFormSection>
+
+        <ClienteFormSection title="Profesión y cargo">
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                <ClienteDropdownField label="Profesión" required error={profesionError}>
+                    <SearchableDropdownInput
+                        options={profesiones.map((prof) => ({
+                            id: prof.idprofesion.toString(),
+                            label: prof.desprofesion,
+                        }))}
+                        selected={profesion}
+                        setSelected={setProfesion}
+                        onInputChange={setProfesionInput}
+                        placeholder="Buscar profesión"
+                        required
+                        defaultValue={profesionInput}
+                        error={profesionError}
+                        setError={setProfesionError}
+                        requireSelectionFirst
+                        requireSelectionMessage={PROFESION_SELECT_MESSAGE}
+                    />
+                </ClienteDropdownField>
+                <ClienteDropdownField label="Cargo" required error={cargoError}>
+                    <SearchableDropdownInput
+                        options={cargos.map((car) => ({
+                            id: car.idcargoprofe.toString(),
+                            label: car.descripcrapro,
+                        }))}
+                        selected={cargo}
+                        setSelected={setCargo}
+                        onInputChange={setCargoInput}
+                        placeholder="Buscar cargo"
+                        required
+                        defaultValue={cargoInput}
+                        error={cargoError}
+                        setError={setCargoError}
+                        requireSelectionFirst
+                        requireSelectionMessage={CARGO_SELECT_MESSAGE}
+                    />
+                </ClienteDropdownField>
+            </div>
+        </ClienteFormSection>
+
+        <ClienteFormSection title="Contacto">
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                <SimpleInput
+                    label="Teléfono Celular"
+                    value={celphone}
+                    setValue={setCellphone}
+                    fullWidth
+                    error={phoneError}
+                    setError={setPhoneError}
+                />
+                <SimpleInput
+                    label="Teléfono Oficina"
+                    value={officePhone}
+                    setValue={setOfficePhone}
+                    fullWidth
+                />
+                <SimpleInput
+                    label="Teléfono Fijo"
+                    value={fixedPhone}
+                    setValue={setFixedPhone}
+                    fullWidth
+                    error={phoneError}
+                    setError={setPhoneError}
+                />
+                <SimpleInput
+                    label="Email"
+                    value={email}
+                    setValue={setEmail}
+                    fullWidth
                 />
             </div>
-            <div className="w-full flex justify-center items-center gap-4 col-span-2">
-                <p className="pl-2 block text-xs font-semibold text-slate-700">Cargo</p>
-                <SearchableDropdownInput
-                    options={[...cargos
-                        .map(car => ({ id: (car.idcargoprofe).toString(), label: car.descripcrapro }))]}
-                    selected={cargo}
-                    setSelected={setCargo}
-                    onInputChange={setCargoInput}
-                    placeholder="Buscar Cargo"
-                    required
-                    defaultValue={cargoInput}
-                    error={cargoError}
-                    setError={setCargoError}
-                    requireSelectionFirst
-                    requireSelectionMessage={CARGO_SELECT_MESSAGE}
-                />
-            </div>
-            {/* <button className="bg-gray-50 px-2 py-1 transition duration-300 text-xs border-1 border-gray-300 cursor-pointer hover:bg-gray-300 rounded-md">Seleccionar</button> */}
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <SimpleInput 
-                label="Teléfono Celular"
-                value={celphone}
-                setValue={setCellphone}
-                horizontal={true}
-                error={phoneError}
-                setError={setPhoneError}
-            />
-            <SimpleInput 
-                label="Teléfono Oficina"
-                value={officePhone}
-                setValue={setOfficePhone}
-                horizontal={true}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <SimpleInput 
-                label="Teléfono Fijo"
-                value={fixedPhone}
-                setValue={setFixedPhone}
-                horizontal={true}
-                error={phoneError}
-                setError={setPhoneError}
-            />
-            <SimpleInput 
-                label="Email"
-                value={email}
-                setValue={setEmail}
-                horizontal={true}
-            />
-        </div>
+        </ClienteFormSection>
+
         <TopModal
             isOpen={openChangeConyuge}
             onClose={() => setOpenChangeConyuge(false)}
         >
-            <ExplanationMessage 
+            <ExplanationMessage
                 message="El cliente está casado, está seguro de querer cambiar el conyuge?"
                 onClick={() => {
                     setConyugeMarried(false)
@@ -1058,124 +1080,137 @@ const ClientesForm = ({
                 onClickSecondaryMessage="Cancelar"
             />
         </TopModal>
-        </>}
-        {selectedTipoPersona === 2 &&
-        <>
-        <div className="flex justify-end">
-            <button
-                type="button"
-                onClick={handleSunat}
-                className={clienteFormBackButtonClass}
-            >
-                Consulta Sunat
-            </button>
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <SimpleInput 
-                label="Razón Social"
-                value={razonSocial}
-                setValue={setRazonSocial}
-                horizontal={true}
-                required
-                fullWidth
-                error={razonSocialError}
-                setError={setRazonSocialError}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <SimpleInput 
-                label="Domicilio Fiscal"
-                value={domFiscal}
-                setValue={setDomFiscal}
-                horizontal={true}
-                required
-                fullWidth
-                error={domFiscalError}
-                setError={setDomFiscalError}
-            />
-        </div>
-        <div className="w-full flex justify-center items-center gap-4 col-span-2">
-            <p className="pl-2 block text-xs font-semibold text-slate-700">Ubigeo</p>
-            <SearchableDropdownInput
-                options={[...ubigeos.map(ubi => ({ id: ubi.coddis, label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}` }))]}
-                selected={ubigeo}
-                setSelected={setUbigeo}
-                placeholder="Buscar Ubigeo"
-                required
-                error={ubigeoError}
-                setError={setUbigeoError}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <DateInput 
-                label="Fecha de constitución"
-                value={fechaConstitucion}
-                setValue={setFechaConstitucion}
-                horizontal
-            />
-            <SimpleInput 
-                label="Número de Registro"
-                value={numeroDeRegistro}
-                setValue={setNumeroDeRegistro}
-                horizontal={true}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleSelectorStr 
-                label="Sede Registral"
-                defaultValue={selectedSedeRegistral ? selectedSedeRegistral.id : '0'}
-                setter={(value: string) => setSelectedSedeRegistral(value ? { id: value, label: '' } : null)}
-                options={[{ value: '0', label: 'Seleccionar Sede Registral' }, ...SEDES_REGISTRALES.map(sede => ({ value: sede.idsedereg, label: sede.dessede }))]}
-                horizontal={true}
-            />
-            <SimpleInput 
-                label="Número de Partida"
-                value={numeroPartida}
-                setValue={setNumeroPartida}
-                horizontal={true}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-6">
-            <SimpleInput 
-                label="Teléfono"
-                value={teleEmpresa}
-                setValue={setTeleEmpresa}
-                horizontal={true}
-            />
-            <SimpleSelectorStr 
-                label="CIIU"
-                setter={setCiiu}
-                options={[{ value: '0', label: 'Seleccionar CIIU' }, ...GIRO_NEGOCIO.map(giro => ({ value: giro.coddivi, label: giro.nombre }))]}
-                horizontal={true}
-                defaultValue={ciiu}
-                required
-                error={ciiuError}
-                setError={setCiiuError}
-            />
-        </div>
-        <div className="w-full mb-4">
-            <SimpleInput 
-                label="Objeto Social"
-                value={contacEmpresa}
-                setValue={(val) => setContacEmpresa(sanitizePlainTextInput(val))}
-                required
-                fullWidth
-                error={contacEmpresaError}
-                setError={setContacEmpresaError}
-            />
-        </div>
-        <div className="flex justify-center items-center gap-6 mb-4">
-            <SimpleInput 
-                label="Correo de la Empresa"
-                value={correoDeEmpresa}
-                setValue={setCorreoDeEmpresa}
-                horizontal={true}
-                fullWidth
-            />
-        </div>
         </>
-        }
-    </div>
+        )}
+
+        {selectedTipoPersona === 2 && (
+        <>
+        <ClienteFormSection
+            title="Datos de la empresa"
+            action={
+                <button type="button" onClick={handleSunat} className={clienteFormActionButtonClass}>
+                    Consulta SUNAT
+                </button>
+            }
+        >
+            <div className="grid grid-cols-1 items-start gap-4">
+                <SimpleInput
+                    label="Razón Social"
+                    value={razonSocial}
+                    setValue={setRazonSocial}
+                    required
+                    fullWidth
+                    error={razonSocialError}
+                    setError={setRazonSocialError}
+                />
+                <SimpleInput
+                    label="Domicilio Fiscal"
+                    value={domFiscal}
+                    setValue={setDomFiscal}
+                    required
+                    fullWidth
+                    error={domFiscalError}
+                    setError={setDomFiscalError}
+                />
+                <ClienteDropdownField label="Ubigeo" required error={ubigeoError}>
+                    <SearchableDropdownInput
+                        options={ubigeos.map((ubi) => ({
+                            id: ubi.coddis,
+                            label: `${ubi.nomdpto} - ${ubi.nomprov} - ${ubi.nomdis}`,
+                        }))}
+                        selected={ubigeo}
+                        setSelected={setUbigeo}
+                        placeholder="Buscar ubigeo"
+                        required
+                        error={ubigeoError}
+                        setError={setUbigeoError}
+                    />
+                </ClienteDropdownField>
+            </div>
+        </ClienteFormSection>
+
+        <ClienteFormSection title="Información registral">
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                <DateInput
+                    label="Fecha de constitución"
+                    value={fechaConstitucion}
+                    setValue={setFechaConstitucion}
+                />
+                <SimpleInput
+                    label="Número de Registro"
+                    value={numeroDeRegistro}
+                    setValue={setNumeroDeRegistro}
+                    fullWidth
+                />
+                <SimpleSelectorStr
+                    label="Sede Registral"
+                    defaultValue={selectedSedeRegistral ? selectedSedeRegistral.id : "0"}
+                    setter={(value: string) =>
+                        setSelectedSedeRegistral(value ? { id: value, label: "" } : null)
+                    }
+                    options={[
+                        { value: "0", label: "Seleccionar Sede Registral" },
+                        ...SEDES_REGISTRALES.map((sede) => ({
+                            value: sede.idsedereg,
+                            label: sede.dessede,
+                        })),
+                    ]}
+                />
+                <SimpleInput
+                    label="Número de Partida"
+                    value={numeroPartida}
+                    setValue={setNumeroPartida}
+                    fullWidth
+                />
+            </div>
+        </ClienteFormSection>
+
+        <ClienteFormSection title="Contacto y actividad">
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
+                <SimpleInput
+                    label="Teléfono"
+                    value={teleEmpresa}
+                    setValue={setTeleEmpresa}
+                    fullWidth
+                />
+                <SimpleSelectorStr
+                    label="CIIU"
+                    setter={setCiiu}
+                    options={[
+                        { value: "0", label: "Seleccionar CIIU" },
+                        ...GIRO_NEGOCIO.map((giro) => ({
+                            value: giro.coddivi,
+                            label: giro.nombre,
+                        })),
+                    ]}
+                    defaultValue={ciiu}
+                    required
+                    error={ciiuError}
+                    setError={setCiiuError}
+                />
+                <div className="sm:col-span-2">
+                    <SimpleInput
+                        label="Objeto Social"
+                        value={contacEmpresa}
+                        setValue={(val) => setContacEmpresa(sanitizePlainTextInput(val))}
+                        required
+                        fullWidth
+                        error={contacEmpresaError}
+                        setError={setContacEmpresaError}
+                    />
+                </div>
+                <div className="sm:col-span-2">
+                    <SimpleInput
+                        label="Correo de la Empresa"
+                        value={correoDeEmpresa}
+                        setValue={setCorreoDeEmpresa}
+                        fullWidth
+                    />
+                </div>
+            </div>
+        </ClienteFormSection>
+        </>
+        )}
     </ClienteContratanteFormLayout>
   )
 }

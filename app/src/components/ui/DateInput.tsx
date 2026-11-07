@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { formControlClass, formControlErrorClass, formFieldStackClass, formLabelClass } from './formControlStyles';
 
 interface DateInputProps {
   label?: string;
@@ -51,10 +52,10 @@ const DateInput = ({
       };
 
   return (
-    <div className={`flex w-full ${horizontal ? 'grid grid-cols-3 items-center' : 'flex-col justify-center items-start'} gap-6`}>
+    <div className={horizontal ? 'grid w-full grid-cols-3 items-center gap-3' : formFieldStackClass}>
       {label && (
-        <label className="pl-1 text-xs font-semibold text-slate-700">
-          {label} {required && <span className="text-red-500">*</span>}
+        <label className={formLabelClass}>
+          {label}{required && <span className="ml-0.5 text-red-500">*</span>}
         </label>
       )}
       <motion.input
@@ -65,15 +66,13 @@ const DateInput = ({
         placeholder="DD/MM/AAAA"
         value={value}
         onChange={handleChange}
-        className={`col-span-2 ${fullWidth ? 'w-full' : ''} bg-white text-slate-700 border ${
-          error ? 'border-red-500' : 'border-slate-300'
-        } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
-          error ? 'focus:ring-red-300' : 'focus:ring-blue-300'
+        className={`${horizontal ? 'col-span-2' : ''} ${formControlClass} ${
+          error ? formControlErrorClass : ''
         }`}
       />
       {error && (
         <motion.div
-          className="text-xs text-red-500 mt-1 px-1"
+          className="text-xs text-red-500"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
         >

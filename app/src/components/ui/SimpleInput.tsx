@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
+import { formControlClass, formControlErrorClass, formFieldStackClass, formLabelClass } from './formControlStyles';
 
 interface SimpleInputProps {
   label?: string;
@@ -36,32 +37,27 @@ const SimpleInput = ({
   suffix,
   rows,
 }: SimpleInputProps) => {
-  const fieldClassName = `bg-white text-slate-700 border ${
-    fullWidth ? 'w-full' : 'min-w-64'
-  } ${
-    horizontal && 'col-span-2'
-  } ${
-    error ? 'border-red-500' : 'border-slate-300'
-  } rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
-    error ? 'focus:ring-red-300' : 'focus:ring-blue-300'
-  }
-  ${disabled ? 'cursor-not-allowed' : ''}
-  ${rows ? 'resize-y min-h-[5rem]' : ''}`
+  const fieldClassName = `${rows ? 'min-h-[5rem] h-auto resize-y py-2.5' : formControlClass} ${
+    error ? formControlErrorClass : ''
+  } ${disabled ? 'cursor-not-allowed bg-slate-50 text-slate-400' : ''}`
 
   return (
     <div
-      className={`flex w-full ${
-        horizontal ? 'grid grid-cols-3 items-center' : 'flex-col justify-center items-start'
-      } gap-6`}
+      className={
+        horizontal
+          ? 'grid w-full grid-cols-3 items-center gap-3'
+          : formFieldStackClass
+      }
     >
       {label && (
-        <label className="pl-2 block text-xs font-semibold text-slate-700">
+        <label className={formLabelClass}>
           {label}
+          {required && <span className="ml-0.5 text-red-500">*</span>}
         </label>
       )}
 
-        <div className={`col-span-2 ${fullWidth && !horizontal ? 'w-full' : ''}`}>
-            <div className='flex items-start gap-2'>
+        <div className={`${horizontal ? 'col-span-2' : 'w-full'}`}>
+            <div className='flex w-full items-center gap-2'>
                 {rows ? (
                   <motion.textarea
                     {...(error ? shakeAnimation : {})}
@@ -89,12 +85,11 @@ const SimpleInput = ({
                     className={fieldClassName}
                   />
                 )}
-                {required && <span className="text-red-500 mt-2">*</span>}
                 {suffix}
             </div>
             {error && (
                 <motion.div
-                    className="text-xs text-red-500 mt-1 px-2"
+                    className="mt-1 text-xs text-red-500"
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                     >
@@ -102,8 +97,6 @@ const SimpleInput = ({
                 </motion.div>
             )}
         </div>
-
-      {/*  */}
     </div>
   );
 };

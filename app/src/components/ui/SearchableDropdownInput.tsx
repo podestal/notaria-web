@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import { formControlClass, formControlErrorClass } from './formControlStyles';
 
 interface Option {
   id: string;
@@ -74,18 +75,14 @@ const SearchableDropdownInput: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative w-full my-4" ref={wrapperRef}>
-      <div className="flex items-center w-full gap-2">
+    <div className="relative w-full" ref={wrapperRef}>
+      <div className="flex w-full items-center">
         <motion.input
           {...(error ? shakeAnimation : {})}
           ref={inputRef}
           type="text"
           placeholder={placeholder || 'Select an option'}
-          className={`w-full bg-white text-slate-900 border rounded-md py-2 px-3 focus:outline-none focus:ring-2 ${
-            error
-              ? 'border-red-500 focus:ring-red-300'
-              : 'border-slate-300 focus:ring-blue-300'
-          }`}
+          className={`${formControlClass} ${error ? formControlErrorClass : ''}`}
           value={inputValue}
           onFocus={() => {
             setOpen(true);
@@ -124,20 +121,19 @@ const SearchableDropdownInput: React.FC<Props> = ({
             }
           }}
         />
-        {required && <span className="text-red-500">*</span>}
       </div>
       {error && (
-        <div className="text-xs text-red-500 mt-1 px-2">{error}</div>
+        <div className="mt-1 text-xs text-red-500">{error}</div>
       )}
       {open && (
-        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-300 bg-white text-slate-800 shadow-lg">
+        <div className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-slate-200 bg-white text-slate-800 shadow-lg">
           {filtered.length === 0 ? (
-            <div className="px-4 py-2 text-sm text-slate-500">No results found</div>
+            <div className="px-4 py-2 text-sm text-slate-500">Sin resultados</div>
           ) : (
             filtered.map((option) => (
               <div
                 key={option.id}
-                className="cursor-pointer px-4 py-2 text-sm text-slate-800 hover:bg-blue-100"
+                className="cursor-pointer px-4 py-2.5 text-sm text-slate-800 hover:bg-sky-50"
                 onClick={() => handleSelect(option)}
               >
                 {option.label}

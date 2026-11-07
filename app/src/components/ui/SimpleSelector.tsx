@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
-
-
+import { formControlClass, formControlErrorClass, formFieldStackClass, formLabelClass } from "./formControlStyles";
 
 interface Item {
     value: number;
@@ -19,7 +18,7 @@ interface Props {
     error?: string;
     setError?: (val: string) => void;
     disabled?: boolean;
-  }
+}
 
 
 const shakeAnimation = {
@@ -32,6 +31,7 @@ const SimpleSelector = ({
     defaultValue,
     setter,
     label,
+    horizontal = false,
     required = false,
     error,
     setError,
@@ -44,68 +44,52 @@ const SimpleSelector = ({
         }
     }, [defaultValue]);
 
+    const selectClass = `${formControlClass} cursor-pointer ${
+        error ? formControlErrorClass : ""
+    } ${disabled ? "cursor-not-allowed bg-slate-50 text-slate-400" : ""}`
+
+    const select = (
+        <motion.select
+            {...(error ? shakeAnimation : {})}
+            value={defaultValue !== undefined ? defaultValue?.toString() : "0"}
+            disabled={disabled}
+            onChange={(e) => {
+                setError?.("")
+                setter(parseInt(e.target.value))
+            }}
+            className={selectClass}
+        >
+            {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                    {option.label}
+                </option>
+            ))}
+        </motion.select>
+    )
+
   return (
-    <div className="flex flex-col gap-2">
+    <div className={horizontal ? "grid w-full grid-cols-3 items-center gap-3" : formFieldStackClass}>
         {label ? (
-        <div className="grid w-full grid-cols-3 items-center gap-2">
-            <p className="block pl-2 text-xs font-semibold text-slate-700">{label}</p>
-            <div className="col-span-2 flex w-full items-center gap-1">
-                <motion.select 
-                    {...(error ? shakeAnimation : {})}
-                    defaultValue={defaultValue ? defaultValue.toString() : '0'}
-                    value={defaultValue !== undefined ? defaultValue?.toString() : '0'}
-                    disabled={disabled}
-                    onChange={(e) => {
-                        setError?.('');
-                        setter(parseInt(e.target.value));
-                    }}
-                    className={`w-full flex-1 rounded-md border bg-white px-2 py-2 text-slate-700 ${
-                        error ? 'border-red-500 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-300'
-                    } focus:outline-none focus:ring-2 ${disabled ? 'cursor-not-allowed bg-slate-100 text-slate-500' : ''}`}
-                >
-                        {options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                </motion.select>
-                {required && <span className="text-red-500">*</span>}
-            </div>
-        </div>
+            <>
+                <p className={formLabelClass}>
+                    {label}
+                    {required && <span className="ml-0.5 text-red-500">*</span>}
+                </p>
+                <div className={horizontal ? "col-span-2 w-full" : "w-full"}>{select}</div>
+            </>
         ) : (
-        <div className="flex w-full items-center gap-1">
-            <motion.select
-                {...(error ? shakeAnimation : {})}
-                defaultValue={defaultValue ? defaultValue.toString() : '0'}
-                value={defaultValue !== undefined ? defaultValue?.toString() : '0'}
-                disabled={disabled}
-                onChange={(e) => {
-                    setError?.('');
-                    setter(parseInt(e.target.value));
-                }}
-                className={`w-full rounded-md border bg-white px-2 py-2 text-slate-700 ${
-                    error ? 'border-red-500 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-300'
-                } focus:outline-none focus:ring-2 ${disabled ? 'cursor-not-allowed bg-slate-100 text-slate-500' : ''}`}
-            >
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </motion.select>
-            {required && <span className="text-red-500">*</span>}
-        </div>
+            select
         )}
         {error && (
             <motion.div
-                className="mt-1 px-2 text-center text-xs text-red-500"
+                className="text-xs text-red-500"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                >
+            >
                 {error}
             </motion.div>
         )}
-        </div>
+    </div>
   )
 }
 

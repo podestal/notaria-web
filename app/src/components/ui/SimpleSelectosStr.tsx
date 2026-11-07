@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { formControlClass, formControlErrorClass, formFieldStackClass, formLabelClass } from "./formControlStyles";
 
 interface Item {
     value: string;
@@ -30,6 +31,7 @@ const SimpleSelectorStr = ({
     defaultValue,
     setter,
     label,
+    horizontal = false,
     required = false,
     error,
     setError,
@@ -43,23 +45,26 @@ const SimpleSelectorStr = ({
     }, [defaultValue]);
 
   return (
-    <div className="grid grid-cols-3 items-center gap-2 w-full">
-        <p className="pl-2 block text-xs font-semibold text-slate-700">{label}</p>
-        <div className="flex items-center gap-1 w-full col-span-2">
+    <div className={horizontal ? "grid w-full grid-cols-3 items-center gap-3" : formFieldStackClass}>
+        {label && (
+            <p className={formLabelClass}>
+                {label}
+                {required && <span className="ml-0.5 text-red-500">*</span>}
+            </p>
+        )}
+        <div className={horizontal ? "col-span-2 w-full" : "w-full"}>
             <motion.select 
                 disabled={disabled}
                 {...(error ? shakeAnimation : {})}
-                // defaultValue={value ? value?.toString() : '0'}
                 value={value ? value?.toString() : '0'}
                 onChange={(e) => {
                     setValue(e.target.value ? e.target.value : '');
                     setError?.('');
                     setter(e.target.value ? e.target.value : '');
                 }}
-                // className="flex-1 bg-white w-2xl col-span-2 text-slate-700 border border-slate-300 rounded-md py-2  px-2"
-                className={`flex-1 bg-white text-slate-700 border rounded-md py-2 px-2 w-full ${
-                    error ? 'border-red-500 focus:ring-red-300' : 'border-slate-300 focus:ring-blue-300'
-                } focus:outline-none focus:ring-2 ${disabled ? 'cursor-not-allowed bg-slate-100 text-slate-500' : ''}`}
+                className={`${formControlClass} cursor-pointer ${
+                    error ? formControlErrorClass : ""
+                } ${disabled ? "cursor-not-allowed bg-slate-50 text-slate-400" : ""}`}
             >
                     {options.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -67,8 +72,16 @@ const SimpleSelectorStr = ({
                         </option>
                     ))}
             </motion.select>
-            {required && <span className="text-red-500">*</span>}
         </div>
+        {error && (
+            <motion.div
+                className="text-xs text-red-500"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+            >
+                {error}
+            </motion.div>
+        )}
     </div>
   )
 }
