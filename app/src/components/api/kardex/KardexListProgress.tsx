@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion"
 import type { KardexListTone } from "../../../services/compliance/complianceService"
 
 export type KardexListProgressTone = KardexListTone | "pending"
@@ -16,37 +17,86 @@ const LABEL_CLASS: Record<KardexListProgressTone, string> = {
     complete: "text-emerald-700",
 }
 
-const FILL: Record<Exclude<KardexListProgressTone, "pending">, string> = {
-    incomplete: "w-[42%] bg-rose-400",
-    warning: "inset-0 bg-amber-400",
-    complete: "inset-0 bg-emerald-400",
+const FILL_CLASS: Record<Exclude<KardexListProgressTone, "pending">, string> = {
+    incomplete: "bg-rose-400",
+    warning: "bg-amber-400",
+    complete: "bg-emerald-400",
+}
+
+const FILL_WIDTH: Record<Exclude<KardexListProgressTone, "pending">, string> = {
+    incomplete: "42%",
+    warning: "100%",
+    complete: "100%",
 }
 
 const KardexListProgress = ({ tone }: { tone: KardexListProgressTone }) => (
     <div className="mt-1.5 min-w-0" title={LABEL[tone]}>
         <div className="relative h-[3px]">
             <div className="absolute inset-0 overflow-hidden rounded-full bg-slate-200">
-                {tone === "pending" ? (
-                    <span className="kardex-list-pending absolute inset-y-0 left-0 w-1/3 rounded-full bg-slate-300" />
-                ) : (
-                    <span className={`absolute ${FILL[tone]}`} />
-                )}
+                <AnimatePresence mode="wait" initial={false}>
+                    {tone === "pending" ? (
+                        <motion.span
+                            key="pending"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="kardex-list-pending absolute inset-y-0 left-0 w-1/3 rounded-full bg-slate-300"
+                        />
+                    ) : (
+                        <motion.span
+                            key={`fill-${tone}`}
+                            className={`absolute inset-y-0 left-0 rounded-full ${FILL_CLASS[tone]}`}
+                            initial={{ width: 0, opacity: 0.4 }}
+                            animate={{ width: FILL_WIDTH[tone], opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                        />
+                    )}
+                </AnimatePresence>
                 {tone === "complete" && (
-                    <span className="kardex-list-flow absolute inset-y-0 left-0 w-1/3" />
+                    <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.35 }}
+                        className="kardex-list-flow absolute inset-y-0 left-0 w-1/3"
+                    />
                 )}
                 {tone === "warning" && (
-                    <span className="kardex-list-flow kardex-list-flow-slow absolute inset-y-0 left-0 w-1/3" />
+                    <motion.span
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.35 }}
+                        className="kardex-list-flow kardex-list-flow-slow absolute inset-y-0 left-0 w-1/3"
+                    />
                 )}
             </div>
-            {tone === "incomplete" && (
-                <span className="kardex-list-stop absolute top-1/2 left-[42%] h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-rose-500" />
-            )}
+            <AnimatePresence>
+                {tone === "incomplete" && (
+                    <motion.span
+                        key="stop"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 420, damping: 22, delay: 0.28 }}
+                        className="kardex-list-stop absolute top-1/2 left-[42%] h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-rose-500"
+                    />
+                )}
+            </AnimatePresence>
         </div>
-        {tone !== "pending" && (
-            <p className={`mt-1 font-mono text-[9px] font-semibold uppercase tracking-wider ${LABEL_CLASS[tone]}`}>
-                {LABEL[tone]}
-            </p>
-        )}
+        <AnimatePresence mode="wait">
+            {tone !== "pending" && (
+                <motion.p
+                    key={tone}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -2 }}
+                    transition={{ duration: 0.28, delay: 0.18, ease: "easeOut" }}
+                    className={`mt-1 font-mono text-[9px] font-semibold uppercase tracking-wider ${LABEL_CLASS[tone]}`}
+                >
+                    {LABEL[tone]}
+                </motion.p>
+            )}
+        </AnimatePresence>
     </div>
 )
 
