@@ -6,7 +6,7 @@ const LABEL: Record<KardexListProgressTone, string> = {
     pending: "Revisando",
     incomplete: "Incompleto",
     warning: "Avisos",
-    complete: "Listo",
+    complete: "Completado",
 }
 
 const LABEL_CLASS: Record<KardexListProgressTone, string> = {

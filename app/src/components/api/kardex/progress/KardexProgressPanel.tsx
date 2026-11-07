@@ -49,7 +49,7 @@ const LABEL: Record<ProgressStatus, string> = {
 }
 
 const STATUS_LABEL: Record<ProgressStatus, string> = {
-    done: "Listo",
+    done: "Completado",
     warning: "Aviso",
     error: "Falló",
     idle: "Sin iniciar",
@@ -382,7 +382,7 @@ const KardexProgressPanel = ({
         barClass = "bg-rose-400"
         runClass = "border-rose-200 bg-rose-50 text-rose-700"
     } else if (complete) {
-        summary = warningCount > 0 ? "Listo con avisos" : "Listo"
+        summary = warningCount > 0 ? "Completado con avisos" : "Completado"
         summaryClass = "text-emerald-700"
         barClass = "bg-emerald-500"
         runClass = "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -576,7 +576,7 @@ const KardexProgressPanel = ({
 
             <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-slate-200 bg-white px-4 py-2 font-mono text-[10px] text-slate-500">
                 <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" /> Listo
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" /> Completado
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-amber-500" /> Aviso
