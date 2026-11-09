@@ -28,13 +28,13 @@ export const ClienteFormSection = ({ title, children, action }: SectionProps) =>
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.24, ease: "easeOut" }}
-        className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        className="rounded-2xl border border-slate-200 bg-white shadow-sm"
     >
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/80 px-4 py-3">
+        <div className="flex items-center justify-between gap-3 overflow-hidden rounded-t-2xl border-b border-slate-100 bg-slate-50/80 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{title}</p>
             {action}
         </div>
-        <div className="p-4 sm:p-5">{children}</div>
+        <div className="relative overflow-visible p-4 sm:p-5">{children}</div>
     </motion.section>
 )
 
@@ -59,8 +59,8 @@ export const clienteFormActionButtonClass =
 
 const ClienteContratanteFormLayout = ({ title, subtitle, onBack, children, footer }: LayoutProps) => (
     <div className="mx-auto w-full max-w-4xl text-slate-800">
-        <div className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-4 py-4 sm:px-5">
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex flex-wrap items-center gap-3 overflow-hidden rounded-t-2xl border-b border-slate-100 px-4 py-4 sm:px-5">
                 <button type="button" onClick={onBack} className={`shrink-0 ${clienteFormBackButtonClass}`}>
                     <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
                     Volver
@@ -70,9 +70,9 @@ const ClienteContratanteFormLayout = ({ title, subtitle, onBack, children, foote
                     {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
                 </div>
             </div>
-            <div className="space-y-4 bg-slate-50/60 p-4 sm:p-5">{children}</div>
+            <div className="relative space-y-4 overflow-visible bg-slate-50/60 p-4 sm:p-5">{children}</div>
             {footer && (
-                <div className="flex flex-wrap items-center justify-end gap-3 border-t border-slate-100 bg-white px-4 py-4 sm:px-5">
+                <div className="flex flex-wrap items-center justify-end gap-3 overflow-hidden rounded-b-2xl border-t border-slate-100 bg-white px-4 py-4 sm:px-5">
                     {footer}
                 </div>
             )}

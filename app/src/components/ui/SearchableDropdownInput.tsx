@@ -75,7 +75,7 @@ const SearchableDropdownInput: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative w-full" ref={wrapperRef}>
+    <div className={`relative w-full ${open ? "z-50" : "z-10"}`} ref={wrapperRef}>
       <div className="flex w-full items-center">
         <motion.input
           {...(error ? shakeAnimation : {})}
@@ -121,12 +121,13 @@ const SearchableDropdownInput: React.FC<Props> = ({
             }
           }}
         />
+        {required && <span className="ml-1 text-red-500">*</span>}
       </div>
       {error && (
         <div className="mt-1 text-xs text-red-500">{error}</div>
       )}
       {open && (
-        <div className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-slate-200 bg-white text-slate-800 shadow-lg">
+        <div className="absolute left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-xl border border-slate-200 bg-white text-slate-800 shadow-lg">
           {filtered.length === 0 ? (
             <div className="px-4 py-2 text-sm text-slate-500">Sin resultados</div>
           ) : (
@@ -134,7 +135,10 @@ const SearchableDropdownInput: React.FC<Props> = ({
               <div
                 key={option.id}
                 className="cursor-pointer px-4 py-2.5 text-sm text-slate-800 hover:bg-sky-50"
-                onClick={() => handleSelect(option)}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  handleSelect(option)
+                }}
               >
                 {option.label}
               </div>
