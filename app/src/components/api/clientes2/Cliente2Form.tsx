@@ -131,8 +131,15 @@ const Cliente2Form = ({
         const [birthdate, setBirthdate] = useState(cliente2 ? cliente2.cumpclie || '' : '')
         const [resident, setResident] = useState(1)
     
+        // DB trigger on cliente2 copies free-text profesion into profesion_plantilla
+        // and overwrites detaprofesion with the catalog name — prefer plantilla for display.
+        const initialProfesionText = (
+            cliente2?.profesion_plantilla ||
+            cliente2?.detaprofesion ||
+            ''
+        ).trim()
         const [profesion, setProfesion] = useState<{ id: string; label: string } | null>(() => {
-            const detalleProf = (cliente2?.detaprofesion || '').trim()
+            const detalleProf = initialProfesionText
             // A valid selection requires a real profesion id that exists in the list.
             if (cliente2?.idprofesion) {
                 const match = profesiones.find(profesion => profesion.idprofesion === cliente2.idprofesion)
@@ -181,7 +188,7 @@ const Cliente2Form = ({
             }
             return null
           })
-        const [profesionInput, setProfesionInput] = useState(() => (cliente2?.detaprofesion || profesion?.label || '').trim())
+        const [profesionInput, setProfesionInput] = useState(() => (initialProfesionText || profesion?.label || '').trim())
         const [cargoInput, setCargoInput] = useState(() => (cliente2?.profocupa || cargo?.label || '').trim())
     
         const [celphone, setCellphone] = useState(cliente2 ? cliente2.telcel || '' : '')
@@ -479,6 +486,10 @@ const Cliente2Form = ({
                 const changedPayload = getChangedFields(fullPayload, cliente2 || undefined)
                 // Backend expects profession id to persist even when only the label changes.
                 changedPayload.idprofesion = profesionIdForCustomText
+                // Always re-send free-text profesion: cliente2 triggers overwrite detaprofesion
+                // with the catalog name and store the typed detail in profesion_plantilla.
+                changedPayload.detaprofesion = profesionText
+                changedPayload.profesion_plantilla = profesionText
                 // Same rule for cargo: keep selected cargo id while profocupa text changes.
                 changedPayload.idcargoprofe = cargoId
                 if (Object.keys(changedPayload).length === 0) {

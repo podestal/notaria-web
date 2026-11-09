@@ -41,15 +41,26 @@ const SearchableDropdownInput: React.FC<Props> = ({
   requireSelectionFirst,
   requireSelectionMessage,
 }) => {
-  const [inputValue, setInputValue] = useState(selected?.label || defaultValue || '');
+  // Prefer defaultValue (e.g. persisted free-text detail) over the catalog label.
+  const [inputValue, setInputValue] = useState(defaultValue || selected?.label || '');
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const prevSelectedIdRef = useRef<string | null>(selected?.id ?? null);
 
+  // Only sync from the selected option when the selection *id* changes.
+  // Re-running on every selected/onInputChange change was wiping free-text
+  // suffixes the user typed after picking an option (e.g. "ABOGADO litigante").
   useEffect(() => {
-    if (selected) {
+    const nextId = selected?.id ?? null;
+    if (selected && nextId !== prevSelectedIdRef.current) {
+      prevSelectedIdRef.current = nextId;
       setInputValue(selected.label);
       onInputChange?.(selected.label);
+      return;
+    }
+    if (!selected) {
+      prevSelectedIdRef.current = null;
     }
   }, [selected, onInputChange]);
 
@@ -68,8 +79,10 @@ const SearchableDropdownInput: React.FC<Props> = ({
   );
 
   const handleSelect = (option: Option) => {
+    prevSelectedIdRef.current = option.id;
     setSelected(option);
     setInputValue(option.label);
+    onInputChange?.(option.label);
     setOpen(false);
     setError?.(''); // clear error when an option is selected
   };
