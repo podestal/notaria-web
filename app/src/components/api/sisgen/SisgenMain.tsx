@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { SendHorizontal, ShieldCheck } from "lucide-react";
 import KardexFormTabs from "../kardex/KardexFormTabs"
 import SisgenBody from "./SisgenBody"
+import SisgenPointerStyles from "./SisgenPointerStyles"
 import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
 import useUserInfoStore from "../../../hooks/store/useGetUserInfo";
 
@@ -33,8 +34,9 @@ const SisgenMain = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="mx-auto mb-10 mt-[80px] w-[92%] max-w-[1400px] text-slate-800"
+        className="sisgen-ui mx-auto mb-10 mt-[80px] w-[92%] max-w-[1400px] text-slate-800"
     >
+        <SisgenPointerStyles />
         <div className="keep-dark relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-5 text-slate-50 shadow-lg">
             <motion.div
                 aria-hidden

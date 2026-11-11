@@ -16,6 +16,7 @@ import {
 } from "../../../utils/sisgenJobSummary"
 import SisgenJobDocumentsTable from "./SisgenJobDocumentsTable"
 import SisgenJobSummaryCards from "./SisgenJobSummaryCards"
+import SisgenPointerStyles from "./SisgenPointerStyles"
 import getTitleCase from "../../../utils/getTitleCase"
 
 const ESTADO_LABELS: Record<number, string> = {
@@ -188,7 +189,8 @@ const SisgenSendAllPreviewModal = ({
 
     return (
         <TopModal isOpen={isOpen} onClose={handleClose} wide portal>
-            <div className="flex min-h-0 flex-1 flex-col">
+            <div className="sisgen-ui flex min-h-0 flex-1 flex-col">
+                <SisgenPointerStyles />
                 <header className="mb-4 border-b border-slate-200 pb-3">
                     <h3 className="text-lg font-semibold text-slate-900">
                         {sendResult

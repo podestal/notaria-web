@@ -3,6 +3,7 @@ import PreKardexForm from "../reportes/registrosUif/PreKardexForm"
 import useRefreshLastSisgenSearch from "../../../hooks/sisgen/useRefreshLastSisgenSearch"
 import useSisgenKardexErrors from "../../../hooks/sisgen/useSisgenKardexErrors"
 import SisgenKardexErrorsPanel from "./SisgenKardexErrorsPanel"
+import SisgenPointerStyles from "./SisgenPointerStyles"
 
 interface Props {
     isOpen: boolean
@@ -41,7 +42,8 @@ const SisgenKardexModal = ({
 
     return (
         <TopModal isOpen={isOpen} onClose={onClose} wide portal={portal}>
-            <div className="flex min-h-0 flex-1 flex-col gap-3 xl:flex-row xl:gap-0">
+            <div className="sisgen-ui flex min-h-0 flex-1 flex-col gap-3 xl:flex-row xl:gap-0">
+                <SisgenPointerStyles />
                 {isLoading && (
                     <aside className="flex max-h-[28vh] shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500 xl:max-h-none xl:w-52 xl:rounded-none xl:border-r xl:border-y-0">
                         Cargando errores SISGEN...
