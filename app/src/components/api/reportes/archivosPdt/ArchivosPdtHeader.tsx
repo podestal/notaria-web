@@ -1,7 +1,13 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Calendar from "../../../ui/Calendar"
 import { CalendarDays, Loader2, FileSpreadsheet } from "lucide-react"
+import {
+    DATE_PRESETS,
+    getDatePresetRange,
+    matchDatePreset,
+    type DatePresetId,
+} from "../../../../utils/datePresets"
 
 interface Props {
     dateFrom: Date | undefined
@@ -10,7 +16,7 @@ interface Props {
     setDateTo: Dispatch<SetStateAction<Date | undefined>>
     loading: boolean
     setLoading: Dispatch<SetStateAction<boolean>>
-    refetch: any
+    refetch: () => Promise<unknown>
 }
 
 const ArchivosPdtHeader = ({
@@ -22,56 +28,106 @@ const ArchivosPdtHeader = ({
     setLoading,
     refetch,
 }: Props) => {
-    const handleGeneratePDT = () => {
+    const [activePreset, setActivePreset] = useState<DatePresetId | null>(() =>
+        matchDatePreset(dateFrom, dateTo),
+    )
+
+    useEffect(() => {
+        setActivePreset(matchDatePreset(dateFrom, dateTo))
+    }, [dateFrom, dateTo])
+
+    const runGenerate = () => {
         setLoading(true)
-        refetch().finally(() => {
-            setLoading(false)
-        })
+        Promise.resolve(refetch())
+            .catch(() => undefined)
+            .finally(() => setLoading(false))
     }
 
-  return (
-    <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.05 }}
-        className="border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5"
-    >
-        <div className="mb-4 flex items-center gap-2">
-            <span className="rounded-lg bg-emerald-50 p-2 ring-1 ring-emerald-100">
-                <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
-            </span>
-            <div>
-                <h2 className="text-sm font-semibold text-slate-800">Información requerida para PDT</h2>
-                <p className="text-xs text-slate-500">Seleccione el rango de fechas y genere el archivo</p>
+    const handleGeneratePDT = () => {
+        runGenerate()
+    }
+
+    const applyDatePreset = (id: DatePresetId) => {
+        const range = getDatePresetRange(id)
+        setDateFrom(range.from)
+        setDateTo(range.to)
+        setLoading(true)
+        // Let date state reach the active PDT query, then refresh immediately.
+        window.setTimeout(() => {
+            Promise.resolve(refetch())
+                .catch(() => undefined)
+                .finally(() => setLoading(false))
+        }, 0)
+    }
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+            className="border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5"
+        >
+            <div className="mb-4 flex items-center gap-2">
+                <span className="rounded-lg bg-emerald-50 p-2 ring-1 ring-emerald-100">
+                    <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+                </span>
+                <div>
+                    <h2 className="text-sm font-semibold text-slate-800">Información requerida para PDT</h2>
+                    <p className="text-xs text-slate-500">Seleccione el rango de fechas y genere el archivo</p>
+                </div>
             </div>
-        </div>
-        <div className="flex flex-wrap items-end gap-4">
-            <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
-                <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    <CalendarDays className="h-3.5 w-3.5" /> Fecha inicio
+
+            <div className="mb-3">
+                <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    <CalendarDays className="h-3.5 w-3.5" /> Rango rápido
                 </p>
-                <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} fullWidth />
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Rangos de fecha rápidos">
+                    {DATE_PRESETS.map((preset) => {
+                        const isActive = activePreset === preset.id
+                        return (
+                            <button
+                                key={preset.id}
+                                type="button"
+                                disabled={loading}
+                                onClick={() => applyDatePreset(preset.id)}
+                                className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                                    isActive ? preset.tone.active : preset.tone.idle
+                                }`}
+                            >
+                                {preset.label}
+                            </button>
+                        )
+                    })}
+                </div>
             </div>
-            <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
-                <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    <CalendarDays className="h-3.5 w-3.5" /> Fecha fin
-                </p>
-                <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} fullWidth />
+
+            <div className="flex flex-wrap items-end gap-4">
+                <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
+                    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                        <CalendarDays className="h-3.5 w-3.5" /> Fecha inicio
+                    </p>
+                    <Calendar selectedDate={dateFrom} setSelectedDate={setDateFrom} fullWidth />
+                </div>
+                <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
+                    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                        <CalendarDays className="h-3.5 w-3.5" /> Fecha fin
+                    </p>
+                    <Calendar selectedDate={dateTo} setSelectedDate={setDateTo} fullWidth />
+                </div>
+                <motion.button
+                    type="button"
+                    onClick={handleGeneratePDT}
+                    disabled={loading}
+                    whileHover={loading ? undefined : { y: -1 }}
+                    whileTap={loading ? undefined : { scale: 0.97 }}
+                    className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSpreadsheet className="h-4 w-4" />}
+                    {loading ? "Generando..." : "Generar PDT"}
+                </motion.button>
             </div>
-            <motion.button
-                type="button"
-                onClick={handleGeneratePDT}
-                disabled={loading}
-                whileHover={loading ? undefined : { y: -1 }}
-                whileTap={loading ? undefined : { scale: 0.97 }}
-                className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSpreadsheet className="h-4 w-4" />}
-                {loading ? "Generando..." : "Generar PDT"}
-            </motion.button>
-        </div>
-    </motion.div>
-  )
+        </motion.div>
+    )
 }
 
 export default ArchivosPdtHeader
