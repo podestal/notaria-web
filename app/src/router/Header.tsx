@@ -13,6 +13,7 @@ import {
   FileSpreadsheet,
   Send,
   Settings,
+  Shield,
   Stamp,
   type LucideProps,
 } from 'lucide-react'
@@ -298,9 +299,6 @@ const Header = ({ kardexTypes }: Props) => {
                     {name: "Transferencias Vehiculares", path: "/app/reportes/alfabeticos/transferencias-vehiculares"}, 
                     {name: "Testamentos", path: "/app/reportes/alfabeticos/testamentos"}
                   ]},
-                {name: "Registro de Operaciones UIF",
-                  path: "/app/reportes/registros-uif",
-                  },
                 {name: "Reporte UIF-IAOC", 
                   path: "/app/reportes/reporte-uif-iaoc",
                 },
@@ -560,6 +558,18 @@ const Header = ({ kardexTypes }: Props) => {
                 </Link>
               </motion.div>
             )}
+            <motion.div variants={navItemVariants}>
+              <Link
+                to="/app/registros-uif"
+                title="Registro UIF"
+                className={topLinkClass(isHrefActive("/app/registros-uif"), collapsed)}
+                aria-current={isHrefActive("/app/registros-uif") ? "page" : undefined}
+                onClick={resetNavigationState}
+              >
+                <Shield className="h-4 w-4 shrink-0" aria-hidden />
+                {!collapsed && <span>Registro UIF</span>}
+              </Link>
+            </motion.div>
             <motion.div variants={navItemVariants}>
               <Link
                 to="/app/archivos-pdt"

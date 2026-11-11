@@ -348,7 +348,7 @@ const routes = createBrowserRouter([
                     },
                     {
                         path: "registros-uif",
-                        element: <PrivateRoutes><RegistrosUifMain /></PrivateRoutes>
+                        element: <Navigate to="/app/registros-uif" replace />,
                     },
                     {
                         path: "reporte-uif-iaoc",
@@ -448,6 +448,14 @@ const routes = createBrowserRouter([
                 <PrivateRoutes>
                     <SisgenMain />
                 </PrivateRoutes>
+            },
+            {
+                path: "registros-uif",
+                element: (
+                    <PrivateRoutes>
+                        <RegistrosUifMain />
+                    </PrivateRoutes>
+                ),
             },
             {
                 path: "archivos-pdt",

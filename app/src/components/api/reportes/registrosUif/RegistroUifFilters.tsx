@@ -1,9 +1,16 @@
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import Calendar from "../../../ui/Calendar"
 import SingleSelect from "../../../ui/SingleSelect"
 import { CalendarDays, Loader2, Shield } from "lucide-react"
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore"
 import type { UifReportPolicy } from "../../../../services/uif/uifService"
+import {
+    DATE_PRESETS,
+    getDatePresetRange,
+    matchDatePreset,
+    type DatePresetId,
+} from "../../../../utils/datePresets"
 
 interface Props {
     dateFrom: Date | undefined
@@ -27,6 +34,13 @@ const RegistroUifFilters = ({
     isLoading,
 }: Props) => {
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const [activePreset, setActivePreset] = useState<DatePresetId | null>(() =>
+        matchDatePreset(dateFrom, dateTo),
+    )
+
+    useEffect(() => {
+        setActivePreset(matchDatePreset(dateFrom, dateTo))
+    }, [dateFrom, dateTo])
 
     const handleGenerateRO = () => {
         if (!dateFrom || !dateTo) {
@@ -35,6 +49,13 @@ const RegistroUifFilters = ({
             setType("error")
             return
         }
+        onGenerate()
+    }
+
+    const applyDatePreset = (id: DatePresetId) => {
+        const range = getDatePresetRange(id)
+        setDateFrom(range.from)
+        setDateTo(range.to)
         onGenerate()
     }
 
@@ -54,6 +75,31 @@ const RegistroUifFilters = ({
                 <p className="text-xs text-slate-500">Seleccione fechas y tipo de registro para generar el RO</p>
             </div>
         </div>
+
+        <div className="mb-3">
+            <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <CalendarDays className="h-3.5 w-3.5" /> Rango rápido
+            </p>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Rangos de fecha rápidos">
+                {DATE_PRESETS.map((preset) => {
+                    const isActive = activePreset === preset.id
+                    return (
+                        <button
+                            key={preset.id}
+                            type="button"
+                            disabled={isLoading}
+                            onClick={() => applyDatePreset(preset.id)}
+                            className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                                isActive ? preset.tone.active : preset.tone.idle
+                            }`}
+                        >
+                            {preset.label}
+                        </button>
+                    )
+                })}
+            </div>
+        </div>
+
         <div className="flex flex-wrap items-end gap-4">
             <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
                 <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
