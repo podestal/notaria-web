@@ -8,6 +8,8 @@ interface SimpleInputProps {
   setValue: (val: string) => void;
   error?: string;
   setError?: (val: string) => void;
+  /** When false, keeps shake/red border but hides the inline error text. Default true. */
+  showErrorMessage?: boolean;
   horizontal?: boolean;
   required?: boolean;
   fullWidth?: boolean;
@@ -18,17 +20,13 @@ interface SimpleInputProps {
   rows?: number;
 }
 
-const shakeAnimation = {
-  initial: { x: 0 },
-  animate: { x: [0, -5, 5, -5, 5, 0], transition: { duration: 0.4 } },
-};
-
 const SimpleInput = ({
   label,
   value,
   setValue,
   error,
   setError,
+  showErrorMessage = true,
   horizontal = false,
   required = false,
   fullWidth = false,
@@ -37,8 +35,9 @@ const SimpleInput = ({
   suffix,
   rows,
 }: SimpleInputProps) => {
+  const hasError = Boolean(error)
   const fieldClassName = `${rows ? 'min-h-[5rem] h-auto resize-y py-2.5' : formControlClass} ${
-    error ? formControlErrorClass : ''
+    hasError ? formControlErrorClass : ''
   } ${disabled ? 'cursor-not-allowed bg-slate-50 text-slate-400' : ''}`
 
   return (
@@ -60,7 +59,10 @@ const SimpleInput = ({
             <div className='flex w-full items-center gap-2'>
                 {rows ? (
                   <motion.textarea
-                    {...(error ? shakeAnimation : {})}
+                    key={hasError ? `err-${error}` : 'ok'}
+                    initial={{ x: 0 }}
+                    animate={hasError ? { x: [0, -6, 6, -6, 6, 0] } : { x: 0 }}
+                    transition={{ duration: 0.4 }}
                     value={value}
                     disabled={disabled}
                     rows={rows}
@@ -73,7 +75,10 @@ const SimpleInput = ({
                   />
                 ) : (
                   <motion.input
-                    {...(error ? shakeAnimation : {})}
+                    key={hasError ? `err-${error}` : 'ok'}
+                    initial={{ x: 0 }}
+                    animate={hasError ? { x: [0, -6, 6, -6, 6, 0] } : { x: 0 }}
+                    transition={{ duration: 0.4 }}
                     type={type}
                     value={value}
                     disabled={disabled}
@@ -87,7 +92,7 @@ const SimpleInput = ({
                 )}
                 {suffix}
             </div>
-            {error && (
+            {hasError && showErrorMessage && (
                 <motion.div
                     className="mt-1 text-xs text-red-500"
                     initial={{ opacity: 0, y: -5 }}
