@@ -298,24 +298,27 @@ const ChildJob = ({
             <StageNode status={status} index={index} active={active} hold={hold} size="sm" />
             <div className="min-w-0 flex-1 pt-0.5">
                 <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-[13px] font-medium text-slate-800">{step.label}</p>
-                    <span
-                        className={`shrink-0 text-[10px] font-semibold uppercase tracking-wider ${
-                            waiting
-                                ? "text-slate-400"
-                                : status === "done"
-                                  ? "text-emerald-600"
-                                  : status === "warning"
-                                    ? "text-amber-600"
-                                    : status === "error"
-                                      ? "text-rose-600"
-                                      : active
-                                        ? "text-sky-600"
-                                        : "text-slate-400"
-                        }`}
-                    >
-                        {waiting ? "En cola" : active ? "En curso" : STATUS_LABEL[status]}
-                    </span>
+                    <p className="min-w-0 flex-1 text-[13px] font-medium leading-snug text-slate-800">
+                        {step.label}
+                    </p>
+                    {/* Green check already means done — skip repeating "Completado". */}
+                    {(waiting || active || status === "warning" || status === "error") && (
+                        <span
+                            className={`shrink-0 text-[10px] font-semibold uppercase tracking-wider ${
+                                waiting
+                                    ? "text-slate-400"
+                                    : status === "warning"
+                                      ? "text-amber-600"
+                                      : status === "error"
+                                        ? "text-rose-600"
+                                        : active
+                                          ? "text-sky-600"
+                                          : "text-slate-400"
+                            }`}
+                        >
+                            {waiting ? "En cola" : active ? "En curso" : STATUS_LABEL[status]}
+                        </span>
+                    )}
                 </div>
                 {!waiting && <IssueList issues={step.issues} />}
             </div>
@@ -384,32 +387,25 @@ const StageCard = ({
                                     : "border-slate-100 bg-slate-50/80"
                         }`}
                     >
-                        <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-slate-900">{step.label}</p>
-                            {active && !waiting && (
-                                <p className="mt-0.5 flex items-center gap-1.5 text-[11px] font-medium text-sky-600">
-                                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-500" />
-                                    En curso
-                                </p>
-                            )}
+                        <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold leading-snug text-slate-900">{step.label}</p>
                         </div>
-                        <span
-                            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
-                                waiting
-                                    ? "bg-slate-100 text-slate-400"
-                                    : status === "done"
-                                      ? "bg-emerald-100 text-emerald-700"
-                                      : status === "warning"
-                                        ? "bg-amber-100 text-amber-700"
-                                        : status === "error"
-                                          ? "bg-rose-100 text-rose-700"
-                                          : active
-                                            ? "bg-sky-100 text-sky-700"
-                                            : "bg-slate-100 text-slate-500"
-                            }`}
-                        >
-                            {waiting ? "En cola" : active ? "En curso" : STATUS_LABEL[status]}
-                        </span>
+                        {/* Done/idle use the node icon only — keep badges for active issues. */}
+                        {(waiting || active || status === "warning" || status === "error") && (
+                            <span
+                                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                                    waiting
+                                        ? "bg-slate-100 text-slate-400"
+                                        : status === "warning"
+                                          ? "bg-amber-100 text-amber-700"
+                                          : status === "error"
+                                            ? "bg-rose-100 text-rose-700"
+                                            : "bg-sky-100 text-sky-700"
+                                }`}
+                            >
+                                {waiting ? "En cola" : active ? "En curso" : STATUS_LABEL[status]}
+                            </span>
+                        )}
                     </div>
 
                     {!waiting && step.issues.length > 0 && !hasChildren && (
