@@ -16,7 +16,12 @@ const KardexTableBody = ({ kardexList, readyOnly }: Props) => {
     const access = useAuthStore(s => s.access_token) || ''
     const rows = Array.isArray(kardexList) ? kardexList : []
     const keys = useMemo(() => rows.map((row) => row.kardex).filter(Boolean), [rows])
-    const { data, isSuccess } = useGetKardexListProgress({ access, kardex: keys })
+    const showProgress = !readyOnly
+    const { data, isSuccess } = useGetKardexListProgress({
+        access,
+        kardex: keys,
+        enabled: showProgress,
+    })
 
     if (rows.length === 0) {
         return (
@@ -40,7 +45,7 @@ const KardexTableBody = ({ kardexList, readyOnly }: Props) => {
 
   return (
     <>
-    <KardexListProgressStyles />
+    {showProgress && <KardexListProgressStyles />}
     <div className="divide-y divide-slate-100">
         {rows.map((singleKardex, index) => (
             <KardexCard 
@@ -48,7 +53,13 @@ const KardexTableBody = ({ kardexList, readyOnly }: Props) => {
                 kardex={singleKardex}
                 readyOnly={readyOnly}
                 index={index}
-                progress={isSuccess ? (data.results[singleKardex.kardex] ?? "incomplete") : "pending"}
+                progress={
+                    showProgress
+                        ? isSuccess
+                            ? (data.results[singleKardex.kardex] ?? "incomplete")
+                            : "pending"
+                        : undefined
+                }
             />
         ))}
     </div>

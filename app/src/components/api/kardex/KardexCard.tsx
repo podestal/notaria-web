@@ -85,7 +85,7 @@ const KardexCard = ({ kardex, readyOnly, index = 0, progress = "pending" }: Prop
             }`}>
                 {kardex.kardex}
             </span>
-            <KardexListProgress tone={progress} />
+            {!readyOnly && <KardexListProgress tone={progress} />}
         </div>
         <CellValue value={kardex.fechaingreso} className="tabular-nums text-slate-600" />
         <p className="line-clamp-2 leading-snug text-slate-700" title={kardex.contrato || undefined}>
