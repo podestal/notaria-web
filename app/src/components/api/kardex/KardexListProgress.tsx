@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion"
+import { Check } from "lucide-react"
 import type { KardexListTone } from "../../../services/compliance/complianceService"
 
 export type KardexListProgressTone = KardexListTone | "pending"
@@ -20,7 +21,7 @@ const LABEL_CLASS: Record<KardexListProgressTone, string> = {
 const FILL_CLASS: Record<Exclude<KardexListProgressTone, "pending">, string> = {
     incomplete: "bg-rose-400",
     warning: "bg-amber-400",
-    complete: "bg-emerald-400",
+    complete: "bg-emerald-500",
 }
 
 const FILL_WIDTH: Record<Exclude<KardexListProgressTone, "pending">, string> = {
@@ -40,7 +41,7 @@ const KardexListProgress = ({ tone }: { tone: KardexListProgressTone }) => (
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="kardex-list-pending absolute inset-y-0 left-0 w-1/3 rounded-full bg-slate-300"
+                            className="kardex-list-pending absolute inset-y-0 left-0 w-1/3 rounded-full bg-sky-300"
                         />
                     ) : (
                         <motion.span
@@ -53,20 +54,14 @@ const KardexListProgress = ({ tone }: { tone: KardexListProgressTone }) => (
                         />
                     )}
                 </AnimatePresence>
-                {tone === "complete" && (
+                {(tone === "complete" || tone === "warning") && (
                     <motion.span
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.35 }}
-                        className="kardex-list-flow absolute inset-y-0 left-0 w-1/3"
-                    />
-                )}
-                {tone === "warning" && (
-                    <motion.span
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.35 }}
-                        className="kardex-list-flow kardex-list-flow-slow absolute inset-y-0 left-0 w-1/3"
+                        className={`kardex-list-flow absolute inset-y-0 left-0 w-1/3 ${
+                            tone === "warning" ? "kardex-list-flow-slow" : ""
+                        }`}
                     />
                 )}
             </div>
@@ -91,8 +86,13 @@ const KardexListProgress = ({ tone }: { tone: KardexListProgressTone }) => (
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -2 }}
                     transition={{ duration: 0.28, delay: 0.18, ease: "easeOut" }}
-                    className={`mt-1 font-mono text-[9px] font-semibold uppercase tracking-wider ${LABEL_CLASS[tone]}`}
+                    className={`mt-1 inline-flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-wider ${LABEL_CLASS[tone]}`}
                 >
+                    {tone === "complete" && (
+                        <span className="flex h-3 w-3 items-center justify-center rounded-full bg-emerald-500 text-white">
+                            <Check className="h-2 w-2" strokeWidth={3} aria-hidden />
+                        </span>
+                    )}
                     {LABEL[tone]}
                 </motion.p>
             )}
