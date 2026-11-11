@@ -9,7 +9,7 @@ import Paginator from "../../../../../ui/Paginator"
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
 import LoadingState from "../../../../../ui/LoadingState"
-const PermisoViajes = () => {
+const PermisoViajes = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   const [page, setPage] = useState(1)
   const access = useAuthStore(s => s.access_token) || ''
@@ -24,8 +24,8 @@ const PermisoViajes = () => {
 
   const { data: permisoViajesPage, isLoading, isError, error, isSuccess, refetch } = useGetPermisosViaje({ access, page, dateFrom, dateTo })
   return (
-    <ReportPageShell>
-        <ReportHeader title="Indice Cronológico de Permisos de Viaje" />
+    <ReportPageShell embedded={embedded}>
+        {!embedded && <ReportHeader title="Indice Cronológico de Permisos de Viaje"/>}
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
           dateTo={dateTo} 

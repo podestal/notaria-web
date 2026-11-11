@@ -10,7 +10,7 @@ import Paginator from "../../../../../ui/Paginator"
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
 import LoadingState from "../../../../../ui/LoadingState"
-const Poderes = () => {
+const Poderes = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
 
   const [page, setPage] = useState(1)
@@ -26,8 +26,8 @@ const Poderes = () => {
 
   const { data: poderesPage, isLoading, isError, error, isSuccess, refetch } = useGetIngresoPoderes({ access, page, dateFrom, dateTo })
   return (
-    <ReportPageShell>
-        <ReportHeader title="Indice Cronológico de Poderes Fuera de Registro" />
+    <ReportPageShell embedded={embedded}>
+        {!embedded && <ReportHeader title="Indice Cronológico de Poderes Fuera de Registro"/>}
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
           dateTo={dateTo} 

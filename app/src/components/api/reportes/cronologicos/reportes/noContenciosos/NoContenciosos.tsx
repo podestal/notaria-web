@@ -8,7 +8,7 @@ import ReportHeader from "../../../../../ui/ReportHeader"
 import LoadingState from "../../../../../ui/LoadingState"
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
-const NoContenciosos = () => {
+const NoContenciosos = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
     const now = new Date()
     return new Date(now.getFullYear(), now.getMonth(), 1)
@@ -21,8 +21,8 @@ const NoContenciosos = () => {
   const access = useAuthStore(s => s.access_token) || ''
   const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 2, indexReport: 'yes', access, dateFrom, dateTo})
   return (
-    <ReportPageShell>
-      <ReportHeader title="Indice Cronológico de Asuntos No Contenciosos" />
+    <ReportPageShell embedded={embedded}>
+      {!embedded && <ReportHeader title="Indice Cronológico de Asuntos No Contenciosos"/>}
       <ExtraProtocolaresHeader 
         dateFrom={dateFrom} 
         dateTo={dateTo} 

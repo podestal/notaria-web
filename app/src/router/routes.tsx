@@ -22,21 +22,6 @@ import SuperIncapazMain from "../components/api/extraprotocolares/supervivenciaI
 import CertDomiciliarioMain from "../components/api/extraprotocolares/certificadoDomiciliario/CertDomiciliarioMain";
 import CambioCaracteristicasMain from "../components/api/extraprotocolares/cambioCaracteristicas/CambioCaracteristicasMain";
 import CronologicosMain from "../components/api/reportes/cronologicos/CronologicosMain";
-import EscriturasPublicas from "../components/api/reportes/cronologicos/reportes/escritruasPublicas/EscriturasPublicas";
-import NoContenciosos from "../components/api/reportes/cronologicos/reportes/noContenciosos/NoContenciosos";
-import TransferenciasVehiculares from "../components/api/reportes/cronologicos/reportes/vehicular/TransferenciasVehiculares";
-import GarantiasMobiliarias from "../components/api/reportes/cronologicos/reportes/garantias/GarantiasMobiliarias";
-import Testamentos from "../components/api/reportes/cronologicos/reportes/testamento/Testamentos";
-import Protestos from "../components/api/reportes/cronologicos/reportes/Protestos";
-import ActasProtestos from "../components/api/reportes/cronologicos/reportes/ActasProtestos";
-import CamaraDeComercio from "../components/api/reportes/cronologicos/reportes/CamaraDeComercio";
-import CartasNotariales from "../components/api/reportes/cronologicos/reportes/cartasNotariales/CartasNotariales";
-import AperturaLibros from "../components/api/reportes/cronologicos/reportes/aperturaLibro/AperturaLibros";
-import PermisoViajes from "../components/api/reportes/cronologicos/reportes/permisoViaje/PermisoViajes";
-import Poderes from "../components/api/reportes/cronologicos/reportes/poderes/Poderes";
-import SupervivenciaCapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaCapaz";
-import SupervivenciaIncapaz from "../components/api/reportes/cronologicos/reportes/SupervivenciaIncapaz";
-import Domiciliario from "../components/api/reportes/cronologicos/reportes/domiciliario/Domiciliario";
 import AlfabeticosMain from "../components/api/reportes/alfabeticos/AlfabeticosMain";
 import ArchivosPdtMain from "../components/api/reportes/archivosPdt/ArchivosPdtMain";
 import RegistrosUifMain from "../components/api/reportes/registrosUif/RegistrosUifMain";
@@ -243,72 +228,15 @@ const routes = createBrowserRouter([
                 children: [
                     {
                         path: "cronologicos",
-                        element: 
-                        <PrivateRoutes>
-                            <CronologicosMain />
-                        </PrivateRoutes>,
-                        children: [
-                            {
-                                path: "escrituras",
-                                element: <PrivateRoutes><EscriturasPublicas /></PrivateRoutes>
-                            },
-                            {
-                                path: "no-contenciosos",
-                                element: <PrivateRoutes><NoContenciosos /></PrivateRoutes>
-                            },
-                            {
-                                path: "transferencias-vehiculares",
-                                element: <PrivateRoutes><TransferenciasVehiculares /></PrivateRoutes>
-                            },
-                            {
-                                path: "garantias-mobiliarias",
-                                element: <PrivateRoutes><GarantiasMobiliarias /></PrivateRoutes>
-                            },
-                            {
-                                path: "testamentos",
-                                element: <PrivateRoutes><Testamentos /></PrivateRoutes>
-                            },
-                            {
-                                path: "protestos",
-                                element: <PrivateRoutes><Protestos /></PrivateRoutes>
-                            },
-                            {
-                                path: "generar-actas-protesto",
-                                element: <PrivateRoutes><ActasProtestos /></PrivateRoutes>
-                            },
-                            {
-                                path: "informe-camara-comercio",
-                                element: <PrivateRoutes><CamaraDeComercio /></PrivateRoutes>
-                            },
-                            {
-                                path: "cartas-notariales",
-                                element: <PrivateRoutes><CartasNotariales /></PrivateRoutes>
-                            },
-                            {
-                                path: "certificacion-apertura-libros",
-                                element: <PrivateRoutes><AperturaLibros /></PrivateRoutes>
-                            },
-                            {
-                                path: "permisos-viaje",
-                                element: <PrivateRoutes><PermisoViajes /></PrivateRoutes>
-                            },
-                            {
-                                path: "poderes-fuera-registro",
-                                element: <PrivateRoutes><Poderes /></PrivateRoutes>
-                            },
-                            {
-                                path: "cart-supervivencia-persona-capaz",
-                                element: <PrivateRoutes><SupervivenciaCapaz /></PrivateRoutes>
-                            },
-                            {
-                                path: "cart-supervivencia-persona-incapaz",
-                                element: <PrivateRoutes><SupervivenciaIncapaz /></PrivateRoutes>
-                            },
-                            {
-                                path: "certificado-domiciliario",
-                                element: <PrivateRoutes><Domiciliario /></PrivateRoutes>
-                            }
-                        ]
+                        element: (
+                            <PrivateRoutes>
+                                <CronologicosMain />
+                            </PrivateRoutes>
+                        ),
+                    },
+                    {
+                        path: "cronologicos/*",
+                        element: <Navigate to="/app/reportes/cronologicos" replace />,
                     },
                     {
                         path: "alfabeticos",

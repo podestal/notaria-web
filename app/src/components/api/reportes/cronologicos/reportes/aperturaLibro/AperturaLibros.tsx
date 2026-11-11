@@ -11,7 +11,7 @@ import moment from "moment"
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
 import LoadingState from "../../../../../ui/LoadingState"
-const AperturaLibros = () => {
+const AperturaLibros = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const access = useAuthStore(s => s.access_token) || ''
   const [page, setPage] = useState(1)
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
@@ -26,8 +26,8 @@ const AperturaLibros = () => {
 
   const { data: librosPage, isLoading, isError, error, isSuccess, refetch } = useGetLibros({ access, page:1, dateFrom, dateTo })
   return (
-    <ReportPageShell>
-        <ReportHeader title="Indice Cronológico de Libros" />
+    <ReportPageShell embedded={embedded}>
+        {!embedded && <ReportHeader title="Indice Cronológico de Libros"/>}
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
           dateTo={dateTo} 

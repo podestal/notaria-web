@@ -8,7 +8,7 @@ import ReportHeader from "../../../../../ui/ReportHeader"
 import LoadingState from "../../../../../ui/LoadingState"
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
-const GarantiasMobiliarias = () => {
+const GarantiasMobiliarias = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
     const now = new Date()
@@ -22,8 +22,8 @@ const GarantiasMobiliarias = () => {
   const access = useAuthStore(s => s.access_token) || ''
   const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 4, indexReport: 'yes', access, dateFrom, dateTo})
   return (
-    <ReportPageShell>
-      <ReportHeader title="Indice Cronológico de Garantías Mobiliarias" />
+    <ReportPageShell embedded={embedded}>
+      {!embedded && <ReportHeader title="Indice Cronológico de Garantías Mobiliarias"/>}
       <ExtraProtocolaresHeader 
         dateFrom={dateFrom} 
         dateTo={dateTo} 

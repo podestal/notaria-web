@@ -4,9 +4,15 @@ import type { ReactNode } from "react"
 interface Props {
     children: ReactNode
     className?: string
+    /** Skip the outer page chrome when rendered inside a parent module. */
+    embedded?: boolean
 }
 
-const ReportPageShell = ({ children, className = "" }: Props) => {
+const ReportPageShell = ({ children, className = "", embedded = false }: Props) => {
+  if (embedded) {
+    return <div className={`w-full text-slate-800 ${className}`}>{children}</div>
+  }
+
   return (
     <motion.div
         initial={{ opacity: 0, y: 12 }}

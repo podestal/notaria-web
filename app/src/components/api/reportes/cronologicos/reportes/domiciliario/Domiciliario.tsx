@@ -9,7 +9,7 @@ import Paginator from "../../../../../ui/Paginator";
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
 import LoadingState from "../../../../../ui/LoadingState"
-const Domiciliario = () => {
+const Domiciliario = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const access = useAuthStore(state => state.access_token) || '';
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
     const now = new Date()
@@ -23,8 +23,8 @@ const Domiciliario = () => {
   
   const { data: domiciliariosPage, isLoading, isError, error, isSuccess, refetch } = useGetDomiciliarios({ access, page, dateFrom, dateTo })
   return (
-    <ReportPageShell>
-      <ReportHeader title="Indice Cronológico de Certificados Domiciliarios" />
+    <ReportPageShell embedded={embedded}>
+      {!embedded && <ReportHeader title="Indice Cronológico de Certificados Domiciliarios"/>}
       <ExtraProtocolaresHeader 
         dateFrom={dateFrom} 
         dateTo={dateTo} 

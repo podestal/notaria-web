@@ -2,10 +2,10 @@ import ComingSoon from "../../../../ui/ComingSoon"
 
 import ReportPageShell from "../../../../ui/ReportPageShell"
 import ReportHeader from "../../../../ui/ReportHeader"
-const Protestos = () => {
+const Protestos = ({ embedded = false }: { embedded?: boolean } = {}) => {
   return (
-    <ReportPageShell>
-      <ReportHeader title="Protestos" />
+    <ReportPageShell embedded={embedded}>
+      {!embedded && <ReportHeader title="Protestos"/>}
         <ComingSoon />
     </ReportPageShell>
   )

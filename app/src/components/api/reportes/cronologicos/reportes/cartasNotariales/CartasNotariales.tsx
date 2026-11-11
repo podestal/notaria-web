@@ -9,7 +9,7 @@ import CartasNotarialesTable from "../../../../extraprotocolares/cartasNotariale
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
 import LoadingState from "../../../../../ui/LoadingState"
-const CartasNotariales = () => {
+const CartasNotariales = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   const [page, setPage] = useState(1)
   const access = useAuthStore(s => s.access_token) || ''
@@ -24,8 +24,8 @@ const CartasNotariales = () => {
 
   const { data: cartasPage, isLoading, isError, error, isSuccess, refetch } = useGetIngresoCartas({ access, page, dateFrom, dateTo })
   return (
-    <ReportPageShell>
-        <ReportHeader title="Indice Cronológico de Cartas" />
+    <ReportPageShell embedded={embedded}>
+        {!embedded && <ReportHeader title="Indice Cronológico de Cartas"/>}
         <ExtraProtocolaresHeader 
           dateFrom={dateFrom} 
           dateTo={dateTo} 

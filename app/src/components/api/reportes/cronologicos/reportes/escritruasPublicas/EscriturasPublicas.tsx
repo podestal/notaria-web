@@ -8,7 +8,7 @@ import KardexTable from "../../../../kardex/KardexTable"
 import LoadingState from "../../../../../ui/LoadingState"
 
 import ReportPageShell from "../../../../../ui/ReportPageShell"
-const EscriturasPublicas = () => {
+const EscriturasPublicas = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(() => {
     const now = new Date()
@@ -22,8 +22,8 @@ const EscriturasPublicas = () => {
   const access = useAuthStore(s => s.access_token) || ''
   const {data: escrituras, isLoading, isError, error, isSuccess, refetch} = useGetKardexList({ page: page.toString(), idtipkar: 1, indexReport: 'yes', access, dateFrom, dateTo})
   return (
-    <ReportPageShell>
-      <ReportHeader title="Indice Cronológico de Escrituras Públicas" />
+    <ReportPageShell embedded={embedded}>
+      {!embedded && <ReportHeader title="Indice Cronológico de Escrituras Públicas"/>}
       <ExtraProtocolaresHeader 
         dateFrom={dateFrom} 
         dateTo={dateTo} 
