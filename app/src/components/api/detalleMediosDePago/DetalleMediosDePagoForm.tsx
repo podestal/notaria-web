@@ -7,7 +7,6 @@ import { UseMutationResult } from "@tanstack/react-query"
 import useAuthStore from "../../../store/useAuthStore"
 import { Patrimonial } from "../../../services/api/patrimonialService"
 import { useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
 import { TriangleAlert } from "lucide-react"
 import { UpdateDetalleMedioDePagoData } from "../../../hooks/api/detalleMedioDePago/useUpdateDetalleMedioDePago"
@@ -48,13 +47,9 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
 
     const [loading, setLoading] = useState(false)
 
-    const documentosRequired =
-        (patrimonial.exhibiomp || "").trim().toLowerCase() === "si"
-
     // ERRORS
     const [importeError, setImporteError] = useState('')
     const [fechaOperacionError, setFechaOperacionError] = useState('')
-    const [documentosError, setDocumentosError] = useState('')
 
     const handleSubmit = () => {
         let hasError = false
@@ -69,11 +64,6 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
             setMessage("La fecha de operación es requerida")
             setShow(true)
             setType("error")
-            hasError = true
-        }
-
-        if (documentosRequired && !documentos.trim()) {
-            setDocumentosError("Documentos es requerido cuando se exhibió medio de pago")
             hasError = true
         }
 
@@ -116,7 +106,6 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 setDocumentos("")
                 setFechaOperacion(undefined)
                 setFechaOperacionError('')
-                setDocumentosError('')
             },
             onError: (error) => {
                 setMessage("Error al crear medio de pago")
@@ -165,20 +154,6 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
   return (
     <div className=" w-[80%] mx-auto flex flex-col justify-center items-center gap-2">
         <h2 className="text-center font-bold text-lg">Nuevo Medio de Pago/Tipo de fondo</h2>
-        <AnimatePresence initial={false}>
-            {documentosError && (
-                <motion.p
-                    key="documentos-error"
-                    initial={{ opacity: 0, y: -6, height: 0 }}
-                    animate={{ opacity: 1, y: 0, height: "auto" }}
-                    exit={{ opacity: 0, y: -4, height: 0 }}
-                    transition={{ duration: 0.25, ease: "easeOut" }}
-                    className="mb-2 overflow-hidden text-center text-xs font-medium text-red-500"
-                >
-                    {documentosError}
-                </motion.p>
-            )}
-        </AnimatePresence>
         <div className="w-full flex flex-col gap-1 text-sm text-slate-600 mb-4 text-center">
             <p>
                 <span className="font-semibold text-slate-700">Fecha de Acta:</span> {patrimonial.nminuta}
@@ -257,16 +232,10 @@ const DetalleMediosDePagoForm = ({ patrimonial, createDetalleMedioDePago, update
                 setter={setMoneda}
             />
             <SimpleInput 
-                setValue={(value) => {
-                    setDocumentos(value)
-                    if (documentosError) setDocumentosError('')
-                }}
+                setValue={setDocumentos}
                 value={documentos}
                 horizontal
                 label="Documentos"
-                required={documentosRequired}
-                error={documentosError}
-                showErrorMessage={false}
             />
         </div>
         <div className="flex items-center justify-center gap-4 my-8">
