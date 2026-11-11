@@ -10,6 +10,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Receipt,
+  FileSpreadsheet,
   Send,
   Settings,
   Stamp,
@@ -297,15 +298,6 @@ const Header = ({ kardexTypes }: Props) => {
                     {name: "Transferencias Vehiculares", path: "/app/reportes/alfabeticos/transferencias-vehiculares"}, 
                     {name: "Testamentos", path: "/app/reportes/alfabeticos/testamentos"}
                   ]},
-                {name: "Archivos PDT Notaría", 
-                  path: "/app/reportes/archivos-pdt",
-                  subOptions: [
-                    {name: "Archivos PDT Escrituras", path: "/app/reportes/archivos-pdt/escrituras"}, 
-                    {name: "Archivos PDT Garantías", path: "/app/reportes/archivos-pdt/garantias"}, 
-                    {name: "Archivos PDT Vehiculares", path: "/app/reportes/archivos-pdt/vehiculares"}, 
-                    {name: "Archivos PDT Libros", path: "/app/reportes/archivos-pdt/libros"},
-                    {name: "Mis errores PDT", path: "/app/reportes/archivos-pdt/mis-errores"}
-                  ]},
                 {name: "Registro de Operaciones UIF",
                   path: "/app/reportes/registros-uif",
                   },
@@ -559,7 +551,7 @@ const Header = ({ kardexTypes }: Props) => {
                 <Link
                   to="/app/sisgen"
                   title="Sisgen"
-                  className={`${topLinkClass(isHrefActive("/app/sisgen"), collapsed)} mb-3`}
+                  className={topLinkClass(isHrefActive("/app/sisgen"), collapsed)}
                   aria-current={isHrefActive("/app/sisgen") ? "page" : undefined}
                   onClick={resetNavigationState}
                 >
@@ -568,6 +560,18 @@ const Header = ({ kardexTypes }: Props) => {
                 </Link>
               </motion.div>
             )}
+            <motion.div variants={navItemVariants}>
+              <Link
+                to="/app/archivos-pdt"
+                title="Archivos PDT"
+                className={`${topLinkClass(isHrefActive("/app/archivos-pdt"), collapsed)} mb-3`}
+                aria-current={isHrefActive("/app/archivos-pdt") ? "page" : undefined}
+                onClick={resetNavigationState}
+              >
+                <FileSpreadsheet className="h-4 w-4 shrink-0" aria-hidden />
+                {!collapsed && <span>Archivos PDT</span>}
+              </Link>
+            </motion.div>
             {menuItems.map((item, index) => {
               const isOpen = openDropdown === index
               const sectionActive = isSectionActive(item)

@@ -39,7 +39,6 @@ import SupervivenciaIncapaz from "../components/api/reportes/cronologicos/report
 import Domiciliario from "../components/api/reportes/cronologicos/reportes/domiciliario/Domiciliario";
 import AlfabeticosMain from "../components/api/reportes/alfabeticos/AlfabeticosMain";
 import ArchivosPdtMain from "../components/api/reportes/archivosPdt/ArchivosPdtMain";
-import ArchivosPdtHub from "../components/api/reportes/archivosPdt/ArchivosPdtHub";
 import RegistrosUifMain from "../components/api/reportes/registrosUif/RegistrosUifMain";
 import ReoporteUifMian from "../components/api/reportes/reporteUif/ReoporteUifMian";
 import BusquedaMain from "../components/api/reportes/busqueda/BusquedaMain";
@@ -47,11 +46,6 @@ import CorrelativoMain from "../components/api/reportes/correlativo/CorrelativoM
 import CronologicosPasadoMain from "../components/api/reportes/cronologicosPasado/CronologicosPasadoMain";
 import ReporteFirmaMain from "../components/api/reportes/reportePendFirma.tsx/ReporteFirmaMain";
 import BusquedaAvanzadaMain from "../components/api/extraprotocolares/busqueda/BusquedaAvanzadaMain";
-import ArchivosPdtEscrituras from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtEscrituras";
-import ArchivosPdtTransferencias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtTransferencias";
-import ArchivosPdtGarantias from "../components/api/reportes/archivosPdt/pdtKardex/ArchivosPdtGarantias";
-import ArchivosPdtLibros from "../components/api/reportes/archivosPdt/PDTLibros/ArchivosPdtLibros";
-import MisErroresPdt from "../components/api/reportes/archivosPdt/misErrores/MisErroresPdt";
 import AlfabeticosEscrituras from "../components/api/reportes/alfabeticos/AlfabeticosEscrituras";
 import AlfabeticosGarantias from "../components/api/reportes/alfabeticos/AlfabeticosGarantias";
 import AlfabeticosNoCont from "../components/api/reportes/alfabeticos/AlfebeticosNoCont";
@@ -344,33 +338,13 @@ const routes = createBrowserRouter([
                     },
                     {
                         path: "archivos-pdt",
-                        element: <PrivateRoutes><ArchivosPdtMain /></PrivateRoutes>,
+                        element: <Navigate to="/app/archivos-pdt" replace />,
                         children: [
                             {
-                                index: true,
-                                element: <ArchivosPdtHub />,
+                                path: "*",
+                                element: <Navigate to="/app/archivos-pdt" replace />,
                             },
-                            {
-                                path: "escrituras",
-                                element: <PrivateRoutes><ArchivosPdtEscrituras /></PrivateRoutes>
-                            },
-                            {
-                                path: "vehiculares",
-                                element: <PrivateRoutes><ArchivosPdtTransferencias /></PrivateRoutes>
-                            },
-                            {
-                                path: "garantias",
-                                element: <PrivateRoutes><ArchivosPdtGarantias /></PrivateRoutes>
-                            },
-                            {
-                                path: "libros",
-                                element: <PrivateRoutes><ArchivosPdtLibros /></PrivateRoutes>
-                            },
-                            {
-                                path: "mis-errores",
-                                element: <PrivateRoutes><MisErroresPdt /></PrivateRoutes>
-                            }
-                        ]
+                        ],
                     },
                     {
                         path: "registros-uif",
@@ -474,6 +448,14 @@ const routes = createBrowserRouter([
                 <PrivateRoutes>
                     <SisgenMain />
                 </PrivateRoutes>
+            },
+            {
+                path: "archivos-pdt",
+                element: (
+                    <PrivateRoutes>
+                        <ArchivosPdtMain />
+                    </PrivateRoutes>
+                ),
             },
             ...taxesRoutes,
                 ],
