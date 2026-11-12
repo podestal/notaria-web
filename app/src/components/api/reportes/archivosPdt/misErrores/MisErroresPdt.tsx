@@ -11,8 +11,7 @@ import getTitleCase from "../../../../../utils/getTitleCase"
 import ReportPageShell from "../../../../ui/ReportPageShell"
 import ReportHeader from "../../../../ui/ReportHeader"
 import LoadingState from "../../../../ui/LoadingState"
-import TopModal from "../../../../ui/TopModal"
-import PreKardexForm from "../../registrosUif/PreKardexForm"
+import ComplianceKardexModal from "../../../kardex/kardexErrors/ComplianceKardexModal"
 
 const YEAR_START = 2021
 const currentYear = new Date().getFullYear()
@@ -30,7 +29,7 @@ const MisErroresPdt = () => {
     const me = useUserInfoStore((s) => s.user)
     const [searchParams, setSearchParams] = useSearchParams()
     const [year, setYear] = useState(currentYear)
-    const [openKardexId, setOpenKardexId] = useState<number | null>(null)
+    const [openKardex, setOpenKardex] = useState<{ id: number; code: string } | null>(null)
 
     const usuarioParam = (searchParams.get("usuario") || "").trim()
     const usuario = usuarioParam || me?.username || ""
@@ -186,7 +185,12 @@ const MisErroresPdt = () => {
                                                     <button
                                                         type="button"
                                                         className="cursor-pointer font-mono font-semibold text-sky-700 hover:text-sky-900"
-                                                        onClick={() => setOpenKardexId(row.idkardex)}
+                                                        onClick={() =>
+                                                            setOpenKardex({
+                                                                id: row.idkardex,
+                                                                code: row.kardex,
+                                                            })
+                                                        }
                                                     >
                                                         {row.kardex}
                                                     </button>
@@ -230,11 +234,12 @@ const MisErroresPdt = () => {
                 </motion.section>
             </div>
 
-            <TopModal isOpen={openKardexId != null} onClose={() => setOpenKardexId(null)} portal>
-                {openKardexId != null && (
-                    <PreKardexForm isOpen={openKardexId != null} kardexId={openKardexId} />
-                )}
-            </TopModal>
+            <ComplianceKardexModal
+                isOpen={openKardex != null}
+                onClose={() => setOpenKardex(null)}
+                idkardex={openKardex?.id ?? 0}
+                kardex={openKardex?.code ?? ""}
+            />
         </ReportPageShell>
     )
 }

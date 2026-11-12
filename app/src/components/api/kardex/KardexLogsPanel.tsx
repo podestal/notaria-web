@@ -158,7 +158,7 @@ const KardexLogsPanel = ({ idkardex, enabled, className = "" }: Props) => {
 
     return (
         <aside
-            className={`flex min-h-0 w-full shrink-0 flex-col overflow-hidden rounded-lg border border-slate-200 bg-slate-50 lg:rounded-none lg:border-y-0 lg:border-l-0 lg:border-r ${className}`}
+            className={`flex h-full min-h-0 w-full shrink-0 flex-col overflow-hidden rounded-lg border border-slate-200 bg-slate-50 lg:rounded-none lg:border-y-0 lg:border-l-0 lg:border-r ${className}`}
         >
             <div className="border-b border-slate-200 px-4 py-3">
                 <div className="flex items-start justify-between gap-2">

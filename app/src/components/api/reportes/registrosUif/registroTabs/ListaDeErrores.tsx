@@ -2,8 +2,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { FileSearch } from "lucide-react"
 import { KardexError } from "../../../../../services/api/kardexService"
-import TopModal from "../../../../ui/TopModal"
-import PreKardexForm from "../PreKardexForm"
+import ComplianceKardexModal from "../../../kardex/kardexErrors/ComplianceKardexModal"
 import getTitleCase from "../../../../../utils/getTitleCase"
 import { EXTRA_HEADER_CLASS, EXTRA_ID_BADGE_CLASS, EXTRA_ROW_CLASS } from "../../../extraprotocolares/ExtraTableShell"
 import { emptyMotionProps, rowMotionProps } from "../../../extraprotocolares/rowMotion"
@@ -19,7 +18,14 @@ const ListaDeErrores = ({
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false)
   const [kardexId, setKardexId] = useState(0)
+  const [kardexCode, setKardexCode] = useState("")
   const errors = kardexErrors ?? []
+
+  const openKardex = (row: KardexError) => {
+    setKardexId(row.idkardex)
+    setKardexCode(row.kardex)
+    setIsOpen(true)
+  }
 
   return (
     <>
@@ -53,15 +59,11 @@ const ListaDeErrores = ({
                                 {...rowMotionProps(idx)}
                                 role="button"
                                 tabIndex={0}
-                                onClick={() => {
-                                    setIsOpen(true)
-                                    setKardexId(error.idkardex)
-                                }}
+                                onClick={() => openKardex(error)}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" || e.key === " ") {
                                         e.preventDefault()
-                                        setIsOpen(true)
-                                        setKardexId(error.idkardex)
+                                        openKardex(error)
                                     }
                                 }}
                                 className={`${EXTRA_ROW_CLASS} cursor-pointer`}
@@ -78,16 +80,12 @@ const ListaDeErrores = ({
                 )}
             </div>
         </div>
-        <TopModal
+        <ComplianceKardexModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
-            portal
-        >
-            <PreKardexForm
-                isOpen={isOpen}
-                kardexId={kardexId}
-            />
-        </TopModal>
+            idkardex={kardexId}
+            kardex={kardexCode}
+        />
     </>
   )
 }
