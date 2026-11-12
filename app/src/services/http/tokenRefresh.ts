@@ -159,6 +159,7 @@ export function isAppBackendAbsoluteUrl(url: string | undefined): boolean {
         normalizeBase(import.meta.env.VITE_SISGEN_URL),
         normalizeBase(import.meta.env.VITE_UIF_URL),
         normalizeBase(import.meta.env.VITE_COMPLIANCE_URL),
+        normalizeBase(import.meta.env.VITE_DOCUMENTOS_URL),
         normalizeBase(import.meta.env.VITE_AUTH_URL),
     ].filter(Boolean)
     return bases.some((base) => url.startsWith(base))

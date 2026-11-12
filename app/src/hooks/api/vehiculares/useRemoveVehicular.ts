@@ -1,5 +1,6 @@
 import { useMutation, UseMutationResult, useQueryClient } from "@tanstack/react-query"
 import getVehicleService, { Vehicle } from "../../../services/api/vehicleService"
+import { DOCUMENTOS_VEHICULARES_LIST_KEY } from "../../documentos/useGetDocumentosVehiculares"
 
 export interface RemoveVehicularData {
     access: string;
@@ -19,6 +20,8 @@ const useRemoveVehicular = ({ idVehicular, kardex }: Props): UseMutationResult<V
         onSuccess: (data) => {
             console.log('Vehicle removed successfully:', data);
             queryClient.invalidateQueries({ queryKey:['vehiculares by kardex', kardex] });
+            // Boleta returns to pendientes after backend unlinks DocumentoBien.
+            queryClient.invalidateQueries({ queryKey: DOCUMENTOS_VEHICULARES_LIST_KEY });
         },
         onError: (error) => {
             console.error("Error removing Vehicle:", error);

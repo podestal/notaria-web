@@ -6,6 +6,7 @@ import {
   BarChart3,
   ChevronDown,
   FileText,
+  FolderOpen,
   LayoutDashboard,
   PanelLeftClose,
   PanelLeftOpen,
@@ -40,6 +41,7 @@ const SECTION_ICONS: Record<string, NavIcon> = {
   Protocolares: FileText,
   Extraprotocolares: Stamp,
   Reportes: BarChart3,
+  Documentos: FolderOpen,
   Configuracion: Settings,
   Facturacion: Receipt,
 }
@@ -54,6 +56,7 @@ const SECTION_PREFIX: Record<string, string> = {
   Protocolares: "/app/protocolares",
   Extraprotocolares: "/app/extraprotocolares",
   Reportes: "/app/reportes",
+  Documentos: "/app/documentos",
   Configuracion: "/app/configuracion",
   Facturacion: "/app/taxes",
 }
@@ -286,6 +289,10 @@ const Header = ({ kardexTypes }: Props) => {
                 {name: "Reporte Correlativo de Documentos", 
                   path: "/app/reportes/correlativo",
                 },
+            ]},
+        { label: "Documentos", options:
+            [
+              { name: "Vehiculares", path: "/app/documentos/vehiculares" },
             ]},
         // { label: "Caja", options:
         //     [   {name: "Egresos", 
@@ -564,12 +571,18 @@ const Header = ({ kardexTypes }: Props) => {
                   type="button"
                   title={item.label}
                   onClick={() => {
-                    if (item.label === "Protocolares" || item.label === "Extraprotocolares") {
+                    if (
+                      item.label === "Protocolares" ||
+                      item.label === "Extraprotocolares" ||
+                      item.label === "Documentos"
+                    ) {
                       resetNavigationState()
                       navigate(
                         item.label === "Protocolares"
                           ? "/app/protocolares"
-                          : "/app/extraprotocolares",
+                          : item.label === "Extraprotocolares"
+                            ? "/app/extraprotocolares"
+                            : "/app/documentos/vehiculares",
                       )
                       if (collapsed) setCollapsed(false)
                       setOpenDropdown(index)

@@ -74,7 +74,11 @@ const PatrimonialForm = ({
     const [inporteTransaccion, setImporteTransaccion] = useState(patrimonial ? patrimonial.importetrans.toString() : '');
     const [monedaSelected, setMonedaSelected] = useState(patrimonial ? patrimonial.idmon : 1);
 
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(patrimonial ? moment(patrimonial.nminuta, "DD/MM/YYYY").toDate() : undefined);
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(() =>
+        patrimonial
+            ? moment(patrimonial.nminuta, "DD/MM/YYYY").toDate()
+            : moment().startOf("day").toDate()
+    );
 
     const [exhibiompSelected, setExhibiompSelected] = useState(patrimonial ? patrimonial.exhibiomp : 'Si');
     const [tipoDeCambio, setTipoDeCambio] = useState(patrimonial ? patrimonial.tipocambio : '');
@@ -104,7 +108,7 @@ const PatrimonialForm = ({
         setSelectedTipoDeActo('');
         setImporteTransaccion('');
         setMonedaSelected(1);
-        setSelectedDate(undefined);
+        setSelectedDate(moment().startOf("day").toDate());
         setExhibiompSelected('Si');
         setTipoDeCambio('');
 

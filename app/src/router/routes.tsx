@@ -12,6 +12,8 @@ import UsuariosMain from "../components/api/usuarios/UsuariosMain";
 import HerramientasMain from "../components/api/herramientas/HerramientasMain";
 import ConfiguracionMain from "../components/api/configuracion/ConfiguracionMain";
 import SisgenMain from "../components/api/sisgen/SisgenMain";
+import DocumentosMain from "../components/api/documentos/DocumentosMain";
+import DocumentosVehicularesMain from "../components/api/documentos/vehiculares/DocumentosVehicularesMain";
 import LegalizacionMain from "../components/api/extraprotocolares/legalizacion/LegalizacionMain";
 import PermisosMain from "../components/api/extraprotocolares/permisosViaje/PermisosMain";
 import PoderesFueraDeRegistroMain from "../components/api/extraprotocolares/poderesFueraDeRegistro/PoderesFueraDeRegistroMain";
@@ -392,6 +394,28 @@ const routes = createBrowserRouter([
                         <ArchivosPdtMain />
                     </PrivateRoutes>
                 ),
+            },
+            {
+                path: "documentos",
+                element: (
+                    <PrivateRoutes>
+                        <DocumentosMain />
+                    </PrivateRoutes>
+                ),
+                children: [
+                    {
+                        index: true,
+                        element: <Navigate to="vehiculares" replace />,
+                    },
+                    {
+                        path: "vehiculares",
+                        element: (
+                            <PrivateRoutes>
+                                <DocumentosVehicularesMain />
+                            </PrivateRoutes>
+                        ),
+                    },
+                ],
             },
             ...taxesRoutes,
                 ],
