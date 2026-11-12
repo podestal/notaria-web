@@ -75,6 +75,19 @@ export interface Pagination {
     search_id: string;
     total_documents: number;
     total_pages: number;
+    instrumento_stats?: SisgenInstrumentoStats;
+}
+
+export interface SisgenInstrumentoStats {
+    kardex_count: number
+    instrumento_first: number | null
+    instrumento_last: number | null
+    instrumento_expected: number | null
+    instrumento_unique: number
+    missing_instrumento: number
+    gaps: number[]
+    duplicates: number[]
+    correlative_ok: boolean
 }
 
 export interface SISGENSearchResponse {
@@ -83,6 +96,7 @@ export interface SISGENSearchResponse {
     total: number;
     message?: string;     
     pagination: Pagination;
+    instrumento_stats?: SisgenInstrumentoStats;
 }
 
 export interface SISGENSearchRequest {

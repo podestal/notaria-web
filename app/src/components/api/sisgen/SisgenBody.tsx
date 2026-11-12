@@ -3,12 +3,16 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { registerSisgenSearchHandlers } from "../../../hooks/sisgen/sisgenSearchKeys";
 import SisgenSearchForm from "./SisgenSearchForm";
 import SIsgenSearchTable from "./SIsgenSearchTable";
-import { SISGENDocument } from "../../../services/sisgen/searchSisgenService";
+import {
+    SISGENDocument,
+    type SisgenInstrumentoStats,
+} from "../../../services/sisgen/searchSisgenService";
 import Paginator from "../../ui/Paginator";
 import SisgenBooksTable from "./SisgenBooksTable";
 import LoadingState from "../../ui/LoadingState";
 import { AnimatePresence, motion } from "framer-motion";
 import { CalendarSearch, FileStack, SearchX } from "lucide-react";
+import SisgenInstrumentoStatsCards from "./SisgenInstrumentoStatsCards";
 
 interface Props {
     typekardex: string;
@@ -32,6 +36,8 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
     const [selectedFromDate, setSelectedFromDate] = useState<Date | undefined>(undefined);
     const [selectedToDate, setSelectedToDate] = useState<Date | undefined>(undefined);
     const [errorDisplay, setErrorDisplay] = useState('');
+    const [instrumentoStats, setInstrumentoStats] =
+        useState<SisgenInstrumentoStats | null>(null)
 
     const searchHandlers = useMemo(
         () => ({
@@ -41,6 +47,7 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
             setNoDocsMessage,
             setErrorDisplay,
             setLoading,
+            setInstrumentoStats,
         }),
         [
             setSisgenDocs,
@@ -111,6 +118,11 @@ const SisgenBody = ({ typekardex, instrumentType, sisgenDocs, setSisgenDocs, ite
           errorDisplay={errorDisplay}
           searchHandlers={searchHandlers}
         />
+        {instrumentoStats && instrumentType !== 5 && itemsCount > 0 && (
+            <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                <SisgenInstrumentoStatsCards stats={instrumentoStats} />
+            </div>
+        )}
         <AnimatePresence mode="wait">
         {loading ? (
           <motion.div

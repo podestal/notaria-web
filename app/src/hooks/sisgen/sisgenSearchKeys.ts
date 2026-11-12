@@ -1,5 +1,9 @@
 import type { Dispatch, SetStateAction } from "react"
-import type { SISGENDocument, SISGENSearchRequest } from "../../services/sisgen/searchSisgenService"
+import type {
+    SISGENDocument,
+    SISGENSearchRequest,
+    SisgenInstrumentoStats,
+} from "../../services/sisgen/searchSisgenService"
 import type { SearchSisgenData } from "./useSearchSisgen"
 
 export const sisgenSearchKeys = {
@@ -16,6 +20,7 @@ export type SisgenSearchHandlers = {
     setNoDocsMessage: Dispatch<SetStateAction<string>>
     setErrorDisplay: Dispatch<SetStateAction<string>>
     setLoading: Dispatch<SetStateAction<boolean>>
+    setInstrumentoStats?: Dispatch<SetStateAction<SisgenInstrumentoStats | null>>
 }
 
 const handlersRef: { current: SisgenSearchHandlers | null } = { current: null }

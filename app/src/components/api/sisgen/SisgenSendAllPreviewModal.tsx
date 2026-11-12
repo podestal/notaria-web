@@ -16,6 +16,7 @@ import {
 } from "../../../utils/sisgenJobSummary"
 import SisgenJobDocumentsTable from "./SisgenJobDocumentsTable"
 import SisgenJobSummaryCards from "./SisgenJobSummaryCards"
+import SisgenInstrumentoStatsCards from "./SisgenInstrumentoStatsCards"
 import SisgenPointerStyles from "./SisgenPointerStyles"
 import getTitleCase from "../../../utils/getTitleCase"
 
@@ -398,26 +399,33 @@ const SisgenSendAllPreviewModal = ({
 
                 {!sendResult && !isJobActive && !jobFailedMessage && data?.error === 0 && (
                     <>
-                        <div className="mb-4 grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3 text-xs sm:grid-cols-3">
-                            <div>
-                                <p className="font-semibold text-slate-500">Total</p>
-                                <p className="mt-0.5 text-base font-semibold text-slate-900">
-                                    {data.total}
-                                </p>
+                        <div className="mb-4 space-y-3 rounded-lg bg-slate-50 p-3 text-xs">
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                                <div>
+                                    <p className="font-semibold text-slate-500">Total</p>
+                                    <p className="mt-0.5 text-base font-semibold text-slate-900">
+                                        {data.total}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-slate-500">Desde / Hasta</p>
+                                    <p className="mt-0.5 text-slate-800">
+                                        {data.filters.fechaDesde} — {data.filters.fechaHasta}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-slate-500">Estado</p>
+                                    <p className="mt-0.5 text-slate-800">
+                                        {ESTADO_LABELS[data.filters.estado] ?? data.filters.estado}
+                                    </p>
+                                </div>
                             </div>
+
+                            {data.instrumento_stats && (
+                                <SisgenInstrumentoStatsCards stats={data.instrumento_stats} />
+                            )}
+
                             <div>
-                                <p className="font-semibold text-slate-500">Desde / Hasta</p>
-                                <p className="mt-0.5 text-slate-800">
-                                    {data.filters.fechaDesde} — {data.filters.fechaHasta}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="font-semibold text-slate-500">Estado</p>
-                                <p className="mt-0.5 text-slate-800">
-                                    {ESTADO_LABELS[data.filters.estado] ?? data.filters.estado}
-                                </p>
-                            </div>
-                            <div className="col-span-2 sm:col-span-3">
                                 <p className="font-semibold text-slate-500">
                                     Tipo de instrumento
                                 </p>
@@ -449,7 +457,8 @@ const SisgenSendAllPreviewModal = ({
                                 <div className="grid grid-cols-12 gap-2 bg-slate-100 px-3 py-2 text-[10px] font-semibold uppercase text-slate-600">
                                     <p className="col-span-1">Nº</p>
                                     <p className="col-span-3">Kardex</p>
-                                    <p className="col-span-8">Acto</p>
+                                    <p className="col-span-2 text-center">Nº Inst.</p>
+                                    <p className="col-span-6">Acto</p>
                                 </div>
                                 <ul className="max-h-[50vh] divide-y divide-slate-100 overflow-y-auto">
                                     {documents.map((doc, idx) => (
@@ -461,7 +470,10 @@ const SisgenSendAllPreviewModal = ({
                                             <p className="col-span-3 font-mono font-medium">
                                                 {doc.kardex}
                                             </p>
-                                            <p className="col-span-8 leading-snug">
+                                            <p className="col-span-2 text-center font-mono tabular-nums text-slate-700">
+                                                {doc.numero_instrumento || "—"}
+                                            </p>
+                                            <p className="col-span-6 leading-snug">
                                                 {getTitleCase(doc.contrato || "")}
                                             </p>
                                         </li>

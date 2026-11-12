@@ -10,6 +10,11 @@ export const applySisgenSearchResponse = (
         handlers.setSisgenDocs(data.data)
         handlers.setItemsCount(data.pagination.total_documents)
         handlers.setSearchId(data.pagination.search_id)
+        handlers.setInstrumentoStats?.(
+            data.instrumento_stats
+                ?? data.pagination.instrumento_stats
+                ?? null,
+        )
         if (data.data.length === 0) {
             handlers.setNoDocsMessage("No se encontraron documentos SISGEN.")
         } else {
@@ -17,6 +22,7 @@ export const applySisgenSearchResponse = (
         }
         handlers.setErrorDisplay("")
     } else {
+        handlers.setInstrumentoStats?.(null)
         handlers.setErrorDisplay(
             data.message || "Error al buscar documentos SISGEN.",
         )
