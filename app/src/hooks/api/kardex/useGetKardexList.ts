@@ -58,7 +58,18 @@ const useGetKardexList = ({
     }
 
     return useQuery({
-        queryKey: ['kardex list', page, idtipkar],
+        queryKey: [
+            "kardex list",
+            page,
+            idtipkar,
+            indexReport || "",
+            correlative || "",
+            name || "",
+            document || "",
+            numescritura || "",
+            dateFrom ? moment(dateFrom).format("YYYY-MM-DD") : "",
+            dateTo ? moment(dateTo).format("YYYY-MM-DD") : "",
+        ],
         queryFn: () => kardexService.get(access, params),
         refetchOnWindowFocus: false,
         enabled: enabled && idtipkar > 0,

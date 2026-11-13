@@ -1,14 +1,6 @@
-import ComingSoon from '../../../ui/ComingSoon'
+import { Navigate } from "react-router-dom"
 
-import ReportPageShell from "../../../ui/ReportPageShell"
-import ReportHeader from "../../../ui/ReportHeader"
-const AlfebeticosNoCont = () => {
-  return (
-    <ReportPageShell>
-      <ReportHeader title="Índice Alfabético · No Contenciosos" />
-        <ComingSoon />
-    </ReportPageShell>
-  )
-}
+/** Legacy path → unified Índices Alfabéticos module. */
+const AlfabeticosNoCont = () => <Navigate to="/app/reportes/alfabeticos" replace />
 
-export default AlfebeticosNoCont
+export default AlfabeticosNoCont

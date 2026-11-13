@@ -1,14 +1,6 @@
-import ComingSoon from '../../../ui/ComingSoon'
+import { Navigate } from "react-router-dom"
 
-import ReportPageShell from "../../../ui/ReportPageShell"
-import ReportHeader from "../../../ui/ReportHeader"
-const AlfabeticosTestamento = () => {
-  return (
-    <ReportPageShell>
-      <ReportHeader title="Índice Alfabético · Testamentos" />
-        <ComingSoon />
-    </ReportPageShell>
-  )
-}
+/** Legacy path → unified Índices Alfabéticos module. */
+const AlfabeticosTestamento = () => <Navigate to="/app/reportes/alfabeticos" replace />
 
 export default AlfabeticosTestamento

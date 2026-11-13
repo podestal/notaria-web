@@ -278,15 +278,9 @@ const Header = ({ kardexTypes }: Props) => {
             [   {name: "Indices Cronologicos", 
                   path: "/app/reportes/cronologicos",
                   },
-                {name: "Indices Alfabeticos", 
+                {name: "Indices Alfabeticos",
                   path: "/app/reportes/alfabeticos",
-                  subOptions: [
-                    {name: "Escrituras Públicas", path: "/app/reportes/alfabeticos/escrituras"}, 
-                    {name: "Garantías Mobiliarias", path: "/app/reportes/alfabeticos/garantias-mobiliarias"}, 
-                    {name: "Asuntos no Contenciosos", path: "/app/reportes/alfabeticos/no-contenciosos"}, 
-                    {name: "Transferencias Vehiculares", path: "/app/reportes/alfabeticos/transferencias-vehiculares"}, 
-                    {name: "Testamentos", path: "/app/reportes/alfabeticos/testamentos"}
-                  ]},
+                },
                 {name: "Reporte Correlativo de Documentos", 
                   path: "/app/reportes/correlativo",
                 },
