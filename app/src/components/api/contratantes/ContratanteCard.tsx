@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react"
 import { debounce, omit } from "lodash"
+import { Building2, UserRound } from "lucide-react"
 import { Contratante, type CreateUpdateContratante } from "../../../services/api/contratantesService"
 import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
@@ -8,11 +9,13 @@ import {
     fechafirmaToDisplay,
     isValidCompleteDdMmYyyy,
 } from "../../../utils/fechaFirmaDdMmYyyy"
+import { isEmpresaContratante } from "../../../utils/sortContratantesDisplay"
 import RemoveContratante from "./RemoveContratante"
 import UpdateContratante from "./UpdateContratante"
 import useUpdateContratante from "../../../hooks/api/contratantes/useUpdateContratante"
 import useAuthStore from "../../../store/useAuthStore"
 import useNotificationsStore from "../../../hooks/store/useNotificationsStore"
+import { CONTRATANTES_GRID } from "./contratantesGrid"
 
 interface Props {
     contratante: Contratante
@@ -46,6 +49,7 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
         idkardex: kardex.idkardex,
     })
     const { setMessage, setShow, setType } = useNotificationsStore()
+    const isEmpresa = isEmpresaContratante(contratante)
 
     const accessRef = useRef(access)
     const contratanteRef = useRef(contratante)
@@ -120,15 +124,60 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
 
     return (
         <div
-            key={contratante.idcontratante}
-            className="grid grid-cols-9 text-xs text-black px-2 my-2 place-content-center border-b-2 border-gray-200"
+            className="group grid items-center gap-3 px-4 py-3 text-xs text-slate-700 transition-colors hover:bg-sky-50/60"
+            style={{ gridTemplateColumns: CONTRATANTES_GRID }}
         >
-            <p className="col-span-2">{getTitleCase(contratante.cliente)}</p>
-            <p className="col-span-2">{getTitleCase(contratante.condicion_str)}</p>
-            <p className="pl-2">{contratante.firma === "1" ? "Si" : "No"}</p>
+            <div className="min-w-0">
+                <div className="flex items-start gap-2">
+                    <span
+                        className={`mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${
+                            isEmpresa
+                                ? "border-amber-200 bg-amber-50 text-amber-700"
+                                : "border-sky-200 bg-sky-50 text-sky-700"
+                        }`}
+                    >
+                        {isEmpresa ? (
+                            <Building2 className="h-3.5 w-3.5" aria-hidden />
+                        ) : (
+                            <UserRound className="h-3.5 w-3.5" aria-hidden />
+                        )}
+                    </span>
+                    <div className="min-w-0">
+                        <p
+                            className="truncate font-medium leading-snug text-slate-800"
+                            title={getTitleCase(contratante.cliente)}
+                        >
+                            {getTitleCase(contratante.cliente) || "—"}
+                        </p>
+                        <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                            {isEmpresa ? "Persona jurídica" : "Persona natural"}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <p
+                className="line-clamp-2 leading-snug text-slate-600"
+                title={getTitleCase(contratante.condicion_str)}
+            >
+                {getTitleCase(contratante.condicion_str) || "—"}
+            </p>
+
+            <div className="flex justify-center">
+                <span
+                    className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                        showFechaFirma
+                            ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                            : "bg-slate-100 text-slate-500 ring-1 ring-slate-200"
+                    }`}
+                >
+                    {showFechaFirma ? "Sí" : "No"}
+                </span>
+            </div>
+
             {showFechaFirma ? (
                 <input
-                    className="rounded-xl py-1 px-2 bg-slate-100 mx-1 h-6 text-center"
+                    className="h-8 w-full rounded-lg border border-slate-200 bg-white px-2 text-center text-xs tabular-nums text-slate-800 shadow-sm outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-100 disabled:opacity-60"
                     value={fechafirma}
                     onChange={handleChangeFechafirma}
                     onBlur={handleBlurFechafirma}
@@ -141,21 +190,26 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
                     aria-label="Fecha de firma"
                 />
             ) : (
-                <p className="pl-2 text-slate-400" aria-hidden>
+                <p className="text-center text-slate-300" aria-hidden>
                     —
                 </p>
             )}
-            <p className="pl-2">{kardex.usuario ? getTitleCase(kardex.usuario) : ""}</p>
-            <p></p>
-            <div className="flex items-start justify-start gap-2 pl-4">
-                <RemoveContratante contratanteId={contratante.idcontratante} kardex={contratante.kardex} />
-                <p>|</p>
+
+            <p className="truncate text-slate-600" title={kardex.usuario ? getTitleCase(kardex.usuario) : undefined}>
+                {kardex.usuario ? getTitleCase(kardex.usuario) : "—"}
+            </p>
+
+            <div className="flex items-center justify-center gap-1.5">
                 <UpdateContratante
                     idtipoacto={kardex.codactos}
                     idtipkar={kardex.idtipkar}
                     kardex={kardex.kardex}
                     idkardex={kardex.idkardex}
                     contratante={contratante}
+                />
+                <RemoveContratante
+                    contratanteId={contratante.idcontratante}
+                    kardex={contratante.kardex}
                 />
             </div>
         </div>
