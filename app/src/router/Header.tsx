@@ -29,6 +29,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useUserInfoStore from '../hooks/store/useGetUserInfo'
 import { userCanExtraprotocolar } from '../services/auth/userService'
 import { isFacturacionEnabled } from '../utils/isFacturacionEnabled'
+import { userIsStaffOrSuperuser } from '../utils/userIsStaffOrSuperuser'
 import ComplianceMeReminder from '../components/api/kardex/kardexErrors/ComplianceMeReminder'
 import useSidebarStore, {
   SIDEBAR_WIDTH_COLLAPSED,
@@ -372,7 +373,7 @@ const Header = ({ kardexTypes }: Props) => {
     //   { label: "CONFIGURACION", options: ["Datos del Notario", "Edición de Datos", "Registrar Servidor", "Editar Servidor", "Backup Servidor", "Configurar SISNOT", "Activar Errores Usuarios"] },
     ].filter((item) => {
       if (item.label === "Configuracion") {
-        return Number(user?.is_superuser) !== 0 || Number(user?.is_staff) !== 0;
+        return userIsStaffOrSuperuser(user);
       }
       if (item.label === "Facturacion") {
         return isFacturacionEnabled();
@@ -523,44 +524,46 @@ const Header = ({ kardexTypes }: Props) => {
                 {!collapsed && <span>Panel General</span>}
               </Link>
             </motion.div>
-            {Number(user?.is_superuser) !== 0 && (
-              <motion.div variants={navItemVariants}>
-                <Link
-                  to="/app/sisgen"
-                  title="Sisgen"
-                  className={topLinkClass(isHrefActive("/app/sisgen"), collapsed)}
-                  aria-current={isHrefActive("/app/sisgen") ? "page" : undefined}
-                  onClick={resetNavigationState}
-                >
-                  <Send className="h-4 w-4 shrink-0" aria-hidden />
-                  {!collapsed && <span>Sisgen</span>}
-                </Link>
-              </motion.div>
+            {userIsStaffOrSuperuser(user) && (
+              <>
+                <motion.div variants={navItemVariants}>
+                  <Link
+                    to="/app/sisgen"
+                    title="Sisgen"
+                    className={topLinkClass(isHrefActive("/app/sisgen"), collapsed)}
+                    aria-current={isHrefActive("/app/sisgen") ? "page" : undefined}
+                    onClick={resetNavigationState}
+                  >
+                    <Send className="h-4 w-4 shrink-0" aria-hidden />
+                    {!collapsed && <span>Sisgen</span>}
+                  </Link>
+                </motion.div>
+                <motion.div variants={navItemVariants}>
+                  <Link
+                    to="/app/registros-uif"
+                    title="Registro UIF"
+                    className={topLinkClass(isHrefActive("/app/registros-uif"), collapsed)}
+                    aria-current={isHrefActive("/app/registros-uif") ? "page" : undefined}
+                    onClick={resetNavigationState}
+                  >
+                    <Shield className="h-4 w-4 shrink-0" aria-hidden />
+                    {!collapsed && <span>Registro UIF</span>}
+                  </Link>
+                </motion.div>
+                <motion.div variants={navItemVariants}>
+                  <Link
+                    to="/app/archivos-pdt"
+                    title="Archivos PDT"
+                    className={`${topLinkClass(isHrefActive("/app/archivos-pdt"), collapsed)} mb-3`}
+                    aria-current={isHrefActive("/app/archivos-pdt") ? "page" : undefined}
+                    onClick={resetNavigationState}
+                  >
+                    <FileSpreadsheet className="h-4 w-4 shrink-0" aria-hidden />
+                    {!collapsed && <span>Archivos PDT</span>}
+                  </Link>
+                </motion.div>
+              </>
             )}
-            <motion.div variants={navItemVariants}>
-              <Link
-                to="/app/registros-uif"
-                title="Registro UIF"
-                className={topLinkClass(isHrefActive("/app/registros-uif"), collapsed)}
-                aria-current={isHrefActive("/app/registros-uif") ? "page" : undefined}
-                onClick={resetNavigationState}
-              >
-                <Shield className="h-4 w-4 shrink-0" aria-hidden />
-                {!collapsed && <span>Registro UIF</span>}
-              </Link>
-            </motion.div>
-            <motion.div variants={navItemVariants}>
-              <Link
-                to="/app/archivos-pdt"
-                title="Archivos PDT"
-                className={`${topLinkClass(isHrefActive("/app/archivos-pdt"), collapsed)} mb-3`}
-                aria-current={isHrefActive("/app/archivos-pdt") ? "page" : undefined}
-                onClick={resetNavigationState}
-              >
-                <FileSpreadsheet className="h-4 w-4 shrink-0" aria-hidden />
-                {!collapsed && <span>Archivos PDT</span>}
-              </Link>
-            </motion.div>
             {menuItems.map((item, index) => {
               const isOpen = openDropdown === index
               const sectionActive = isSectionActive(item)

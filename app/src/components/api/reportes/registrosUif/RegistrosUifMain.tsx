@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react"
+import { Navigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Shield } from "lucide-react"
 import RegistroUifFilters from "./RegistroUifFilters"
@@ -11,9 +12,11 @@ import type { UifTabId } from "../../../../services/uif/uifTypes"
 import ReportPageShell from "../../../ui/ReportPageShell"
 import ReportHeader from "../../../ui/ReportHeader"
 import LoadingState from "../../../ui/LoadingState"
+import useUserInfoStore from "../../../../hooks/store/useGetUserInfo"
+import { userIsStaffOrSuperuser } from "../../../../utils/userIsStaffOrSuperuser"
 
 const RegistrosUifMain = () => {
-
+  const user = useUserInfoStore((s) => s.user)
   const access = useAuthStore(s => s.access_token) || ''
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
@@ -24,13 +27,15 @@ const RegistrosUifMain = () => {
   const [hasGenerated, setHasGenerated] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
+  const canAccess = userIsStaffOrSuperuser(user)
+
   const { data: uifData, isLoading, isFetching, isError, error } = useGetUifRegistro({
     access,
     dateFrom,
     dateTo,
     activeTab,
     page,
-    enabled: hasGenerated,
+    enabled: canAccess && hasGenerated,
     refreshKey,
   })
 
@@ -47,6 +52,10 @@ const RegistrosUifMain = () => {
   }, [])
 
   const showLoading = hasGenerated && (isLoading || isFetching)
+
+  if (!canAccess) {
+    return <Navigate to="/app/protocolares" replace />
+  }
 
   return (
     <ReportPageShell>

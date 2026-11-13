@@ -1,11 +1,15 @@
 import { useCallback, useRef, useState } from "react"
+import { Navigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { FileSpreadsheet, Filter, ShieldCheck } from "lucide-react"
 import ArchivosPdtHeader from "./ArchivosPdtHeader"
 import ArchivosPdtPanel from "./ArchivosPdtPanel"
 import { PDT_TYPE_OPTIONS, type PdtTypeId } from "./archivosPdtTypes"
+import useUserInfoStore from "../../../../hooks/store/useGetUserInfo"
+import { userIsStaffOrSuperuser } from "../../../../utils/userIsStaffOrSuperuser"
 
 const ArchivosPdtMain = () => {
+    const user = useUserInfoStore((s) => s.user)
     const [pdtType, setPdtType] = useState<PdtTypeId>("escrituras")
     const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined)
     const [dateTo, setDateTo] = useState<Date | undefined>(undefined)
@@ -18,6 +22,10 @@ const ArchivosPdtMain = () => {
     }, [])
 
     const activeOption = PDT_TYPE_OPTIONS.find((option) => option.id === pdtType)
+
+    if (!userIsStaffOrSuperuser(user)) {
+        return <Navigate to="/app/protocolares" replace />
+    }
 
     return (
         <motion.div
