@@ -2,6 +2,10 @@ import { useEffect, useMemo } from "react"
 import useGetActoCondicionByTipoActo from "../../../hooks/api/actoCondicion/useGetActoCondicionByTipoActo"
 import useGetDetalleActosByKardexAndTipoActo from "../../../hooks/api/detalleActos/useGetDetalleActosByKardexAndTipoActo"
 import useAuthStore from "../../../store/useAuthStore"
+import {
+    getRepresentanteCondicionConflict,
+    isRepresentanteCondicionLabel,
+} from "../../../utils/representanteCondicionConflict"
 import ActoCondicionesChecklist from "./ActoCondicionesChecklist"
 
 interface Props {
@@ -11,10 +15,8 @@ interface Props {
     setSelectedActos: React.Dispatch<React.SetStateAction<string[]>>
     autoSelectRepresentanteCondicion?: boolean
     clearRepresentanteCondicion?: boolean
+    onConflictLabelsChange?: (tipoActo: string, otherLabels: string[]) => void
 }
-
-const isRepresentanteCondicion = (label: string) =>
-    label.trim().toUpperCase() === "REPRESENTANTE"
 
 const FilteredActoCondiciones = ({
     idtipoacto,
@@ -23,6 +25,7 @@ const FilteredActoCondiciones = ({
     setSelectedActos,
     autoSelectRepresentanteCondicion = false,
     clearRepresentanteCondicion = false,
+    onConflictLabelsChange,
 }: Props) => {
     const access = useAuthStore((state) => state.access_token) || ""
     const {
@@ -49,11 +52,27 @@ const FilteredActoCondiciones = ({
     }, [isSuccessCondicion, isSuccessDetalleActos, actoCondiciones, detalleActo])
 
     const representanteOptionIds = useMemo(
-        () => options.filter((option) => isRepresentanteCondicion(option.label)).map((option) => option.id),
+        () =>
+            options
+                .filter((option) => isRepresentanteCondicionLabel(option.label))
+                .map((option) => option.id),
         [options]
     )
 
     const optionIds = useMemo(() => options.map((option) => option.id), [options])
+
+    const selectedLabelsInActo = useMemo(
+        () =>
+            options
+                .filter((option) => selectedActos.includes(option.id))
+                .map((option) => option.label),
+        [options, selectedActos]
+    )
+
+    const conflict = useMemo(
+        () => getRepresentanteCondicionConflict(selectedLabelsInActo),
+        [selectedLabelsInActo]
+    )
 
     // Drop stale selections from a previous acto/item (e.g. 043.6027 after acto → 028).
     useEffect(() => {
@@ -85,6 +104,22 @@ const FilteredActoCondiciones = ({
         autoSelectRepresentanteCondicion,
         clearRepresentanteCondicion,
         setSelectedActos,
+    ])
+
+    const conflictOthersKey = conflict.otherLabels.join("|")
+
+    useEffect(() => {
+        onConflictLabelsChange?.(
+            idtipoacto,
+            conflict.hasRepresentante ? conflict.otherLabels : [],
+        )
+        return () => onConflictLabelsChange?.(idtipoacto, [])
+    }, [
+        conflict.hasRepresentante,
+        conflictOthersKey,
+        conflict.otherLabels,
+        idtipoacto,
+        onConflictLabelsChange,
     ])
 
     if (isLoadingCondicion || isLoadingDetalleActos) {

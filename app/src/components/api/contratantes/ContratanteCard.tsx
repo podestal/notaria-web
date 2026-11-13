@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react"
 import { debounce, omit } from "lodash"
-import { Building2, UserRound } from "lucide-react"
+import { AlertTriangle, Building2, UserRound } from "lucide-react"
 import { Contratante, type CreateUpdateContratante } from "../../../services/api/contratantesService"
 import { Kardex } from "../../../services/api/kardexService"
 import getTitleCase from "../../../utils/getTitleCase"
@@ -10,6 +10,11 @@ import {
     isValidCompleteDdMmYyyy,
 } from "../../../utils/fechaFirmaDdMmYyyy"
 import { isEmpresaContratante } from "../../../utils/sortContratantesDisplay"
+import {
+    formatOtherCondiciones,
+    getRepresentanteCondicionConflict,
+    parseCondicionLabels,
+} from "../../../utils/representanteCondicionConflict"
 import RemoveContratante from "./RemoveContratante"
 import UpdateContratante from "./UpdateContratante"
 import useUpdateContratante from "../../../hooks/api/contratantes/useUpdateContratante"
@@ -50,6 +55,24 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
     })
     const { setMessage, setShow, setType } = useNotificationsStore()
     const isEmpresa = isEmpresaContratante(contratante)
+    const condicionConflict = useMemo(() => {
+        const fromStr = getRepresentanteCondicionConflict(
+            parseCondicionLabels(contratante.condicion_str),
+        )
+        if (fromStr.hasRepresentante && fromStr.otherLabels.length > 0) return fromStr
+
+        // tiporepresentacion 1/2 + non-representante condiciones in raw condicion ids/labels
+        const tiporep = String(contratante.tiporepresentacion ?? "").trim()
+        const isRepTipo = tiporep === "1" || tiporep === "2"
+        if (!isRepTipo) return fromStr
+
+        const labels = parseCondicionLabels(contratante.condicion_str)
+        const others = labels.filter(
+            (label) => label.trim().toUpperCase() !== "REPRESENTANTE",
+        )
+        if (others.length === 0) return fromStr
+        return { hasRepresentante: true, otherLabels: others }
+    }, [contratante.condicion_str, contratante.tiporepresentacion])
 
     const accessRef = useRef(access)
     const contratanteRef = useRef(contratante)
@@ -156,12 +179,27 @@ const ContratanteCard = ({ contratante, kardex }: Props) => {
                 </div>
             </div>
 
-            <p
-                className="line-clamp-2 leading-snug text-slate-600"
-                title={getTitleCase(contratante.condicion_str)}
-            >
-                {getTitleCase(contratante.condicion_str) || "—"}
-            </p>
+            <div className="min-w-0">
+                <p
+                    className="line-clamp-2 leading-snug text-slate-600"
+                    title={getTitleCase(contratante.condicion_str)}
+                >
+                    {getTitleCase(contratante.condicion_str) || "—"}
+                </p>
+                {condicionConflict.hasRepresentante &&
+                    condicionConflict.otherLabels.length > 0 && (
+                        <p
+                            className="mt-1 inline-flex max-w-full items-start gap-1 rounded-md bg-amber-50 px-1.5 py-1 text-[10px] font-medium leading-snug text-amber-800 ring-1 ring-amber-200"
+                            title={`Representante también marcado como ${formatOtherCondiciones(condicionConflict.otherLabels)}`}
+                        >
+                            <AlertTriangle className="mt-px h-3 w-3 shrink-0" aria-hidden />
+                            <span className="line-clamp-2">
+                                Representante +{" "}
+                                {formatOtherCondiciones(condicionConflict.otherLabels)}
+                            </span>
+                        </p>
+                    )}
+            </div>
 
             <div className="flex justify-center">
                 <span
