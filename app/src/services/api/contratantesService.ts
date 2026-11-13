@@ -10,6 +10,9 @@ export interface Contratante {
     fechafirma: string;
     cliente: string;
     cliente_id: string;
+    tipper?: string;
+    partes?: string[];
+    uif_roles?: string[];
     resfirma: number;
     tiporepresentacion: string;
     indice: string;

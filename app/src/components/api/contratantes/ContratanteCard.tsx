@@ -23,7 +23,15 @@ const FECHAFIRMA_SAVE_DEBOUNCE_MS = 700
 
 function toUpdatePayload(c: Contratante, fechafirma: string): CreateUpdateContratante {
     return {
-        ...omit(c, ["idcontratante", "cliente", "cliente_id", "condicion_str"]),
+        ...omit(c, [
+            "idcontratante",
+            "cliente",
+            "cliente_id",
+            "condicion_str",
+            "tipper",
+            "partes",
+            "uif_roles",
+        ]),
         fechafirma,
     }
 }

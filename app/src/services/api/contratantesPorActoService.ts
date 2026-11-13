@@ -18,6 +18,9 @@ export interface ContratantesPorActo {
     montop: string
     cliente: string
     cliente_id: string
+    tipper?: string
+    tiporepresentacion?: string
+    idcontratanterp?: string
     condicion_str: string
     renta: {
             idrenta: string
