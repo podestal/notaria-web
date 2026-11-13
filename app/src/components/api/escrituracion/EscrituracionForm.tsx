@@ -363,6 +363,50 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
             return
         }
 
+        const foIni = follioIni.trim()
+        const foFin = folioFin.trim()
+        if ((foIni && !isValidSerieNotarialFormat(foIni)) || (foFin && !isValidSerieNotarialFormat(foFin))) {
+            setMessage(
+                'Folio: solo números o números seguidos de " VTA" (ej.: 345 o 345 VTA). No use otros caracteres.'
+            )
+            setType("error")
+            setShow(true)
+            return
+        }
+        if (Boolean(foIni) !== Boolean(foFin)) {
+            setMessage('Debe completar ambos: Folio inicial y Folio final.')
+            setType("error")
+            setShow(true)
+            return
+        }
+        if (foIni && foFin) {
+            const folioOrder = compareSerieNotarial(foIni, foFin)
+            if (folioOrder != null && folioOrder > 0) {
+                setMessage(`Folio final (${foFin}) no puede ser menor que Folio inicial (${foIni}).`)
+                setType("error")
+                setShow(true)
+                return
+            }
+        }
+
+        if (Boolean(snIni) !== Boolean(snFin)) {
+            setMessage('Debe completar ambos: Serie notarial inicial y Serie notarial final.')
+            setType("error")
+            setShow(true)
+            return
+        }
+        if (snIni && snFin) {
+            const serieOrder = compareSerieNotarial(snIni, snFin)
+            if (serieOrder != null && serieOrder > 0) {
+                setMessage(
+                    `Serie notarial final (${snFin}) no puede ser menor que Serie notarial inicial (${snIni}).`
+                )
+                setType("error")
+                setShow(true)
+                return
+            }
+        }
+
         setLoading(true)
 
         const fechaMinutaStr = dateInputToApiYmd(fechaMinuta)
