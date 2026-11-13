@@ -1,11 +1,17 @@
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import Calendar from "../../../ui/Calendar"
+import ReportPeriodFilters from "../../../ui/ReportPeriodFilters"
 import { Sheet, FileText, Loader2, Search, CalendarDays } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import axios from "axios"
 import useAuthStore from "../../../../store/useAuthStore"
 import SingleSelect from "../../../ui/SingleSelect"
+import {
+    getReportYears,
+    inferPeriodFromDates,
+    type MonthSelection,
+} from "../../../../utils/reportPeriod"
 
 interface Props {
     dateFrom: Date | undefined
@@ -38,6 +44,22 @@ const ExtraProtocolaresHeader = ({
     const [loadingExcel, setLoadingExcel] = useState(false)
     const [loading, setLoading] = useState(false)
     const [selectedOrientation, setSelectedOrientation] = useState(orientation)
+
+    const inferred = inferPeriodFromDates(dateFrom, dateTo)
+    const years = getReportYears()
+    const [year, setYear] = useState(
+        () => inferred?.year ?? years[0] ?? new Date().getFullYear(),
+    )
+    const [month, setMonth] = useState<MonthSelection>(
+        () => inferred?.month ?? new Date().getMonth() as MonthSelection,
+    )
+
+    useEffect(() => {
+        const next = inferPeriodFromDates(dateFrom, dateTo)
+        if (!next) return
+        setYear(next.year)
+        setMonth(next.month)
+    }, [dateFrom, dateTo])
 
     const handleFilter = () => {
         if (loading) return
@@ -102,7 +124,18 @@ const ExtraProtocolaresHeader = ({
     }
 
     return (
-        <div className="border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+        <div className="space-y-3 border-b border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <ReportPeriodFilters
+                year={year}
+                month={month}
+                onChange={({ year: nextYear, month: nextMonth, from, to }) => {
+                    setYear(nextYear)
+                    setMonth(nextMonth)
+                    setDateFrom(from)
+                    setDateTo(to)
+                }}
+            />
+
             <div className="flex flex-wrap items-end gap-4">
                 <div className="flex min-w-[12rem] flex-1 flex-col gap-1.5">
                     <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
