@@ -413,9 +413,11 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         const fechaEscrituraStr = isTip15 ? fechaEscritura.trim() : fechaActa.trim()
 
         updateKardex.mutate({
+            // Plantilla is owned by KardexForm — never send fktemplate from escrituración
+            // (sending 0 was wiping the saved plantilla).
             kardex: {
                 idtipkar: kardex.idtipkar,
-                fechaingreso:kardex.fechaingreso,
+                fechaingreso: kardex.fechaingreso,
                 referencia: kardex.referencia || '',
                 codactos: kardex.codactos,
                 idusuario: kardex.idusuario,
@@ -424,13 +426,15 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 desistido: 0,
                 autorizado: 0,
                 idrecogio: 0,
-                pagado: 0,
+                pagado: kardex.pagado ?? 0,
                 visita: 0,
                 idnotario: 1,
-                contrato: kardex.contrato, 
+                contrato: kardex.contrato,
                 numescritura: kardex.idtipkar === 3 ? numActa : numEscritura,
                 numminuta: numMinuta,
-                fktemplate: Number(kardex.fktemplate) > 0 ? Number(kardex.fktemplate) : 0,
+                ...(Number(kardex.fktemplate) > 0
+                    ? { fktemplate: Number(kardex.fktemplate) }
+                    : {}),
                 papelini: serieNotarialIni,
                 papelfin: serieNotarialFin,
                 folioini: follioIni,
@@ -440,10 +444,12 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 numinstrmento: registro,
                 papeltrasladoini: papelTraslNotarialIni,
                 papeltrasladofin: papelTraslNotarialFin,
-                estado_sisgen: 0,
+                estado_sisgen: kardex.estado_sisgen ?? 0,
                 fechaminuta: fechaMinutaStr,
-                nc: '',
-            },
+                nc: kardex.nc ?? '',
+                idabogado: kardex.idabogado ?? "",
+                recepcion: kardex.recepcion,
+            } as UpdateKardexData["kardex"],
             access,
             signatumReservationId
         }, {
@@ -471,9 +477,10 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
         setLoading(true)
 
         updateKardex.mutate({
+            // Same rule as save: never clear plantilla / SISGEN meta from this tab.
             kardex: {
                 idtipkar: kardex.idtipkar,
-                fechaingreso:kardex.fechaingreso,
+                fechaingreso: kardex.fechaingreso,
                 referencia: kardex.referencia || '',
                 codactos: kardex.codactos,
                 idusuario: kardex.idusuario,
@@ -482,13 +489,15 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 desistido: 0,
                 autorizado: 0,
                 idrecogio: 0,
-                pagado: 0,
+                pagado: kardex.pagado ?? 0,
                 visita: 0,
                 idnotario: 1,
                 contrato: kardex.contrato,
                 numescritura: '',
                 numminuta: '',
-                fktemplate: Number(kardex.fktemplate) > 0 ? Number(kardex.fktemplate) : 0,
+                ...(Number(kardex.fktemplate) > 0
+                    ? { fktemplate: Number(kardex.fktemplate) }
+                    : {}),
                 papelini: '',
                 papelfin: '',
                 folioini: '',
@@ -498,10 +507,12 @@ const EscrituracionForm = ({ kardex, updateKardex }: Props) => {
                 numinstrmento: '',
                 papeltrasladoini: '',
                 papeltrasladofin: '',
-                estado_sisgen: 0,
+                estado_sisgen: kardex.estado_sisgen ?? 0,
                 fechaminuta: '',
-                nc: '',
-            },
+                nc: kardex.nc ?? '',
+                idabogado: kardex.idabogado ?? "",
+                recepcion: kardex.recepcion,
+            } as UpdateKardexData["kardex"],
             access
         }, {
             onSuccess: () => {

@@ -275,6 +275,10 @@ const KardexForm = ({
 
         if (kardex || doneCreate) {
             const mutation = updateKardex ?? updateKardexInternal
+            const resolvedTemplate =
+                normalizeTemplateId(selectedTemplate) ||
+                normalizeTemplateId(kardex?.fktemplate)
+
             mutation.mutate({
                 kardex: {
                     idtipkar: selectedKardexType,
@@ -287,26 +291,27 @@ const KardexForm = ({
                     desistido: 0,
                     autorizado: 0,
                     idrecogio: 0,
-                    pagado: 0,
+                    pagado: kardex?.pagado ?? 0,
                     visita: 0,
                     idnotario: 1,
-                    contrato: `${formattedContratoDes} / `, 
-                    // Keep existing plantilla if the select snapped to 0 while
-                    // templates were reloading for the current actos.
-                    fktemplate:
-                        selectedTemplate ||
-                        normalizeTemplateId(kardex?.fktemplate) ||
-                        0,
+                    contrato: `${formattedContratoDes} / `,
+                    // Never PATCH fktemplate: 0 — that wiped plantilla when the
+                    // select was on placeholder / templates were still loading.
+                    ...(resolvedTemplate > 0 ? { fktemplate: resolvedTemplate } : {}),
                     recepcion: recepcion,
                     estado_sisgen: kardex?.estado_sisgen ?? 0,
                     nc: formattedContratoDes.includes('NO CORRE') ? '1' : '',
                     idabogado: selectedAbogado || "",
                     ...preservedKardexFields(kardex),
-                },
+                } as CreateUpdateKardex,
                 access
             }, {
-                onSuccess: () => {
+                onSuccess: (updated) => {
                     notify("success", "Kardex actualizado exitosamente")
+                    if (updated && setKardex) setKardex(updated)
+                    if (updated?.idkardex) setKardexId(updated.idkardex)
+                    const nextTemplate = normalizeTemplateId(updated?.fktemplate)
+                    if (nextTemplate > 0) setSelectedTemplate(nextTemplate)
                 }, 
                 onError: (error) => {
                     if ((error as { response?: { data?: { error?: string } } })?.response?.data?.error) {
