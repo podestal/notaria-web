@@ -72,3 +72,31 @@ export function compareSerieNotarial(a: string, b: string): number | null {
 }
 
 export const SERIE_NOTARIAL_VTA_SUFFIX = " VTA"
+
+/** Siguiente folio/serie en orden de libro (anverso → VTA → siguiente número). */
+export function nextSerieNotarialToken(raw: string): string | null {
+    const p = parseSerieNotarialToken(raw)
+    if (!p) return null
+    const pad = (x: number) => String(x).padStart(p.width, "0")
+    if (p.hasVta) return pad(p.n + 1)
+    return `${pad(p.n)}${SERIE_NOTARIAL_VTA_SUFFIX}`
+}
+
+/**
+ * Continuidad entre el folio fin del documento anterior y el folio ini del actual.
+ * `ok` = sigue exactamente; `gap` = hay hueco; `overlap` = se solapa / retrocede.
+ */
+export function folioContinuity(
+    prevFin: string,
+    currentIni: string,
+): "ok" | "gap" | "overlap" | null {
+    const prev = (prevFin || "").trim()
+    const cur = (currentIni || "").trim()
+    if (!prev || !cur) return null
+    const expected = nextSerieNotarialToken(prev)
+    if (!expected) return null
+    const vsExpected = compareSerieNotarial(cur, expected)
+    if (vsExpected == null) return null
+    if (vsExpected === 0) return "ok"
+    return vsExpected > 0 ? "gap" : "overlap"
+}

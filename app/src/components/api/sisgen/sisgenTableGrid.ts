@@ -1,12 +1,15 @@
-export const SISGEN_TABLE_GRID = "grid grid-cols-12 items-center gap-x-3 gap-y-2 px-4"
+/** Compact kardex + doc button; remaining columns share the rest. */
+export const SISGEN_TABLE_GRID =
+    "grid items-center gap-x-3 gap-y-2 px-4 [grid-template-columns:minmax(7.5rem,9.5rem)_minmax(3.5rem,0.7fr)_minmax(5rem,0.85fr)_minmax(3.75rem,0.7fr)_minmax(3.75rem,0.7fr)_minmax(8rem,1.6fr)_minmax(6rem,1.1fr)_minmax(4.5rem,0.8fr)_minmax(6.5rem,0.95fr)]"
 
 export const sisgenCol = {
-    idx: "col-span-1 text-center",
-    kardex: "col-span-1 min-w-0 truncate",
-    instrumento: "col-span-1 text-center",
-    fecha: "col-span-1 text-center",
-    acto: "col-span-2 min-w-0 truncate",
-    estado: "col-span-2 min-w-0",
-    validacion: "col-span-2",
-    action: "col-span-2 flex justify-center",
+    kardex: "min-w-0",
+    instrumento: "text-center",
+    fecha: "text-center",
+    folioIni: "min-w-0 text-center",
+    folioFin: "min-w-0 text-center",
+    acto: "min-w-0 truncate",
+    estado: "min-w-0",
+    validacion: "min-w-0",
+    action: "flex justify-center",
 } as const

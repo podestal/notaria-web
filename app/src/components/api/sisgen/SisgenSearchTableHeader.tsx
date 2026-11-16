@@ -74,16 +74,17 @@ const SisgenSearchTableHeader = ({
   return (
     <>
       <div className={`${SISGEN_TABLE_GRID} sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 backdrop-blur`}>
-        <p className={sisgenCol.idx}>Nº</p>
         <p className={sisgenCol.kardex}>Nº Kardex</p>
         <p className={sisgenCol.instrumento}>Nº Inst.</p>
         <p className={sisgenCol.fecha}>Fec. escrit.</p>
+        <p className={sisgenCol.folioIni}>Folio ini</p>
+        <p className={sisgenCol.folioFin}>Folio fin</p>
         <p className={sisgenCol.acto}>Acto</p>
         <p className={sisgenCol.estado}>Estado</p>
         <p className={`${sisgenCol.validacion} leading-tight`}>
           Validación
           <span className="block text-[9px] font-normal normal-case tracking-normal text-slate-400">
-            Errores / Obs. / Personas
+            Err / Obs / Per
           </span>
         </p>
         <div className={sisgenCol.action}>

@@ -12,18 +12,30 @@ import {
     canSendSisgenDocument,
     getSisgenDisplayStatus,
 } from "../../../utils/sisgenSendState"
+import {
+    compareSerieNotarial,
+    folioContinuity,
+    nextSerieNotarialToken,
+} from "../../../utils/serieNotarialFormat"
 import SisgenValidationCountsCell from "./SisgenValidationCountsCell"
 import SisgenLastSubmissionView from "./SisgenLastSubmissionView"
 import { SISGEN_TABLE_GRID, sisgenCol } from "./sisgenTableGrid"
 import SisgenStatusBadge from "./SisgenStatusBadge"
+import SisgenOpenDocumentButton from "./SisgenOpenDocumentButton"
 import { motion } from "framer-motion"
-import { CheckCircle2, Loader2, MessageSquareText, RotateCw, Send } from "lucide-react"
+import {
+    CheckCircle2,
+    Loader2,
+    MessageSquareText,
+    RotateCw,
+    Send,
+} from "lucide-react"
 
 interface Props {
     sisgenDoc: SISGENDocument
-    idx: number
+    prevFolioFin?: string
 }
-const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
+const SisgenSingleCard = ({ sisgenDoc, prevFolioFin = "" }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
     const { setMessage, setShow, setType } =useNotificationsStore()
@@ -38,6 +50,35 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
     const fechaLabel = fechaRaw
         ? formatLocalDate(toDateInputValue(fechaRaw) || fechaRaw)
         : "—"
+    const folioIni = (sisgenDoc.folioini || "").trim()
+    const folioFin = (sisgenDoc.foliofin || "").trim()
+    const folioOrder =
+        folioIni && folioFin ? compareSerieNotarial(folioIni, folioFin) : null
+    const folioInvalid = folioOrder != null && folioOrder > 0
+    const continuity = folioContinuity(prevFolioFin, folioIni)
+    const expectedNext = prevFolioFin ? nextSerieNotarialToken(prevFolioFin) : null
+    const folioBroken = continuity === "gap" || continuity === "overlap" || folioInvalid
+    const folioIniClass = !folioIni
+        ? "font-semibold text-red-600"
+        : folioBroken
+          ? "font-semibold text-amber-700"
+          : continuity === "ok"
+            ? "font-semibold text-emerald-600"
+            : "text-slate-700"
+    const folioFinClass = !folioFin
+        ? "font-semibold text-red-600"
+        : folioInvalid
+          ? "font-semibold text-red-600"
+          : "text-slate-700"
+    const folioIniTitle = !folioIni
+        ? "Folio inicial faltante"
+        : continuity === "gap"
+          ? `Hueco: se esperaba ${expectedNext || "—"} tras ${prevFolioFin}`
+          : continuity === "overlap"
+            ? `Solape/retroceso: se esperaba ${expectedNext || "—"} tras ${prevFolioFin}`
+            : folioInvalid
+              ? `Folio final (${folioFin}) menor que inicial (${folioIni})`
+              : undefined
   
     const handleSend = () => {
       setLoading(true)
@@ -98,24 +139,45 @@ const SisgenSingleCard = ({ sisgenDoc, idx }: Props) => {
         key={sisgenDoc.idkardex} 
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, delay: Math.min(idx, 20) * 0.025, ease: "easeOut" }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
         className={`${SISGEN_TABLE_GRID} py-3 text-xs text-slate-700 transition-colors hover:bg-slate-50`}
     >
-        <p className={`${sisgenCol.idx} tabular-nums text-slate-400`}>{idx}</p>
-        <div className={sisgenCol.kardex}>
+        <div className={`${sisgenCol.kardex} flex items-center gap-1`}>
             <button
                 type="button"
-                className="max-w-full truncate rounded-md bg-sky-50 px-2 py-1 font-mono text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100 transition hover:bg-sky-100 hover:ring-sky-200"
+                className="min-w-0 flex-1 truncate rounded-md bg-sky-50 px-1.5 py-1 font-mono text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100 transition hover:bg-sky-100 hover:ring-sky-200"
                 title={sisgenDoc?.kardex || ''}
                 onClick={() => setIsOpen(true)}
             >
                 {sisgenDoc?.kardex || ''}
             </button>
+            <SisgenOpenDocumentButton
+                idkardex={sisgenDoc.idkardex}
+                kardex={sisgenDoc.kardex}
+            />
         </div>
         <p className={`${sisgenCol.instrumento} font-mono tabular-nums text-slate-800`}>
             {sisgenDoc?.numero_instrumento || sisgenDoc?.numinstrmento || <span className="text-slate-300">—</span>}
         </p>
         <p className={`${sisgenCol.fecha} tabular-nums text-slate-600`}>{fechaLabel}</p>
+        <p
+            className={`${sisgenCol.folioIni} font-mono text-[11px] tabular-nums ${folioIniClass}`}
+            title={folioIniTitle}
+        >
+            {folioIni || "faltante"}
+        </p>
+        <p
+            className={`${sisgenCol.folioFin} font-mono text-[11px] tabular-nums ${folioFinClass}`}
+            title={
+                !folioFin
+                    ? "Folio final faltante"
+                    : folioInvalid
+                      ? `Folio final (${folioFin}) menor que inicial (${folioIni})`
+                      : undefined
+            }
+        >
+            {folioFin || "faltante"}
+        </p>
         <p className={sisgenCol.acto} title={sisgenDoc?.contrato || ''}>
             {getTitleCase(sisgenDoc?.contrato || '')}
         </p>
