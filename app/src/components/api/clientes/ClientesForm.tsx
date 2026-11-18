@@ -473,15 +473,6 @@ const ClientesForm = ({
                 return
             }
 
-            if (!fixedPhone.trim() && !celphone.trim()) {
-                const phoneMessage = 'Ingrese teléfono fijo o teléfono celular. Debe registrar al menos uno.'
-                setPhoneError(phoneMessage)
-                setType('error')
-                setMessage(phoneMessage)
-                setShow(true)
-                return
-            }
-
             const profesionId = matchedProfesion
                 ? matchedProfesion.idprofesion
                 : (Number.isNaN(selectedProfesionId) ? 0 : selectedProfesionId)
@@ -1033,11 +1024,6 @@ const ClientesForm = ({
         </ClienteFormSection>
 
         <ClienteFormSection title="Contacto">
-            <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-snug text-amber-900">
-                <span className="font-semibold">Obligatorio:</span> registre al menos un{" "}
-                <span className="font-semibold">teléfono celular</span> o un{" "}
-                <span className="font-semibold">teléfono fijo</span>. No es necesario completar ambos.
-            </p>
             <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
                 <SimpleInput
                     label="Teléfono Celular"

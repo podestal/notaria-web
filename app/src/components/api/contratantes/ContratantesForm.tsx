@@ -38,9 +38,6 @@ interface Props {
     onRegisterCloseGuard?: (guard: () => boolean) => void
 }
 
-const PHONE_SAVE_MESSAGE =
-    "No se pudo crear el contratante porque el cliente no tiene teléfono fijo ni celular. Registre al menos uno en la ficha del cliente."
-
 const isSessionFailure = (error: unknown) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) return true
     if (axios.isCancel(error)) return /sesi[oó]n/i.test(error.message || "")
@@ -67,7 +64,6 @@ const apiErrorText = (error: unknown): string => {
 const contratanteSaveError = (error: unknown, fallback: string) => {
     if (isSessionFailure(error)) return SESSION_EXPIRED_MESSAGE
     const text = apiErrorText(error)
-    if (/tel[eé]fono fijo|telcel|informaci[oó]n de contacto/i.test(text)) return PHONE_SAVE_MESSAGE
     if (text && !text.trim().startsWith("<") && text.length < 400) return text
     return fallback
 }
