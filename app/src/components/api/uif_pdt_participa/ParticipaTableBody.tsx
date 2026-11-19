@@ -49,7 +49,7 @@ const Section = ({
 )
 
 const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props) => {
-    const { otorgantes, beneficiarios } = useMemo(
+    const { otorgantes, beneficiarios, otros } = useMemo(
         () => groupContratantesBySide(Array.isArray(contratantes) ? contratantes : []),
         [contratantes],
     )
@@ -78,6 +78,15 @@ const ParticipaTableBody = ({ contratantes, detalleActo, monto, kardex }: Props)
                 monto={monto}
                 kardex={kardex}
             />
+            {otros.length > 0 && (
+                <Section
+                    title="Otros"
+                    items={otros}
+                    detalleActo={detalleActo}
+                    monto={monto}
+                    kardex={kardex}
+                />
+            )}
         </div>
     )
 }

@@ -101,7 +101,8 @@ export const directContratanteSides = (c: ContratanteDisplaySortable): Contratan
 
 /**
  * Representantes inherit the side of who they represent (via idcontratanterp on that party).
- * No "otros" bucket — everyone lands under Otorgantes and/or Beneficiarios when resolvable.
+ * Anyone who is neither otorgante nor beneficiario lands in "otros"
+ * (common in testamentos: testigo, albacea, etc.).
  */
 export const groupContratantesBySide = <T extends ContratanteDisplaySortable>(items: T[]) => {
     const list = Array.isArray(items) ? items : []
@@ -159,25 +160,35 @@ export const groupContratantesBySide = <T extends ContratanteDisplaySortable>(it
 
     const otorgantes: T[] = []
     const beneficiarios: T[] = []
+    const otros: T[] = []
     const seenO = new Set<string>()
     const seenB = new Set<string>()
+    const seenOtros = new Set<string>()
 
     for (const item of list) {
         const id = String(item.idcontratante || "").trim()
         if (!id) continue
         const sides = resolveSides(id)
-        if (sides.has("otorgante") && !seenO.has(id)) {
+        const isOtorgante = sides.has("otorgante")
+        const isBeneficiario = sides.has("beneficiario")
+
+        if (isOtorgante && !seenO.has(id)) {
             seenO.add(id)
             otorgantes.push(item)
         }
-        if (sides.has("beneficiario") && !seenB.has(id)) {
+        if (isBeneficiario && !seenB.has(id)) {
             seenB.add(id)
             beneficiarios.push(item)
+        }
+        if (!isOtorgante && !isBeneficiario && !seenOtros.has(id)) {
+            seenOtros.add(id)
+            otros.push(item)
         }
     }
 
     return {
         otorgantes: sortContratantesDisplay(otorgantes, list),
         beneficiarios: sortContratantesDisplay(beneficiarios, list),
+        otros: sortContratantesDisplay(otros, list),
     }
 }

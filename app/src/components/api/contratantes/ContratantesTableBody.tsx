@@ -11,6 +11,8 @@ interface Props {
     kardex: Kardex
 }
 
+type SectionTone = "otorgante" | "beneficiario" | "otros"
+
 const sectionMotion = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
@@ -38,6 +40,30 @@ const rowMotion = (index: number) => ({
     },
 })
 
+const TONE_CLASS: Record<
+    SectionTone,
+    { bar: string; dot: string; title: string; badge: string }
+> = {
+    otorgante: {
+        bar: "border-violet-100 bg-violet-50/70",
+        dot: "bg-violet-500",
+        title: "text-violet-800",
+        badge: "bg-violet-100 text-violet-700",
+    },
+    beneficiario: {
+        bar: "border-emerald-100 bg-emerald-50/70",
+        dot: "bg-emerald-500",
+        title: "text-emerald-800",
+        badge: "bg-emerald-100 text-emerald-700",
+    },
+    otros: {
+        bar: "border-amber-100 bg-amber-50/70",
+        dot: "bg-amber-500",
+        title: "text-amber-900",
+        badge: "bg-amber-100 text-amber-800",
+    },
+}
+
 const SectionHeader = ({
     title,
     count,
@@ -45,41 +71,28 @@ const SectionHeader = ({
 }: {
     title: string
     count: number
-    tone: "otorgante" | "beneficiario"
-}) => (
-    <div
-        className={`flex items-center gap-2 border-y px-4 py-2 ${
-            tone === "otorgante"
-                ? "border-violet-100 bg-violet-50/70"
-                : "border-emerald-100 bg-emerald-50/70"
-        }`}
-    >
-        <span
-            className={`h-1.5 w-1.5 rounded-full ${
-                tone === "otorgante" ? "bg-violet-500" : "bg-emerald-500"
-            }`}
-        />
-        <span
-            className={`text-[11px] font-semibold uppercase tracking-wide ${
-                tone === "otorgante" ? "text-violet-800" : "text-emerald-800"
-            }`}
-        >
-            {title}
-        </span>
-        <motion.span
-            key={`${title}-${count}`}
-            initial={{ scale: 0.85, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                tone === "otorgante"
-                    ? "bg-violet-100 text-violet-700"
-                    : "bg-emerald-100 text-emerald-700"
-            }`}
-        >
-            {count}
-        </motion.span>
-    </div>
-)
+    tone: SectionTone
+}) => {
+    const styles = TONE_CLASS[tone]
+    return (
+        <div className={`flex items-center gap-2 border-y px-4 py-2 ${styles.bar}`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${styles.dot}`} />
+            <span
+                className={`text-[11px] font-semibold uppercase tracking-wide ${styles.title}`}
+            >
+                {title}
+            </span>
+            <motion.span
+                key={`${title}-${count}`}
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${styles.badge}`}
+            >
+                {count}
+            </motion.span>
+        </div>
+    )
+}
 
 const Section = ({
     title,
@@ -90,7 +103,7 @@ const Section = ({
     title: string
     items: Contratante[]
     kardex: Kardex
-    tone: "otorgante" | "beneficiario"
+    tone: SectionTone
 }) => (
     <motion.div layout {...sectionMotion} className="overflow-hidden">
         <SectionHeader title={title} count={items.length} tone={tone} />
@@ -193,6 +206,13 @@ const ContratantesTableBody = ({ kardex }: Props) => {
                     items={grouped.beneficiarios}
                     kardex={kardex}
                     tone="beneficiario"
+                />
+                <Section
+                    key="otros"
+                    title="Otros"
+                    items={grouped.otros}
+                    kardex={kardex}
+                    tone="otros"
                 />
             </AnimatePresence>
         </div>
