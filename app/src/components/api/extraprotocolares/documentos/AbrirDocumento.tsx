@@ -67,18 +67,23 @@ const AbrirDocumento = ({ name, url, params }: Props) => {
     };
   return (
   <>
-    <div 
+    <button
+        type="button"
         onClick={handleOpenDocument}
-        className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
+        disabled={isLoading}
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-xs font-semibold text-white shadow-sm transition ${
+            isLoading
+                ? "cursor-not-allowed bg-indigo-600/60"
+                : "cursor-pointer bg-indigo-600 hover:bg-indigo-500"
+        }`}
+    >
         {isLoading ? (
-            <Loader2 className="text-xl text-blue-600 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
         ) : (
-            <FileText className="text-xl text-slate-50"/>
+            <FileText className="h-4 w-4" aria-hidden />
         )}
-        <p className="text-xs">
-            {isLoading ? 'Descargando...' : 'Ver Doc'}
-        </p>
-    </div>
+        <span>{isLoading ? "Descargando…" : "Ver Doc"}</span>
+    </button>
     <TopModal
         isOpen={openExplanation}
         onClose={() => setOpenExplanation(false)}

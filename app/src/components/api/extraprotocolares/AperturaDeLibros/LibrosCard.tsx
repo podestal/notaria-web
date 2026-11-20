@@ -53,7 +53,7 @@ const LibrosCard = ({ libro, readyOnly, page, index = 0 }: Props) => {
             </p>
             <p className="font-mono text-center tabular-nums">{libro.folio || <Empty />}</p>
             <p>{TIPOS_FOLIOS.find(folio => folio.idtipfol === libro.idtipfol)?.destipfol || <Empty />}</p>
-            <p className="font-mono tabular-nums text-slate-600">{libro.ruc || <Empty />}</p>
+            <p className="font-mono tabular-nums text-slate-600">{libro.numdoc_plantilla || libro.ruc || <Empty />}</p>
         </motion.div>
         <TopModal
             isOpen={open}

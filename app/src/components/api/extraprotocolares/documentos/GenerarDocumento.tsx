@@ -80,22 +80,23 @@ const GenerarDocumento = ({ name, url, params }: Props) => {
 
   return (
     <>
-    <div 
+    <button
+        type="button"
         onClick={handleOpenDocument}
-        className={`w-full flex items-center justify-between px-4 py-2 gap-1 rounded-lg mb-4 text-blue-600 transition-all duration-200 ${
-            isLoading 
-                ? 'bg-blue-100 cursor-not-allowed opacity-70' 
-                : 'bg-blue-200 hover:opacity-85 cursor-pointer hover:bg-blue-300'
-        }`}>
+        disabled={isLoading}
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-xs font-semibold text-white shadow-sm transition ${
+            isLoading
+                ? "cursor-not-allowed bg-emerald-600/60"
+                : "cursor-pointer bg-emerald-600 hover:bg-emerald-500"
+        }`}
+    >
         {isLoading ? (
-            <Loader2 className="text-xl text-blue-600 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
         ) : (
-            <FileCog className="text-xl text-green-600"/>
+            <FileCog className="h-4 w-4" aria-hidden />
         )}
-        <p className="text-xs font-medium">
-            {isLoading ? 'Generando...' : 'Generar'}
-        </p>
-    </div>
+        <span>{isLoading ? "Generando…" : "Generar"}</span>
+    </button>
       <TopModal
         isOpen={openExplanation}
         onClose={() => setOpenExplanation(false)}

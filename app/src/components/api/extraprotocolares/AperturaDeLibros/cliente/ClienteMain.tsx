@@ -9,6 +9,8 @@ import useGetCargos from "../../../../../hooks/api/cargos/useGetCargos"
 import useGetUbigeos from "../../../../../hooks/api/ubigeo/useGetUbigeos"
 import NuevoClienteForm from "./NuevoClienteForm"
 import useAuthStore from "../../../../../store/useAuthStore"
+import getCliente1Service, { Cliente } from "../../../../../services/api/cliente1Service"
+import useNotificationsStore from "../../../../../hooks/store/useNotificationsStore"
 
 interface Props {
     selectedTipoPersona: number
@@ -29,9 +31,11 @@ interface Props {
     domicilioFiscal: string
     setRazonSocial: React.Dispatch<React.SetStateAction<string>>
     setDomicilioFiscal: React.Dispatch<React.SetStateAction<string>>
+    codeCliente: string
     setCodeCliente: React.Dispatch<React.SetStateAction<string>>
     setDocumentError: React.Dispatch<React.SetStateAction<string>>
     setUbigeo: React.Dispatch<React.SetStateAction<string>>
+    onClienteCreated?: (cliente: Cliente) => void
 }
 
 const ClienteMain = ({ 
@@ -53,17 +57,49 @@ const ClienteMain = ({
     domicilioFiscal,
     setRazonSocial,
     setDomicilioFiscal,
+    codeCliente,
     setCodeCliente,
     setUbigeo,
+    onClienteCreated,
  }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
+    const { setMessage, setType, setShow } = useNotificationsStore()
 
     const [openCreateCliente, setOpenCreateCliente] = useState(false)
+    const [existingCliente, setExistingCliente] = useState<Cliente | null>(null)
+    const [loadingUpdate, setLoadingUpdate] = useState(false)
     const { data: nacionalidades, isLoading: isNacionalidadesLoading, isError: isNacionalidadesError, isSuccess: nacionalidadesSuccess } = useGetNacionalidades({ access })
     const { data: profesiones, isLoading: isLoadingProfesiones, isError: isErrorProfesiones, isSuccess: isSuccessProfesiones } = useGetProfesiones({ access })
     const { data: cargos, isLoading: isLoadingCargos, isError: isErrorCargos, isSuccess: isSuccessCargos } = useGetCargos({ access })
     const { data: ubigeos, isLoading: isLoadingUbigeos, isError: isErrorUbigeo, isSuccess: isSuccessUbigeo } = useGetUbigeos({ access })
+
+    const handleOpenUpdateJuridica = async () => {
+        if (!codeCliente) {
+            setMessage("No hay cliente vinculado para actualizar")
+            setType("error")
+            setShow(true)
+            return
+        }
+        setLoadingUpdate(true)
+        try {
+            const cliente = await getCliente1Service({ clienteId: codeCliente }).get(access)
+            setExistingCliente(cliente)
+            setOpenCreateCliente(true)
+        } catch (error) {
+            console.error("Error al cargar cliente:", error)
+            setMessage("No se pudo cargar la persona jurídica")
+            setType("error")
+            setShow(true)
+        } finally {
+            setLoadingUpdate(false)
+        }
+    }
+
+    const handleCloseClienteModal = () => {
+        setOpenCreateCliente(false)
+        setExistingCliente(null)
+    }
 
     if (isNacionalidadesLoading || isLoadingProfesiones || isLoadingCargos || isLoadingUbigeos) return <p className="animate-pulse text-center text-xs my-6">Cargando...</p>
 
@@ -88,7 +124,10 @@ const ClienteMain = ({
             setDomicilioFiscal={setDomicilioFiscal}
             setCodeCliente={setCodeCliente}
             setUbigeo={setUbigeo}
-            setOpenCreateCliente={setOpenCreateCliente}
+            setOpenCreateCliente={(open) => {
+                if (open) setExistingCliente(null)
+                setOpenCreateCliente(open)
+            }}
         />
         <ClienteForm 
             tipoPersona={selectedTipoPersona}
@@ -104,12 +143,16 @@ const ClienteMain = ({
             setDireccion={setDireccion}
             razonSocial={razonSocial}
             domicilioFiscal={domicilioFiscal}
+            codeCliente={codeCliente}
+            onUpdateJuridica={handleOpenUpdateJuridica}
+            updatingJuridica={loadingUpdate}
         />
         <TopModal
             isOpen={openCreateCliente}
-            onClose={() => setOpenCreateCliente(false)}
+            onClose={handleCloseClienteModal}
         >
             <NuevoClienteForm 
+                key={existingCliente?.idcliente || `new-${document}`}
                 selectedTipoPersona={selectedTipoPersona}
                 ubigeos={ubigeos}
                 nacionalidades={nacionalidades}
@@ -125,7 +168,11 @@ const ClienteMain = ({
                 setRazonSocial={setRazonSocial}
                 setDomicilioFiscal={setDomicilioFiscal}
                 setCodeCliente={setCodeCliente}
-                onCreated={() => setOpenCreateCliente(false)}
+                existingCliente={existingCliente}
+                onCreated={(cliente) => {
+                    handleCloseClienteModal()
+                    onClienteCreated?.(cliente)
+                }}
             />
         </TopModal>
     </>

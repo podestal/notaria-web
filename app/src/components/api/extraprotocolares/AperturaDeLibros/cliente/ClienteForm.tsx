@@ -1,3 +1,4 @@
+import { Pencil } from "lucide-react"
 import SimpleInput from "../../../../ui/SimpleInput"
 
 interface Props {
@@ -14,14 +15,34 @@ interface Props {
     setDireccion: React.Dispatch<React.SetStateAction<string>>
     razonSocial: string
     domicilioFiscal: string
+    codeCliente?: string
+    onUpdateJuridica?: () => void
+    updatingJuridica?: boolean
 }
 
-const ClienteForm = ({ tipoPersona, apellidoPaterno, apellidoMaterno, primerNombre, segundoNombre, direccion, setApellidoPaterno, setApellidoMaterno, setPrimerNombre, setSegundoNombre, setDireccion, razonSocial, domicilioFiscal }: Props) => {
+const ClienteForm = ({
+    tipoPersona,
+    apellidoPaterno,
+    apellidoMaterno,
+    primerNombre,
+    segundoNombre,
+    direccion,
+    setApellidoPaterno,
+    setApellidoMaterno,
+    setPrimerNombre,
+    setSegundoNombre,
+    setDireccion,
+    razonSocial,
+    domicilioFiscal,
+    codeCliente,
+    onUpdateJuridica,
+    updatingJuridica,
+}: Props) => {
   return (
     <>
     {tipoPersona === 1 && (
-        <div>
-            <div className="grid grid-cols-2 gap-4 my-4">
+        <div className="my-4 space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <SimpleInput 
                     label="Apellido Paterno"
                     value={apellidoPaterno}
@@ -34,8 +55,6 @@ const ClienteForm = ({ tipoPersona, apellidoPaterno, apellidoMaterno, primerNomb
                     setValue={setApellidoMaterno}
                     horizontal
                 />
-            </div>
-            <div className="grid grid-cols-2 gap-4 my-4">
                 <SimpleInput 
                     label="Primer Nombre"
                     value={primerNombre}
@@ -59,7 +78,7 @@ const ClienteForm = ({ tipoPersona, apellidoPaterno, apellidoMaterno, primerNomb
         </div>
     )}
     {tipoPersona === 2 && (
-        <div className="flex flex-col gap-4 my-4">
+        <div className="my-4 space-y-3 rounded-xl border border-slate-200 bg-white p-4">
             <SimpleInput 
                 label="Razón Social"
                 value={razonSocial}
@@ -76,6 +95,19 @@ const ClienteForm = ({ tipoPersona, apellidoPaterno, apellidoMaterno, primerNomb
                 fullWidth
                 disabled
             />
+            {!!codeCliente && (
+                <div className="flex justify-end pt-1">
+                    <button
+                        type="button"
+                        onClick={onUpdateJuridica}
+                        disabled={updatingJuridica}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 disabled:cursor-wait disabled:opacity-60"
+                    >
+                        <Pencil className="h-3.5 w-3.5" aria-hidden />
+                        {updatingJuridica ? "Cargando..." : "Actualizar persona jurídica"}
+                    </button>
+                </div>
+            )}
         </div>
     )}
     </>

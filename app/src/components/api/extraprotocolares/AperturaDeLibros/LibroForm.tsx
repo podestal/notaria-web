@@ -6,7 +6,7 @@ import SimpleInput from "../../../ui/SimpleInput";
 import Calendar from "../../../ui/Calendar";
 import SimpleSelector from "../../../ui/SimpleSelector";
 import { NUMERO_LIBROS, TIPOS_LEGAL, TIPOS_FOLIOS } from "../../../../data/librosData";
-import { QrCode, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import GenerarDocumento from "../documentos/GenerarDocumento";
 import AbrirDocumento from "../documentos/AbrirDocumento";
 import ClienteMain from "./cliente/ClienteMain";
@@ -19,6 +19,7 @@ import { CreateLibroData } from "../../../../hooks/api/extraprotocolares/apertur
 import useAuthStore from "../../../../store/useAuthStore";
 import useNotificationsStore from "../../../../hooks/store/useNotificationsStore";
 import useUpdateLibro, { UpdateLibroData } from "../../../../hooks/api/extraprotocolares/aperturaLibros/useUpdateLibro";
+import { Cliente } from "../../../../services/api/cliente1Service";
 
 
 interface Props {
@@ -28,6 +29,20 @@ interface Props {
     updateLibro?: UseMutationResult<Libro, Error, UpdateLibroData>
 }
 
+type LibroClienteOverrides = {
+    tipper: "N" | "J"
+    apepat: string
+    apemat: string
+    prinom: string
+    segnom: string
+    documentValue: string
+    domicilio: string
+    coddis: string
+    empresa: string
+    domfiscal: string
+    codclie: string
+}
+
 const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
 
     const access = useAuthStore(s => s.access_token) || ''
@@ -35,7 +50,11 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
 
     const [loading, setLoading] = useState(false);
     const [selectedTipoPersona, setSelectedTipoPersona] = useState(libro ? libro.tipper === 'N' ? 1 : 2 : 2);
-    const [document, setDocument] = useState(libro ? libro.ruc : 'CODJU000000');
+    const [document, setDocument] = useState(
+        libro
+            ? (libro.numdoc_plantilla || libro.ruc || '')
+            : 'CODJU000000'
+    );
     const user = useUserInfoStore(state => state.user);
     const [cronologico, setCronologico] = useState<string>(libro?.numlibro ? `${libro.numlibro}-${libro.ano}` : '');
     const [fechaIngreso, setFechaIngreso] = useState<Date | undefined>(
@@ -83,9 +102,44 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
     const [doneCreate, setDoneCreate] = useState(false);
     const updateLibroInternal = useUpdateLibro({ page: 1, libroId: idLibro })
 
+    const buildLibroPayload = (overrides?: LibroClienteOverrides) => {
+        const tipper = overrides?.tipper ?? (selectedTipoPersona === 1 ? "N" : "J")
+        const doc = overrides?.documentValue ?? document
+        const isCodju = doc.startsWith("CODJU")
+        return {
+            fecing: moment(fechaIngreso).format("YYYY-MM-DD"),
+            tipper,
+            apepat: overrides?.apepat ?? apellidoPaterno,
+            apemat: overrides?.apemat ?? apellidoMaterno,
+            prinom: overrides?.prinom ?? primerNombre,
+            segnom: overrides?.segnom ?? segundoNombre,
+            ruc: tipper === "N" ? "" : isCodju ? "" : doc,
+            domicilio: overrides?.domicilio ?? direccion,
+            coddis: overrides?.coddis ?? ubigeo ?? "",
+            empresa: overrides?.empresa ?? razonSocial,
+            domfiscal: overrides?.domfiscal ?? domicilioFiscal,
+            idtiplib: parseInt(selectedTipoLibro?.id || "0"),
+            descritiplib: selectedTipoLibro?.label || "",
+            idlegal: selectedTipoLegal,
+            folio: numFojas,
+            idtipfol: tipoFolio,
+            detalle: detalle,
+            idnotario: 1,
+            solicitante: solicitanteName,
+            comentario: comentario,
+            feclegal: "",
+            comentario2: "",
+            dni: solicitanteDocument,
+            idusuario: user?.idusuario || 0,
+            idnlibro: numeroLibro,
+            codclie: overrides?.codclie ?? codeCliente,
+            flag: 1,
+            numdoc_plantilla: isCodju ? doc : "",
+            estadosisgen: 0,
+        }
+    }
 
-    
-    const handleSave = () => {
+    const handleSave = (overrides?: LibroClienteOverrides) => {
 
         if (!numeroLibro) {
             setNumLibroError('Seleccione un tipo de libro')
@@ -120,41 +174,14 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
         }
 
         setLoading(true);
+        const clienteFields = buildLibroPayload(overrides)
 
         createLibro && !doneCreate && createLibro.mutate({
             access: access,
             libro: {
                 numlibro: '0',
                 ano: moment().format('YYYY'),
-                fecing: moment(fechaIngreso).format('YYYY-MM-DD'),
-                tipper: selectedTipoPersona === 1 ? 'N' : 'J',
-                apepat: apellidoPaterno,
-                apemat: apellidoMaterno,
-                prinom: primerNombre,
-                segnom: segundoNombre,
-                ruc: selectedTipoPersona === 1 ? '' : document.startsWith('CODJU') ? '' : document,
-                domicilio: direccion,
-                coddis: ubigeo || '',
-                empresa: razonSocial,
-                domfiscal: domicilioFiscal,
-                idtiplib: parseInt(selectedTipoLibro?.id || '0'),
-                descritiplib: selectedTipoLibro?.label || '',
-                idlegal: selectedTipoLegal,
-                folio: numFojas,
-                idtipfol: tipoFolio,
-                detalle: detalle,
-                idnotario: 1,
-                solicitante: solicitanteName,
-                comentario: comentario,
-                feclegal: '',
-                comentario2: '',
-                dni: solicitanteDocument,
-                idusuario: user?.idusuario || 0,
-                idnlibro: numeroLibro,
-                codclie: codeCliente,
-                flag: 1,
-                numdoc_plantilla: document.startsWith('CODJU') ? document : '',
-                estadosisgen: 0,
+                ...clienteFields,
             }
         }, {
             onSuccess: res  => {
@@ -183,35 +210,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
             libro: {
                 numlibro: libro.numlibro,
                 ano: libro.ano,
-                fecing: moment(fechaIngreso).format('YYYY-MM-DD'),
-                tipper: selectedTipoPersona === 1 ? 'N' : 'J',
-                apepat: apellidoPaterno,
-                apemat: apellidoMaterno,
-                prinom: primerNombre,
-                segnom: segundoNombre,
-                ruc: selectedTipoPersona === 1 ? '' : document.startsWith('CODJU') ? '' : document,
-                domicilio: direccion,
-                coddis: ubigeo || '',
-                empresa: razonSocial,
-                domfiscal: domicilioFiscal,
-                idtiplib: parseInt(selectedTipoLibro?.id || '0'),
-                descritiplib: selectedTipoLibro?.label || '',
-                idlegal: selectedTipoLegal,
-                folio: numFojas,
-                idtipfol: tipoFolio,
-                detalle: detalle,
-                idnotario: 1,
-                solicitante: solicitanteName,
-                comentario: comentario,
-                feclegal: '',
-                comentario2: '',
-                dni: solicitanteDocument,
-                idusuario: user?.idusuario || 0,
-                idnlibro: numeroLibro,
-                codclie: codeCliente,
-                flag: 1,
-                numdoc_plantilla: document.startsWith('CODJU') ? document : '',
-                estadosisgen: 0,
+                ...clienteFields,
             }
         }, {
             onSuccess: res => {
@@ -235,35 +234,7 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
                 libro: {
                     numlibro: numLibro,
                     ano: anoLibro,
-                    fecing: moment(fechaIngreso).format('YYYY-MM-DD'),
-                    tipper: selectedTipoPersona === 1 ? 'N' : 'J',
-                    apepat: apellidoPaterno,
-                    apemat: apellidoMaterno,
-                    prinom: primerNombre,
-                    segnom: segundoNombre,
-                    ruc: selectedTipoPersona === 1 ? '' : document.startsWith('CODJU') ? '' : document,
-                    domicilio: direccion,
-                    coddis: ubigeo || '',
-                    empresa: razonSocial,
-                    domfiscal: domicilioFiscal,
-                    idtiplib: parseInt(selectedTipoLibro?.id || '0'),
-                    descritiplib: selectedTipoLibro?.label || '',
-                    idlegal: selectedTipoLegal,
-                    folio: numFojas,
-                    idtipfol: tipoFolio,
-                    detalle: detalle,
-                    idnotario: 1,
-                    solicitante: solicitanteName,
-                    comentario: comentario,
-                    feclegal: '',
-                    comentario2: '',
-                    dni: solicitanteDocument,
-                    idusuario: user?.idusuario || 0,
-                    idnlibro: numeroLibro,
-                    codclie: codeCliente,
-                    flag: 1,
-                    numdoc_plantilla: document.startsWith('CODJU') ? document : '',
-                    estadosisgen: 0,
+                    ...clienteFields,
                 }
             }, {
                 onSuccess: () => {
@@ -285,16 +256,62 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
         
     }
 
+    const handleClienteCreated = (cliente: Cliente) => {
+        const isJuridica = (cliente.tipper || "").toUpperCase() === "J"
+        const documentValue = isJuridica
+            ? (cliente.numdoc_plantilla || cliente.numdoc || document)
+            : (cliente.numdoc || document)
+
+        setSelectedTipoPersona(isJuridica ? 2 : 1)
+        setDocument(documentValue)
+        setCodeCliente(cliente.idcliente)
+        setUbigeo(cliente.idubigeo || "")
+
+        if (isJuridica) {
+            setRazonSocial(cliente.razonsocial || "")
+            setDomicilioFiscal(cliente.domfiscal || "")
+            setApellidoPaterno("")
+            setApellidoMaterno("")
+            setPrimerNombre("")
+            setSegundoNombre("")
+            setDireccion("")
+        } else {
+            setApellidoPaterno(cliente.apepat || "")
+            setApellidoMaterno(cliente.apemat || "")
+            setPrimerNombre(cliente.prinom || "")
+            setSegundoNombre(cliente.segnom || "")
+            setDireccion(cliente.direccion || "")
+            setRazonSocial("")
+            setDomicilioFiscal("")
+        }
+
+        handleSave({
+            tipper: isJuridica ? "J" : "N",
+            apepat: isJuridica ? "" : (cliente.apepat || ""),
+            apemat: isJuridica ? "" : (cliente.apemat || ""),
+            prinom: isJuridica ? "" : (cliente.prinom || ""),
+            segnom: isJuridica ? "" : (cliente.segnom || ""),
+            documentValue,
+            domicilio: isJuridica ? "" : (cliente.direccion || ""),
+            coddis: cliente.idubigeo || "",
+            empresa: isJuridica ? (cliente.razonsocial || "") : "",
+            domfiscal: isJuridica ? (cliente.domfiscal || "") : "",
+            codclie: cliente.idcliente,
+        })
+    }
+
   return (
     <div>
         <h2 className="text-lg font-semibold text-center mb-8">Formulario Apertura de Libros</h2>
         <>{console.log('libro', libro)}</>
-        <div className="grid grid-cols-8 gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
             <button 
-                onClick={handleSave}
-                className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                {!loading && <Save className="text-xl"/>}
-                <p className="text-xs">{loading ? 'Guardando...' : 'Guardar'}</p>
+                type="button"
+                onClick={() => handleSave()}
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-sky-600 px-3.5 text-xs font-semibold text-white shadow-sm transition hover:bg-sky-500 cursor-pointer"
+            >
+                {!loading && <Save className="h-4 w-4" aria-hidden />}
+                <span>{loading ? "Guardando…" : "Guardar"}</span>
             </button>
             {showDocs && 
             <GenerarDocumento 
@@ -315,10 +332,6 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
                     action: 'retrieve'
                 }}
             />}
-            {/* <div className=" w-full flex items-center justify-between px-4 py-2 gap-1 bg-blue-200 rounded-lg mb-4 text-blue-600 hover:opacity-85 cursor-pointer">
-                <QrCode className="text-xl text-slate-950"/>
-                <p className="text-xs">Generar QR</p>
-            </div> */}
         </div>
         <div className="grid grid-cols-2 gap-4 my-4">
             <SimpleInput 
@@ -369,9 +382,11 @@ const LibroForm = ({ libro, tipoLibros, createLibro, updateLibro }: Props) => {
             domicilioFiscal={domicilioFiscal}
             setRazonSocial={setRazonSocial}
             setDomicilioFiscal={setDomicilioFiscal}
+            codeCliente={codeCliente}
             setCodeCliente={setCodeCliente}
             setDocumentError={setDocumentError}
             setUbigeo={setUbigeo}
+            onClienteCreated={handleClienteCreated}
         />
         <p className="w-full border-b-1 border-slate-300 my-4 pb-2 text-md font-semibold text-center">Datos del Libro</p>
         <div className="w-full flex justify-center items-center gap-4 col-span-2">
